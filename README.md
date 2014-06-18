@@ -2,7 +2,9 @@
 
 ## Overview
 
-Add analytics to your Java programs and data pipelines with the [Snowplow] [snowplow] event tracker for [Java] [java].
+Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Java] [java]** (Android support is coming soon).
+
+With this tracker you can collect event data from your Java-based desktop and server apps, servlets and games.
 
 ## Current Build
 
@@ -40,7 +42,7 @@ Dont have the collector configured? [See Snowplow setup][setup]
 
 ## Copyright and license
 
-The Snowplow Java Tracker is copyright 2013 Snowplow Analytics Ltd.
+The Snowplow Java Tracker is copyright 2014 Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0] [license]** (the "License");
 you may not use this software except in compliance with the License.
