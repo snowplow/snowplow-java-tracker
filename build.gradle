@@ -1,0 +1,43 @@
+/*
+ * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
+
+// Applying the java plugin to add support for Java
+apply plugin: 'java'
+
+// Where to find the dependencies of our project
+repositories {
+    // Use 'maven central' for resolving our dependencies
+    mavenCentral()
+}
+
+version = '0.1.0'
+
+// Dependencies for our production and test code
+dependencies {
+
+    // Apache Commons
+    compile 'commons-codec:commons-codec:1.2'
+    compile 'commons-net:commons-net:3.3'
+
+    // Apache HTTP
+    compile 'org.apache.httpcomponents:httpclient:4.3.3'
+
+    // JSON, TODO replace this, https://github.com/snowplow/snowplow-java-tracker/issues/14
+    compile 'org.json:json:20140107'
+
+    // SLF4J logging API, TODO use this, https://github.com/snowplow/snowplow-java-tracker/issues/15
+    compile 'org.slf4j:slf4j-api:1.7.5'
+
+    // Test, TODO use this, https://github.com/snowplow/snowplow-java-tracker/issues/5
+    testCompile 'junit:junit:4.11'
+}
