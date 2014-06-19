@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplow.javaplow;
+package com.snowplowanalytics.snowplow.tracker;
 
 import org.json.JSONObject;
 
@@ -61,7 +61,7 @@ public interface PayloadMap {
 
     /**
      * Add the standard name-value-pairs, snowplow depends on them.
-     * @see com.snowplow.javaplow.TrackerC
+     * @see com.snowplowanalytics.snowplow.tracker.TrackerC
      * @param p Platform
      * @param tv Tracker Version
      * @param tna Namespace

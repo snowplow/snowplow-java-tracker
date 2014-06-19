@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplow.javaplow;
+package com.snowplowanalytics.snowplow.tracker;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;

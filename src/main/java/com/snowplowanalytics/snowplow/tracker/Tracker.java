@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplow.javaplow;
+package com.snowplowanalytics.snowplow.tracker;
 
 import org.json.JSONException;
 
@@ -25,7 +25,7 @@ import java.util.Map;
  * The tracker interface contains all usable tracking commands that are implemented
  *  in the TrackerC class.
  *  {@inheritDoc}
- * @see com.snowplow.javaplow.TrackerC
+ * @see com.snowplowanalytics.snowplow.tracker.TrackerC
  * @version 0.1.0
  * @author Kevin Gleason
  */

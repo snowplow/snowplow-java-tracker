@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplow.javaplow;
+package com.snowplowanalytics.snowplow.tracker;
 
 /**
  * The version class is used for documentation purposes.
@@ -25,18 +25,18 @@ public class Version {
     static final String VERSION = "0.1.0";
 }
 /**
- * JavaPlow com.snowplow.javaplow.Tracker
+ * JavaPlow com.snowplowanalytics.snowplow.tracker.Tracker
 
     Instructions to Use:
 
-     Instantiate a com.snowplow.javaplow.PayloadMap and a com.snowplow.javaplow.Tracker:
-      com.snowplow.javaplow.PayloadMap pd = new com.snowplow.javaplow.PayloadMapC();
-      com.snowplow.javaplow.Tracker t1 = new com.snowplow.javaplow.TrackerC("collector_uri","namespace");
+     Instantiate a com.snowplowanalytics.snowplow.tracker.PayloadMap and a com.snowplowanalytics.snowplow.tracker.Tracker:
+      com.snowplowanalytics.snowplow.tracker.PayloadMap pd = new com.snowplowanalytics.snowplow.tracker.PayloadMapC();
+      com.snowplowanalytics.snowplow.tracker.Tracker t1 = new com.snowplowanalytics.snowplow.tracker.TrackerC("collector_uri","namespace");
 
      Configure payload if needed:
       pd.add_json("{'Movie':'Shawshank Redemption', 'Time':'100 Minutes' }");
 
-     Attach the payload to the com.snowplow.javaplow.Tracker:
+     Attach the payload to the com.snowplowanalytics.snowplow.tracker.Tracker:
       t1.setPayload(pd);
 
      Configure the payload as you must:

@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplow.javaplow;
+package com.snowplowanalytics.snowplow.tracker;
 
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
@@ -40,7 +40,7 @@ import java.util.*;
  *
  *  <p><b>To use:</b></p>
  *  <ul>
- *      <li>Import the com.snowplow.javaplow package</li>
+ *      <li>Import the com.snowplowanalytics.snowplow.tracker package</li>
  *      <li>You must first declare a payload and a tracker</li>
  *      <li>Tracker will instantiate with a good-for-tracking payload</li>
  *      <li>(recommended) Build the payload identity with TrackerC set functions (e.g setUser(String user))</li>
@@ -417,7 +417,7 @@ public class TrackerC implements Tracker {
         setStandardNV();
     }
 
-    //Only called once when the Payload class is attacked to the com.snowplow.javaplow.Tracker
+    //Only called once when the Payload class is attacked to the com.snowplowanalytics.snowplow.tracker.Tracker
     private void setStandardNV(){
         this.payload = this.payload.add_standard_nv_pairs(DEFAULT_PLATFORM, VERSION, this.namespace, this.app_id);
     }
@@ -507,7 +507,7 @@ public class TrackerC implements Tracker {
     //Test case main function
     public static void main(String[] args) throws URISyntaxException, IOException, ClientProtocolException, JSONException {
         ///// GENERICS
-        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net", "com.snowplow.javaplow.Tracker Test", "JavaPlow", "com.saggezza", true, true);
+        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net", "com.snowplowanalytics.snowplow.tracker.Tracker Test", "JavaPlow", "com.saggezza", true, true);
 //        t1.track();
         t1.setUserID("User1");
         t1.setLanguage("ital");

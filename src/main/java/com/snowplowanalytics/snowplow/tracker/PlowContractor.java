@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplow.javaplow;
+package com.snowplowanalytics.snowplow.tracker;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -124,7 +124,7 @@ public class PlowContractor<T> {
     /**
      * Is Supported Platform
      * Currently snowplow only supports a few platforms.
-     * @see com.snowplow.javaplow.TrackerC
+     * @see com.snowplowanalytics.snowplow.tracker.TrackerC
      */
     public static final Function<String> is_supported_platform = new Function<String>(){
         public boolean functionCheck(String input){
