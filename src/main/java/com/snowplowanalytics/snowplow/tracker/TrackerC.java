@@ -507,6 +507,7 @@ public class TrackerC implements Tracker {
     public PayloadMap getPayload(){ return this.payload; }
 
     //Test case main function
+    // TODO: move this into tests, see https://github.com/snowplow/snowplow-java-tracker/issues/5
     public static void main(String[] args) throws URISyntaxException, IOException, ClientProtocolException, JSONException {
         ///// GENERICS
         Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net", "com.snowplowanalytics.snowplow.tracker.Tracker Test", "JavaPlow", "com.saggezza", true, true);
