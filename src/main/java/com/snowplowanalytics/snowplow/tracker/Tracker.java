@@ -10,15 +10,16 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-
 package com.snowplowanalytics.snowplow.tracker;
 
-import org.json.JSONException;
-
+// Java
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+
+// JSON
+import org.json.JSONException;
 
 /**
  * Tracker Interface
@@ -29,7 +30,6 @@ import java.util.Map;
  * @version 0.1.0
  * @author Kevin Gleason
  */
-
 public interface Tracker {
     /**
      * The basic track command. All other track functions eventually call this.

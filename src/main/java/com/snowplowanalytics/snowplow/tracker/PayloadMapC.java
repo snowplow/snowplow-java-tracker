@@ -10,17 +10,20 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-
 package com.snowplowanalytics.snowplow.tracker;
 
-import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
-
+// Java
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Random;
 import java.util.Set;
+
+// Apache Commons
+import org.apache.commons.codec.binary.Base64;
+
+// JSON
+import org.json.JSONObject;
 
 /**
  * PayloadMapC implements the PayloadMap interface
@@ -30,7 +33,6 @@ import java.util.Set;
  * @version 0.1.0
  * @author Kevin Gleason
  */
-
 public class PayloadMapC implements PayloadMap{
     private LinkedHashMap<String,String> parameters;
     private LinkedHashMap<String,Boolean> configurations;

@@ -10,14 +10,15 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-
 package com.snowplowanalytics.snowplow.tracker;
 
-import org.json.JSONObject;
-
+// Java
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Set;
+
+// JSON
+import org.json.JSONObject;
 
 /**
  * PayloadMap interface
@@ -27,9 +28,7 @@ import java.util.Set;
  * @version 0.1.0
  * @author Kevin Gleason
  */
-
-//Immutable structure -- Payload will always be a string.
-
+// Immutable structure -- Payload will always be a string.
 public interface PayloadMap {
     /**
      * Add a basic parameter.
