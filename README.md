@@ -38,9 +38,9 @@ limitations under the License.
 [roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[techdocs]: https://github.com/snowplow/snowplow/wiki/Snowplow-technical-documentation
-[setup]: https://github.com/snowplow/snowplow/wiki/Setting-up-Snowplow
-[roadmap]: https://github.com/snowplow/snowplow/wiki
-[contributing]: https://github.com/snowplow/snowplow/wiki/Contributing
+[techdocs]: https://github.com/snowplow/snowplow/wiki/Java-Tracker
+[setup]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Setup
+[roadmap]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Roadmap
+[contributing]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Contributing
 
 [license]: http://www.apache.org/licenses/LICENSE-2.0
