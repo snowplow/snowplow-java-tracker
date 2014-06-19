@@ -13,6 +13,8 @@
 
 // Applying the java plugin to add support for Java
 apply plugin: 'java'
+// As per http://www.gradle.org/docs/current/userguide/publishing_maven.html
+apply plugin: 'maven-publish'
 
 // Where to find the dependencies of our project
 repositories {
@@ -20,6 +22,7 @@ repositories {
     mavenCentral()
 }
 
+group = 'com.snowplowanalytics'
 version = '0.1.0'
 
 // Dependencies for our production and test code
@@ -40,4 +43,18 @@ dependencies {
 
     // JUnit, TODO use this, https://github.com/snowplow/snowplow-java-tracker/issues/5
     testCompile 'junit:junit:4.11'
+}
+
+// Publishing
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "$buildDir/repo" // change to point to your repo, e.g. http://my.org/repo
+        }
+    }
 }
