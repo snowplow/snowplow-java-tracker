@@ -45,11 +45,19 @@ dependencies {
     testCompile 'junit:junit:4.11'
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
 // Publishing
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
         }
     }
     repositories {
