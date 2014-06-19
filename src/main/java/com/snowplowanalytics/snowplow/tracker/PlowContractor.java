@@ -163,6 +163,7 @@ public class PlowContractor<T> {
         }
     };
 
+    // TODO: move this into tests, see https://github.com/snowplow/snowplow-java-tracker/issues/5
     public static void main(String[] args){
         //Test cases - contracts enables or disables all contracts
         boolean contracts = false;

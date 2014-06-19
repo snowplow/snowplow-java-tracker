@@ -342,7 +342,7 @@ public class PayloadMapC implements PayloadMap{
                 "\nConfigurations: " + this.configurations.toString();
     }
 
-    //Test function
+    // TODO: move this into tests, see https://github.com/snowplow/snowplow-java-tracker/issues/5
     public static void main(String[] args){
         PayloadMap pl = new PayloadMapC();
         LinkedHashMap<String,String> configurations = new LinkedHashMap<String, String>();
