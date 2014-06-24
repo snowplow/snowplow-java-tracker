@@ -21,8 +21,6 @@ import java.util.*;
 
 // Apache HTTP
 import org.apache.http.Header;
-import org.apache.http.HeaderIterator;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -135,7 +133,7 @@ public class TrackerC implements Tracker {
      * @throws JSONException
      * @throws IOException
      */
-    public void track_page_view(String page_url, String page_title, String referrer, String context)
+    public void trackPageView(String page_url, String page_title, String referrer, String context)
             throws URISyntaxException, JSONException, IOException{
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, page_url);
         if (context != null && !context.equals("")) {
@@ -161,8 +159,8 @@ public class TrackerC implements Tracker {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public void track_struct_event(String category, String action, String label, String property,
-                                   int value, String vendor, String context)
+    public void trackStructEvent(String category, String action, String label, String property,
+                                 int value, String vendor, String context)
             throws JSONException, URISyntaxException, IOException {
         String valueStr = String.valueOf(value);
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, category);
@@ -188,7 +186,7 @@ public class TrackerC implements Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void track_unstruct_event(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
+    public void trackUnstructEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
             throws JSONException, IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, eventVendor);
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, eventName);
@@ -213,7 +211,7 @@ public class TrackerC implements Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void track_unstruct_event(String eventVendor, String eventName, String dictInfo, String context)
+    public void trackUnstructEvent(String eventVendor, String eventName, String dictInfo, String context)
             throws JSONException, IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, eventVendor);
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, eventName);
@@ -239,14 +237,14 @@ public class TrackerC implements Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void track_screen_view(String name, String id, String context)
+    public void trackScreenView(String name, String id, String context)
             throws JSONException, IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, name);
         Map<String, Object> screenViewProperties = new LinkedHashMap<String, Object>();
         screenViewProperties.put("Name", name); // or String screenVie... = "{'name': '"+ name + "'}"
         if (id != null)
             this.payload.add("id", id);
-        this.track_unstruct_event(DEFAULT_VENDOR, "screen_view", screenViewProperties, context);
+        this.trackUnstructEvent(DEFAULT_VENDOR, "screen_view", screenViewProperties, context);
     }
 
     /**
@@ -264,8 +262,8 @@ public class TrackerC implements Tracker {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public void track_ecommerce_transaction_item(String order_id, String sku, Double price, Integer quantity,
-            String name, String category, String currency, String context, String transaction_id)
+    public void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity,
+                                              String name, String category, String currency, String context, String transaction_id)
             throws JSONException, URISyntaxException, IOException {
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, order_id);
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, sku);
@@ -298,8 +296,8 @@ public class TrackerC implements Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void track_ecommerce_transaction(String order_id, Double total_value, String affiliation, Double tax_value,
-            Double shipping, String city, String state, String country, String currency, List<Map<String,String>> items, String context)
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
+                                          Double shipping, String city, String state, String country, String currency, List<Map<String, String>> items, String context)
             throws JSONException, IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, order_id);
         //Track ecommerce event.
@@ -315,7 +313,7 @@ public class TrackerC implements Tracker {
         }
         this.track();
         for (Map<String,String> item : items){
-            this.track_ecommerce_transaction_item(order_id, mapCheck(item, "sku"), dParseCatch(mapCheck(item, "price")),
+            this.trackEcommerceTransactionItem(order_id, mapCheck(item, "sku"), dParseCatch(mapCheck(item, "price")),
                     iParseCatch(mapCheck(item, "quantity")), mapCheck(item, "name"), mapCheck(item, "category"), mapCheck(item, "currency"), null,
                     this.payload.getParam("tid"));
         }
@@ -506,38 +504,4 @@ public class TrackerC implements Tracker {
      */
     public PayloadMap getPayload(){ return this.payload; }
 
-    //Test case main function
-    // TODO: move this into tests, see https://github.com/snowplow/snowplow-java-tracker/issues/5
-    public static void main(String[] args) throws URISyntaxException, IOException, ClientProtocolException, JSONException {
-        ///// GENERICS
-        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net", "com.snowplowanalytics.snowplow.tracker.Tracker Test", "JavaPlow", "com.saggezza", true, true);
-//        t1.track();
-        t1.setUserID("User1");
-        t1.setLanguage("ital");
-        t1.setPlatform("mob");
-        t1.setScreenResolution(760, 610);
-        String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
-
-        ///// E COMMERCE TEST
-        Map<String,String> items = new HashMap<String, String>();
-        items.put("sku", "SKUVAL"); items.put("quantity","2"); items.put("price","19.99");
-        List<Map<String,String>> lst = new LinkedList<Map<String, String>>();
-        lst.add(items);
-        TrackerC.debug=true;
-
-        /////TRACK TEST
-        for (int i = 0; i < 2; i++) {
-            t1.track();
-            try { Thread.sleep(2000); }
-            catch (InterruptedException e){}
-            System.out.println("Loop " + i);
-            Map<String, Object> dict = new LinkedHashMap<String, Object>();
-            dict.put("Iteration", i);
-            t1.track_unstruct_event("Lube Insights", "Data Loop", dict, context);
-            t1.track_struct_event("Items", "Stuff", "Pants", "Green Blue", 3, DEFAULT_VENDOR, context);
-            t1.track_page_view("www.saggezza.com", "Saggezza Home", "KG", null);
-            t1.track_ecommerce_transaction_item("IT1023", "SKUVAL", 29.99, 2, "boots", "Shoes","USD",null,null);
-            t1.track_ecommerce_transaction("OID", 19.99, "Kohls", 2.50, 1.99, "Chagrin", "OH", "USA", "USD", lst, context);
-        }
-    }
 }

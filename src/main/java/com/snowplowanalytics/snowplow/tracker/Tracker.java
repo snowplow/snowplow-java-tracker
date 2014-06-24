@@ -51,7 +51,7 @@ public interface Tracker {
      * @throws JSONException
      * @throws IOException
      */
-    public void track_page_view(String page_url, String page_title, String referrer, String context)
+    public void trackPageView(String page_url, String page_title, String referrer, String context)
             throws IOException, URISyntaxException, JSONException;
 
     /**
@@ -67,8 +67,8 @@ public interface Tracker {
      * @throws URISyntaxException If there is an issue with the tracking call.
      * @throws IOException If there is an issue with processing the HTTP GET
      */
-    public void track_struct_event(String category, String action, String label, String property,
-            int value, String vendor, String context) throws JSONException, URISyntaxException, IOException;
+    public void trackStructEvent(String category, String action, String label, String property,
+                                 int value, String vendor, String context) throws JSONException, URISyntaxException, IOException;
 
     /**
      * Track an unstructured event.
@@ -80,7 +80,7 @@ public interface Tracker {
      * @throws IOException If there is an issue with the tracking call.
      * @throws URISyntaxException If there is an issue with processing the HTTP GET
      */
-    public void track_unstruct_event(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
+    public void trackUnstructEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
             throws JSONException, IOException, URISyntaxException;
 
     /**
@@ -93,7 +93,7 @@ public interface Tracker {
      * @throws IOException If there is an issue with the tracking call.
      * @throws URISyntaxException If there is an issue with processing the HTTP GET
      */
-    public void track_unstruct_event(String eventVendor, String eventName, String dictInfo, String context)
+    public void trackUnstructEvent(String eventVendor, String eventName, String dictInfo, String context)
             throws JSONException, IOException, URISyntaxException;
 
     /**
@@ -105,7 +105,7 @@ public interface Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void track_screen_view(String name, String id, String context)
+    public void trackScreenView(String name, String id, String context)
             throws JSONException, IOException, URISyntaxException;
 
     /**
@@ -124,8 +124,8 @@ public interface Tracker {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public void track_ecommerce_transaction_item(String order_id, String sku, Double price, Integer quantity, String name,
-            String category, String currency, String context, String transaction_id)throws JSONException, URISyntaxException, IOException;
+    public void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity, String name,
+                                              String category, String currency, String context, String transaction_id)throws JSONException, URISyntaxException, IOException;
     /**
      * Track an Ecommerce Transaction
      * Option to provide a Map of only strings of items in the transaction which can be used
@@ -145,8 +145,8 @@ public interface Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void track_ecommerce_transaction(String order_id, Double total_value, String affiliation, Double tax_value,
-            Double shipping, String city, String state, String country, String currency, List<Map<String, String>> items, String context)
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
+                                          Double shipping, String city, String state, String country, String currency, List<Map<String, String>> items, String context)
             throws JSONException, IOException, URISyntaxException;
 
 
