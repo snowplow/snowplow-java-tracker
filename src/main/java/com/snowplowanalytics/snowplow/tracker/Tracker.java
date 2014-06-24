@@ -158,8 +158,8 @@ public interface Tracker {
      * @param stringContractor A contractory of type String
      * @param dictionaryContractor A Contractor of type Map with key value of String, Object
      */
-    public void setContractors(PlowContractor<Integer> integerContractor, PlowContractor<String> stringContractor,
-            PlowContractor<Map<String, Object>> dictionaryContractor);
+    public void setContractors(ContractManager<Integer> integerContractor, ContractManager<String> stringContractor,
+            ContractManager<Map<String, Object>> dictionaryContractor);
 
     /**
      * Used to add custom parameter. Be careful with use, must abide by snowplow table standards.

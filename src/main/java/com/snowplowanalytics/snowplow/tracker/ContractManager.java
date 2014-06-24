@@ -31,7 +31,7 @@ import java.util.Map;
  * @author Kevin Gleason
  */
 
-public class PlowContractor<T> {
+public class ContractManager<T> {
     //Class variables
     private static final String[] SUPPORTED_PLATFORMS = {"pc", "tv", "mob", "cnsl", "iot"};
 

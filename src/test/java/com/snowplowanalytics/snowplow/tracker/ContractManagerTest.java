@@ -8,7 +8,7 @@ import java.util.Date;
 
 import static org.junit.Assert.*;
 
-public class PlowContractorTest extends TestCase {
+public class ContractManagerTest extends TestCase {
 
 
 //    // TODO: move this into tests, see https://github.com/snowplow/snowplow-java-tracker/issues/5
