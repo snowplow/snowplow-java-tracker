@@ -240,8 +240,6 @@ public class PayloadMapC implements PayloadMap{
     public PayloadMap trackUnstructEventConfig(String eventVendor, String eventName, JSONObject dictInfo,
                                                JSONObject context) throws UnsupportedEncodingException{
         this.parameters.put("e","ue");
-        this.parameters.put("ue_na", eventName);
-        this.parameters.put("evn", eventVendor);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
         tmp = tmp.addUnstruct(dictInfo, this.configurations.get("encode_base64"));
         if (context==null)

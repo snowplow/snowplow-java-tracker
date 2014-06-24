@@ -187,8 +187,6 @@ public class TrackerC implements Tracker {
      */
     public void trackUnstructEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
             throws JSONException, IOException, URISyntaxException{
-        assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, eventVendor);
-        assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, eventName);
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_dict, dictInfo.toString());
         JSONObject jsonDict = mapToJSON(dictInfo); //Make compatible for Map<String, Object>
         if (context != null && !context.equals("")) {
@@ -212,8 +210,6 @@ public class TrackerC implements Tracker {
      */
     public void trackUnstructEvent(String eventVendor, String eventName, String dictInfo, String context)
             throws JSONException, IOException, URISyntaxException{
-        assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, eventVendor);
-        assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, eventName);
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_dict, dictInfo.toString());
         JSONObject jsonDict = stringToJSON(dictInfo); //Make compatible for Map<String, Object>
         if (context != null && !context.equals("")) {
