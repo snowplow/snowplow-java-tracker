@@ -19,7 +19,7 @@ public class TrackerCTest extends TestCase {
 //        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
 //                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", "com.snowplow", true, true);
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", "com.snowplow", true, true);
+                                  "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -27,15 +27,15 @@ public class TrackerCTest extends TestCase {
         String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
 
         t1.trackEcommerceTransactionItem("IT1023", "SKUVAL",
-                29.99, 2, "boots",
-                "Shoes", "USD",
-                null, context);
+                                         29.99, 2, "boots",
+                                         "Shoes", "USD",
+                                         null, context);
     }
 
     @Test
     public void testTrackEcommerceTransactionItem2() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", "com.snowplow", true, true);
+                                  "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -43,15 +43,15 @@ public class TrackerCTest extends TestCase {
         String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
 
         t1.trackEcommerceTransactionItem("IT1023", "SKUVAL",
-                29.99, 2, "boots",
-                "Shoes", "USD",
-                null, null);
+                                         29.99, 2, "boots",
+                                         "Shoes", "USD",
+                                         null, null);
     }
 
     @Test
     public void testTrackEcommerceTransaction() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", "com.snowplow", true, true);
+                                  "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -64,16 +64,16 @@ public class TrackerCTest extends TestCase {
         lst.add(items);
 
         t1.trackEcommerceTransaction("OID", 19.99,
-                "Kohls", 2.50,
-                1.99, "Chagrin",
-                "OH", "USA",
-                "USD", lst, context);
+                                     "Kohls", 2.50,
+                                     1.99, "Chagrin",
+                                     "OH", "USA",
+                                     "USD", lst, context);
     }
 
     @Test
     public void testTrackUnstructEvent() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", "com.snowplow", true, true);
+                                  "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -89,19 +89,20 @@ public class TrackerCTest extends TestCase {
     @Test
     public void testTrackStructEvent() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", "com.snowplow", true, true);
+                                  "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
         t1.setScreenResolution(760, 610);
         String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
+
         t1.trackStructEvent("Items", "Stuff", "Pants", "Green Blue", 3, "com.snowplow", context);
     }
 
     @Test
     public void testTrackPageView() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", "com.snowplow", true, true);
+                                  "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
