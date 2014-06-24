@@ -54,7 +54,7 @@ public class TrackerCTest extends TestCase {
     }
 
     @Test
-    public void testTrack_ecommerce_transaction_item() throws Exception {
+    public void testTrackEcommerceTransactionItem() throws Exception {
 //        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net", "com.snowplowanalytics.snowplow.tracker", "JavaPlow", "com.snowplow", true, true);
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker", "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
@@ -66,7 +66,7 @@ public class TrackerCTest extends TestCase {
     }
 
     @Test
-    public void testTrack_ecommerce_transaction_item2() throws Exception {
+    public void testTrackEcommerceTransactionItem2() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker", "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
@@ -77,7 +77,7 @@ public class TrackerCTest extends TestCase {
     }
 
     @Test
-    public void testTrack_ecommerce_transaction() throws Exception {
+    public void testTrackEcommerceTransaction() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker", "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
@@ -85,7 +85,6 @@ public class TrackerCTest extends TestCase {
         t1.setScreenResolution(760, 610);
         String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
 
-        // TODO: This bit needs to be changed to accept a list of ecomm transaction items
         Map<String,String> items = new HashMap<String, String>();
         items.put("sku", "SKUVAL"); items.put("quantity","2"); items.put("price","19.99");
         List<Map<String,String>> lst = new LinkedList<Map<String, String>>();
@@ -95,7 +94,7 @@ public class TrackerCTest extends TestCase {
     }
 
     @Test
-    public void testTrack_unstruct_event() throws Exception {
+    public void testTrackUnstructEvent() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker", "JavaPlow", "com.snowplow", true, true);
         t1.setUserID("User1");
         t1.setLanguage("ital");

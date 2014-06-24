@@ -64,7 +64,7 @@ public class TrackerC implements Tracker {
     //Static Class variables
     private static final String VERSION = Version.VERSION;
     private static final String DEFAULT_PLATFORM = "pc";
-    public static final String DEFAULT_VENDOR = "com.saggezza";
+    public static final String DEFAULT_VENDOR = "com.snowplow";
 
     //DEBUG
     public static boolean debug = false;
