@@ -21,7 +21,6 @@ import java.util.*;
 
 // Apache HTTP
 import org.apache.http.Header;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -138,10 +137,10 @@ public class TrackerC implements Tracker {
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, page_url);
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.track_page_view_config(page_url, page_title, referrer, jsonContext);
+            this.payload = this.payload.trackPageViewConfig(page_url, page_title, referrer, jsonContext);
         }
         else {
-            this.payload = this.payload.track_page_view_config(page_url, page_title, referrer, null);
+            this.payload = this.payload.trackPageViewConfig(page_url, page_title, referrer, null);
         }
         this.track();
     }
@@ -167,10 +166,10 @@ public class TrackerC implements Tracker {
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, valueStr);
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.track_struct_event_config(category, action, label, property, valueStr,
+            this.payload = this.payload.trackStructEventConfig(category, action, label, property, valueStr,
                     jsonContext);
         } else {
-            this.payload = this.payload.track_struct_event_config(category, action, label, property, valueStr,
+            this.payload = this.payload.trackStructEventConfig(category, action, label, property, valueStr,
                     null);
         }
         this.track();
@@ -194,9 +193,9 @@ public class TrackerC implements Tracker {
         JSONObject jsonDict = mapToJSON(dictInfo); //Make compatible for Map<String, Object>
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.track_unstruct_event_config(eventVendor, eventName, jsonDict, jsonContext);
+            this.payload = this.payload.trackUnstructEventConfig(eventVendor, eventName, jsonDict, jsonContext);
         } else {
-            this.payload = this.payload.track_unstruct_event_config(eventVendor, eventName, jsonDict, null);
+            this.payload = this.payload.trackUnstructEventConfig(eventVendor, eventName, jsonDict, null);
         }
         this.track();
     }
@@ -219,9 +218,9 @@ public class TrackerC implements Tracker {
         JSONObject jsonDict = stringToJSON(dictInfo); //Make compatible for Map<String, Object>
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.track_unstruct_event_config(eventVendor, eventName, jsonDict, jsonContext);
+            this.payload = this.payload.trackUnstructEventConfig(eventVendor, eventName, jsonDict, jsonContext);
         } else {
-            this.payload = this.payload.track_unstruct_event_config(eventVendor, eventName, jsonDict, null);
+            this.payload = this.payload.trackUnstructEventConfig(eventVendor, eventName, jsonDict, null);
         }
         this.track();
     }
@@ -269,10 +268,10 @@ public class TrackerC implements Tracker {
         assert this.stringContractor.checkContract(this.contracts, PlowContractor.non_empty_string, sku);
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.track_ecommerce_transaction_item_config(order_id, sku, doubleCheck(price),
+            this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
                     integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), jsonContext, null);
         } else {
-            this.payload = this.payload.track_ecommerce_transaction_item_config(order_id, sku, doubleCheck(price),
+            this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
                     integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), null, null);
         }
         this.track();
@@ -303,11 +302,11 @@ public class TrackerC implements Tracker {
         //Track ecommerce event.
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.track_ecommerce_transaction_config(order_id, doubleCheck(total_value), stringCheck(affiliation),
+            this.payload = this.payload.trackEcommerceTransactionConfig(order_id, doubleCheck(total_value), stringCheck(affiliation),
                     doubleCheck(tax_value), doubleCheck(shipping), stringCheck(city), stringCheck(state), stringCheck(country),
                     stringCheck(currency), jsonContext);
         } else {
-            this.payload = this.payload.track_ecommerce_transaction_config(order_id, doubleCheck(total_value), stringCheck(affiliation),
+            this.payload = this.payload.trackEcommerceTransactionConfig(order_id, doubleCheck(total_value), stringCheck(affiliation),
                     doubleCheck(tax_value), doubleCheck(shipping), stringCheck(city), stringCheck(state), stringCheck(country),
                     stringCheck(currency), null);
         }
@@ -413,13 +412,13 @@ public class TrackerC implements Tracker {
 
     private void setPayload(PayloadMap payload){
         this.payload=payload;
-        this.payload = this.payload.add_config("encode_base64", this.base64_encode);
+        this.payload = this.payload.addConfig("encode_base64", this.base64_encode);
         setStandardNV();
     }
 
     //Only called once when the Payload class is attacked to the com.snowplowanalytics.snowplow.tracker.Tracker
     private void setStandardNV(){
-        this.payload = this.payload.add_standard_nv_pairs(DEFAULT_PLATFORM, VERSION, this.namespace, this.app_id);
+        this.payload = this.payload.addStandardNvPairs(DEFAULT_PLATFORM, VERSION, this.namespace, this.app_id);
     }
 
     /**

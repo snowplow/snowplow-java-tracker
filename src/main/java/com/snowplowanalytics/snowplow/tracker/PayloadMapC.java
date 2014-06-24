@@ -88,7 +88,7 @@ public class PayloadMapC implements PayloadMap{
      *  Map is then used to build "Associative array for getter function.
      *  Some use Base64 encoding
      */
-    private String base64encode(String string) throws UnsupportedEncodingException{
+    private String base64Encode(String string) throws UnsupportedEncodingException{
         Base64 b64 = new Base64(true);
         String safe_str = b64.encodeBase64String(string.getBytes(Charset.forName("US-ASCII")));
         return safe_str;
@@ -112,14 +112,14 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap add_unstruct(JSONObject dictInfo, boolean encode_base64)
+    public PayloadMap addUnstruct(JSONObject dictInfo, boolean encode_base64)
             throws UnsupportedEncodingException{
         //Encode parameter
         if (dictInfo == null)
             return this;  //Catch this in contractor
         String json = dictInfo.toString();
         if (encode_base64) {
-            json = base64encode(json);
+            json = base64Encode(json);
             this.parameters.put("ue_px", json);
         }
         else
@@ -134,14 +134,14 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap add_json(JSONObject jsonObject, boolean encode_base64)
+    public PayloadMap addJson(JSONObject jsonObject, boolean encode_base64)
         throws UnsupportedEncodingException{
         //Encode parameter
         if (jsonObject == null)  ///CATCH IF JSON LEFT NULL
             return this;         ///need to figure out purpose of JSON
         String json = jsonObject.toString();
         if (encode_base64) {
-            json = base64encode(json);
+            json = base64Encode(json);
             this.parameters.put("cx", json);
         }
         else
@@ -157,7 +157,7 @@ public class PayloadMapC implements PayloadMap{
      * @param aid App_id
      * @return
      */
-    public PayloadMap add_standard_nv_pairs(String p, String tv, String tna, String aid){
+    public PayloadMap addStandardNvPairs(String p, String tv, String tna, String aid){
         this.parameters.put("p",p);
         this.parameters.put("tv",tv);
         this.parameters.put("tna",tna);
@@ -171,7 +171,7 @@ public class PayloadMapC implements PayloadMap{
      * @param config Value of the configuration
      * @return
      */
-    public PayloadMap add_config(String config_title, boolean config){
+    public PayloadMap addConfig(String config_title, boolean config){
         this.configurations.put(config_title, config);
         return new PayloadMapC(this.parameters, this.configurations);
     }
@@ -186,8 +186,8 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap track_page_view_config(String page_url, String page_title, String referrer,
-             JSONObject context) throws UnsupportedEncodingException{
+    public PayloadMap trackPageViewConfig(String page_url, String page_title, String referrer,
+                                          JSONObject context) throws UnsupportedEncodingException{
         this.parameters.put("e", "pv");
         this.parameters.put("url", page_url);
         this.parameters.put("page", page_title);
@@ -196,7 +196,7 @@ public class PayloadMapC implements PayloadMap{
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.add_json(context, this.configurations.get("encode_base64"));
+        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
         return tmp;
     }
 
@@ -211,8 +211,8 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap track_struct_event_config(String category, String action, String label, String property,
-            String value, JSONObject context)
+    public PayloadMap trackStructEventConfig(String category, String action, String label, String property,
+                                             String value, JSONObject context)
             throws UnsupportedEncodingException{
         this.parameters.put("e","se");
         this.parameters.put("se_ca", category);
@@ -224,7 +224,7 @@ public class PayloadMapC implements PayloadMap{
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.add_json(context, this.configurations.get("encode_base64"));
+        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
         return tmp;
     }
 
@@ -237,16 +237,16 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap track_unstruct_event_config(String eventVendor, String eventName, JSONObject dictInfo,
-                                                  JSONObject context) throws UnsupportedEncodingException{
+    public PayloadMap trackUnstructEventConfig(String eventVendor, String eventName, JSONObject dictInfo,
+                                               JSONObject context) throws UnsupportedEncodingException{
         this.parameters.put("e","ue");
         this.parameters.put("ue_na", eventName);
         this.parameters.put("evn", eventVendor);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.add_unstruct(dictInfo, this.configurations.get("encode_base64"));
+        tmp = tmp.addUnstruct(dictInfo, this.configurations.get("encode_base64"));
         if (context==null)
             return tmp;
-        tmp = tmp.add_json(context, this.configurations.get("encode_base64"));
+        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
         return tmp;
     }
 
@@ -264,8 +264,11 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap track_ecommerce_transaction_item_config(String order_id, String sku, String price, String quantity,
-            String name, String category, String currency, JSONObject context, String transaction_id)
+    public PayloadMap trackEcommerceTransactionItemConfig(String order_id, String sku,
+                                                          String price, String quantity,
+                                                          String name, String category,
+                                                          String currency, JSONObject context,
+                                                          String transaction_id)
             throws UnsupportedEncodingException{
         this.parameters.put("e","ti");
         this.parameters.put("tid", (transaction_id==null) ? String.valueOf(makeTransactionID()) : transaction_id);
@@ -280,7 +283,7 @@ public class PayloadMapC implements PayloadMap{
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.add_json(context, this.configurations.get("encode_base64"));
+        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
         return tmp;
     }
 
@@ -299,8 +302,11 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap track_ecommerce_transaction_config(String order_id, String total_value, String affiliation, String tax_value,
-            String shipping, String city, String state, String country, String currency, JSONObject context)
+    public PayloadMap trackEcommerceTransactionConfig(String order_id, String total_value,
+                                                      String affiliation, String tax_value,
+                                                      String shipping, String city,
+                                                      String state, String country,
+                                                      String currency, JSONObject context)
             throws UnsupportedEncodingException{
         this.setTransactionID();
         this.parameters.put("e", "tr");
@@ -317,7 +323,7 @@ public class PayloadMapC implements PayloadMap{
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.add_json(context, this.configurations.get("encode_base64"));
+        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
         return tmp;
     }
 
