@@ -346,19 +346,4 @@ public class PayloadMapC implements PayloadMap{
                 "\nConfigurations: " + this.configurations.toString();
     }
 
-    // TODO: move this into tests, see https://github.com/snowplow/snowplow-java-tracker/issues/5
-    public static void main(String[] args){
-        PayloadMap pl = new PayloadMapC();
-        LinkedHashMap<String,String> configurations = new LinkedHashMap<String, String>();
-
-        System.out.println(pl.toString());
-        LinkedHashMap<String, String> params = pl.getParams();
-        Set<String> paramsSet = pl.getParams().keySet();
-        for(String s : paramsSet){
-            System.out.println(s + ":" + params.get(s));
-        }
-
-        System.out.println(configurations.toString().length());
-        System.out.println(configurations.toString().equals("{}"));
-    }
 }
