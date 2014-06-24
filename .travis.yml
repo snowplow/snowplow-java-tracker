@@ -1,0 +1,8 @@
+language: java
+
+gradle check
+gradle assemble
+
+jdk:
+ - oraclejdk7
+ - openjdk6
