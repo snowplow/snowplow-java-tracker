@@ -76,8 +76,7 @@ public class TrackerC implements Tracker {
     private ContractManager<Map<String, Object>> dictionaryContractor = new ContractManager<Map<String, Object>>();
     private String collector_uri,
                    namespace,
-                   app_id,
-                   context_vendor;
+                   app_id;
     private boolean base64_encode,
                     contracts;
 
@@ -86,18 +85,17 @@ public class TrackerC implements Tracker {
     public TrackerC(String collector_uri, String namespace) {
         this.collector_uri = (collector_uri);
         this.namespace = namespace;
-        this.app_id = this.context_vendor = "";
+        this.app_id = "";
         this.base64_encode = this.contracts = true;
         this.setPayload(new PayloadMapC());
     }
 
     //Constructor with all arguments
     public TrackerC(String collector_uri, String namespace, String app_id,
-                    String context_vendor, boolean base64_encode, boolean contracts) {
+                    boolean base64_encode, boolean contracts) {
         this.collector_uri = (collector_uri);
         this.namespace = namespace;
         this.app_id = app_id;
-        this.context_vendor = context_vendor;
         this.base64_encode = base64_encode;
         this.contracts = contracts;
         this.setPayload(new PayloadMapC());
