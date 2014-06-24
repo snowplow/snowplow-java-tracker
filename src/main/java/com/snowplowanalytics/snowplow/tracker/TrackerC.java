@@ -80,16 +80,6 @@ public class TrackerC implements Tracker {
     private boolean base64_encode,
                     contracts;
 
-
-    //Base Constructor
-    public TrackerC(String collector_uri, String namespace) {
-        this.collector_uri = (collector_uri);
-        this.namespace = namespace;
-        this.app_id = "";
-        this.base64_encode = this.contracts = true;
-        this.setPayload(new PayloadMapC());
-    }
-
     //Constructor with all arguments
     public TrackerC(String collector_uri, String namespace, String app_id,
                     boolean base64_encode, boolean contracts) {
