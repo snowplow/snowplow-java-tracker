@@ -232,10 +232,11 @@ public class TrackerC implements Tracker {
     }
 
     /**
-     * {@inheritDoc}
+     * Track and ecommerce transaction item. Not usually called alone, but called for each
+     * individual item of the ecommerce transaction function.
      * @param order_id ID of the item.
      * @param sku SKU value of the item.
-     * @param price Price of the item.
+     * @param price Prive of the item.
      * @param quantity Quantity of the item.
      * @param name Name of the item.
      * @param category Category of the item.
@@ -246,7 +247,7 @@ public class TrackerC implements Tracker {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity,
+    private void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity,
                                               String name, String category, String currency, String context, String transaction_id)
             throws JSONException, URISyntaxException, IOException {
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, order_id);
