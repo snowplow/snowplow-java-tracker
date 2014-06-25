@@ -1,5 +1,7 @@
 # Java Analytics for Snowplow
 
+[ ![Build Status] [travis-image] ] [travis]
+
 ## Overview
 
 Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Java] [java]** (Android support is coming soon).
@@ -42,5 +44,8 @@ limitations under the License.
 [setup]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Setup
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Contributing
+
+[travis]: https://travis-ci.org/snowplow/snowplow-java-tracker
+[travis-image]: https://travis-ci.org/snowplow/snowplow-java-tracker.svg?branch=develop
 
 [license]: http://www.apache.org/licenses/LICENSE-2.0
