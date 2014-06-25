@@ -75,7 +75,6 @@ public class TrackerC implements Tracker {
     private PayloadMap payload = new PayloadMapC();
     private ContractManager<String> stringContractor = new ContractManager<String>();
     private ContractManager<Integer> integerContractor = new ContractManager<Integer>();
-    private ContractManager<Map<String, Object>> dictionaryContractor = new ContractManager<Map<String, Object>>();
     private String collector_uri,
                    namespace,
                    app_id;
@@ -148,18 +147,18 @@ public class TrackerC implements Tracker {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public void trackStructEvent(String category, String action, String label, String property,
-                                 int value, String vendor, String context)
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, String vendor, String context)
             throws JSONException, URISyntaxException, IOException {
         String valueStr = String.valueOf(value);
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, category);
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, valueStr);
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.trackStructEventConfig(category, action, label, property, valueStr,
+            this.payload = this.payload.trackStructuredEventConfig(category, action, label, property, valueStr,
                     jsonContext);
         } else {
-            this.payload = this.payload.trackStructEventConfig(category, action, label, property, valueStr,
+            this.payload = this.payload.trackStructuredEventConfig(category, action, label, property, valueStr,
                     null);
         }
         this.track();
@@ -175,15 +174,15 @@ public class TrackerC implements Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void trackUnstructEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
+    public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
             throws JSONException, IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_dict, dictInfo.toString());
         JSONObject jsonDict = mapToJSON(dictInfo); //Make compatible for Map<String, Object>
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.trackUnstructEventConfig(eventVendor, eventName, jsonDict, jsonContext);
+            this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, jsonContext);
         } else {
-            this.payload = this.payload.trackUnstructEventConfig(eventVendor, eventName, jsonDict, null);
+            this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, null);
         }
         this.track();
     }
@@ -198,15 +197,15 @@ public class TrackerC implements Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void trackUnstructEvent(String eventVendor, String eventName, String dictInfo, String context)
+    public void trackUnstructuredEvent(String eventVendor, String eventName, String dictInfo, String context)
             throws JSONException, IOException, URISyntaxException{
-        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_dict, dictInfo.toString());
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_dict, dictInfo);
         JSONObject jsonDict = stringToJSON(dictInfo); //Make compatible for Map<String, Object>
         if (context != null && !context.equals("")) {
             JSONObject jsonContext = stringToJSON(context);
-            this.payload = this.payload.trackUnstructEventConfig(eventVendor, eventName, jsonDict, jsonContext);
+            this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, jsonContext);
         } else {
-            this.payload = this.payload.trackUnstructEventConfig(eventVendor, eventName, jsonDict, null);
+            this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, null);
         }
         this.track();
     }
@@ -229,14 +228,14 @@ public class TrackerC implements Tracker {
         screenViewProperties.put("Name", name); // or String screenVie... = "{'name': '"+ name + "'}"
         if (id != null)
             this.payload.add("id", id);
-        this.trackUnstructEvent(DEFAULT_VENDOR, "screen_view", screenViewProperties, context);
+        this.trackUnstructuredEvent(DEFAULT_VENDOR, "screen_view", screenViewProperties, context);
     }
 
     /**
      * {@inheritDoc}
      * @param order_id ID of the item.
      * @param sku SKU value of the item.
-     * @param price Prive of the item.
+     * @param price Price of the item.
      * @param quantity Quantity of the item.
      * @param name Name of the item.
      * @param category Category of the item.
@@ -393,7 +392,6 @@ public class TrackerC implements Tracker {
                                ContractManager<Map<String,Object>> dictionaryContractor){
         this.integerContractor=integerContractor;
         this.stringContractor=stringContractor;
-        this.dictionaryContractor=dictionaryContractor;
     }
 
     private void setPayload(PayloadMap payload){

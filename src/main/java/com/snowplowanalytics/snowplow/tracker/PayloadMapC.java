@@ -62,9 +62,7 @@ public class PayloadMapC implements PayloadMap{
      *   Left void/mutable since they take place on instantiation.
      */
     public void setTransactionID(){
-        Random r = new Random(); //NEED ID RANGE
-        int tid = r.nextInt(999999-100000+1) + 100000;
-        this.parameters.put("tid", String.valueOf(tid));
+        this.parameters.put("tid", makeTransactionID());
     }
 
     //GUID
@@ -88,9 +86,7 @@ public class PayloadMapC implements PayloadMap{
      *  Some use Base64 encoding
      */
     private String base64Encode(String string) throws UnsupportedEncodingException{
-        Base64 b64 = new Base64(true);
-        String safe_str = b64.encodeBase64String(string.getBytes(Charset.forName("US-ASCII")));
-        return safe_str;
+        return Base64.encodeBase64URLSafeString(string.getBytes(Charset.forName("US-ASCII")));
     }
 
     /**
@@ -111,7 +107,7 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap addUnstruct(JSONObject dictInfo, boolean encode_base64)
+    public PayloadMap addUnstructured(JSONObject dictInfo, boolean encode_base64)
             throws UnsupportedEncodingException{
         //Encode parameter
         if (dictInfo == null)
@@ -195,8 +191,7 @@ public class PayloadMapC implements PayloadMap{
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
-        return tmp;
+        return tmp.addJson(context, this.configurations.get("encode_base64"));
     }
 
     /**
@@ -210,8 +205,8 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap trackStructEventConfig(String category, String action, String label, String property,
-                                             String value, JSONObject context)
+    public PayloadMap trackStructuredEventConfig(String category, String action, String label, String property,
+                                                 String value, JSONObject context)
             throws UnsupportedEncodingException{
         this.parameters.put("e","se");
         this.parameters.put("se_ca", category);
@@ -223,8 +218,7 @@ public class PayloadMapC implements PayloadMap{
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
-        return tmp;
+        return tmp.addJson(context, this.configurations.get("encode_base64"));
     }
 
     /**
@@ -236,22 +230,21 @@ public class PayloadMapC implements PayloadMap{
      * @return
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap trackUnstructEventConfig(String eventVendor, String eventName, JSONObject dictInfo,
-                                               JSONObject context) throws UnsupportedEncodingException{
+    public PayloadMap trackUnstructuredEventConfig(String eventVendor, String eventName, JSONObject dictInfo,
+                                                   JSONObject context) throws UnsupportedEncodingException{
         this.parameters.put("e","ue");
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.addUnstruct(dictInfo, this.configurations.get("encode_base64"));
+        tmp = tmp.addUnstructured(dictInfo, this.configurations.get("encode_base64"));
         if (context==null)
             return tmp;
-        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
-        return tmp;
+        return tmp.addJson(context, this.configurations.get("encode_base64"));
     }
 
     /**
      * {@inheritDoc}
      * @param order_id ID of the item.
      * @param sku SKU value of the item.
-     * @param price Prive of the item.
+     * @param price Price of the item.
      * @param quantity Quantity of the item.
      * @param name Name of the item.
      * @param category Category of the item.
@@ -280,8 +273,7 @@ public class PayloadMapC implements PayloadMap{
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
-        return tmp;
+        return tmp.addJson(context, this.configurations.get("encode_base64"));
     }
 
     /**
@@ -320,17 +312,16 @@ public class PayloadMapC implements PayloadMap{
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
-        tmp = tmp.addJson(context, this.configurations.get("encode_base64"));
-        return tmp;
+        return tmp.addJson(context, this.configurations.get("encode_base64"));
     }
 
     /* Getter functions.
      *  Can be used to get key sets of parameters and configurations
      *  Also used to get the linked hash maps of the parameters and configurations
     */
-    public Set getParamKeySet(){ return this.parameters.keySet(); }
+    public Set<String> getParamKeySet(){ return this.parameters.keySet(); }
 
-    public Set getConfigKeySet(){ return this.configurations.keySet(); }
+    public Set<String> getConfigKeySet(){ return this.configurations.keySet(); }
 
     public String getParam(String key){ return this.parameters.get(key); }
 

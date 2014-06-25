@@ -67,8 +67,8 @@ public interface Tracker {
      * @throws URISyntaxException If there is an issue with the tracking call.
      * @throws IOException If there is an issue with processing the HTTP GET
      */
-    public void trackStructEvent(String category, String action, String label, String property,
-                                 int value, String vendor, String context) throws JSONException, URISyntaxException, IOException;
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, String vendor, String context) throws JSONException, URISyntaxException, IOException;
 
     /**
      * Track an unstructured event.
@@ -80,7 +80,7 @@ public interface Tracker {
      * @throws IOException If there is an issue with the tracking call.
      * @throws URISyntaxException If there is an issue with processing the HTTP GET
      */
-    public void trackUnstructEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
+    public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
             throws JSONException, IOException, URISyntaxException;
 
     /**
@@ -93,7 +93,7 @@ public interface Tracker {
      * @throws IOException If there is an issue with the tracking call.
      * @throws URISyntaxException If there is an issue with processing the HTTP GET
      */
-    public void trackUnstructEvent(String eventVendor, String eventName, String dictInfo, String context)
+    public void trackUnstructuredEvent(String eventVendor, String eventName, String dictInfo, String context)
             throws JSONException, IOException, URISyntaxException;
 
     /**

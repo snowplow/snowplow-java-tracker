@@ -45,7 +45,7 @@ public interface PayloadMap {
      * @return Returns a new PayloadMap with the key-value-pair
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap addUnstruct(JSONObject dictInfo, boolean encode_base64)
+    public PayloadMap addUnstructured(JSONObject dictInfo, boolean encode_base64)
             throws UnsupportedEncodingException;
 
     /**
@@ -100,8 +100,8 @@ public interface PayloadMap {
      * @return Returns a new PayloadMap with the key-value-pairs
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap trackStructEventConfig(String category, String action, String label, String property,
-                                             String value, JSONObject context)throws UnsupportedEncodingException;
+    public PayloadMap trackStructuredEventConfig(String category, String action, String label, String property,
+                                                 String value, JSONObject context)throws UnsupportedEncodingException;
 
     /**
      * Configuration to track an unstructured event.
@@ -111,8 +111,8 @@ public interface PayloadMap {
      * @param context Additional JSON context for the tracking call (optional)
      * @throws UnsupportedEncodingException If JSON is in improper formatting
      */
-    public PayloadMap trackUnstructEventConfig(String eventVendor, String eventName, JSONObject dictInfo,
-                                               JSONObject context) throws UnsupportedEncodingException;
+    public PayloadMap trackUnstructuredEventConfig(String eventVendor, String eventName, JSONObject dictInfo,
+                                                   JSONObject context) throws UnsupportedEncodingException;
     /**
      * Configuration to track an ecommerce transaction item. Not usually called alone, but called for each
      * individual item of the ecommerce transaction function.
@@ -160,8 +160,8 @@ public interface PayloadMap {
     public PayloadMap setTimestamp();
 
     //Getters
-    public Set getParamKeySet();
-    public Set getConfigKeySet();
+    public Set<String> getParamKeySet();
+    public Set<String> getConfigKeySet();
     public LinkedHashMap<String,String> getParams();
     public LinkedHashMap<String,Boolean> getConfigs();
     public String getParam(String key);

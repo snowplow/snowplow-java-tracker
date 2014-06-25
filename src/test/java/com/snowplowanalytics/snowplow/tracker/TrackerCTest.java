@@ -81,7 +81,7 @@ public class TrackerCTest extends TestCase {
         Map<String, Object> dict = new LinkedHashMap<String, Object>();
         dict.put("Iteration", 1);
 
-        t1.trackUnstructEvent("Lube Insights", "Data Loop", dict, context);
+        t1.trackUnstructuredEvent("Lube Insights", "Data Loop", dict, context);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class TrackerCTest extends TestCase {
         t1.setScreenResolution(760, 610);
         String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
 
-        t1.trackStructEvent("Items", "Stuff", "Pants", "Green Blue", 3, "com.snowplow", context);
+        t1.trackStructuredEvent("Items", "Stuff", "Pants", "Green Blue", 3, "com.snowplow", context);
     }
 
     @Test
