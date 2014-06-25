@@ -13,7 +13,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
