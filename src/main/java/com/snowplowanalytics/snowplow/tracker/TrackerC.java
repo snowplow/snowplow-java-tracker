@@ -30,8 +30,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 // JSON
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.codehaus.jackson.JsonNode;
 
 /**
  *  <p>TrackerC is the implementing class for the Tracker interface.</p>
@@ -118,14 +117,13 @@ public class TrackerC implements Tracker {
      * @param referrer The one who referred you to the page (optional)
      * @param context Additional JSON context for the tracking call (optional)
      * @throws URISyntaxException
-     * @throws JSONException
      * @throws IOException
      */
     public void trackPageView(String page_url, String page_title, String referrer, String context)
-            throws URISyntaxException, JSONException, IOException{
+            throws URISyntaxException, IOException{
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, page_url);
         if (context != null && !context.equals("")) {
-            JSONObject jsonContext = stringToJSON(context);
+            JsonNode jsonContext = stringToJSON(context);
             this.payload = this.payload.trackPageViewConfig(page_url, page_title, referrer, jsonContext);
         }
         else {
@@ -143,18 +141,17 @@ public class TrackerC implements Tracker {
      * @param value The value associated with the property being tracked.
      * @param vendor The vendor the the property being tracked. (optional)
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException
      * @throws URISyntaxException
      * @throws IOException
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
                                      int value, String vendor, String context)
-            throws JSONException, URISyntaxException, IOException {
+            throws URISyntaxException, IOException {
         String valueStr = String.valueOf(value);
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, category);
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, valueStr);
         if (context != null && !context.equals("")) {
-            JSONObject jsonContext = stringToJSON(context);
+            JsonNode jsonContext = stringToJSON(context);
             this.payload = this.payload.trackStructuredEventConfig(category, action, label, property, valueStr,
                     jsonContext);
         } else {
@@ -170,16 +167,15 @@ public class TrackerC implements Tracker {
      * @param eventName A name for the unstructured event being tracked.
      * @param dictInfo The unstructured information being tracked in dictionary form.
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException
      * @throws IOException
      * @throws URISyntaxException
      */
     public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
-            throws JSONException, IOException, URISyntaxException{
+            throws IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_dict, dictInfo.toString());
-        JSONObject jsonDict = mapToJSON(dictInfo); //Make compatible for Map<String, Object>
+        JsonNode jsonDict = mapToJSON(dictInfo); //Make compatible for Map<String, Object>
         if (context != null && !context.equals("")) {
-            JSONObject jsonContext = stringToJSON(context);
+            JsonNode jsonContext = stringToJSON(context);
             this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, jsonContext);
         } else {
             this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, null);
@@ -193,16 +189,15 @@ public class TrackerC implements Tracker {
      * @param eventName A name for the unstructured event being tracked.
      * @param dictInfo The unstructured information being tracked in dictionary form.
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException
      * @throws IOException
      * @throws URISyntaxException
      */
     public void trackUnstructuredEvent(String eventVendor, String eventName, String dictInfo, String context)
-            throws JSONException, IOException, URISyntaxException{
+            throws IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_dict, dictInfo);
-        JSONObject jsonDict = stringToJSON(dictInfo); //Make compatible for Map<String, Object>
+        JsonNode jsonDict = stringToJSON(dictInfo); //Make compatible for Map<String, Object>
         if (context != null && !context.equals("")) {
-            JSONObject jsonContext = stringToJSON(context);
+            JsonNode jsonContext = stringToJSON(context);
             this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, jsonContext);
         } else {
             this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, null);
@@ -217,12 +212,11 @@ public class TrackerC implements Tracker {
      * @param name The name of the screen view being tracked
      * @param id The ID of the screen view being tracked.
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException
      * @throws IOException
      * @throws URISyntaxException
      */
     public void trackScreenView(String name, String id, String context)
-            throws JSONException, IOException, URISyntaxException{
+            throws IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, name);
         Map<String, Object> screenViewProperties = new LinkedHashMap<String, Object>();
         screenViewProperties.put("Name", name); // or String screenVie... = "{'name': '"+ name + "'}"
@@ -243,17 +237,16 @@ public class TrackerC implements Tracker {
      * @param currency Currency used for the purchase.
      * @param context Additional JSON context for the tracking call (optional)
      * @param transaction_id Transaction ID, if left blank new value will be generated.
-     * @throws JSONException
      * @throws URISyntaxException
      * @throws IOException
      */
     private void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity,
                                               String name, String category, String currency, String context, String transaction_id)
-            throws JSONException, URISyntaxException, IOException {
+            throws URISyntaxException, IOException {
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, order_id);
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, sku);
         if (context != null && !context.equals("")) {
-            JSONObject jsonContext = stringToJSON(context);
+            JsonNode jsonContext = stringToJSON(context);
             this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
                     integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), jsonContext, null);
         } else {
@@ -276,18 +269,17 @@ public class TrackerC implements Tracker {
      * @param currency The currency used for the purchase
      * @param items A list containing a Map of Strings. Each item must have order ID, sku, price, and quantity.
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException
      * @throws UnsupportedEncodingException
      * @throws IOException
      * @throws URISyntaxException
      */
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
                                           Double shipping, String city, String state, String country, String currency, List<Map<String, String>> items, String context)
-            throws JSONException, IOException, URISyntaxException{
+            throws IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, order_id);
         //Track ecommerce event.
         if (context != null && !context.equals("")) {
-            JSONObject jsonContext = stringToJSON(context);
+            JsonNode jsonContext = stringToJSON(context);
             this.payload = this.payload.trackEcommerceTransactionConfig(order_id, doubleCheck(total_value), stringCheck(affiliation),
                     doubleCheck(tax_value), doubleCheck(shipping), stringCheck(city), stringCheck(state), stringCheck(country),
                     stringCheck(currency), jsonContext);
@@ -366,11 +358,12 @@ public class TrackerC implements Tracker {
         }
     }
 
-    //Turn String input into JSONObject
-    private JSONObject stringToJSON(String jsonStr) throws JSONException{
-        return new JSONObject(jsonStr);
+    //Turn String input into JsonNode
+    private JsonNode stringToJSON(String jsonStr) {
+        return Util.stringToJsonNode(jsonStr);
     }
-    private JSONObject mapToJSON(Map<String, Object> oMap) { return new JSONObject(oMap); }
+
+    private JsonNode mapToJSON(Map<String, Object> oMap) { return Util.mapToJsonNode(oMap); }
 
     //Clear Payload for next iterations
     private void clearPayload() {

@@ -18,7 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 // JSON
-import org.json.JSONObject;
+import org.codehaus.jackson.JsonNode;
 
 /**
  * PayloadMap interface
@@ -45,7 +45,7 @@ public interface PayloadMap {
      * @return Returns a new PayloadMap with the key-value-pair
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap addUnstructured(JSONObject dictInfo, boolean encode_base64)
+    public PayloadMap addUnstructured(JsonNode dictInfo, boolean encode_base64)
             throws UnsupportedEncodingException;
 
     /**
@@ -55,7 +55,7 @@ public interface PayloadMap {
      * @return Returns a new PayloadMap with the key-value-pair
      * @throws UnsupportedEncodingException
      */
-    public PayloadMap addJson(JSONObject jsonObject, boolean encode_base64)
+    public PayloadMap addJson(JsonNode jsonObject, boolean encode_base64)
             throws UnsupportedEncodingException;
 
     /**
@@ -87,7 +87,7 @@ public interface PayloadMap {
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackPageViewConfig(String page_url, String page_title, String referrer,
-                                          JSONObject context) throws UnsupportedEncodingException;
+                                          JsonNode context) throws UnsupportedEncodingException;
 
     /**
      * Configuration for tracking a structured event
@@ -101,7 +101,7 @@ public interface PayloadMap {
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackStructuredEventConfig(String category, String action, String label, String property,
-                                                 String value, JSONObject context)throws UnsupportedEncodingException;
+                                                 String value, JsonNode context)throws UnsupportedEncodingException;
 
     /**
      * Configuration to track an unstructured event.
@@ -111,8 +111,8 @@ public interface PayloadMap {
      * @param context Additional JSON context for the tracking call (optional)
      * @throws UnsupportedEncodingException If JSON is in improper formatting
      */
-    public PayloadMap trackUnstructuredEventConfig(String eventVendor, String eventName, JSONObject dictInfo,
-                                                   JSONObject context) throws UnsupportedEncodingException;
+    public PayloadMap trackUnstructuredEventConfig(String eventVendor, String eventName, JsonNode dictInfo,
+                                                   JsonNode context) throws UnsupportedEncodingException;
     /**
      * Configuration to track an ecommerce transaction item. Not usually called alone, but called for each
      * individual item of the ecommerce transaction function.
@@ -129,7 +129,7 @@ public interface PayloadMap {
      * @return Returns a new PayloadMap with the key-value-pairs
      */
     public PayloadMap trackEcommerceTransactionItemConfig(String order_id, String sku, String price, String quantity,
-                                                          String name, String category, String currency, JSONObject context, String transaction_id)
+                                                          String name, String category, String currency, JsonNode context, String transaction_id)
             throws UnsupportedEncodingException;
 
     /**
@@ -150,7 +150,7 @@ public interface PayloadMap {
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackEcommerceTransactionConfig(String order_id, String total_value, String affiliation, String tax_value,
-                                                      String shipping, String city, String state, String country, String currency, JSONObject context)
+                                                      String shipping, String city, String state, String country, String currency, JsonNode context)
             throws UnsupportedEncodingException;
 
     /**
