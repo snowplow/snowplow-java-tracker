@@ -25,7 +25,7 @@ import org.codehaus.jackson.JsonNode;
  *  The PayloadMap is used to store all the parameters and configurations that are used
  *  to send data via the HTTP GET request.
  * PayloadMaps have an immutable structure for secure and accurate transfers of information.
- * @version 0.1.0
+ * @version 0.2.0
  * @author Kevin Gleason
  */
 // Immutable structure -- Payload will always be a string.

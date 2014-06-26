@@ -57,7 +57,7 @@ import org.codehaus.jackson.JsonNode;
  *      sending logs to your S3 bucket, put `TrackerC.track = false` in your code.</li>
  *    <li>Default values are `TrackerC.debug = false` and `TrackerC.track = true`</li>
  *  </ul>
- *  @version 0.1.0
+ *  @version 0.2.0
  *  @author Kevin Gleason
  */
 public class TrackerC implements Tracker {
