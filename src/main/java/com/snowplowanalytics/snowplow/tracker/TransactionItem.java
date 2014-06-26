@@ -20,9 +20,29 @@ import java.util.HashMap;
 
 public class TransactionItem extends HashMap {
     public TransactionItem (String order_id, String sku,
-                            String price, String quantity,
+                            double price, int quantity,
                             String name, String category,
                             String currency, JsonNode context) throws UnsupportedEncodingException {
+        put(Parameter.EVENT, "ti");
+        put(Parameter.ITEM_ID, order_id);
+        put(Parameter.ITEM_SKU, sku);
+        put(Parameter.ITEM_NAME, name);
+        put(Parameter.ITEM_CATEGORY, category);
+        put(Parameter.ITEM_PRICE, price);
+        put(Parameter.ITEM_QUANTITY, quantity);
+        put(Parameter.ITEM_CURRENCY, currency);
 
+        put(Parameter.CONTEXT, context);
+
+        put(Parameter.TID, Util.getTransactionId());
+        put(Parameter.TIMESTAMP, Util.getTimestamp());
+    }
+
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    @Override
+    public Object put(Object key, Object value) {
+        if (value != null || value != "") return super.put(key, value);
+        else
+            return null;
     }
 }

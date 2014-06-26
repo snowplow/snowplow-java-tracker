@@ -18,6 +18,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Random;
 
 public class Util {
     private static ObjectMapper sObjectMapper = new ObjectMapper();
@@ -36,5 +37,14 @@ public class Util {
 
     public static JsonNode mapToJsonNode(Map map) {
         return defaultMapper().valueToTree(map);
+    }
+
+    public static int getTransactionId() {
+        Random r = new Random(); //NEED ID RANGE
+        return r.nextInt(999999-100000+1) + 100000;
+    }
+
+    public static long getTimestamp() {
+        return System.currentTimeMillis();
     }
 }

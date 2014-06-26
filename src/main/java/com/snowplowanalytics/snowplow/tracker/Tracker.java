@@ -128,7 +128,7 @@ public interface Tracker {
      * @throws URISyntaxException
      */
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
-                                          Double shipping, String city, String state, String country, String currency, List<Map<String, String>> items, String context)
+                                          Double shipping, String city, String state, String country, String currency, List<TransactionItem> items, String context)
             throws JSONException, IOException, URISyntaxException;
 
 

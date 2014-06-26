@@ -239,7 +239,7 @@ public class TrackerC implements Tracker {
      * @throws IOException
      */
     private void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity,
-                                              String name, String category, String currency, String context, String transaction_id)
+                                              String name, String category, String currency, String context, long transaction_id)
             throws URISyntaxException, IOException {
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, order_id);
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, sku);
@@ -272,7 +272,7 @@ public class TrackerC implements Tracker {
      * @throws URISyntaxException
      */
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
-                                          Double shipping, String city, String state, String country, String currency, List<Map<String, String>> items, String context)
+                                          Double shipping, String city, String state, String country, String currency, List<TransactionItem> items, String context)
             throws IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, order_id);
         //Track ecommerce event.
@@ -287,10 +287,16 @@ public class TrackerC implements Tracker {
                     stringCheck(currency), null);
         }
         this.track();
-        for (Map<String,String> item : items){
-            this.trackEcommerceTransactionItem(order_id, mapCheck(item, "sku"), dParseCatch(mapCheck(item, "price")),
-                    iParseCatch(mapCheck(item, "quantity")), mapCheck(item, "name"), mapCheck(item, "category"), mapCheck(item, "currency"), null,
-                    this.payload.getParam("tid"));
+        for (TransactionItem item : items){
+            this.trackEcommerceTransactionItem((String) item.get(Parameter.ITEM_ID),
+                    (String) item.get(Parameter.ITEM_SKU),
+                    (Double) item.get(Parameter.ITEM_PRICE),
+                    (Integer) item.get(Parameter.ITEM_QUANTITY),
+                    (String) item.get(Parameter.ITEM_NAME),
+                    (String) item.get(Parameter.ITEM_CATEGORY),
+                    (String) item.get(Parameter.ITEM_CURRENCY),
+                    null,
+                    (Long) item.get(Parameter.TIMESTAMP));
         }
     }
 

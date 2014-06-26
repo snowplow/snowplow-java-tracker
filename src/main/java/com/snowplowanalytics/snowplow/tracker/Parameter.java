@@ -14,10 +14,20 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 public class Parameter {
-    public static final String E = "e";
+    public static final String EVENT = "e";
     public static final String TID = "tid";
     public static final String EID = "eid";
+    public static final String TIMESTAMP = "dtm";
 
     public static final String UID = "uid";
+    public static final String CONTEXT = "co";
+
+    public static final String ITEM_ID = "ti_id";
+    public static final String ITEM_SKU = "ti_sk";
+    public static final String ITEM_NAME = "ti_nm";
+    public static final String ITEM_CATEGORY = "ti_ca";
+    public static final String ITEM_PRICE = "ti_pr";
+    public static final String ITEM_QUANTITY = "ti_qu";
+    public static final String ITEM_CURRENCY = "ti_cu";
     //TODO: Finish when time permits
 }
