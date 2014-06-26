@@ -13,8 +13,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
-import com.sun.tools.internal.jxc.apt.Const;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
