@@ -16,7 +16,7 @@ package com.snowplowanalytics.snowplow.tracker;
 public class LinkedHashMap<K,V> extends java.util.LinkedHashMap<K, V> {
     @Override
     public V put(K key, V value) {
-        if(value != null)
+        if(value != null && value != "")
             return super.put(key, value);
         else
             return null;
