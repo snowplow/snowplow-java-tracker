@@ -13,6 +13,8 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
+import com.sun.tools.internal.jxc.apt.Const;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -63,8 +65,6 @@ import org.codehaus.jackson.JsonNode;
 public class TrackerC implements Tracker {
     //Static Class variables
     private static final String VERSION = Version.VERSION;
-    private static final String DEFAULT_PLATFORM = "pc";
-    public static final String DEFAULT_VENDOR = "com.snowplow";
 
     //DEBUG
     public static boolean debug = false;
@@ -222,7 +222,7 @@ public class TrackerC implements Tracker {
         screenViewProperties.put("Name", name); // or String screenVie... = "{'name': '"+ name + "'}"
         if (id != null)
             this.payload.add("id", id);
-        this.trackUnstructuredEvent(DEFAULT_VENDOR, "screen_view", screenViewProperties, context);
+        this.trackUnstructuredEvent(Constants.DEFAULT_VENDOR, "screen_view", screenViewProperties, context);
     }
 
     /**
@@ -396,7 +396,7 @@ public class TrackerC implements Tracker {
 
     //Only called once when the Payload class is attacked to the com.snowplowanalytics.snowplow.tracker.Tracker
     private void setStandardNV(){
-        this.payload = this.payload.addStandardNvPairs(DEFAULT_PLATFORM, VERSION, this.namespace, this.app_id);
+        this.payload = this.payload.addStandardNvPairs(Constants.DEFAULT_PLATFORM, VERSION, this.namespace, this.app_id);
     }
 
     /**
