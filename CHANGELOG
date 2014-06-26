@@ -11,7 +11,7 @@ Make sure null fields are left off from querystring (#21)
 Remove Tracker base constructor (#23)
 TODO Add tests for track_ecommerce_transaction and _transaction_item (#25)
 Make track_ecommerce_transaction_item private (#29)
-TODO Change transaction_items to use a Class, not a Map (#31)
+Change transaction_items to use a Class, not a Map (#31)
 Remove event_name and event_vendor from trackUnstructEvent (#32)
 Remove context_vendor from Tracker constructor (#36)
 
