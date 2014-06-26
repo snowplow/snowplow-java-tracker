@@ -193,7 +193,7 @@ public class PayloadMapC implements PayloadMap{
         this.parameters.put("url", page_url);
         this.parameters.put("page", page_title);
         this.parameters.put("refr", referrer);
-        this.parameters.put("evn", TrackerC.DEFAULT_VENDOR);
+        this.parameters.put("evn", Constants.DEFAULT_VENDOR);
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
@@ -220,7 +220,7 @@ public class PayloadMapC implements PayloadMap{
         this.parameters.put("se_la", label);
         this.parameters.put("se_pr", property);
         this.parameters.put("se_va", value);
-        this.parameters.put("evn", TrackerC.DEFAULT_VENDOR);
+        this.parameters.put("evn", Constants.DEFAULT_VENDOR);
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
@@ -275,7 +275,7 @@ public class PayloadMapC implements PayloadMap{
         this.parameters.put("ti_pr", String.valueOf(price));
         this.parameters.put("ti_qu", String.valueOf(quantity));
         this.parameters.put("ti_cu", currency);
-        this.parameters.put("evn", TrackerC.DEFAULT_VENDOR);
+        this.parameters.put("evn", Constants.DEFAULT_VENDOR);
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
@@ -314,7 +314,7 @@ public class PayloadMapC implements PayloadMap{
         this.parameters.put("tr_st", state);
         this.parameters.put("tr_co", country);
         this.parameters.put("tr_cu", currency);
-        this.parameters.put("evn", TrackerC.DEFAULT_VENDOR);
+        this.parameters.put("evn", Constants.DEFAULT_VENDOR);
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
