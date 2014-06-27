@@ -1,7 +1,7 @@
 Version 0.2.0 (2014-xx-xx)
 --------------------------
-TODO Write Technical Documentation in snowplow/snowplow wiki (#1)
-TODO Publish 0.2.0 to Maven (#3)
+Write Technical Documentation in snowplow/snowplow wiki (#1)
+Publish 0.2.0 to Maven (#3)
 Move all 3 main()s into unit tests (#5)
 Add Travis support to README (#9)
 Replace org.JSON code with latest Jackson (#14)
