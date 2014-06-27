@@ -72,20 +72,20 @@ public class TrackerC implements Tracker {
     private PayloadMap payload = new PayloadMapC();
     private ContractManager<String> stringContractor = new ContractManager<String>();
     private ContractManager<Integer> integerContractor = new ContractManager<Integer>();
-    private String collector_uri,
-                   namespace,
-                   app_id;
+    private String collector_uri;
+    private String namespace;
+    private String app_id;
     private boolean base64_encode,
                     contracts;
 
     //Constructor with all arguments
     public TrackerC(String collector_uri, String namespace, String app_id,
-                    boolean base64_encode, boolean contracts) {
-        this.collector_uri = (collector_uri);
+                    boolean base64_encode) {
+        this.collector_uri = collector_uri;
         this.namespace = namespace;
         this.app_id = app_id;
         this.base64_encode = base64_encode;
-        this.contracts = contracts;
+        this.contracts = false;
         this.setPayload(new PayloadMapC());
     }
 

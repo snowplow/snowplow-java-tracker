@@ -15,7 +15,7 @@ public class TrackerCTest extends TestCase {
     @Test
     public void testTrackEcommerceTransaction() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                                  "JavaPlow", true, true);
+                                  "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -36,7 +36,7 @@ public class TrackerCTest extends TestCase {
     @Test
     public void testTrackUnstructEvent() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                                  "JavaPlow", true, true);
+                                  "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -52,7 +52,7 @@ public class TrackerCTest extends TestCase {
     @Test
     public void testTrackStructEvent() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                                  "JavaPlow", true, true);
+                                  "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -65,7 +65,7 @@ public class TrackerCTest extends TestCase {
     @Test
     public void testTrackPageView() throws Exception {
         Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                                  "JavaPlow", true, true);
+                                  "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
