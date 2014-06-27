@@ -238,18 +238,18 @@ public class TrackerC implements Tracker {
      * @throws URISyntaxException
      * @throws IOException
      */
-    private void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity,
-                                              String name, String category, String currency, String context, long transaction_id)
+    protected void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity,
+                                                 String name, String category, String currency, String context, long transaction_id)
             throws URISyntaxException, IOException {
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, order_id);
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, sku);
         if (context != null && !context.equals("")) {
             JsonNode jsonContext = stringToJSON(context);
             this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
-                    integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), jsonContext, null);
+                    integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), jsonContext, Long.toString(transaction_id));
         } else {
             this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
-                    integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), null, null);
+                    integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), null, Long.toString(transaction_id));
         }
         this.track();
     }
