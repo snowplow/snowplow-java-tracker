@@ -14,6 +14,7 @@ Make track_ecommerce_transaction_item private (#29)
 Change transaction_items to use a Class, not a Map (#31)
 Remove event_name and event_vendor from trackUnstructEvent (#32)
 Remove context_vendor from Tracker constructor (#36)
+Create Constant class or equivalent (#33)
 
 Version 0.1.0 (2014-06-19)
 --------------------------
