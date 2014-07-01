@@ -23,7 +23,7 @@ import java.util.Set;
 import org.apache.commons.codec.binary.Base64;
 
 // JSON
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * PayloadMapC implements the PayloadMap interface

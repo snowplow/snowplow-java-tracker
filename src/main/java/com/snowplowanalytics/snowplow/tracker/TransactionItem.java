@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;

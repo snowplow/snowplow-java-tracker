@@ -18,7 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 // JSON
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * PayloadMap interface
