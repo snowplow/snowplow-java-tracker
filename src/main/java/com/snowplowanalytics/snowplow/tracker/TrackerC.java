@@ -383,7 +383,7 @@ public class TrackerC implements Tracker {
     /**
      * {@inheritDoc}
      * @param integerContractor A contractor of type integer.
-     * @param stringContractor A contractory of type String
+     * @param stringContractor A contractor of type String
      * @param dictionaryContractor A Contractor of type Map with key value of String, Object
      */
     public void setContractors(ContractManager<Integer> integerContractor, ContractManager<String> stringContractor,
@@ -436,9 +436,7 @@ public class TrackerC implements Tracker {
      * @param height Height of the screen in pixels.
      */
     public void setScreenResolution(int width, int height){
-        assert this.integerContractor.checkContract(this.contracts, ContractManager.positive_number, height);
-        assert this.integerContractor.checkContract(this.contracts, ContractManager.positive_number, width);
-        this.payload = this.payload.add("res", String.valueOf(width) + "x" + String.valueOf(height));
+        this.payload = this.payload.add("res", String.valueOf(Math.abs(width)) + "x" + String.valueOf(Math.abs(height)));
     }
 
     /**
@@ -447,9 +445,7 @@ public class TrackerC implements Tracker {
      * @param height Height of the viewport in pixels.
      */
     public void setViewport(int width, int height){
-        assert this.integerContractor.checkContract(this.contracts, ContractManager.positive_number, height);
-        assert this.integerContractor.checkContract(this.contracts, ContractManager.positive_number, width);
-        this.payload = this.payload.add("vp", String.valueOf(width) + "x" + String.valueOf(height));
+        this.payload = this.payload.add("vp", String.valueOf(Math.abs(width)) + "x" + String.valueOf(Math.abs(height)));
     }
 
     /**
@@ -457,8 +453,7 @@ public class TrackerC implements Tracker {
      * @param depth Depth of the color.
      */
     public void setColorDepth(int depth){
-        assert this.integerContractor.checkContract(this.contracts, ContractManager.positive_number, depth) || depth==0;
-        this.payload = this.payload.add("cd", String.valueOf(depth));
+        this.payload = this.payload.add("cd", String.valueOf(Math.abs(depth)));
     }
 
     /**
