@@ -10,15 +10,24 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+
 package com.snowplowanalytics.snowplow.tracker;
 
-/**
- * The version class is used for documentation purposes.
- * It follows the python convention of creating a version identity class
- *
- * @version 0.2.0
- * @author Kevin Gleason
- */
-public class Version {
-    static final String VERSION = "0.2.0";
+public class Parameter {
+    public static final String EVENT = "e";
+    public static final String TID = "tid";
+    public static final String EID = "eid";
+    public static final String TIMESTAMP = "dtm";
+
+    public static final String UID = "uid";
+    public static final String CONTEXT = "co";
+
+    public static final String ITEM_ID = "ti_id";
+    public static final String ITEM_SKU = "ti_sk";
+    public static final String ITEM_NAME = "ti_nm";
+    public static final String ITEM_CATEGORY = "ti_ca";
+    public static final String ITEM_PRICE = "ti_pr";
+    public static final String ITEM_QUANTITY = "ti_qu";
+    public static final String ITEM_CURRENCY = "ti_cu";
+    //TODO: Finish when time permits
 }

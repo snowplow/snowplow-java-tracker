@@ -18,16 +18,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
-// JSON
-import org.json.JSONException;
-
 /**
  * Tracker Interface
  * The tracker interface contains all usable tracking commands that are implemented
  *  in the TrackerC class.
  *  {@inheritDoc}
  * @see com.snowplowanalytics.snowplow.tracker.TrackerC
- * @version 0.1.0
+ * @version 0.2.0
  * @author Kevin Gleason
  */
 public interface Tracker {
@@ -48,11 +45,10 @@ public interface Tracker {
      * @param referrer The one who referred you to the page (optional)
      * @param context Additional JSON context for the tracking call (optional)
      * @throws URISyntaxException
-     * @throws JSONException
      * @throws IOException
      */
-    public void track_page_view(String page_url, String page_title, String referrer, String context)
-            throws IOException, URISyntaxException, JSONException;
+    public void trackPageView(String page_url, String page_title, String referrer, String context)
+            throws IOException, URISyntaxException;
 
     /**
      * Track a structured event. Useful for tracking data transfer and other structured transactions.
@@ -63,12 +59,11 @@ public interface Tracker {
      * @param value The value associated with the property being tracked.
      * @param vendor The vendor the the property being tracked. (optional)
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException If JSON is in improper formatting
      * @throws URISyntaxException If there is an issue with the tracking call.
      * @throws IOException If there is an issue with processing the HTTP GET
      */
-    public void track_struct_event(String category, String action, String label, String property,
-            int value, String vendor, String context) throws JSONException, URISyntaxException, IOException;
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, String vendor, String context) throws URISyntaxException, IOException;
 
     /**
      * Track an unstructured event.
@@ -76,12 +71,11 @@ public interface Tracker {
      * @param eventName A name for the unstructured event being tracked.
      * @param dictInfo The unstructured information being tracked in dictionary form.
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException If JSON is in improper formatting
      * @throws IOException If there is an issue with the tracking call.
      * @throws URISyntaxException If there is an issue with processing the HTTP GET
      */
-    public void track_unstruct_event(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
-            throws JSONException, IOException, URISyntaxException;
+    public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
+            throws IOException, URISyntaxException;
 
     /**
      * Track an unstructured event. Allowed to use String or Map<String,Object> as input
@@ -89,43 +83,23 @@ public interface Tracker {
      * @param eventName A name for the unstructured event being tracked.
      * @param dictInfo The unstructured information being tracked in dictionary form.
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException If JSON is in improper formatting
      * @throws IOException If there is an issue with the tracking call.
      * @throws URISyntaxException If there is an issue with processing the HTTP GET
      */
-    public void track_unstruct_event(String eventVendor, String eventName, String dictInfo, String context)
-            throws JSONException, IOException, URISyntaxException;
+    public void trackUnstructuredEvent(String eventVendor, String eventName, String dictInfo, String context)
+            throws IOException, URISyntaxException;
 
     /**
      * Track a screen view
      * @param name The name of the screen view being tracked
      * @param id The ID of the screen view being tracked.
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void track_screen_view(String name, String id, String context)
-            throws JSONException, IOException, URISyntaxException;
+    public void trackScreenView(String name, String id, String context)
+            throws IOException, URISyntaxException;
 
-    /**
-     * Track and ecommerce transaction item. Not usually called alone, but called for each
-     * individual item of the ecommerce transaction function.
-     * @param order_id ID of the item.
-     * @param sku SKU value of the item.
-     * @param price Prive of the item.
-     * @param quantity Quantity of the item.
-     * @param name Name of the item.
-     * @param category Category of the item.
-     * @param currency Currency used for the purchase.
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param transaction_id Transaction ID, if left blank new value will be generated.
-     * @throws JSONException
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public void track_ecommerce_transaction_item(String order_id, String sku, Double price, Integer quantity, String name,
-            String category, String currency, String context, String transaction_id)throws JSONException, URISyntaxException, IOException;
     /**
      * Track an Ecommerce Transaction
      * Option to provide a Map of only strings of items in the transaction which can be used
@@ -141,13 +115,12 @@ public interface Tracker {
      * @param currency The currency used for the purchase
      * @param items A list containing a Map of Strings. Each item must have order ID, sku, price, and quantity.
      * @param context Additional JSON context for the tracking call (optional)
-     * @throws JSONException
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void track_ecommerce_transaction(String order_id, Double total_value, String affiliation, Double tax_value,
-            Double shipping, String city, String state, String country, String currency, List<Map<String, String>> items, String context)
-            throws JSONException, IOException, URISyntaxException;
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
+                                          Double shipping, String city, String state, String country, String currency, List<TransactionItem> items, String context)
+            throws IOException, URISyntaxException;
 
 
     /**
@@ -158,8 +131,8 @@ public interface Tracker {
      * @param stringContractor A contractory of type String
      * @param dictionaryContractor A Contractor of type Map with key value of String, Object
      */
-    public void setContractors(PlowContractor<Integer> integerContractor, PlowContractor<String> stringContractor,
-            PlowContractor<Map<String, Object>> dictionaryContractor);
+    public void setContractors(ContractManager<Integer> integerContractor, ContractManager<String> stringContractor,
+            ContractManager<Map<String, Object>> dictionaryContractor);
 
     /**
      * Used to add custom parameter. Be careful with use, must abide by snowplow table standards.

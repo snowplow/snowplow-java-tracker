@@ -1,3 +1,19 @@
+Version 0.2.0 (2014-07-02)
+--------------------------
+Moved all 3 main()s into unit tests (#5)
+Added Travis support to README (#9)
+Replaced org.JSON code with Jackson 1.9.13 (#14)
+Renamed PlowContractor (#19)
+Camelcased all functions (#20)
+Made sure null fields are left off from querystring (#21)
+Removed Tracker base constructor (#23)
+Added tests for track_ecommerce_transaction and _transaction_item (#25)
+Madke track_ecommerce_transaction_item private (#29)
+Changed transaction_items to use a Class, not a Map (#31)
+Removed event_name and event_vendor from trackUnstructEvent (#32)
+Removed context_vendor from Tracker constructor (#36)
+Created Constant class or equivalent (#33)
+
 Version 0.1.0 (2014-06-19)
 --------------------------
 Initial release, huge thanks @GleasonK!

@@ -35,13 +35,12 @@ dependencies {
     // Apache HTTP
     compile 'org.apache.httpcomponents:httpclient:4.3.3'
 
-    // JSON, TODO replace this, https://github.com/snowplow/snowplow-java-tracker/issues/14
-    compile 'org.json:json:20140107'
-
     // SLF4J logging API, TODO use this, https://github.com/snowplow/snowplow-java-tracker/issues/15
     compile 'org.slf4j:slf4j-api:1.7.5'
 
-    // JUnit, TODO use this, https://github.com/snowplow/snowplow-java-tracker/issues/5
+    // Jackson JSON processor
+    compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
+
     testCompile 'junit:junit:4.11'
 }
 

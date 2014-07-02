@@ -13,7 +13,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,11 +26,11 @@ import java.util.Map;
  *  Contractor to verify preconditions, post conditions and invariants.
  *  Uses data structure to hold custom ID contracts for specific jobs
  *
- * @version 0.1.0
+ * @version 0.2.0
  * @author Kevin Gleason
  */
 
-public class PlowContractor<T> {
+public class ContractManager<T> {
     //Class variables
     private static final String[] SUPPORTED_PLATFORMS = {"pc", "tv", "mob", "cnsl", "iot"};
 
@@ -163,29 +162,4 @@ public class PlowContractor<T> {
         }
     };
 
-    // TODO: move this into tests, see https://github.com/snowplow/snowplow-java-tracker/issues/5
-    public static void main(String[] args){
-        //Test cases - contracts enables or disables all contracts
-        boolean contracts = false;
-        PlowContractor<String> stringContractor = new PlowContractor<String>();
-        PlowContractor<Integer> integerContractor = new PlowContractor<Integer>();
-
-        //Able to make custom contracts like so
-        PlowContractor.Function<String> string_is_long = new PlowContractor.Function<String>() {
-            public boolean functionCheck(String input){
-                return !input.isEmpty() && input.length() > 10;
-            }
-            public String getErrorMsg(){
-                return "String Error - Input cannot be a string under length 10.";
-            }
-        };
-
-        //Check with checkCustomContract
-        stringContractor.customContract("dict", string_is_long);
-        assert stringContractor.checkCustomContract(contracts,"dict","Hello I Am Kevin");
-        assert integerContractor.checkContract(contracts, PlowContractor.positive_number, -10);
-        System.out.println((System.currentTimeMillis()/10));
-        Date date = new Date(System.currentTimeMillis());
-        System.out.println(date.toString());
-    }
 }

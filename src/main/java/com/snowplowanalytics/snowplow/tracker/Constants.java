@@ -10,15 +10,11 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+
 package com.snowplowanalytics.snowplow.tracker;
 
-/**
- * The version class is used for documentation purposes.
- * It follows the python convention of creating a version identity class
- *
- * @version 0.2.0
- * @author Kevin Gleason
- */
-public class Version {
-    static final String VERSION = "0.2.0";
+public class Constants {
+    public static final String DEFAULT_PLATFORM = "pc";
+    public static final String DEFAULT_VENDOR = "com.snowplowanalytics.snowplow";
+
 }
