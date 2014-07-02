@@ -1,4 +1,4 @@
-Version 0.2.0 (2014-0x-xx)
+Version 0.2.0 (2014-07-02)
 --------------------------
 Moved all 3 main()s into unit tests (#5)
 Added Travis support to README (#9)
