@@ -4,9 +4,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +26,7 @@ public class TrackerCTest extends TestCase {
         t1.trackEcommerceTransactionItem("IT1023", "SKUVAL",
                 29.99, 2, "boots",
                 "Shoes", "USD",
-                context, 0);
+                context, 0, 0);
     }
 
     @Test
@@ -47,7 +44,7 @@ public class TrackerCTest extends TestCase {
         t1.trackEcommerceTransactionItem("IT1023", "SKUVAL",
                 29.99, 2, "boots",
                 "Shoes", "USD",
-                null, 0);
+                null, 0, 0);
     }
 
     @Test
@@ -70,7 +67,7 @@ public class TrackerCTest extends TestCase {
                                      "Kohls", 2.50,
                                      1.99, "Chagrin",
                                      "OH", "USA",
-                                     "USD", lst, null);
+                                     "USD", lst, null, 0);
     }
 
     @Test
@@ -88,7 +85,7 @@ public class TrackerCTest extends TestCase {
         Map<String, Object> dict = new LinkedHashMap<String, Object>();
         dict.put("Iteration", 1);
 
-        t1.trackUnstructuredEvent("Lube Insights", "Data Loop", dict, context);
+        t1.trackUnstructuredEvent("Lube Insights", "Data Loop", dict, context, 0);
     }
 
     @Test
@@ -103,7 +100,7 @@ public class TrackerCTest extends TestCase {
         t1.setScreenResolution(760, 610);
         String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
 
-        t1.trackStructuredEvent("Items", "Stuff", "Pants", "Green Blue", 3, "com.snowplow", context);
+        t1.trackStructuredEvent("Items", "Stuff", "Pants", "Green Blue", 3, "com.snowplow", context, 0);
     }
 
     @Test
@@ -118,7 +115,7 @@ public class TrackerCTest extends TestCase {
         t1.setScreenResolution(760, 610);
         String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
 
-        t1.trackPageView("www.saggezza.com", "Saggezza Home", "KG", context);
+        t1.trackPageView("www.saggezza.com", "Saggezza Home", "KG", context, 0);
     }
 
 }

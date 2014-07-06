@@ -43,7 +43,6 @@ public class PayloadMapC implements PayloadMap{
     public PayloadMapC(){
         this.parameters = new LinkedHashMap<String, String>();
         this.configurations = new LinkedHashMap<String, Boolean>();
-        setTimestamp();
     }
 
     /**
@@ -76,9 +75,17 @@ public class PayloadMapC implements PayloadMap{
      * {@inheritDoc}
      * @return
      */
-    public PayloadMap setTimestamp(){
-        this.parameters.put("dtm", String.valueOf(System.currentTimeMillis()));
-        return new PayloadMapC(this.parameters, this.configurations);
+    public void setTimestamp(){
+        this.setTimestamp(0);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return
+     */
+    public void setTimestamp(float timestamp){
+        if(timestamp == 0)
+            this.parameters.put("dtm", String.valueOf(System.currentTimeMillis()));
     }
 
     /* Addition functions
@@ -184,16 +191,18 @@ public class PayloadMapC implements PayloadMap{
      * @param page_title The Title of the page being tracked.
      * @param referrer The referrer of the page being tracked.
      * @param context Additional JSON context (optional)
+     * @param timestamp
      * @return
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackPageViewConfig(String page_url, String page_title, String referrer,
-                                          JsonNode context) throws UnsupportedEncodingException{
+                                          JsonNode context, long timestamp) throws UnsupportedEncodingException{
         this.parameters.put("e", "pv");
         this.parameters.put("url", page_url);
         this.parameters.put("page", page_title);
         this.parameters.put("refr", referrer);
         this.parameters.put("evn", Constants.DEFAULT_VENDOR);
+        this.setTimestamp(timestamp);
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
@@ -208,11 +217,12 @@ public class PayloadMapC implements PayloadMap{
      * @param property Property of the event being tracked.
      * @param value Value associated with the property being tracked.
      * @param context Additional JSON context (optional)
+     * @param timestamp
      * @return
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackStructuredEventConfig(String category, String action, String label, String property,
-                                                 String value, JsonNode context)
+                                                 String value, JsonNode context, long timestamp)
             throws UnsupportedEncodingException{
         this.parameters.put("e","se");
         this.parameters.put("se_ca", category);
@@ -221,6 +231,7 @@ public class PayloadMapC implements PayloadMap{
         this.parameters.put("se_pr", property);
         this.parameters.put("se_va", value);
         this.parameters.put("evn", Constants.DEFAULT_VENDOR);
+        this.setTimestamp(timestamp);
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
@@ -233,12 +244,14 @@ public class PayloadMapC implements PayloadMap{
      * @param eventName A name for the unstructured event being tracked.
      * @param dictInfo The unstructured information being tracked in dictionary form.
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp
      * @return
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackUnstructuredEventConfig(String eventVendor, String eventName, JsonNode dictInfo,
-                                                   JsonNode context) throws UnsupportedEncodingException{
+                                                   JsonNode context, long timestamp) throws UnsupportedEncodingException{
         this.parameters.put("e","ue");
+        this.setTimestamp(timestamp);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
         tmp = tmp.addUnstructured(dictInfo, this.configurations.get("encode_base64"));
         if (context==null)
@@ -257,6 +270,7 @@ public class PayloadMapC implements PayloadMap{
      * @param currency Currency used for the purchase.
      * @param context Additional JSON context for the tracking call (optional)
      * @param transaction_id Transaction ID, if left blank new value will be generated.
+     * @param timestamp
      * @return
      * @throws UnsupportedEncodingException
      */
@@ -264,7 +278,7 @@ public class PayloadMapC implements PayloadMap{
                                                           String price, String quantity,
                                                           String name, String category,
                                                           String currency, JsonNode context,
-                                                          String transaction_id)
+                                                          String transaction_id, long timestamp)
             throws UnsupportedEncodingException{
         this.parameters.put("e","ti");
         this.parameters.put("tid", (transaction_id==null) ? String.valueOf(makeTransactionID()) : transaction_id);
@@ -276,6 +290,7 @@ public class PayloadMapC implements PayloadMap{
         this.parameters.put("ti_qu", String.valueOf(quantity));
         this.parameters.put("ti_cu", currency);
         this.parameters.put("evn", Constants.DEFAULT_VENDOR);
+        this.setTimestamp(timestamp);
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
@@ -294,6 +309,7 @@ public class PayloadMapC implements PayloadMap{
      * @param country The customers country.
      * @param currency The currency used for the purchase
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp
      * @return
      * @throws UnsupportedEncodingException
      */
@@ -301,7 +317,7 @@ public class PayloadMapC implements PayloadMap{
                                                       String affiliation, String tax_value,
                                                       String shipping, String city,
                                                       String state, String country,
-                                                      String currency, JsonNode context)
+                                                      String currency, JsonNode context, long timestamp)
             throws UnsupportedEncodingException{
         this.setTransactionID();
         this.parameters.put("e", "tr");
@@ -315,6 +331,7 @@ public class PayloadMapC implements PayloadMap{
         this.parameters.put("tr_co", country);
         this.parameters.put("tr_cu", currency);
         this.parameters.put("evn", Constants.DEFAULT_VENDOR);
+        this.setTimestamp(timestamp);
         if (context==null)
             return new PayloadMapC(this.parameters, this.configurations);
         PayloadMap tmp = new PayloadMapC(this.parameters, this.configurations);
