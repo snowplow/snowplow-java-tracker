@@ -49,19 +49,6 @@ public interface Tracker {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public void trackPageView(String page_url, String page_title, String referrer, String context, long timestamp)
-            throws IOException, URISyntaxException;
-
-    /**
-     * Track a single page view on a java web applications.
-     * @param page_url The url of the page where the tracking call lies.
-     * @param page_title The title of the page where the tracking call lies. (optional)
-     * @param referrer The one who referred you to the page (optional)
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws URISyntaxException
-     * @throws IOException
-     */
     public void trackPageView(String page_url, String page_title, String referrer, Map context, long timestamp)
             throws IOException, URISyntaxException;
 
@@ -79,35 +66,7 @@ public interface Tracker {
      * @throws IOException If there is an issue with processing the HTTP GET
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, String vendor, String context, long timestamp) throws URISyntaxException, IOException;
-    /**
-     * Track a structured event. Useful for tracking data transfer and other structured transactions.
-     * @param category The category of the structured event.
-     * @param action The action that is being tracked. (optional)
-     * @param label A label for the tracking event. (optional)
-     * @param property The property of the structured event being tracked. (optional)
-     * @param value The value associated with the property being tracked.
-     * @param vendor The vendor the the property being tracked. (optional)
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws URISyntaxException If there is an issue with the tracking call.
-     * @throws IOException If there is an issue with processing the HTTP GET
-     */
-    public void trackStructuredEvent(String category, String action, String label, String property,
                                      int value, String vendor, Map context, long timestamp) throws URISyntaxException, IOException;
-
-    /**
-     * Track an unstructured event.
-     * @param eventVendor The vendor the the event information.
-     * @param eventName A name for the unstructured event being tracked.
-     * @param dictInfo The unstructured information being tracked in dictionary form.
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws IOException If there is an issue with the tracking call.
-     * @throws URISyntaxException If there is an issue with processing the HTTP GET
-     */
-    public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context, long timestamp)
-            throws IOException, URISyntaxException;
 
     /**
      * Track an unstructured event. Allowed to use String or Map<String,Object> as input
@@ -131,42 +90,7 @@ public interface Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void trackScreenView(String name, String id, String context, long timestamp)
-            throws IOException, URISyntaxException;
-
-    /**
-     * Track a screen view
-     * @param name The name of the screen view being tracked
-     * @param id The ID of the screen view being tracked.
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws IOException
-     * @throws URISyntaxException
-     */
     public void trackScreenView(String name, String id, Map context, long timestamp)
-            throws IOException, URISyntaxException;
-
-    /**
-     * Track an Ecommerce Transaction
-     * Option to provide a Map of only strings of items in the transaction which can be used
-     * to track each individual ecommerce transaction item
-     * @param order_id The transaction ID, will be generated if left null
-     * @param total_value The total value of the transaction.
-     * @param affiliation Affiliations to the transaction (optional)
-     * @param tax_value Tax value of the transaction (optional)
-     * @param shipping Shipping costs of the transaction (optional)
-     * @param city The customers city.
-     * @param state The customers state.
-     * @param country The customers country.
-     * @param currency The currency used for the purchase
-     * @param items A list containing a Map of Strings. Each item must have order ID, sku, price, and quantity.
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws IOException
-     * @throws URISyntaxException
-     */
-    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
-                                          Double shipping, String city, String state, String country, String currency, List<TransactionItem> items, String context, long timestamp)
             throws IOException, URISyntaxException;
 
     /**

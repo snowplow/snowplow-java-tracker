@@ -22,12 +22,15 @@ public class TrackerCTest extends TestCase {
         t1.setLanguage("ital");
         t1.setPlatform("mob");
         t1.setScreenResolution(760, 610);
-        String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("Zone", "UK");
+        map.put("Phone", "iOS");
+        map.put("Time", "2pm");
 
         t1.trackEcommerceTransactionItem("IT1023", "SKUVAL",
                 29.99, 2, "boots",
                 "Shoes", "USD",
-                context, 0, 0);
+                map, 0, 0);
     }
 
     @Test
@@ -40,7 +43,6 @@ public class TrackerCTest extends TestCase {
         t1.setLanguage("ital");
         t1.setPlatform("mob");
         t1.setScreenResolution(760, 610);
-        String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("Zone", "UK");
         map.put("Phone", "Droid");
@@ -62,7 +64,6 @@ public class TrackerCTest extends TestCase {
         t1.setLanguage("ital");
         t1.setPlatform("mob");
         t1.setScreenResolution(760, 610);
-        String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
 
         TransactionItem transactionItem = new TransactionItem("123","SKUVAL",100, 2,"Foo","Bar","USD", null);
         List<TransactionItem> lst = new LinkedList<TransactionItem>();
@@ -89,12 +90,15 @@ public class TrackerCTest extends TestCase {
         t1.setLanguage("ital");
         t1.setPlatform("mob");
         t1.setScreenResolution(760, 610);
-        String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("Zone", "UK");
+        map.put("Phone", "iOS");
+        map.put("Time", "2pm");
 
         Map<String, Object> dict = new LinkedHashMap<String, Object>();
         dict.put("Iteration", 1);
 
-        t1.trackUnstructuredEvent("Lube Insights", "Data Loop", dict, context, 0);
+        t1.trackUnstructuredEvent("Lube Insights", "Data Loop", dict, map, 0);
     }
 
     @Test
@@ -107,9 +111,12 @@ public class TrackerCTest extends TestCase {
         t1.setLanguage("ital");
         t1.setPlatform("mob");
         t1.setScreenResolution(760, 610);
-        String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("Zone", "UK");
+        map.put("Phone", "iOS");
+        map.put("Time", "2pm");
 
-        t1.trackStructuredEvent("Items", "Stuff", "Pants", "Green Blue", 3, "com.snowplow", context, 0);
+        t1.trackStructuredEvent("Items", "Stuff", "Pants", "Green Blue", 3, "com.snowplow", map, 0);
     }
 
     @Test
@@ -122,9 +129,12 @@ public class TrackerCTest extends TestCase {
         t1.setLanguage("eng");
         t1.setPlatform("mob");
         t1.setScreenResolution(760, 610);
-        String context = "{'Zone':'USA', 'Phone':'Droid', 'Time':'2pm'}";
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("Zone", "UK");
+        map.put("Phone", "iOS");
+        map.put("Time", "2pm");
 
-        t1.trackPageView("www.saggezza.com", "Saggezza Home", "KG", context, 0);
+        t1.trackPageView("www.saggezza.com", "Saggezza Home", "KG", map, 0);
     }
 
     @Test
@@ -137,7 +147,6 @@ public class TrackerCTest extends TestCase {
         t2.setLanguage("ital");
         t2.setPlatform("mob");
         t2.setScreenResolution(760, 610);
-        String context = "{'Zone':'Canada', 'Phone':'Droid', 'Time':'2pm'}";
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("Zone", "USA");
         map.put("Phone", "Droid");
@@ -156,7 +165,6 @@ public class TrackerCTest extends TestCase {
         t2.setLanguage("ital");
         t2.setPlatform("mob");
         t2.setScreenResolution(760, 610);
-        String context = "{'Zone':'Canada', 'Phone':'Droid', 'Time':'2pm'}";
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("Zone", "USA");
         map.put("Phone", "Droid");
