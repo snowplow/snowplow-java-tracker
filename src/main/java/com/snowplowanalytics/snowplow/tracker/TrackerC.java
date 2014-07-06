@@ -134,6 +134,29 @@ public class TrackerC implements Tracker {
 
     /**
      * {@inheritDoc}
+     * @param page_url The url of the page where the tracking call lies.
+     * @param page_title The title of the page where the tracking call lies. (optional)
+     * @param referrer The one who referred you to the page (optional)
+     * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public void trackPageView(String page_url, String page_title, String referrer, Map context, long timestamp)
+            throws URISyntaxException, IOException{
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, page_url);
+        if (context != null) {
+            JsonNode jsonContext = Util.defaultMapper().valueToTree(context);
+            this.payload = this.payload.trackPageViewConfig(page_url, page_title, referrer, jsonContext, timestamp);
+        }
+        else {
+            this.payload = this.payload.trackPageViewConfig(page_url, page_title, referrer, null, timestamp);
+        }
+        this.track();
+    }
+
+    /**
+     * {@inheritDoc}
      * @param category The category of the structured event.
      * @param action The action that is being tracked. (optional)
      * @param label A label for the tracking event. (optional)
@@ -153,6 +176,36 @@ public class TrackerC implements Tracker {
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, valueStr);
         if (context != null && !context.equals("")) {
             JsonNode jsonContext = stringToJSON(context);
+            this.payload = this.payload.trackStructuredEventConfig(category, action, label, property, valueStr,
+                    jsonContext, timestamp);
+        } else {
+            this.payload = this.payload.trackStructuredEventConfig(category, action, label, property, valueStr,
+                    null, timestamp);
+        }
+        this.track();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param category The category of the structured event.
+     * @param action The action that is being tracked. (optional)
+     * @param label A label for the tracking event. (optional)
+     * @param property The property of the structured event being tracked. (optional)
+     * @param value The value associated with the property being tracked.
+     * @param vendor The vendor the the property being tracked. (optional)
+     * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, String vendor, Map context, long timestamp)
+            throws URISyntaxException, IOException {
+        String valueStr = String.valueOf(value);
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, category);
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, valueStr);
+        if (context != null) {
+            JsonNode jsonContext = Util.defaultMapper().valueToTree(context);
             this.payload = this.payload.trackStructuredEventConfig(category, action, label, property, valueStr,
                     jsonContext, timestamp);
         } else {
@@ -195,20 +248,18 @@ public class TrackerC implements Tracker {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void trackUnstructuredEvent(String eventVendor, String eventName, String dictInfo, String context, long timestamp)
+    public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, Map context, long timestamp)
             throws IOException, URISyntaxException{
-        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_dict, dictInfo);
-        JsonNode jsonDict = stringToJSON(dictInfo); //Make compatible for Map<String, Object>
-        if (context != null && !context.equals("")) {
-            JsonNode jsonContext = stringToJSON(context);
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_dict, dictInfo.toString());
+        JsonNode jsonDict = mapToJSON(dictInfo); //Make compatible for Map<String, Object>
+        if (context != null) {
+            JsonNode jsonContext = Util.defaultMapper().valueToTree(context);
             this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, jsonContext, timestamp);
         } else {
             this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, null, timestamp);
         }
         this.track();
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -220,6 +271,25 @@ public class TrackerC implements Tracker {
      * @throws URISyntaxException
      */
     public void trackScreenView(String name, String id, String context, long timestamp)
+            throws IOException, URISyntaxException{
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, name);
+        Map<String, Object> screenViewProperties = new LinkedHashMap<String, Object>();
+        screenViewProperties.put("Name", name); // or String screenVie... = "{'name': '"+ name + "'}"
+        if (id != null)
+            this.payload.add("id", id);
+        this.trackUnstructuredEvent(Constants.DEFAULT_VENDOR, "screen_view", screenViewProperties, context, timestamp);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param name The name of the screen view being tracked
+     * @param id The ID of the screen view being tracked.
+     * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public void trackScreenView(String name, String id, Map context, long timestamp)
             throws IOException, URISyntaxException{
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, name);
         Map<String, Object> screenViewProperties = new LinkedHashMap<String, Object>();
@@ -252,6 +322,38 @@ public class TrackerC implements Tracker {
         assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, sku);
         if (context != null && !context.equals("")) {
             JsonNode jsonContext = stringToJSON(context);
+            this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
+                    integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), jsonContext, Long.toString(transaction_id), timestamp);
+        } else {
+            this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
+                    integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), null, Long.toString(transaction_id), timestamp);
+        }
+        this.track();
+    }
+
+    /**
+     * Track and ecommerce transaction item. Not usually called alone, but called for each
+     * individual item of the ecommerce transaction function.
+     * @param order_id ID of the item.
+     * @param sku SKU value of the item.
+     * @param price Prive of the item.
+     * @param quantity Quantity of the item.
+     * @param name Name of the item.
+     * @param category Category of the item.
+     * @param currency Currency used for the purchase.
+     * @param context Additional JSON context for the tracking call (optional)
+     * @param transaction_id Transaction ID, if left blank new value will be generated.
+     * @param timestamp User-input timestamp or 0
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    protected void trackEcommerceTransactionItem(String order_id, String sku, Double price, Integer quantity,
+                                                 String name, String category, String currency, Map context, long transaction_id, long timestamp)
+            throws URISyntaxException, IOException {
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, order_id);
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, sku);
+        if (context != null) {
+            JsonNode jsonContext = Util.defaultMapper().valueToTree(context);
             this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
                     integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), jsonContext, Long.toString(transaction_id), timestamp);
         } else {
@@ -296,14 +398,63 @@ public class TrackerC implements Tracker {
         }
         this.track();
         for (TransactionItem item : items){
-            this.trackEcommerceTransactionItem((String) item.get(Parameter.ITEM_ID),
+            this.trackEcommerceTransactionItem(
+                    (String) item.get(Parameter.ITEM_ID),
                     (String) item.get(Parameter.ITEM_SKU),
                     (Double) item.get(Parameter.ITEM_PRICE),
                     (Integer) item.get(Parameter.ITEM_QUANTITY),
                     (String) item.get(Parameter.ITEM_NAME),
                     (String) item.get(Parameter.ITEM_CATEGORY),
                     (String) item.get(Parameter.ITEM_CURRENCY),
-                    null,
+                    (Map) item.get(Parameter.CONTEXT),
+                    (Long) item.get(Parameter.TIMESTAMP), 0);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param order_id The transaction ID, will be generated if left null
+     * @param total_value The total value of the transaction.
+     * @param affiliation Affiliations to the transaction (optional)
+     * @param tax_value Tax value of the transaction (optional)
+     * @param shipping Shipping costs of the transaction (optional)
+     * @param city The customers city.
+     * @param state The customers state.
+     * @param country The customers country.
+     * @param currency The currency used for the purchase
+     * @param items A list containing a Map of Strings. Each item must have order ID, sku, price, and quantity.
+     * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
+     * @throws UnsupportedEncodingException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
+                                          Double shipping, String city, String state, String country, String currency, List<TransactionItem> items, Map context, long timestamp)
+            throws IOException, URISyntaxException{
+        assert this.stringContractor.checkContract(this.contracts, ContractManager.non_empty_string, order_id);
+        //Track ecommerce event.
+        if (context != null) {
+            JsonNode jsonContext = Util.defaultMapper().valueToTree(context);
+            this.payload = this.payload.trackEcommerceTransactionConfig(order_id, doubleCheck(total_value), stringCheck(affiliation),
+                    doubleCheck(tax_value), doubleCheck(shipping), stringCheck(city), stringCheck(state), stringCheck(country),
+                    stringCheck(currency), jsonContext, timestamp);
+        } else {
+            this.payload = this.payload.trackEcommerceTransactionConfig(order_id, doubleCheck(total_value), stringCheck(affiliation),
+                    doubleCheck(tax_value), doubleCheck(shipping), stringCheck(city), stringCheck(state), stringCheck(country),
+                    stringCheck(currency), null, timestamp);
+        }
+        this.track();
+        for (TransactionItem item : items){
+            this.trackEcommerceTransactionItem(
+                    (String) item.get(Parameter.ITEM_ID),
+                    (String) item.get(Parameter.ITEM_SKU),
+                    (Double) item.get(Parameter.ITEM_PRICE),
+                    (Integer) item.get(Parameter.ITEM_QUANTITY),
+                    (String) item.get(Parameter.ITEM_NAME),
+                    (String) item.get(Parameter.ITEM_CATEGORY),
+                    (String) item.get(Parameter.ITEM_CURRENCY),
+                    (Map) item.get(Parameter.CONTEXT),
                     (Long) item.get(Parameter.TIMESTAMP), 0);
         }
     }
