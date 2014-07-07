@@ -22,6 +22,8 @@ import java.util.Set;
 
 // Apache Commons
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // JSON
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,6 +37,9 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Kevin Gleason
  */
 public class PayloadMapC implements PayloadMap{
+    // Logging
+    private final Logger logger = LoggerFactory.getLogger(PayloadMapC.class)
+
     private LinkedHashMap<String,String> parameters;
     private LinkedHashMap<String,Boolean> configurations;
 
@@ -147,7 +152,7 @@ public class PayloadMapC implements PayloadMap{
         try {
             json = Util.defaultMapper().writeValueAsString(jsonObject);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Parsing error in addJson: {}", e);
         }
         if (encode_base64) {
             json = base64Encode(json);

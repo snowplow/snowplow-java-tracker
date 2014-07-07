@@ -29,6 +29,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // JSON
 import com.fasterxml.jackson.databind.JsonNode;
@@ -66,8 +68,8 @@ public class TrackerC implements Tracker {
     private static final String VERSION = Version.VERSION;
 
     //DEBUG
-    public static boolean debug = false;
     public static boolean track = true;
+    private final Logger logger = LoggerFactory.getLogger(TrackerC.class);
 
     //Instance Variables
     private PayloadMap payload = new PayloadMapC();
@@ -87,6 +89,7 @@ public class TrackerC implements Tracker {
         this.base64_encode = base64_encode;
         this.contracts = false;
         this.setPayload(new PayloadMapC());
+        logger.debug("Initializing new tracker..");
     }
 
     /**
@@ -98,11 +101,9 @@ public class TrackerC implements Tracker {
         URI uri = buildURI("https", collector_uri, "/i");
         this.payload.setTimestamp();
         HttpGet httpGet = makeHttpGet(uri);
-        if (debug) {
-            System.out.println("Payload:\n" + this.payload.toString());
-            System.out.println("URI: " + uri);
-            System.out.println("Making HttpGet...");
-        }
+        logger.debug("Payload: {}", this.payload.toString());
+        logger.debug("URI: {}", uri);
+        logger.debug("Sending HTTP GET");
         if (track)
             makeRequest(httpGet);
         this.clearPayload();
@@ -128,6 +129,7 @@ public class TrackerC implements Tracker {
         else {
             this.payload = this.payload.trackPageViewConfig(page_url, page_title, referrer, null, timestamp);
         }
+        logger.debug("Tracking page view event: {}", timestamp);
         this.track();
     }
 
@@ -158,6 +160,7 @@ public class TrackerC implements Tracker {
             this.payload = this.payload.trackStructuredEventConfig(category, action, label, property, valueStr,
                     null, timestamp);
         }
+        logger.debug("Tracking structured event: {}", timestamp);
         this.track();
     }
 
@@ -181,6 +184,7 @@ public class TrackerC implements Tracker {
         } else {
             this.payload = this.payload.trackUnstructuredEventConfig(eventVendor, eventName, jsonDict, null, timestamp);
         }
+        logger.debug("Tracking unstructured event: {}", timestamp);
         this.track();
     }
 
@@ -201,6 +205,7 @@ public class TrackerC implements Tracker {
         if (id != null)
             this.payload.add("id", id);
         this.trackUnstructuredEvent(Constants.DEFAULT_VENDOR, "screen_view", screenViewProperties, context, timestamp);
+        logger.debug("Tracking screen view event: {}", timestamp);
     }
 
     /**
@@ -232,6 +237,7 @@ public class TrackerC implements Tracker {
             this.payload = this.payload.trackEcommerceTransactionItemConfig(order_id, sku, doubleCheck(price),
                     integerCheck(quantity), stringCheck(name), stringCheck(category), stringCheck(currency), null, Long.toString(transaction_id), timestamp);
         }
+        logger.debug("Tracking ecommerce transaction item event: {}", timestamp);
         this.track();
     }
 
@@ -268,6 +274,7 @@ public class TrackerC implements Tracker {
                     doubleCheck(tax_value), doubleCheck(shipping), stringCheck(city), stringCheck(state), stringCheck(country),
                     stringCheck(currency), null, timestamp);
         }
+        logger.debug("Tracking ecommerce transaction event: {}", timestamp);
         this.track();
         for (TransactionItem item : items){
             this.trackEcommerceTransactionItem(
@@ -334,11 +341,9 @@ public class TrackerC implements Tracker {
             throw new Error("HTTP Error - Error code " + statusCode);
         }
         try{
-            if (debug) {
-                Header[] headers = response.getAllHeaders();
-                for (Header h : headers)
-                    System.out.println(h.toString());
-            }
+            Header[] headers = response.getAllHeaders();
+            for (Header h : headers)
+                logger.debug("{}", h.toString());
         }
         finally {
             response.close();
