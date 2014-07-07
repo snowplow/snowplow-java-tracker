@@ -151,7 +151,7 @@ public interface PayloadMap {
      * @param country The customers country.
      * @param currency The currency used for the purchase
      * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp
+     * @param timestamp User-input timestamp or 0
      * @return Returns a new PayloadMap with the key-value-pair
      * @throws UnsupportedEncodingException
      */
@@ -161,13 +161,11 @@ public interface PayloadMap {
 
     /**
      * Sets the timestamp on a PayloadMap
-     * @return Returns a new PayloadMap with the key-value-pair
      */
     public void setTimestamp();
 
     /**
      * Sets the timestamp on a PayloadMap
-     * @return Returns a new PayloadMap with the key-value-pair
      */
     public void setTimestamp(float timestamp);
 

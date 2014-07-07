@@ -72,7 +72,6 @@ public class TrackerC implements Tracker {
     //Instance Variables
     private PayloadMap payload = new PayloadMapC();
     private ContractManager<String> stringContractor = new ContractManager<String>();
-    private ContractManager<Integer> integerContractor = new ContractManager<Integer>();
     private String collector_uri;
     private String namespace;
     private String app_id;
@@ -344,11 +343,6 @@ public class TrackerC implements Tracker {
         finally {
             response.close();
         }
-    }
-
-    //Turn String input into JsonNode
-    private JsonNode stringToJSON(String jsonStr) {
-        return Util.stringToJsonNode(jsonStr);
     }
 
     private JsonNode mapToJSON(Map<String, Object> oMap) { return Util.mapToJsonNode(oMap); }
