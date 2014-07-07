@@ -35,8 +35,8 @@ dependencies {
     // Apache HTTP
     compile 'org.apache.httpcomponents:httpclient:4.3.3'
 
-    // SLF4J logging API, TODO use this, https://github.com/snowplow/snowplow-java-tracker/issues/15
-    compile 'org.slf4j:slf4j-api:1.7.5'
+    // SLF4J logging API
+    compile 'org.slf4j:slf4j-simple:1.7.7'
 
     // Jackson JSON processor
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
