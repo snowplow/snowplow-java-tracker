@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class PayloadMapC implements PayloadMap{
     // Logging
-    private final Logger logger = LoggerFactory.getLogger(PayloadMapC.class)
+    private final Logger logger = LoggerFactory.getLogger(PayloadMapC.class);
 
     private LinkedHashMap<String,String> parameters;
     private LinkedHashMap<String,Boolean> configurations;
