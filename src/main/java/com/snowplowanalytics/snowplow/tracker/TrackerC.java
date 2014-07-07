@@ -360,13 +360,11 @@ public class TrackerC implements Tracker {
 
     /**
      * {@inheritDoc}
-     * @param integerContractor A contractor of type integer.
      * @param stringContractor A contractor of type String
      * @param dictionaryContractor A Contractor of type Map with key value of String, Object
      */
-    public void setContractors(ContractManager<Integer> integerContractor, ContractManager<String> stringContractor,
+    public void setContractors(ContractManager<String> stringContractor,
                                ContractManager<Map<String,Object>> dictionaryContractor){
-        this.integerContractor=integerContractor;
         this.stringContractor=stringContractor;
     }
 
