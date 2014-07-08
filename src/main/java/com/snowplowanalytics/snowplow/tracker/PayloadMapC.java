@@ -92,6 +92,8 @@ public class PayloadMapC implements PayloadMap{
     public void setTimestamp(float timestamp){
         if(timestamp == 0)
             this.parameters.put("dtm", String.valueOf(System.currentTimeMillis()));
+        else
+            this.parameters.put("dtm", String.valueOf(timestamp));
     }
 
     /* Addition functions
