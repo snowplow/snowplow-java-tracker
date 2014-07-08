@@ -26,6 +26,7 @@ public class Util {
         return sObjectMapper;
     }
 
+    @Deprecated
     public static JsonNode stringToJsonNode(String str) {
         try {
             return defaultMapper().readTree(str);
@@ -44,7 +45,7 @@ public class Util {
         return r.nextInt(999999-100000+1) + 100000;
     }
 
-    public static long getTimestamp() {
+    public static Long getTimestamp() {
         return System.currentTimeMillis();
     }
 }

@@ -23,8 +23,8 @@ public class PayloadMapCTest extends TestCase {
         LinkedHashMap<String, String> param = new LinkedHashMap<String, String>();
         param.put("e","pv");
         PayloadMap payloadMap = new PayloadMapC(param,null);
-        assertSame(param, payloadMap.getParams());
-//        assertNull(payloadMap.getConfigs());
+        assertEquals(param, payloadMap.getParams());
+        assertNull(payloadMap.getConfigs());
     }
 
     @Test
@@ -32,6 +32,7 @@ public class PayloadMapCTest extends TestCase {
         PayloadMapC payloadMap = new PayloadMapC();
         payloadMap.setTransactionID();
         Integer i = Integer.parseInt(payloadMap.getParam("tid"));
+        // Just a formality, the parseLong would catch the error
         assertTrue(i instanceof Integer);
     }
 
@@ -40,16 +41,22 @@ public class PayloadMapCTest extends TestCase {
         PayloadMapC payloadMap = new PayloadMapC();
         payloadMap.setTimestamp();
         Long i = Long.parseLong(payloadMap.getParam("dtm"));
+        // Just a formality, the parseLong would catch the error
         assertTrue(i instanceof Long);
     }
 
-//    @Test
-//    public void testSetTimestamp2() throws Exception {
-//        PayloadMapC payloadMap = new PayloadMapC();
-//        payloadMap.setTimestamp(123456L);
-//        Long i = Long.parseLong(payloadMap.getParam("dtm"));
-//        Long j = 123456L;
-//        assertSame(j, i);
-//    }
+    @Test
+    public void testSetTimestamp2() throws Exception {
+        PayloadMapC payloadMap = new PayloadMapC();
+        payloadMap.setTimestamp(123456);
+        assertEquals("123456.0", payloadMap.getParam("dtm"));
+    }
+
+    @Test
+    public void testAdd() throws Exception {
+        PayloadMapC payloadMap = new PayloadMapC();
+        payloadMap.add("e", "pv");
+
+    }
 
 }
