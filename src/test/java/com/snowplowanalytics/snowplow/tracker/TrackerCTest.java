@@ -14,10 +14,10 @@ public class TrackerCTest extends TestCase {
     @Test
 
     public void testTrackEcommerceTransactionItem() throws Exception {
-//        TrackerC t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
-//                  "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
-        TrackerC t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", true);
+        TrackerC t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
+                  "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
+//        TrackerC t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
+//                "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -35,10 +35,10 @@ public class TrackerCTest extends TestCase {
 
     @Test
     public void testTrackEcommerceTransactionItem2() throws Exception {
-//        TrackerC t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
-//                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
-        TrackerC t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", true);
+        TrackerC t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
+                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
+//        TrackerC t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
+//                "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -56,10 +56,10 @@ public class TrackerCTest extends TestCase {
 
     @Test
     public void testTrackEcommerceTransaction() throws Exception {
-//        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
-//                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
-        Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                                  "JavaPlow", true);
+        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
+                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
+//        Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
+//                                  "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -82,10 +82,10 @@ public class TrackerCTest extends TestCase {
 
     @Test
     public void testTrackUnstructEvent() throws Exception {
-//        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
-//                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
-        Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                                  "JavaPlow", true);
+        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
+                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
+//        Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
+//                                  "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -103,10 +103,10 @@ public class TrackerCTest extends TestCase {
 
     @Test
     public void testTrackStructEvent() throws Exception {
-//        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
-//                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
-        Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                                  "JavaPlow", true);
+        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
+                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
+//        Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
+//                                  "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("ital");
         t1.setPlatform("mob");
@@ -121,10 +121,10 @@ public class TrackerCTest extends TestCase {
 
     @Test
     public void testTrackPageView() throws Exception {
-//        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
-//                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
-        Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                                  "JavaPlow", true);
+        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
+                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
+//        Tracker t1 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
+//                                  "JavaPlow", true);
         t1.setUserID("User1");
         t1.setLanguage("eng");
         t1.setPlatform("mob");
@@ -139,10 +139,10 @@ public class TrackerCTest extends TestCase {
 
     @Test
     public void testTrackPageViewMapContext() throws Exception {
-//        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
-//                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
-        Tracker t2 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", false);
+        Tracker t2 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
+                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
+//        Tracker t2 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
+//                "JavaPlow", false);
         t2.setUserID("User2");
         t2.setLanguage("ital");
         t2.setPlatform("mob");
@@ -157,10 +157,10 @@ public class TrackerCTest extends TestCase {
 
     @Test
     public void testTrackScreenViewMapContext() throws Exception {
-//        Tracker t1 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
-//                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
-        Tracker t2 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
-                "JavaPlow", false);
+        Tracker t2 = new TrackerC("d3rkrsqld9gmqf.cloudfront.net",
+                "com.snowplowanalytics.snowplow.tracker", "JavaPlow", true);
+//        Tracker t2 = new TrackerC("segfault.ngrok.com", "com.snowplowanalytics.snowplow.tracker",
+//                "JavaPlow", false);
         t2.setUserID("User2");
         t2.setLanguage("ital");
         t2.setPlatform("mob");
