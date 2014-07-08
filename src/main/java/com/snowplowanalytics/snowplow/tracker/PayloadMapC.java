@@ -97,15 +97,6 @@ public class PayloadMapC implements PayloadMap{
             this.parameters.put("dtm", String.valueOf(timestamp));
     }
 
-    /* Addition functions
-     *  Used to add different sources of key=>value pairs to a map.
-     *  Map is then used to build "Associative array for getter function.
-     *  Some use Base64 encoding
-     */
-    private String base64Encode(String string) throws UnsupportedEncodingException{
-        return Base64.encodeBase64URLSafeString(string.getBytes(Charset.forName("US-ASCII")));
-    }
-
     /**
      * {@inheritDoc}
      * @param key The parameter key
@@ -131,7 +122,7 @@ public class PayloadMapC implements PayloadMap{
             return this;  //Catch this in contractor
         String json = dictInfo.toString();
         if (encode_base64) {
-            json = base64Encode(json);
+            json = Util.base64Encode(json);
             this.parameters.put("ue_px", json);
         }
         else
@@ -158,7 +149,7 @@ public class PayloadMapC implements PayloadMap{
             logger.error("Parsing error in addJson: {}", e);
         }
         if (encode_base64) {
-            json = base64Encode(json);
+            json = Util.base64Encode(json);
             this.parameters.put("cx", json);
         }
         else
