@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class UtilTest extends TestCase {
     @Test
@@ -22,7 +23,7 @@ public class UtilTest extends TestCase {
 
     @Test
     public void testMapToJsonNode() {
-        Map map = new HashMap();
+        Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("foo", "bar");
 
         JsonNode node = Util.mapToJsonNode(map);
@@ -32,7 +33,7 @@ public class UtilTest extends TestCase {
 
     @Test
     public void testMapToJsonNode2() {
-        Map map = new HashMap();
+        Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("foo", "bar");
 
         ArrayList<String> list = new ArrayList<String>();
@@ -44,24 +45,5 @@ public class UtilTest extends TestCase {
         JsonNode node = Util.mapToJsonNode(map);
 
         assertEquals("{\"list\":[\"some\",\"stuff\"],\"foo\":\"bar\"}", node.toString());
-    }
-
-    @Test
-    public void testStringToJsonNode() throws Exception {
-        Map map = new HashMap();
-        map.put("foo", "bar");
-
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("some");
-        list.add("stuff");
-
-        map.put("list", list);
-        String res = "{\"list\":[\"some\",\"stuff\"],\"foo\":\"bar\"}";
-
-        Util.stringToJsonNode(res);
-
-        JsonNode node = Util.mapToJsonNode(map);
-
-        assertEquals(node.toString(), res);
     }
 }
