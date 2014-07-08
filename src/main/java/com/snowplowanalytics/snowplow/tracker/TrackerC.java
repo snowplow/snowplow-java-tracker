@@ -60,9 +60,10 @@ import com.fasterxml.jackson.databind.JsonNode;
  *      sending logs to your S3 bucket, put `TrackerC.track = false` in your code.</li>
  *    <li>Default values are `TrackerC.debug = false` and `TrackerC.track = true`</li>
  *  </ul>
- *  @version 0.2.0
- *  @author Kevin Gleason
+ *  @version 0.3.0
+ *  @author Kevin Gleason, Jonathan Almeida, Alex Dean
  */
+
 public class TrackerC implements Tracker {
     //Static Class variables
     private static final String VERSION = Version.VERSION;

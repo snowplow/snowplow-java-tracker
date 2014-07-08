@@ -33,9 +33,10 @@ import com.fasterxml.jackson.databind.JsonNode;
  *  The PayloadMap is used to store all the parameters and configurations that are used
  *  to send data via the HTTP GET request.
  *
- * @version 0.2.0
- * @author Kevin Gleason
+ * @version 0.3.0
+ * @author Kevin Gleason, Jonathan Almeida, Alex Dean
  */
+
 public class PayloadMapC implements PayloadMap{
     // Logging
     private final Logger logger = LoggerFactory.getLogger(PayloadMapC.class);

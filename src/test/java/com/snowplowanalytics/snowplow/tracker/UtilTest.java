@@ -1,10 +1,8 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import java.util.ArrayList;

@@ -26,8 +26,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  *  The PayloadMap is used to store all the parameters and configurations that are used
  *  to send data via the HTTP GET request.
  * PayloadMaps have an immutable structure for secure and accurate transfers of information.
- * @version 0.2.0
- * @author Kevin Gleason
+ * @version 0.3.0
+ * @author Kevin Gleason, Jonathan Almeida, Alex Dean
  */
 // Immutable structure -- Payload will always be a string.
 public interface PayloadMap {

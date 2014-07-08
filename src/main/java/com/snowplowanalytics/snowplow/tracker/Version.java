@@ -20,6 +20,7 @@ package com.snowplowanalytics.snowplow.tracker;
  * @version 0.2.0
  * @author Kevin Gleason
  */
+
 public class Version {
     static final String VERSION = "0.2.0";
 }

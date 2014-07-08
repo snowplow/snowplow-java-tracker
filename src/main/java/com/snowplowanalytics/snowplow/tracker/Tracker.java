@@ -25,9 +25,10 @@ import java.util.Map;
  *  in the TrackerC class.
  *  {@inheritDoc}
  * @see com.snowplowanalytics.snowplow.tracker.TrackerC
- * @version 0.2.0
- * @author Kevin Gleason
+ * @version 0.3.0
+ * @author Kevin Gleason, Jonathan Almeida, Alex Dean
  */
+
 public interface Tracker {
     /**
      * The basic track command. All other track functions eventually call this.
