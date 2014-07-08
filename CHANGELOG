@@ -1,17 +1,13 @@
 Version 0.3.0 (2014-0x-xx)
 --------------------------
-TODO: Added support for in-memory batching
-TODO: Added POST support
-TODO: Retrieves Snowplow version automatically pulled from Gradle
-TODO: Added SLF4J logging for key events (e.g. tracker initialization)
-TODO: Added Python-style subject class
-TODO: Added timestamp as option to each track method
-TODO: Created unit tests for Payload class
-TODO: Created unit tests for Subject (and Utils) class
-TODO: Created an async HTTP request solution
-TODO: Updated Jackson dependency to newer version
-TODO: Refactored networking unit tests for mock testing
+Added ablity for contexts to be HashMap, not just JSON string
+Added SLF4J logging for key events (e.g. tracker initialization)
+Added timestamp as option to each track method
+Created unit tests for Payload class
+Created unit tests for Utils class
+Updated Jackson dependency to newer version
 Removed the Contracts class and any use of it with a replacement
+Removed context for JSON String types
 
 Version 0.2.0 (2014-07-02)
 --------------------------
