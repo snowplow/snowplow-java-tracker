@@ -298,15 +298,6 @@ public class TrackerC implements Tracker {
     private String integerCheck(Integer i) { return i==null ? "" : String.valueOf(i); }
     private String doubleCheck(Double d) { return d==null ? "" : String.valueOf(d); }
     private String stringCheck(String s) { return s==null ? "" : s; }
-    private String mapCheck(Map<String,String> m, String s){ return m.containsKey(s) ? m.get(s) : ""; }
-    private double dParseCatch(String s){
-        try{ return Double.parseDouble(s); }
-        catch (NumberFormatException nfe) { throw new NumberFormatException("Item requires fields: 'sku', 'price','quantity'"); }
-    }
-    private int iParseCatch(String s){
-        try{ return Integer.parseInt(s); }
-        catch (NumberFormatException nfe) { throw new NumberFormatException("Item requires fields: 'sku', 'price','quantity'"); }
-    }
 
     /* Web functions
      *   Functions used to configure the Get request
