@@ -13,10 +13,14 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Random;
 
@@ -26,6 +30,7 @@ public class Util {
         return sObjectMapper;
     }
 
+    @Deprecated
     public static JsonNode stringToJsonNode(String str) {
         try {
             return defaultMapper().readTree(str);
@@ -44,7 +49,17 @@ public class Util {
         return r.nextInt(999999-100000+1) + 100000;
     }
 
-    public static long getTimestamp() {
+    public static Long getTimestamp() {
         return System.currentTimeMillis();
+    }
+
+
+    /* Addition functions
+     *  Used to add different sources of key=>value pairs to a map.
+     *  Map is then used to build "Associative array for getter function.
+     *  Some use Base64 encoding
+     */
+    public static String base64Encode(String string) throws UnsupportedEncodingException {
+        return Base64.encodeBase64URLSafeString(string.getBytes(Charset.forName("US-ASCII")));
     }
 }

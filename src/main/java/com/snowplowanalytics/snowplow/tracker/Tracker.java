@@ -10,6 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
@@ -24,9 +25,10 @@ import java.util.Map;
  *  in the TrackerC class.
  *  {@inheritDoc}
  * @see com.snowplowanalytics.snowplow.tracker.TrackerC
- * @version 0.2.0
- * @author Kevin Gleason
+ * @version 0.3.0
+ * @author Kevin Gleason, Jonathan Almeida, Alex Dean
  */
+
 public interface Tracker {
     /**
      * The basic track command. All other track functions eventually call this.
@@ -44,10 +46,11 @@ public interface Tracker {
      * @param page_title The title of the page where the tracking call lies. (optional)
      * @param referrer The one who referred you to the page (optional)
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
      * @throws URISyntaxException
      * @throws IOException
      */
-    public void trackPageView(String page_url, String page_title, String referrer, String context)
+    public void trackPageView(String page_url, String page_title, String referrer, Map context, long timestamp)
             throws IOException, URISyntaxException;
 
     /**
@@ -59,23 +62,12 @@ public interface Tracker {
      * @param value The value associated with the property being tracked.
      * @param vendor The vendor the the property being tracked. (optional)
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
      * @throws URISyntaxException If there is an issue with the tracking call.
      * @throws IOException If there is an issue with processing the HTTP GET
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, String vendor, String context) throws URISyntaxException, IOException;
-
-    /**
-     * Track an unstructured event.
-     * @param eventVendor The vendor the the event information.
-     * @param eventName A name for the unstructured event being tracked.
-     * @param dictInfo The unstructured information being tracked in dictionary form.
-     * @param context Additional JSON context for the tracking call (optional)
-     * @throws IOException If there is an issue with the tracking call.
-     * @throws URISyntaxException If there is an issue with processing the HTTP GET
-     */
-    public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, String context)
-            throws IOException, URISyntaxException;
+                                     int value, String vendor, Map context, long timestamp) throws URISyntaxException, IOException;
 
     /**
      * Track an unstructured event. Allowed to use String or Map<String,Object> as input
@@ -83,10 +75,11 @@ public interface Tracker {
      * @param eventName A name for the unstructured event being tracked.
      * @param dictInfo The unstructured information being tracked in dictionary form.
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
      * @throws IOException If there is an issue with the tracking call.
      * @throws URISyntaxException If there is an issue with processing the HTTP GET
      */
-    public void trackUnstructuredEvent(String eventVendor, String eventName, String dictInfo, String context)
+    public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, Map context, long timestamp)
             throws IOException, URISyntaxException;
 
     /**
@@ -94,10 +87,11 @@ public interface Tracker {
      * @param name The name of the screen view being tracked
      * @param id The ID of the screen view being tracked.
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
      * @throws IOException
      * @throws URISyntaxException
      */
-    public void trackScreenView(String name, String id, String context)
+    public void trackScreenView(String name, String id, Map context, long timestamp)
             throws IOException, URISyntaxException;
 
     /**
@@ -115,23 +109,22 @@ public interface Tracker {
      * @param currency The currency used for the purchase
      * @param items A list containing a Map of Strings. Each item must have order ID, sku, price, and quantity.
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
      * @throws IOException
      * @throws URISyntaxException
      */
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
-                                          Double shipping, String city, String state, String country, String currency, List<TransactionItem> items, String context)
+                                          Double shipping, String city, String state, String country, String currency, List<TransactionItem> items, Map context, long timestamp)
             throws IOException, URISyntaxException;
-
 
     /**
      * Set Contractors
      *  Not required, but useful if you want to make a contractor with a custom checker for processing.
      *  Requires three inputs, a contractor class of each type.
-     * @param integerContractor A contractor of type integer.
      * @param stringContractor A contractory of type String
      * @param dictionaryContractor A Contractor of type Map with key value of String, Object
      */
-    public void setContractors(ContractManager<Integer> integerContractor, ContractManager<String> stringContractor,
+    public void setContractors(ContractManager<String> stringContractor,
             ContractManager<Map<String, Object>> dictionaryContractor);
 
     /**

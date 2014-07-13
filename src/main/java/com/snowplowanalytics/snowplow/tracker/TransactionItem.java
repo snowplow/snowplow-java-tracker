@@ -13,16 +13,15 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import org.codehaus.jackson.JsonNode;
-
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class TransactionItem extends HashMap {
     public TransactionItem (String order_id, String sku,
                             double price, int quantity,
                             String name, String category,
-                            String currency, JsonNode context) throws UnsupportedEncodingException {
+                            String currency, Map context) throws UnsupportedEncodingException {
         put(Parameter.EVENT, "ti");
         put(Parameter.ITEM_ID, order_id);
         put(Parameter.ITEM_SKU, sku);

@@ -10,6 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
@@ -18,15 +19,15 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 // JSON
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * PayloadMap interface
  *  The PayloadMap is used to store all the parameters and configurations that are used
  *  to send data via the HTTP GET request.
  * PayloadMaps have an immutable structure for secure and accurate transfers of information.
- * @version 0.2.0
- * @author Kevin Gleason
+ * @version 0.3.0
+ * @author Kevin Gleason, Jonathan Almeida, Alex Dean
  */
 // Immutable structure -- Payload will always be a string.
 public interface PayloadMap {
@@ -83,11 +84,12 @@ public interface PayloadMap {
      * @param page_title The Title of the page being tracked.
      * @param referrer The referrer of the page being tracked.
      * @param context Additional JSON context (optional)
+     * @param timestamp User-input timestamp or 0
      * @return Returns a new PayloadMap with the key-value-pair
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackPageViewConfig(String page_url, String page_title, String referrer,
-                                          JsonNode context) throws UnsupportedEncodingException;
+                                          JsonNode context, long timestamp) throws UnsupportedEncodingException;
 
     /**
      * Configuration for tracking a structured event
@@ -97,11 +99,12 @@ public interface PayloadMap {
      * @param property Property of the event being tracked.
      * @param value Value associated with the property being tracked.
      * @param context Additional JSON context (optional)
+     * @param timestamp User-input timestamp or 0
      * @return Returns a new PayloadMap with the key-value-pairs
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackStructuredEventConfig(String category, String action, String label, String property,
-                                                 String value, JsonNode context)throws UnsupportedEncodingException;
+                                                 String value, JsonNode context, long timestamp)throws UnsupportedEncodingException;
 
     /**
      * Configuration to track an unstructured event.
@@ -109,10 +112,11 @@ public interface PayloadMap {
      * @param eventName A name for the unstructured event being tracked.
      * @param dictInfo The unstructured information being tracked in dictionary form.
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
      * @throws UnsupportedEncodingException If JSON is in improper formatting
      */
     public PayloadMap trackUnstructuredEventConfig(String eventVendor, String eventName, JsonNode dictInfo,
-                                                   JsonNode context) throws UnsupportedEncodingException;
+                                                   JsonNode context, long timestamp) throws UnsupportedEncodingException;
     /**
      * Configuration to track an ecommerce transaction item. Not usually called alone, but called for each
      * individual item of the ecommerce transaction function.
@@ -125,11 +129,12 @@ public interface PayloadMap {
      * @param currency Currency used for the purchase.
      * @param context Additional JSON context for the tracking call (optional)
      * @param transaction_id Transaction ID, if left blank new value will be generated.
+     * @param timestamp User-input timestamp or 0
      * @throws java.io.UnsupportedEncodingException
      * @return Returns a new PayloadMap with the key-value-pairs
      */
     public PayloadMap trackEcommerceTransactionItemConfig(String order_id, String sku, String price, String quantity,
-                                                          String name, String category, String currency, JsonNode context, String transaction_id)
+                                                          String name, String category, String currency, JsonNode context, String transaction_id, long timestamp)
             throws UnsupportedEncodingException;
 
     /**
@@ -146,18 +151,23 @@ public interface PayloadMap {
      * @param country The customers country.
      * @param currency The currency used for the purchase
      * @param context Additional JSON context for the tracking call (optional)
+     * @param timestamp User-input timestamp or 0
      * @return Returns a new PayloadMap with the key-value-pair
      * @throws UnsupportedEncodingException
      */
     public PayloadMap trackEcommerceTransactionConfig(String order_id, String total_value, String affiliation, String tax_value,
-                                                      String shipping, String city, String state, String country, String currency, JsonNode context)
+                                                      String shipping, String city, String state, String country, String currency, JsonNode context, long timestamp)
             throws UnsupportedEncodingException;
 
     /**
      * Sets the timestamp on a PayloadMap
-     * @return Returns a new PayloadMap with the key-value-pair
      */
-    public PayloadMap setTimestamp();
+    public void setTimestamp();
+
+    /**
+     * Sets the timestamp on a PayloadMap
+     */
+    public void setTimestamp(float timestamp);
 
     //Getters
     public Set<String> getParamKeySet();
