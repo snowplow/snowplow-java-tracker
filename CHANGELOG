@@ -1,13 +1,13 @@
-Version 0.3.0 (2014-0x-xx)
+Version 0.3.0 (2014-07-13)
 --------------------------
-Added ablity for contexts to be HashMap, not just JSON string
-Added SLF4J logging for key events (e.g. tracker initialization)
-Added timestamp as option to each track method
-Created unit tests for Payload class
-Created unit tests for Utils class
-Updated Jackson dependency to newer version
-Removed the Contracts class and any use of it with a replacement
-Removed context for JSON String types
+Added ability for contexts to be HashMap, not just JSON string (#11)
+Added SLF4J logging for key events (e.g. tracker initialization) (#15)
+Added timestamp as option to each track method (#26)
+Created unit tests for Payload class (#34)
+Created unit tests for Utils class (#35)
+Updated Jackson dependency to newer version (#38)
+Removed the Contracts class and any use of it (#42)
+Removed support for context passed in as String (#44)
 
 Version 0.2.0 (2014-07-02)
 --------------------------
