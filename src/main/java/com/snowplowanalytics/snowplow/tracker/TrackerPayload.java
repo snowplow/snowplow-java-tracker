@@ -57,21 +57,28 @@ public class TrackerPayload implements Payload {
         }
     }
 
-    public void setContext() {
+    public void setData(Object data) {
         if (true) {
             // if object passed is an array,
         } else {
             // else it's just an ObjectNode with data to put in
         }
+
+        objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data));
+    }
+
+    public void setContext() {
+
     }
 
     public void setSchema(String schema) {
         // Always sets schema with key "$schema"
+        objectNode.put(Parameter.SCHEMA, schema);
     }
 
     @Override
     public JsonNode getNode() {
-        return null;
+        return objectNode;
     }
 
     @Override
