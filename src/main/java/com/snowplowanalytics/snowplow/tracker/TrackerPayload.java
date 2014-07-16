@@ -15,46 +15,56 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.Map;
 import java.util.Set;
 
-public class TrackerPayload extends ObjectNode implements Payload {
+public class TrackerPayload implements Payload {
+
+    private ObjectMapper objectMapper = Util.defaultMapper();
+    private ObjectNode objectNode;
 
     public TrackerPayload() {
-
-    }
-
-    public TrackerPayload(Map map) {
-
-    }
-
-    public TrackerPayload(JsonNode jsonNode) {
-
+        objectNode = objectMapper.createObjectNode();
     }
 
     @Override
     public void add(String key, String value) {
-        super.put(key, value);
+        objectNode.put(key, value);
     }
+
+    public void add(String key, Object value) { objectNode.putPOJO(key, value); }
 
     @Override
     public void addMap(Map map) {
-        super.putAll(map);
         Set<String> keys = map.keySet();
         for(String key : keys) {
-            super.putPOJO(key, map.get(key));
+            objectNode.putPOJO(key, objectMapper.valueToTree(map.get(key)));
         }
     }
 
     @Override
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
         if (base64_encoded) { // base64 encoded data
-
+            objectNode.put(type_encoded, Util.base64Encode(map.toString()));
         } else { // add it as a child node
-            
+            add(type_no_encoded, map);
         }
+    }
+
+    public void setContext() {
+        if (true) {
+            // if object passed is an array,
+        } else {
+            // else it's just an ObjectNode with data to put in
+        }
+    }
+
+    public void setSchema(String schema) {
+        // Always sets schema with key "$schema"
     }
 
     @Override
@@ -65,5 +75,10 @@ public class TrackerPayload extends ObjectNode implements Payload {
     @Override
     public Map getMap() {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return objectNode.toString();
     }
 }
