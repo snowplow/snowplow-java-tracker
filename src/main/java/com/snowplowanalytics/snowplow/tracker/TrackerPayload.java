@@ -36,7 +36,9 @@ public class TrackerPayload implements Payload {
         objectNode.put(key, value);
     }
 
-    public void add(String key, Object value) { objectNode.putPOJO(key, value); }
+    public void add(String key, Object value) {
+        objectNode.putPOJO(key, objectMapper.valueToTree(value));
+    }
 
     @Override
     public void addMap(Map map) {
