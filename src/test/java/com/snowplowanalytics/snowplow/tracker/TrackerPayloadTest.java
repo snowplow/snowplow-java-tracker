@@ -13,7 +13,6 @@ public class TrackerPayloadTest extends TestCase {
     public void testAddString() throws Exception {
         Payload payload = new TrackerPayload();
         payload.add("foo", "bar");
-        System.out.println(payload.toString());
 
         String res = "{\"foo\":\"bar\"}";
         assertEquals(payload.toString(), res);
@@ -21,6 +20,11 @@ public class TrackerPayloadTest extends TestCase {
 
     @Test
     public void testAddObject() throws Exception {
+
+    }
+
+    @Test
+    public void testAddMap() throws Exception {
         Map foo = new LinkedHashMap<String, String>();
         ArrayList<String> bar = new ArrayList<String>();
         bar.add("somebar");
@@ -35,13 +39,41 @@ public class TrackerPayloadTest extends TestCase {
     }
 
     @Test
-    public void testAddMap() throws Exception {
+    public void testAddMapNotEncoding() throws Exception {
+        Map foo = new LinkedHashMap<String, String>();
+        ArrayList<String> bar = new ArrayList<String>();
+        bar.add("somebar");
+        bar.add("somebar2");
+        foo.put("myKey", "my Value");
+        foo.put("mehh", bar);
+        Payload payload = new TrackerPayload();
+        payload.addMap(foo, false, "cx", "co");
 
+        String res = "{\"co\":{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}}";
+        assertEquals(payload.toString(), res);
     }
 
     @Test
-    public void testAddMap1() throws Exception {
+    public void testAddMapEncoding() throws Exception {
+        Map foo = new LinkedHashMap<String, String>();
+        ArrayList<String> bar = new ArrayList<String>();
+        bar.add("somebar");
+        bar.add("somebar2");
+        foo.put("myKey", "my Value");
+        foo.put("mehh", bar);
+        Payload payload = new TrackerPayload();
+        payload.addMap(foo, true, "cx", "co");
 
+        String res = "{\"cx\":\"e215S2V5PW15IFZhbHVlLCBtZWhoPVtzb21lYmFyLCBzb21lYmFyMl19\"}";
+        assertEquals(payload.toString(), res);
+    }
+
+    @Test
+    public void testSetSchema() throws Exception {
+        Payload payload = new TrackerPayload();
+        payload.setSchema("iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0");
+        String res = "{\"$schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\"}";
+        assertEquals(payload.toString(), res);
     }
 
     @Test
