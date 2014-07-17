@@ -16,15 +16,21 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
 public class TrackerPayload implements Payload {
 
     private ObjectMapper objectMapper = Util.defaultMapper();
+    private final Logger logger = LoggerFactory.getLogger(TrackerPayload.class);
     private ObjectNode objectNode;
 
     public TrackerPayload() {
@@ -58,17 +64,17 @@ public class TrackerPayload implements Payload {
     }
 
     public void setData(Object data) {
-        if (true) {
-            // if object passed is an array,
-        } else {
-            // else it's just an ObjectNode with data to put in
+        if (data instanceof ArrayList || data.getClass().isArray()) {
+            // If object passed is an array, add ArrayNode
+            logger.debug("Object recognized as an array.");
+            objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data));
+
+        } else if (data instanceof Map || data instanceof Payload ){
+            // Else it's just an ObjectNode with data to put in or a Payload
+            logger.debug("Object recognized as a map (or payload).");
+            objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data));
+
         }
-
-        objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data));
-    }
-
-    public void setContext() {
-
     }
 
     public void setSchema(String schema) {

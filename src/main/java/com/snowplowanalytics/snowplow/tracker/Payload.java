@@ -42,6 +42,8 @@ public interface Payload {
 
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded);
 
+    public void setData(Object data);
+
     public JsonNode getNode();
 
     public void setSchema(String schema);

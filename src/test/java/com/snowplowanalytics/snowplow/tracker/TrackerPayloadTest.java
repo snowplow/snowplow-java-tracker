@@ -69,6 +69,36 @@ public class TrackerPayloadTest extends TestCase {
     }
 
     @Test
+    public void testSetData() {
+        Payload payload;
+        String res;
+        LinkedHashMap foo = new LinkedHashMap<String, String>();
+        ArrayList<String> bar = new ArrayList<String>();
+        bar.add("somebar");
+        bar.add("somebar2");
+        foo.put("myKey", "my Value");
+        foo.put("mehh", bar);
+        String myarray[] = {"arrayItem","arrayItem2"};
+        payload = new TrackerPayload();
+        payload.setData(myarray);
+
+        res = "{\"data\":[\"arrayItem\",\"arrayItem2\"]}";
+        assertEquals(payload.toString(), res);
+
+        payload = new TrackerPayload();
+        payload.setData(foo);
+
+        res = "{\"data\":{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}}";
+        assertEquals(payload.toString(), res);
+
+        payload = new TrackerPayload();
+        payload.setData(bar);
+
+        res = "{\"data\":[\"somebar\",\"somebar2\"]}";
+        assertEquals(payload.toString(), res);
+    }
+
+    @Test
     public void testSetSchema() throws Exception {
         Payload payload = new TrackerPayload();
         payload.setSchema("iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0");
