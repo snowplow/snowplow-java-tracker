@@ -24,40 +24,37 @@ public class Subject {
         setPlatform(DevicePlatform.Desktop);
     }
 
-    public Map setPlatform(DevicePlatform platform) {
+    public void setPlatform(DevicePlatform platform) {
         this.standardPairs.put(Parameter.PLATFORM, platform.toString());
-        return this.standardPairs;
     }
 
-    public Map setUserId(String userId) {
+    public void setUserId(String userId) {
         this.standardPairs.put(Parameter.UID, userId);
-        return this.standardPairs;
     }
 
-    public Map setScreenResolution(int width, int height) {
+    public void setScreenResolution(int width, int height) {
         String res = Integer.toString(width) + "x" + Integer.toString(height);
         this.standardPairs.put(Parameter.RESOLUTION, res);
-        return this.standardPairs;
     }
 
-    public Map setViewPort(int width, int height) {
+    public void setViewPort(int width, int height) {
         String res = Integer.toString(width) + "x" + Integer.toString(height);
         this.standardPairs.put(Parameter.VIEWPORT, res);
-        return this.standardPairs;
     }
 
-    public Map setColorDepth(int depth) {
+    public void setColorDepth(int depth) {
         this.standardPairs.put(Parameter.COLOR_DEPTH, Integer.toString(depth));
-        return this.standardPairs;
     }
 
-    public Map setTimezone(String timezone) {
+    public void setTimezone(String timezone) {
         this.standardPairs.put(Parameter.TIMEZONE, timezone);
-        return this.standardPairs;
     }
 
-    public Map setLanguage(String language) {
+    public void setLanguage(String language) {
         this.standardPairs.put(Parameter.LANGUAGE, language);
+    }
+
+    public Map getSubject() {
         return this.standardPairs;
     }
 }
