@@ -14,6 +14,9 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -23,13 +26,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class TrackerPayload implements Payload {
 
-    private ObjectMapper objectMapper = Util.defaultMapper();
+    private final ObjectMapper objectMapper = Util.defaultMapper();
     private final Logger logger = LoggerFactory.getLogger(TrackerPayload.class);
     private ObjectNode objectNode;
 
@@ -89,7 +94,17 @@ public class TrackerPayload implements Payload {
 
     @Override
     public Map getMap() {
-        return null;
+        HashMap<String, String> map = new HashMap<String, String>();
+        try {
+            map = objectMapper.readValue(objectNode.toString(), new TypeReference<HashMap<String,String>>(){});
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 
     @Override
