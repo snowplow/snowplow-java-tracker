@@ -13,15 +13,22 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class Subject {
 
     private HashMap<String, String> standardPairs;
 
     public Subject() {
+        // Default Platform
         setPlatform(DevicePlatform.Desktop);
+
+        // Default Timezone
+        TimeZone tz = Calendar.getInstance().getTimeZone();
+        setTimezone(tz.getID());
     }
 
     public void setPlatform(DevicePlatform platform) {
