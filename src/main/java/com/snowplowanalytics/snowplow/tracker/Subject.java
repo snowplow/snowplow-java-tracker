@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
+
+package com.snowplowanalytics.snowplow.tracker;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Subject {
+
+    private HashMap<String, String> standardPairs;
+
+    public Subject() {
+        setPlatform(DevicePlatform.Desktop);
+    }
+
+    public Map setPlatform(DevicePlatform platform) {
+        this.standardPairs.put(Parameter.PLATFORM, platform.toString());
+        return this.standardPairs;
+    }
+
+    public Map setUserId(String userId) {
+        this.standardPairs.put(Parameter.UID, userId);
+        return this.standardPairs;
+    }
+
+    public Map setScreenResolution(int width, int height) {
+        String res = Integer.toString(width) + "x" + Integer.toString(height);
+        this.standardPairs.put(Parameter.RESOLUTION, res);
+        return this.standardPairs;
+    }
+
+    public Map setViewPort(int width, int height) {
+        String res = Integer.toString(width) + "x" + Integer.toString(height);
+        this.standardPairs.put(Parameter.VIEWPORT, res);
+        return this.standardPairs;
+    }
+
+    public Map setColorDepth(int depth) {
+        this.standardPairs.put(Parameter.COLOR_DEPTH, Integer.toString(depth));
+        return this.standardPairs;
+    }
+
+    public Map setTimezone(String timezone) {
+        this.standardPairs.put(Parameter.TIMEZONE, timezone);
+        return this.standardPairs;
+    }
+
+    public Map setLanguage(String language) {
+        this.standardPairs.put(Parameter.LANGUAGE, language);
+        return this.standardPairs;
+    }
+}
