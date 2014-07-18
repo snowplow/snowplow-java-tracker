@@ -15,8 +15,6 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -29,10 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
 enum HttpMethod {
     GET,
