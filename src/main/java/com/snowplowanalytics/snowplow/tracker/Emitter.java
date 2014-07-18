@@ -30,21 +30,16 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-enum HttpMethod {
-    GET,
-    POST
-}
-
 public class Emitter {
 
     private URIBuilder uri;
-    private HttpMethod httpMethod = HttpMethod.GET;
+    private EmitterHttpMethod httpMethod = EmitterHttpMethod.GET;
     private final ArrayList<Payload> buffer = new ArrayList<Payload>();
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
 
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
-    public Emitter(String URI, HttpMethod httpMethod) {
+    public Emitter(String URI, EmitterHttpMethod httpMethod) {
         uri = new URIBuilder()
                 .setScheme("http")
                 .setHost(URI)
@@ -100,11 +95,11 @@ public class Emitter {
 //    }
 
     public void flushBuffer() {
-        if (httpMethod == HttpMethod.GET) {
+        if (httpMethod == EmitterHttpMethod.GET) {
             for (Payload payload : buffer) {
                 sendGetData(payload);
             }
-        } else if (httpMethod == HttpMethod.POST) {
+        } else if (httpMethod == EmitterHttpMethod.POST) {
             Payload postPayload = new TrackerPayload();
             postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
             postPayload.setData(buffer);

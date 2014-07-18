@@ -10,12 +10,12 @@ public class EmitterTest extends TestCase {
 
     @Test
     public void testEmitterConstructor() throws Exception {
-        Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.POST);
+        Emitter emitter = new Emitter("segfault.ngrok.com", EmitterHttpMethod.POST);
     }
 
     @Test
     public void testFlushGet() throws Exception {
-        Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.GET);
+        Emitter emitter = new Emitter("segfault.ngrok.com", EmitterHttpMethod.GET);
 
         Payload payload;
         String res;
