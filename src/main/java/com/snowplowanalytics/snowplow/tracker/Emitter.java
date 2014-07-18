@@ -57,7 +57,10 @@ public class Emitter {
     }
 
     public boolean addToBuffer(Payload payload) {
-        return buffer.add(payload);
+        boolean ret = buffer.add(payload);
+        if (buffer.size() == 10)
+            flushBuffer();
+        return ret;
     }
 
 //    public void sendStuff() {
@@ -100,7 +103,7 @@ public class Emitter {
 //        }
 //    }
 
-    public void flushBuffer() throws URISyntaxException, IOException {
+    public void flushBuffer() {
         if (httpMethod == HttpMethod.GET) {
             for (Payload payload : buffer) {
                 sendGetData(payload);
