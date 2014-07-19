@@ -18,4 +18,5 @@ public class Constants {
     public static final String DEFAULT_VENDOR = "com.snowplowanalytics.snowplow";
     public static final String SCHEMA_PAYLOAD_DATA = "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0";
 
+    public static final String EVENT_PAGE_VIEW = "pv";
 }

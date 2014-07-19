@@ -21,6 +21,7 @@ public class Parameter {
     public static final String TID = "tid";
     public static final String EID = "eid";
     public static final String TIMESTAMP = "dtm";
+    public static final String TRACKER_VERSION = "tv";
 
     public static final String UID = "uid";
     public static final String CONTEXT = "co";
@@ -42,4 +43,9 @@ public class Parameter {
     public static final String COLOR_DEPTH = "cd";
     public static final String TIMEZONE = "tz";
     public static final String LANGUAGE = "lang";
+
+    // Page View
+    public static final String PAGE_URL = "url";
+    public static final String PAGE_TITLE = "page";
+    public static final String PAGE_REFR = "refr";
 }
