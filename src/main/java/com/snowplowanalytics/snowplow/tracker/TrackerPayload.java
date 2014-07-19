@@ -45,12 +45,17 @@ public class TrackerPayload implements Payload {
         objectNode.put(key, value);
     }
 
+    @Override
     public void add(String key, Object value) {
         objectNode.putPOJO(key, objectMapper.valueToTree(value));
     }
 
     @Override
     public void addMap(Map map) {
+        // Return if we don't have a map
+        if (map == null)
+            return;
+
         Set<String> keys = map.keySet();
         for(String key : keys) {
             objectNode.putPOJO(key, objectMapper.valueToTree(map.get(key)));
@@ -59,6 +64,10 @@ public class TrackerPayload implements Payload {
 
     @Override
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
+        // Return if we don't have a map
+        if (map == null)
+            return;
+
         if (base64_encoded) { // base64 encoded data
             objectNode.put(type_encoded, Util.base64Encode(map.toString()));
         } else { // add it as a child node
