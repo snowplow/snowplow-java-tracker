@@ -21,12 +21,16 @@ public class Tracker {
     private Emitter emitter;
     private String appId;
     private String namespace;
+    private String contextSchema;
+    private String unstructSchema;
 
     public Tracker(Emitter emitter, String appId, boolean base64Encoded, String namespace) {
         this.emitter = emitter;
         this.appId = appId;
         this.base64Encoded = base64Encoded;
         this.namespace = namespace;
+        this.setSchema(Constants.DEFAULT_VENDOR, Constants.DEFAULT_SCHEMA_TAG,
+                Constants.DEFAULT_SCHEMA_VERSION);
     }
 
     private Payload completePayload(Payload payload, Map context, double timestamp) {
@@ -46,6 +50,11 @@ public class Tracker {
 
     private void addTrackerPayload(Payload payload) {
         this.emitter.addToBuffer(payload);
+    }
+
+    public void setSchema(String vendor, String schemaTag, String version) {
+        this.contextSchema = vendor + "/contexts/" + schemaTag + version;
+        this.unstructSchema = vendor + "/unstruct_event/" + schemaTag + version;
     }
 
     public void trackPageView(String pageUrl, String pageTitle, String referrer, Map context) {
