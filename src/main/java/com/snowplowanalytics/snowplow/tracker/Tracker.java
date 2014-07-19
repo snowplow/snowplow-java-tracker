@@ -57,8 +57,16 @@ public class Tracker {
         this.unstructSchema = vendor + "/unstruct_event/" + schemaTag + version;
     }
 
+    public void trackPageView(String pageUrl, String pageTitle, String referrer) {
+        trackPageView(pageUrl, pageTitle, referrer, null, 0);
+    }
+
     public void trackPageView(String pageUrl, String pageTitle, String referrer, Map context) {
-        trackPageView(pageUrl,pageTitle, referrer,context, 0);
+        trackPageView(pageUrl,pageTitle, referrer, context, 0);
+    }
+
+    public void trackPageView(String pageUrl, String pageTitle, String referrer, double timestamp) {
+        trackPageView(pageUrl, pageTitle, referrer, null, timestamp);
     }
 
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
