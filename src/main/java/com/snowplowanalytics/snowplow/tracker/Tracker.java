@@ -29,7 +29,7 @@ public class Tracker {
         this.namespace = namespace;
     }
 
-    private Payload completePayload(Payload payload, double timestamp) {
+    private Payload completePayload(Payload payload, Map context, double timestamp) {
         payload.add(Parameter.TID, Util.getTransactionId());
         payload.add(Parameter.TIMESTAMP, Util.getTimestamp());
 
@@ -37,6 +37,9 @@ public class Tracker {
 
         // If timestamp is set to 0, generate one
         payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Util.getTimestamp() : timestamp));
+
+        // Encodes context data
+        payload.addMap(context, this.base64Encoded, Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
 
         return payload;
     }
@@ -57,7 +60,7 @@ public class Tracker {
         payload.add(Parameter.PAGE_TITLE, pageTitle);
         payload.add(Parameter.PAGE_REFR, referrer);
 
-        completePayload(payload, timestamp);
+        completePayload(payload, context, timestamp);
 
         addTrackerPayload(payload);
     }
