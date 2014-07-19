@@ -15,6 +15,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -68,8 +69,16 @@ public class TrackerPayload implements Payload {
         if (map == null)
             return;
 
+        String mapString;
+        try {
+            mapString = objectMapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return; // Return because we can't continue
+        }
+
         if (base64_encoded) { // base64 encoded data
-            objectNode.put(type_encoded, Util.base64Encode(map.toString()));
+            objectNode.put(type_encoded, Util.base64Encode(mapString));
         } else { // add it as a child node
             add(type_no_encoded, map);
         }
