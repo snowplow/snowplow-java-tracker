@@ -20,7 +20,7 @@ public class EmitterTest extends TestCase {
 
         Payload payload;
         String res;
-        LinkedHashMap foo = new LinkedHashMap<String, String>();
+        LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
         bar.add("somebar");
         bar.add("somebar2");
