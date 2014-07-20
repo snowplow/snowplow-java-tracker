@@ -18,25 +18,17 @@ public class Parameter {
     public static final String SCHEMA = "schema";
     public static final String DATA = "data";
     public static final String EVENT = "e";
-    public static final String TID = "tid";
     public static final String EID = "eid";
     public static final String TIMESTAMP = "dtm";
     public static final String TRACKER_VERSION = "tv";
+    public static final String APPID = "aid";
+    public static final String NAMESPACE = "tna";
 
     public static final String UID = "uid";
     public static final String CONTEXT = "co";
     public static final String CONTEXT_ENCODED = "cx";
     public static final String UNSTRUCTURED = "ue_pr";
     public static final String UNSTRUCTURED_ENCODED = "ue_px";
-
-    // Transaction Item
-    public static final String ITEM_ID = "ti_id";
-    public static final String ITEM_SKU = "ti_sk";
-    public static final String ITEM_NAME = "ti_nm";
-    public static final String ITEM_CATEGORY = "ti_ca";
-    public static final String ITEM_PRICE = "ti_pr";
-    public static final String ITEM_QUANTITY = "ti_qu";
-    public static final String ITEM_CURRENCY = "ti_cu";
 
     // Subject class
     public static final String PLATFORM = "p";
@@ -57,4 +49,28 @@ public class Parameter {
     public static final String SE_LABEL = "se_la";
     public static final String SE_PROPERTY = "se_pr";
     public static final String SE_VALUE = "se_va";
+
+    // Ecomm Transaction
+    public static final String TR_ID = "tr_id";
+    public static final String TR_TOTAL = "tr_tt";
+    public static final String TR_AFFILIATION = "tr_af";
+    public static final String TR_TAX = "tr_tx";
+    public static final String TR_SHIPPING = "tr_sh";
+    public static final String TR_CITY = "tr_ci";
+    public static final String TR_STATE = "tr_st";
+    public static final String TR_COUNTRY = "tr_co";
+    public static final String TR_CURRENCY = "tr_cu";
+
+    // Transaction Item
+    public static final String TI_ITEM_ID = "ti_id";
+    public static final String TI_ITEM_SKU = "ti_sk";
+    public static final String TI_ITEM_NAME = "ti_nm";
+    public static final String TI_ITEM_CATEGORY = "ti_ca";
+    public static final String TI_ITEM_PRICE = "ti_pr";
+    public static final String TI_ITEM_QUANTITY = "ti_qu";
+    public static final String TI_ITEM_CURRENCY = "ti_cu";
+
+    // Screen View
+    public static final String SV_ID = "id";
+    public static final String SV_NAME = "name";
 }

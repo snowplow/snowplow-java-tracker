@@ -13,9 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.sun.xml.internal.rngom.digested.DDataPattern;
-
-import java.awt.PageAttributes;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Tracker {
@@ -25,6 +25,8 @@ public class Tracker {
     private String appId;
     private String namespace;
     private String contextSchema;
+    private String baseSchemaPath;
+    private String schemaTag;
     private String unstructSchema;
 
     public Tracker(Emitter emitter, String appId, boolean base64Encoded, String namespace) {
@@ -37,7 +39,8 @@ public class Tracker {
     }
 
     private Payload completePayload(Payload payload, Map context, double timestamp) {
-        payload.add(Parameter.TID, Util.getTransactionId());
+        payload.add(Parameter.APPID, this.appId);
+        payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TIMESTAMP, Util.getTimestamp());
 
         payload.add(Parameter.TRACKER_VERSION, Version.VERSION);
@@ -58,6 +61,8 @@ public class Tracker {
     public void setSchema(String vendor, String schemaTag, String version) {
         this.contextSchema = vendor + "/contexts/" + schemaTag + version;
         this.unstructSchema = vendor + "/unstruct_event/" + schemaTag + version;
+        this.baseSchemaPath = vendor;
+        this.schemaTag = schemaTag;
     }
 
     public void trackPageView(String pageUrl, String pageTitle, String referrer) {
@@ -135,10 +140,113 @@ public class Tracker {
         envelope.setData(eventData);
 
         payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
-        payload.addMap(envelope.getMap(), base64Encoded, Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
+        payload.addMap(envelope.getMap(), base64Encoded,
+                Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
 
         completePayload(payload, context, timestamp);
 
         addTrackerPayload(payload);
+    }
+
+    protected void trackEcommerceTransactionItem(String order_id, String sku, Double price,
+                                                 Integer quantity, String name, String category,
+                                                 String currency, Map context, long timestamp) {
+        Payload payload = new TrackerPayload();
+        payload.add(Parameter.EVENT, Constants.EVENT_ECOMM_ITEM);
+        payload.add(Parameter.TI_ITEM_ID, order_id);
+        payload.add(Parameter.TI_ITEM_SKU, sku);
+        payload.add(Parameter.TI_ITEM_NAME, name);
+        payload.add(Parameter.TI_ITEM_CATEGORY, category);
+        payload.add(Parameter.TI_ITEM_PRICE, price);
+        payload.add(Parameter.TI_ITEM_QUANTITY, quantity);
+        payload.add(Parameter.TI_ITEM_CURRENCY, currency);
+
+        completePayload(payload, context, timestamp);
+
+        addTrackerPayload(payload);
+    }
+
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
+                                          Double tax_value, Double shipping, String city,
+                                          String state, String country, String currency,
+                                          List<TransactionItem> items) {
+        trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
+                state, country, currency, items, null, 0);
+    }
+
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
+                                          Double tax_value, Double shipping, String city,
+                                          String state, String country, String currency,
+                                          List<TransactionItem> items, Map context) {
+        trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
+                state, country, currency, items, context, 0);
+    }
+
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
+                                          Double tax_value, Double shipping, String city,
+                                          String state, String country, String currency,
+                                          List<TransactionItem> items, long timestamp) {
+        trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
+                state, country, currency, items, null, timestamp);
+    }
+
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
+                                          Double tax_value, Double shipping, String city,
+                                          String state, String country, String currency,
+                                          List<TransactionItem> items, Map context,long timestamp) {
+        Payload payload = new TrackerPayload();
+        payload.add(Parameter.EVENT, Constants.EVENT_ECOMM);
+        payload.add(Parameter.TR_ID, order_id);
+        payload.add(Parameter.TR_TOTAL, total_value);
+        payload.add(Parameter.TR_AFFILIATION, affiliation);
+        payload.add(Parameter.TR_TAX, tax_value);
+        payload.add(Parameter.TR_SHIPPING, shipping);
+        payload.add(Parameter.TR_CITY, city);
+        payload.add(Parameter.TR_STATE, state);
+        payload.add(Parameter.TR_COUNTRY, country);
+        payload.add(Parameter.TR_CURRENCY, currency);
+
+        completePayload(payload, context, timestamp);
+
+        ArrayList itemResults = new ArrayList();
+
+        for (TransactionItem item : items) {
+            trackEcommerceTransactionItem(
+                    (String) item.get(Parameter.TI_ITEM_ID),
+                    (String) item.get(Parameter.TI_ITEM_SKU),
+                    (Double) item.get(Parameter.TI_ITEM_PRICE),
+                    (Integer) item.get(Parameter.TI_ITEM_QUANTITY),
+                    (String) item.get(Parameter.TI_ITEM_NAME),
+                    (String) item.get(Parameter.TI_ITEM_CATEGORY),
+                    (String) item.get(Parameter.TI_ITEM_CURRENCY),
+                    (Map) item.get(Parameter.CONTEXT),
+                    timestamp);
+        }
+    }
+
+    public void trackScreenView(String name, String id) {
+        trackScreenView(name, id, null, 0);
+    }
+
+    public void trackScreenView(String name, String id, Map context) {
+        trackScreenView(name, id, context, 0);
+    }
+
+    public void trackScreenView(String name, String id, long timestamp) {
+        trackScreenView(name, id, null, timestamp);
+    }
+
+    public void trackScreenView(String name, String id, Map context, long timestamp) {
+        Map<String, String> screenViewProperties = new HashMap<String, String>();
+
+        screenViewProperties.put(Parameter.SV_NAME, name);
+        screenViewProperties.put(Parameter.SV_ID, id);
+
+        Payload payload = new TrackerPayload();
+
+        payload.setSchema( this.baseSchemaPath + "/contexts/" + this.schemaTag + Version.VERSION);
+        payload.setData(screenViewProperties);
+
+        trackUnstructuredEvent(payload.getMap(), context, timestamp);
     }
 }

@@ -38,7 +38,7 @@ public interface Payload {
 
     public void add(String key, Object value);
 
-    public void addMap(Map map);
+    public void addMap(Map<String, Object> map);
 
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded);
 

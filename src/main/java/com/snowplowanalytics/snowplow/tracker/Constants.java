@@ -22,5 +22,6 @@ public class Constants {
     public static final String EVENT_PAGE_VIEW = "pv";
     public static final String EVENT_STRUCTURED = "se";
     public static final String EVENT_UNSTRUCTURED = "ue";
-
+    public static final String EVENT_ECOMM = "tr";
+    public static final String EVENT_ECOMM_ITEM = "ti";
 }

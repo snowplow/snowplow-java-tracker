@@ -16,7 +16,7 @@ public class TrackerPayloadTest extends TestCase {
         payload.add("foo", "bar");
 
         String res = "{\"foo\":\"bar\"}";
-        assertEquals(payload.toString(), res);
+        assertEquals(res, payload.toString());
     }
 
     @Test
@@ -26,7 +26,7 @@ public class TrackerPayloadTest extends TestCase {
 
     @Test
     public void testAddMap() throws Exception {
-        Map foo = new LinkedHashMap<String, String>();
+        Map<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
         bar.add("somebar");
         bar.add("somebar2");
@@ -36,12 +36,12 @@ public class TrackerPayloadTest extends TestCase {
         payload.addMap(foo);
 
         String res = "{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}";
-        assertEquals(payload.toString(),res);
+        assertEquals(res, payload.toString());
     }
 
     @Test
     public void testAddMapNotEncoding() throws Exception {
-        Map foo = new LinkedHashMap<String, String>();
+        Map<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
         bar.add("somebar");
         bar.add("somebar2");
@@ -51,12 +51,12 @@ public class TrackerPayloadTest extends TestCase {
         payload.addMap(foo, false, "cx", "co");
 
         String res = "{\"co\":{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}}";
-        assertEquals(payload.toString(), res);
+        assertEquals(res, payload.toString());
     }
 
     @Test
     public void testAddMapEncoding() throws Exception {
-        Map foo = new LinkedHashMap<String, String>();
+        Map<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
         bar.add("somebar");
         bar.add("somebar2");
@@ -65,15 +65,15 @@ public class TrackerPayloadTest extends TestCase {
         Payload payload = new TrackerPayload();
         payload.addMap(foo, true, "cx", "co");
 
-        String res = "{\"cx\":\"e215S2V5PW15IFZhbHVlLCBtZWhoPVtzb21lYmFyLCBzb21lYmFyMl19\"}";
-        assertEquals(payload.toString(), res);
+        String res = "{\"cx\":\"eyJteUtleSI6Im15IFZhbHVlIiwibWVoaCI6WyJzb21lYmFyIiwic29tZWJhcjIiXX0\"}";
+        assertEquals(res, payload.toString());
     }
 
     @Test
     public void testSetData() {
         Payload payload;
         String res;
-        LinkedHashMap foo = new LinkedHashMap<String, String>();
+        LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
         bar.add("somebar");
         bar.add("somebar2");
@@ -84,27 +84,27 @@ public class TrackerPayloadTest extends TestCase {
         payload.setData(myarray);
 
         res = "{\"data\":[\"arrayItem\",\"arrayItem2\"]}";
-        assertEquals(payload.toString(), res);
+        assertEquals(res, payload.toString());
 
         payload = new TrackerPayload();
         payload.setData(foo);
 
         res = "{\"data\":{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}}";
-        assertEquals(payload.toString(), res);
+        assertEquals(res, payload.toString());
 
         payload = new TrackerPayload();
         payload.setData(bar);
 
         res = "{\"data\":[\"somebar\",\"somebar2\"]}";
-        assertEquals(payload.toString(), res);
+        assertEquals(res, payload.toString());
     }
 
     @Test
     public void testSetSchema() throws Exception {
         Payload payload = new TrackerPayload();
         payload.setSchema("iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0");
-        String res = "{\"$schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\"}";
-        assertEquals(payload.toString(), res);
+        String res = "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\"}";
+        assertEquals(res, payload.toString());
     }
 
     @Test

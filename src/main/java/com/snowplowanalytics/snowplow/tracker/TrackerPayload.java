@@ -52,7 +52,7 @@ public class TrackerPayload implements Payload {
     }
 
     @Override
-    public void addMap(Map map) {
+    public void addMap(Map<String, Object> map) {
         // Return if we don't have a map
         if (map == null)
             return;
