@@ -48,4 +48,11 @@ public class Parameter {
     public static final String PAGE_URL = "url";
     public static final String PAGE_TITLE = "page";
     public static final String PAGE_REFR = "refr";
+
+    // Structured Event
+    public static final String SE_CATEGORY = "se_ca";
+    public static final String SE_ACTION = "se_ac";
+    public static final String SE_LABEL = "se_la";
+    public static final String SE_PROPERTY = "se_pr";
+    public static final String SE_VALUE = "se_va";
 }

@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.sun.xml.internal.rngom.digested.DDataPattern;
+
 import java.util.Map;
 
 public class Tracker {
@@ -76,6 +78,35 @@ public class Tracker {
         payload.add(Parameter.PAGE_URL, pageUrl);
         payload.add(Parameter.PAGE_TITLE, pageTitle);
         payload.add(Parameter.PAGE_REFR, referrer);
+
+        completePayload(payload, context, timestamp);
+
+        addTrackerPayload(payload);
+    }
+
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, String vendor) {
+        trackStructuredEvent(category, action, label, property, value, vendor, null, 0);
+    }
+
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, String vendor, Map context) {
+        trackStructuredEvent(category, action, label, property, value, vendor, context, 0);
+    }
+
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, String vendor, long timestamp) {
+        trackStructuredEvent(category, action, label, property, value, vendor, null, timestamp);
+    }
+
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, String vendor, Map context, long timestamp) {
+        Payload payload = new TrackerPayload();
+        payload.add(Parameter.EVENT, Constants.EVENT_STRUCTURED);
+        payload.add(Parameter.SE_CATEGORY, category);
+        payload.add(Parameter.SE_ACTION, action);
+        payload.add(Parameter.SE_LABEL, label);
+        payload.add(Parameter.SE_VALUE, value);
 
         completePayload(payload, context, timestamp);
 
