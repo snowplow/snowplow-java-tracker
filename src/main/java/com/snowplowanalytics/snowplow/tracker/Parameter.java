@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.tracker;
 
 public class Parameter {
     // General
-    public static final String SCHEMA = "$schema";
+    public static final String SCHEMA = "schema";
     public static final String DATA = "data";
     public static final String EVENT = "e";
     public static final String TID = "tid";

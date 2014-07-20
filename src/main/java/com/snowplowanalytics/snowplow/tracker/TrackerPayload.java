@@ -99,7 +99,7 @@ public class TrackerPayload implements Payload {
     }
 
     public void setSchema(String schema) {
-        // Always sets schema with key "$schema"
+        // Always sets schema with key "schema"
         objectNode.put(Parameter.SCHEMA, schema);
     }
 
