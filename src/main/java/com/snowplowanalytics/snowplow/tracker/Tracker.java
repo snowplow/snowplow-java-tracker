@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.sun.xml.internal.rngom.digested.DDataPattern;
 
+import java.awt.PageAttributes;
 import java.util.Map;
 
 public class Tracker {
@@ -85,28 +86,56 @@ public class Tracker {
     }
 
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, String vendor) {
-        trackStructuredEvent(category, action, label, property, value, vendor, null, 0);
+                                     int value) {
+        trackStructuredEvent(category, action, label, property, value, null, 0);
     }
 
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, String vendor, Map context) {
-        trackStructuredEvent(category, action, label, property, value, vendor, context, 0);
+                                     int value, Map context) {
+        trackStructuredEvent(category, action, label, property, value, context, 0);
     }
 
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, String vendor, long timestamp) {
-        trackStructuredEvent(category, action, label, property, value, vendor, null, timestamp);
+                                     int value, long timestamp) {
+        trackStructuredEvent(category, action, label, property, value, null, timestamp);
     }
 
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, String vendor, Map context, long timestamp) {
+                                     int value, Map context, long timestamp) {
         Payload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_STRUCTURED);
         payload.add(Parameter.SE_CATEGORY, category);
         payload.add(Parameter.SE_ACTION, action);
         payload.add(Parameter.SE_LABEL, label);
+        payload.add(Parameter.SE_PROPERTY, property);
         payload.add(Parameter.SE_VALUE, value);
+
+        completePayload(payload, context, timestamp);
+
+        addTrackerPayload(payload);
+    }
+
+    public void trackUnstructuredEvent(Map<String, Object> eventData) {
+        trackUnstructuredEvent(eventData, null, 0);
+    }
+
+    public void trackUnstructuredEvent(Map<String, Object> eventData, Map context) {
+        trackUnstructuredEvent(eventData, context, 0);
+    }
+
+    public void trackUnstructuredEvent(Map<String, Object> eventData, long timestamp) {
+        trackUnstructuredEvent(eventData, null, timestamp);
+    }
+
+    public void trackUnstructuredEvent(Map<String, Object> eventData, Map context, long timestamp) {
+        Payload payload = new TrackerPayload();
+        Payload envelope = new TrackerPayload();
+
+        envelope.setSchema(unstructSchema);
+        envelope.setData(eventData);
+
+        payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
+        payload.addMap(envelope.getMap(), base64Encoded, Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
 
         completePayload(payload, context, timestamp);
 

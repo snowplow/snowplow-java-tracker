@@ -26,6 +26,8 @@ public class Parameter {
     public static final String UID = "uid";
     public static final String CONTEXT = "co";
     public static final String CONTEXT_ENCODED = "cx";
+    public static final String UNSTRUCTURED = "ue_pr";
+    public static final String UNSTRUCTURED_ENCODED = "ue_px";
 
     // Transaction Item
     public static final String ITEM_ID = "ti_id";
