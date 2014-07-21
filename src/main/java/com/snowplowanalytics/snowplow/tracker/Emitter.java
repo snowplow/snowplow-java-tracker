@@ -33,6 +33,7 @@ import java.util.Iterator;
 public class Emitter {
 
     private URIBuilder uri;
+    private BufferOption option = BufferOption.Default;
     private EmitterHttpMethod httpMethod = EmitterHttpMethod.GET;
     private final ArrayList<Payload> buffer = new ArrayList<Payload>();
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -47,9 +48,13 @@ public class Emitter {
         this.httpMethod = httpMethod;
     }
 
+    public void setBufferOption(BufferOption option) {
+        this.option = option;
+    }
+
     public boolean addToBuffer(Payload payload) {
         boolean ret = buffer.add(payload);
-        if (buffer.size() == 10)
+        if (buffer.size() == option.getCode())
             flushBuffer();
         return ret;
     }
