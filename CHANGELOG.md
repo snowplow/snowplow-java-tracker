@@ -1,3 +1,10 @@
+Version 0.5.0 (2014-0x-xx)
+--------------------------
+Retrieves Snowplow version automatically pulled from Gradle (#13)
+Refactored networking unit tests for mock testing (#40)
+Created unit tests for Subject class (#46)
+Created an EnvelopePayload class (#50)
+
 Version 0.4.0 (2014-0x-xx)
 --------------------------
 Added support for in-memory batching (#6)
