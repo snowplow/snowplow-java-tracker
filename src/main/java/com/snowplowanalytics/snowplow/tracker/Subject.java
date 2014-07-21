@@ -23,12 +23,14 @@ public class Subject {
     private HashMap<String, String> standardPairs;
 
     public Subject() {
+        standardPairs = new HashMap<String, String>();
+
         // Default Platform
-        setPlatform(DevicePlatform.Desktop);
+        this.setPlatform(DevicePlatform.Desktop);
 
         // Default Timezone
         TimeZone tz = Calendar.getInstance().getTimeZone();
-        setTimezone(tz.getID());
+        this.setTimezone(tz.getID());
     }
 
     public void setPlatform(DevicePlatform platform) {

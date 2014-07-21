@@ -37,7 +37,9 @@ public class TrackerTest extends TestCase {
     @Test
     public void testTrackPageView3() throws Exception {
         Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.GET);
-        Tracker tracker = new Tracker(emitter, "AF003", true, "cloudfront");
+        Subject subject = new Subject();
+        subject.setViewPort(320, 480);
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", true);
         emitter.setHttpOption(HttpOption.Asynchronous);
 
         Map<String, String> context = new HashMap<String, String>();

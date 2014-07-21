@@ -30,12 +30,15 @@ public class Tracker {
     private String baseSchemaPath;
     private String schemaTag;
     private String unstructSchema;
+    private Subject subject;
 
-    public Tracker(Emitter emitter, String appId, boolean base64Encoded, String namespace) {
+    public Tracker(Emitter emitter, Subject subject,
+                   String namespace, String appId, boolean base64Encoded) {
         this.emitter = emitter;
         this.appId = appId;
         this.base64Encoded = base64Encoded;
         this.namespace = namespace;
+        this.subject = subject;
         this.setSchema(Constants.DEFAULT_VENDOR, Constants.DEFAULT_SCHEMA_TAG,
                 Constants.DEFAULT_SCHEMA_VERSION);
     }
@@ -58,6 +61,8 @@ public class Tracker {
             payload.addMap(context, this.base64Encoded, Parameter.CONTEXT_ENCODED,
                     Parameter.CONTEXT);
         }
+
+        payload.addMap(subject.getSubject());
 
         return payload;
     }
