@@ -10,6 +10,8 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.*;
+
 public class TrackerTest extends TestCase {
 
     @Test
@@ -44,5 +46,90 @@ public class TrackerTest extends TestCase {
         tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", context, 0);
 
         emitter.flushBuffer();
+    }
+
+    @Test
+    public void testTrackStructuredEvent() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackStructuredEvent1() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackStructuredEvent2() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackStructuredEvent3() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackUnstructuredEvent() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackUnstructuredEvent1() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackUnstructuredEvent2() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackUnstructuredEvent3() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackEcommerceTransactionItem() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackEcommerceTransaction() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackEcommerceTransaction1() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackEcommerceTransaction2() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackEcommerceTransaction3() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackScreenView() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackScreenView1() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackScreenView2() throws Exception {
+
+    }
+
+    @Test
+    public void testTrackScreenView3() throws Exception {
+
     }
 }
