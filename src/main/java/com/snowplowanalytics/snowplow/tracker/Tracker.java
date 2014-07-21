@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,6 +87,12 @@ public class Tracker {
 
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
                               Map context, double timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(pageUrl);
+        Preconditions.checkArgument(!pageUrl.isEmpty(), "pageUrl cannot be empty");
+        Preconditions.checkArgument(!pageTitle.isEmpty(), "pageTitle cannot be empty");
+        Preconditions.checkArgument(!referrer.isEmpty(), "referrer cannot be empty");
+
         Payload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_PAGE_VIEW);
         payload.add(Parameter.PAGE_URL, pageUrl);
@@ -113,6 +121,14 @@ public class Tracker {
 
     public void trackStructuredEvent(String category, String action, String label, String property,
                                      int value, Map context, long timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(label);
+        Preconditions.checkNotNull(property);
+        Preconditions.checkArgument(!label.isEmpty(), "label cannot be empty");
+        Preconditions.checkArgument(!property.isEmpty(), "property cannot be empty");
+        Preconditions.checkArgument(!category.isEmpty(), "property cannot be empty");
+        Preconditions.checkArgument(!action.isEmpty(), "property cannot be empty");
+
         Payload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_STRUCTURED);
         payload.add(Parameter.SE_CATEGORY, category);
@@ -157,6 +173,16 @@ public class Tracker {
     protected void trackEcommerceTransactionItem(String order_id, String sku, Double price,
                                                  Integer quantity, String name, String category,
                                                  String currency, Map context, long timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(name);
+        Preconditions.checkNotNull(category);
+        Preconditions.checkNotNull(currency);
+        Preconditions.checkArgument(!order_id.isEmpty(), "order_id cannot be empty");
+        Preconditions.checkArgument(!sku.isEmpty(), "sku cannot be empty");
+        Preconditions.checkArgument(!name.isEmpty(), "name cannot be empty");
+        Preconditions.checkArgument(!category.isEmpty(), "category cannot be empty");
+        Preconditions.checkArgument(!currency.isEmpty(), "currency cannot be empty");
+
         Payload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_ECOMM_ITEM);
         payload.add(Parameter.TI_ITEM_ID, order_id);
@@ -200,6 +226,19 @@ public class Tracker {
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
                                           List<TransactionItem> items, Map context,long timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(affiliation);
+        Preconditions.checkNotNull(city);
+        Preconditions.checkNotNull(state);
+        Preconditions.checkNotNull(country);
+        Preconditions.checkNotNull(currency);
+        Preconditions.checkArgument(!order_id.isEmpty(), "order_id cannot be empty");
+        Preconditions.checkArgument(!affiliation.isEmpty(), "affiliation cannot be empty");
+        Preconditions.checkArgument(!city.isEmpty(), "city cannot be empty");
+        Preconditions.checkArgument(!state.isEmpty(), "state cannot be empty");
+        Preconditions.checkArgument(!country.isEmpty(), "country cannot be empty");
+        Preconditions.checkArgument(!currency.isEmpty(), "ordecurrencyr_id cannot be empty");
+
         Payload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_ECOMM);
         payload.add(Parameter.TR_ID, order_id);
@@ -243,6 +282,11 @@ public class Tracker {
     }
 
     public void trackScreenView(String name, String id, Map context, long timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(id);
+        Preconditions.checkArgument(!name.isEmpty(), "name cannot be empty");
+        Preconditions.checkArgument(!id.isEmpty(), "id cannot be empty");
+
         Map<String, String> screenViewProperties = new HashMap<String, String>();
 
         screenViewProperties.put(Parameter.SV_NAME, name);
