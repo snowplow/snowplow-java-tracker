@@ -49,7 +49,13 @@ public class Tracker {
         payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Util.getTimestamp() : timestamp));
 
         // Encodes context data
-        payload.addMap(context, this.base64Encoded, Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
+        if (context != null) {
+            Payload envelope = new TrackerPayload();
+            envelope.setSchema(contextSchema);
+            envelope.setData(context);
+            payload.addMap(context, this.base64Encoded, Parameter.CONTEXT_ENCODED,
+                    Parameter.CONTEXT);
+        }
 
         return payload;
     }
