@@ -34,6 +34,7 @@ dependencies {
 
     // Apache HTTP
     compile 'org.apache.httpcomponents:httpclient:4.3.3'
+    compile 'org.apache.httpcomponents:httpasyncclient:4.0.1'
 
     // SLF4J logging API
     compile 'org.slf4j:slf4j-simple:1.7.7'

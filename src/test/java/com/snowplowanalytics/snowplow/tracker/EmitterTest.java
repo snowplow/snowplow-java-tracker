@@ -1,5 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -11,12 +13,12 @@ public class EmitterTest extends TestCase {
 
     @Test
     public void testEmitterConstructor() throws Exception {
-        Emitter emitter = new Emitter("segfault.ngrok.com", EmitterHttpMethod.POST);
+        Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.POST);
     }
 
     @Test
     public void testFlushGet() throws Exception {
-        Emitter emitter = new Emitter("segfault.ngrok.com", EmitterHttpMethod.GET);
+        Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.GET);
 
         Payload payload;
         String res;

@@ -11,9 +11,9 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
-public enum EmitterHttpMethod {
+public enum HttpMethod {
     GET,
     POST
 }

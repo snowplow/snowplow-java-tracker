@@ -1,13 +1,14 @@
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpOption;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class TrackerTest extends TestCase {
 
@@ -33,8 +34,9 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testTrackPageView3() throws Exception {
-        Emitter emitter = new Emitter("segfault.ngrok.com", EmitterHttpMethod.GET);
+        Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.GET);
         Tracker tracker = new Tracker(emitter, "AF003", true, "cloudfront");
+        emitter.setHttpOption(HttpOption.Asynchronous);
 
         Map<String, String> context = new HashMap<String, String>();
         context.put("some key", "some value");

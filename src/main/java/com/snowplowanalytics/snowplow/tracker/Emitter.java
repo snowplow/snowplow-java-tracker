@@ -14,13 +14,19 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpOption;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,27 +35,38 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class Emitter {
 
     private URIBuilder uri;
     private BufferOption option = BufferOption.Default;
-    private EmitterHttpMethod httpMethod = EmitterHttpMethod.GET;
+    private HttpMethod httpMethod = HttpMethod.GET;
+    private HttpOption httpOption = HttpOption.Synchronous;
+    private CloseableHttpClient httpClient;
+    private CloseableHttpAsyncClient httpAsyncClient;
     private final ArrayList<Payload> buffer = new ArrayList<Payload>();
-    private final CloseableHttpClient httpClient = HttpClients.createDefault();
 
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
-    public Emitter(String URI, EmitterHttpMethod httpMethod) {
+    public Emitter(String URI, HttpMethod httpMethod) {
         uri = new URIBuilder()
                 .setScheme("http")
                 .setHost(URI)
                 .setPath("/i");
         this.httpMethod = httpMethod;
+        this.httpClient = HttpClients.createDefault();
     }
 
     public void setBufferOption(BufferOption option) {
         this.option = option;
+    }
+
+    public void setHttpOption(HttpOption option) {
+        this.httpOption = option;
+        this.httpAsyncClient = HttpAsyncClients.createDefault();
+        this.httpAsyncClient.start();
     }
 
     public boolean addToBuffer(Payload payload) {
@@ -60,11 +77,11 @@ public class Emitter {
     }
 
     public void flushBuffer() {
-        if (httpMethod == EmitterHttpMethod.GET) {
+        if (httpMethod == HttpMethod.GET) {
             for (Payload payload : buffer) {
                 sendGetData(payload);
             }
-        } else if (httpMethod == EmitterHttpMethod.POST) {
+        } else if (httpMethod == HttpMethod.POST) {
             Payload postPayload = new TrackerPayload();
             postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
             postPayload.setData(buffer);
@@ -79,13 +96,25 @@ public class Emitter {
 
         try {
             StringEntity params = new StringEntity(payload.toString());
+            HttpResponse httpResponse;
             httpPost.setEntity(params);
-            httpClient.execute(httpPost);
+            if (httpOption == HttpOption.Asynchronous) {
+                Future<HttpResponse> future = httpAsyncClient.execute(httpPost, null);
+                httpResponse = future.get();
+            } else {
+                httpResponse = httpClient.execute(httpPost);
+            }
+            logger.debug(httpResponse.getStatusLine().toString());
         } catch (UnsupportedEncodingException e) {
             logger.error("Encoding exception with the payload.");
             e.printStackTrace();
         } catch (IOException e) {
             logger.error("Error when sending HTTP POST.");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            logger.error("Interruption error when sending HTTP POST request.");
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -108,12 +137,24 @@ public class Emitter {
 
         try {
             HttpGet httpGet = new HttpGet(requestUri.build());
-            httpClient.execute(httpGet);
+            HttpResponse httpResponse;
+            if (httpOption == HttpOption.Asynchronous) {
+                Future<HttpResponse> future = httpAsyncClient.execute(httpGet, null);
+                httpResponse = future.get();
+            } else {
+                httpResponse = httpClient.execute(httpGet);
+            }
+            logger.debug(httpResponse.getStatusLine().toString());
         } catch (IOException e) {
             logger.error("Error when sending HTTP GET error.");
             e.printStackTrace();
         } catch (URISyntaxException e) {
             logger.error("Error when creating HTTP GET request. Probably parsing error..");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            logger.error("Interruption error when sending HTTP GET request.");
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
     }
