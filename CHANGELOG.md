@@ -1,6 +1,5 @@
 Version 0.5.0 (2014-0x-xx)
 --------------------------
-Retrieves Snowplow version automatically pulled from Gradle (#13)
 Refactored networking unit tests for mock testing (#40)
 Created unit tests for Subject class (#46)
 Created an EnvelopePayload class (#50)
@@ -14,6 +13,7 @@ Created an async HTTP request solution (#37)
 Replaced contracts with cofoja (#43)
 Removed configurations HashMap (#45)
 Added additional methods that don't require setting a context Map (#48)
+Retrieves Snowplow version automatically pulled from Gradle (#13)
 Added additional methods that don't require setting a timestamp (#49) 
 
 Version 0.3.0 (2014-07-13)
