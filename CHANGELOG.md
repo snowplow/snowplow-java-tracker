@@ -1,4 +1,16 @@
-Version 0.3.0 (2014-0x-xx)
+Version 0.4.0 (2014-0x-xx)
+--------------------------
+Add support for in-memory batching (#6)
+Add POST support (#7)
+TODO Get Snowplow version automatically pulled from Gradle (#13)
+Add Python-style subject class (#22)
+TODO Create an async HTTP request solution (#37)
+TODO Replace contracts with cofoja (#43)
+Remove configurations HashMap (#45)
+Add additional methods that don't require setting a context Map (#48)
+Add additional methods that don't require setting a timestamp (#49) 
+
+Version 0.3.0 (2014-07-13)
 --------------------------
 Added ablity for contexts to be HashMap, not just JSON string
 Added SLF4J logging for key events (e.g. tracker initialization)
