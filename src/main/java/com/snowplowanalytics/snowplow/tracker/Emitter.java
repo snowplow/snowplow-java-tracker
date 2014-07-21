@@ -54,46 +54,6 @@ public class Emitter {
         return ret;
     }
 
-//    public void sendStuff() {
-//        System.out.println(uri.toString());
-////        HttpPost httpPost = new HttpPost(uri.toString());
-////        HttpGet httpGet = new HttpGet(uri.toString());
-//        CloseableHttpResponse response;
-//
-////        httpPost.addHeader("Content-Type", "application/json");
-//
-//        Map foo = new LinkedHashMap<String, String>();
-//        ArrayList<String> bar = new ArrayList<String>();
-//        ArrayList<Payload> arrayList = new ArrayList<Payload>();
-//        bar.add("somebar");
-//        bar.add("somebar2");
-//        foo.put("myKey", "my Value");
-//        foo.put("mehh", bar);
-//        Payload payload = new TrackerPayload();
-//        payload.addMap(foo, false, "cx", "co");
-//        Payload payload1 = new TrackerPayload();
-//        payload1.add("second", "payload");
-//        arrayList.add(payload);
-//        arrayList.add(payload1);
-//
-//
-//        try {
-//            StringEntity params = new StringEntity(arrayList.toString());
-////            httpPost.setEntity(params);
-//            String encodedParameters = URLEncoder.encode(payload.toString(), "UTF-8");
-//
-//            HttpGet httpGet = new HttpGet(uri.toString() + "?" +  encodedParameters);
-//
-//            System.out.println("Encoded:");
-//            System.out.println(uri.toString());
-//            httpClient.execute(httpGet);
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public void flushBuffer() {
         if (httpMethod == EmitterHttpMethod.GET) {
             for (Payload payload : buffer) {
