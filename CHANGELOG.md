@@ -2,7 +2,6 @@ Version 0.4.0 (2014-0x-xx)
 --------------------------
 Added support for in-memory batching (#6)
 Added POST support (#7)
-TODO Get Snowplow version automatically pulled from Gradle (#13)
 Added Python-style subject class (#22)
 Created an async HTTP request solution (#37)
 Replaced contracts with cofoja (#43)
