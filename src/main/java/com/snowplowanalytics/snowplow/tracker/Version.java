@@ -13,14 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-/**
- * The version class is used for documentation purposes.
- * It follows the python convention of creating a version identity class
- *
- * @version 0.4.0
- * @author Kevin Gleason
- */
-
 public class Version {
     static final String VERSION = "0.4.0";
 }
