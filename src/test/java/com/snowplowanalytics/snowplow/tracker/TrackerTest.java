@@ -38,7 +38,7 @@ public class TrackerTest extends TestCase {
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", true);
-        emitter.setHttpOption(RequestOption.Asynchronous);
+        emitter.setRequestOption(RequestOption.Asynchronous);
 
         Map<String, String> context = new HashMap<String, String>();
         context.put("some key", "some value");

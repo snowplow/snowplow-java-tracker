@@ -43,7 +43,7 @@ public class Emitter {
     private URIBuilder uri;
     private BufferOption option = BufferOption.Default;
     private HttpMethod httpMethod = HttpMethod.GET;
-    private RequestOption httpOption = RequestOption.Synchronous;
+    private RequestOption requestOption = RequestOption.Synchronous;
     private CloseableHttpClient httpClient;
     private CloseableHttpAsyncClient httpAsyncClient;
     private final ArrayList<Payload> buffer = new ArrayList<Payload>();
@@ -63,8 +63,8 @@ public class Emitter {
         this.option = option;
     }
 
-    public void setHttpOption(RequestOption option) {
-        this.httpOption = option;
+    public void setRequestOption(RequestOption option) {
+        this.requestOption = option;
         this.httpAsyncClient = HttpAsyncClients.createDefault();
         this.httpAsyncClient.start();
     }
@@ -98,7 +98,7 @@ public class Emitter {
             StringEntity params = new StringEntity(payload.toString());
             HttpResponse httpResponse;
             httpPost.setEntity(params);
-            if (httpOption == RequestOption.Asynchronous) {
+            if (requestOption == RequestOption.Asynchronous) {
                 Future<HttpResponse> future = httpAsyncClient.execute(httpPost, null);
                 httpResponse = future.get();
             } else {
@@ -138,7 +138,7 @@ public class Emitter {
         try {
             HttpGet httpGet = new HttpGet(requestUri.build());
             HttpResponse httpResponse;
-            if (httpOption == RequestOption.Asynchronous) {
+            if (requestOption == RequestOption.Asynchronous) {
                 Future<HttpResponse> future = httpAsyncClient.execute(httpGet, null);
                 httpResponse = future.get();
             } else {
