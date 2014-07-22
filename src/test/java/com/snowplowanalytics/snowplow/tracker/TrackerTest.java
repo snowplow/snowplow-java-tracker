@@ -1,7 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
 
 import junit.framework.TestCase;
 
@@ -38,7 +38,7 @@ public class TrackerTest extends TestCase {
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", true);
-        emitter.setRequestOption(RequestOption.Asynchronous);
+        emitter.setRequestMethod(RequestMethod.Asynchronous);
 
         Map<String, String> context = new HashMap<String, String>();
         context.put("some key", "some value");
