@@ -12,6 +12,9 @@ import java.util.Map;
 
 public class TrackerTest extends TestCase {
 
+    private static String localURL = "segfault.ngrok.com";
+    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+
     @Test
     public void testSetSchema() throws Exception {
 
@@ -34,7 +37,7 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testTrackPageView3() throws Exception {
-        Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.GET);
+        Emitter emitter = new Emitter(testURL, HttpMethod.GET);
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", true);

@@ -11,14 +11,17 @@ import java.util.LinkedHashMap;
 
 public class EmitterTest extends TestCase {
 
+    private static String localURL = "segfault.ngrok.com";
+    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+
     @Test
     public void testEmitterConstructor() throws Exception {
-        Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.POST);
+        Emitter emitter = new Emitter(localURL, HttpMethod.POST);
     }
 
     @Test
     public void testFlushGet() throws Exception {
-        Emitter emitter = new Emitter("segfault.ngrok.com", HttpMethod.GET);
+        Emitter emitter = new Emitter(localURL, HttpMethod.GET);
 
         Payload payload;
         String res;
