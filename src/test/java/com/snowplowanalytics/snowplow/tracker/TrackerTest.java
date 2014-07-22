@@ -1,7 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestOption;
 
 import junit.framework.TestCase;
 
@@ -9,8 +9,6 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class TrackerTest extends TestCase {
 
@@ -40,7 +38,7 @@ public class TrackerTest extends TestCase {
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", true);
-        emitter.setHttpOption(HttpOption.Asynchronous);
+        emitter.setHttpOption(RequestOption.Asynchronous);
 
         Map<String, String> context = new HashMap<String, String>();
         context.put("some key", "some value");

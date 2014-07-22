@@ -16,7 +16,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestOption;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -43,7 +43,7 @@ public class Emitter {
     private URIBuilder uri;
     private BufferOption option = BufferOption.Default;
     private HttpMethod httpMethod = HttpMethod.GET;
-    private HttpOption httpOption = HttpOption.Synchronous;
+    private RequestOption httpOption = RequestOption.Synchronous;
     private CloseableHttpClient httpClient;
     private CloseableHttpAsyncClient httpAsyncClient;
     private final ArrayList<Payload> buffer = new ArrayList<Payload>();
@@ -63,7 +63,7 @@ public class Emitter {
         this.option = option;
     }
 
-    public void setHttpOption(HttpOption option) {
+    public void setHttpOption(RequestOption option) {
         this.httpOption = option;
         this.httpAsyncClient = HttpAsyncClients.createDefault();
         this.httpAsyncClient.start();
@@ -98,7 +98,7 @@ public class Emitter {
             StringEntity params = new StringEntity(payload.toString());
             HttpResponse httpResponse;
             httpPost.setEntity(params);
-            if (httpOption == HttpOption.Asynchronous) {
+            if (httpOption == RequestOption.Asynchronous) {
                 Future<HttpResponse> future = httpAsyncClient.execute(httpPost, null);
                 httpResponse = future.get();
             } else {
@@ -138,7 +138,7 @@ public class Emitter {
         try {
             HttpGet httpGet = new HttpGet(requestUri.build());
             HttpResponse httpResponse;
-            if (httpOption == HttpOption.Asynchronous) {
+            if (httpOption == RequestOption.Asynchronous) {
                 Future<HttpResponse> future = httpAsyncClient.execute(httpGet, null);
                 httpResponse = future.get();
             } else {

@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-public enum HttpOption {
+public enum RequestOption {
     Synchronous,
     Asynchronous
 }
