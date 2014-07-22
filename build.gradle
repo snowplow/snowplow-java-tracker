@@ -48,7 +48,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
 }
 
-task sourceJar(type: Jar) {
+task sourceJar(type: Jar, dependsOn: ':generateSources') {
     from sourceSets.main.allJava
 }
 
@@ -71,13 +71,10 @@ publishing {
 }
 
 task generateSources {
-    outputDir = file("$buildDir/../src/main/java/com/snowplowanalytics/snowplow/tracker")
-    outputs.dir outputDir
+    project.ext.set("outputDir", "src/main/java/com/snowplowanalytics/snowplow/tracker")
     doFirst {
-        outputDir.exists() || outputDir.mkdirs()
-
-
-        def srcFile = new File(outputDir, "Version.java")
+        def srcFile = new File((String)outputDir, "Version.java")
+        srcFile.parentFile.mkdirs()
         srcFile.write(
 """/*
  * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
