@@ -242,7 +242,7 @@ public class Tracker {
         Preconditions.checkArgument(!city.isEmpty(), "city cannot be empty");
         Preconditions.checkArgument(!state.isEmpty(), "state cannot be empty");
         Preconditions.checkArgument(!country.isEmpty(), "country cannot be empty");
-        Preconditions.checkArgument(!currency.isEmpty(), "ordecurrencyr_id cannot be empty");
+        Preconditions.checkArgument(!currency.isEmpty(), "currency cannot be empty");
 
         Payload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_ECOMM);
@@ -257,8 +257,6 @@ public class Tracker {
         payload.add(Parameter.TR_CURRENCY, currency);
 
         completePayload(payload, context, timestamp);
-
-        ArrayList itemResults = new ArrayList();
 
         for (TransactionItem item : items) {
             trackEcommerceTransactionItem(
