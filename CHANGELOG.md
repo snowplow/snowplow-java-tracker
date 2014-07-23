@@ -1,10 +1,4 @@
-Version 0.5.0 (2014-0x-xx)
---------------------------
-Refactored networking unit tests for mock testing (#40)
-Created unit tests for Subject class (#46)
-Created an EnvelopePayload class (#50)
-
-Version 0.4.0 (2014-0x-xx)
+Version 0.4.0 (2014-07-23)
 --------------------------
 Added support for in-memory batching (#6)
 Added POST support (#7)
