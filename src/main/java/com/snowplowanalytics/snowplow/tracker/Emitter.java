@@ -50,6 +50,10 @@ public class Emitter {
 
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
+    public Emitter(String URI) {
+        new Emitter(URI, HttpMethod.GET);
+    }
+
     public Emitter(String URI, HttpMethod httpMethod) {
         uri = new URIBuilder()
                 .setScheme("http")
