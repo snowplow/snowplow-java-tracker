@@ -13,27 +13,29 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TransactionItem extends HashMap {
-    public TransactionItem (String order_id, String sku,
-                            double price, int quantity,
-                            String name, String category,
-                            String currency, Map context) throws UnsupportedEncodingException {
+
+    public TransactionItem (String order_id, String sku, double price, int quantity, String name,
+                            String category, String currency) {
+        new TransactionItem(order_id,sku, price, quantity, name, category, currency, null);
+    }
+
+    public TransactionItem (String order_id, String sku, double price, int quantity, String name,
+                            String category, String currency, Map context) {
         put(Parameter.EVENT, "ti");
-        put(Parameter.ITEM_ID, order_id);
-        put(Parameter.ITEM_SKU, sku);
-        put(Parameter.ITEM_NAME, name);
-        put(Parameter.ITEM_CATEGORY, category);
-        put(Parameter.ITEM_PRICE, price);
-        put(Parameter.ITEM_QUANTITY, quantity);
-        put(Parameter.ITEM_CURRENCY, currency);
+        put(Parameter.TI_ITEM_ID, order_id);
+        put(Parameter.TI_ITEM_SKU, sku);
+        put(Parameter.TI_ITEM_NAME, name);
+        put(Parameter.TI_ITEM_CATEGORY, category);
+        put(Parameter.TI_ITEM_PRICE, price);
+        put(Parameter.TI_ITEM_QUANTITY, quantity);
+        put(Parameter.TI_ITEM_CURRENCY, currency);
 
         put(Parameter.CONTEXT, context);
 
-        put(Parameter.TID, Util.getTransactionId());
         put(Parameter.TIMESTAMP, Util.getTimestamp());
     }
 

@@ -11,14 +11,9 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
-public class LinkedHashMap<K,V> extends java.util.LinkedHashMap<K, V> {
-    @Override
-    public V put(K key, V value) {
-        if(value != null && value != "")
-            return super.put(key, value);
-        else
-            return null;
-    }
+public enum RequestMethod {
+    Synchronous,
+    Asynchronous
 }

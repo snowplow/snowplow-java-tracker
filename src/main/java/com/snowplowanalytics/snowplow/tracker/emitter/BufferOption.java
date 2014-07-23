@@ -11,8 +11,19 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
-public class Version {
-    static final String VERSION = "0.4.0";
+public enum BufferOption {
+    Instant(1),
+    Default(10);
+
+    private int code;
+
+    private BufferOption(int c) {
+        code = c;
+    }
+
+    public int getCode() {
+        return code;
+    }
 }

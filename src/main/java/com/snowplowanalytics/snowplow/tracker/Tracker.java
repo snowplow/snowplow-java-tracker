@@ -13,176 +13,310 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-// Java
-import java.io.IOException;
-import java.net.URISyntaxException;
+import com.google.common.base.Preconditions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Tracker Interface
- * The tracker interface contains all usable tracking commands that are implemented
- *  in the TrackerC class.
- *  {@inheritDoc}
- * @see com.snowplowanalytics.snowplow.tracker.TrackerC
- * @version 0.3.0
- * @author Kevin Gleason, Jonathan Almeida, Alex Dean
- */
+public class Tracker {
 
-public interface Tracker {
-    /**
-     * The basic track command. All other track functions eventually call this.
-     * The function compiles all the parameters in the PayloadMap into a proper
-     * URI which then is made into a HttpGet instance. The GET request is then sent to
-     * the collector URI where it is logged.
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public void track() throws URISyntaxException, IOException;
+    private boolean base64Encoded = true;
+    private Emitter emitter;
+    private String appId;
+    private String namespace;
+    private String contextSchema;
+    private String baseSchemaPath;
+    private String schemaTag;
+    private String unstructSchema;
+    private Subject subject;
 
-    /**
-     * Track a single page view on a java web applications.
-     * @param page_url The url of the page where the tracking call lies.
-     * @param page_title The title of the page where the tracking call lies. (optional)
-     * @param referrer The one who referred you to the page (optional)
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public void trackPageView(String page_url, String page_title, String referrer, Map context, long timestamp)
-            throws IOException, URISyntaxException;
+    public Tracker(Emitter emitter, String namespace, String appId) {
+        new Tracker(emitter, null, namespace, appId, true);
+    }
 
-    /**
-     * Track a structured event. Useful for tracking data transfer and other structured transactions.
-     * @param category The category of the structured event.
-     * @param action The action that is being tracked. (optional)
-     * @param label A label for the tracking event. (optional)
-     * @param property The property of the structured event being tracked. (optional)
-     * @param value The value associated with the property being tracked.
-     * @param vendor The vendor the the property being tracked. (optional)
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws URISyntaxException If there is an issue with the tracking call.
-     * @throws IOException If there is an issue with processing the HTTP GET
-     */
+    public Tracker(Emitter emitter, Subject subject, String namespace, String appId) {
+        new Tracker(emitter, subject, namespace, appId, true);
+    }
+
+    public Tracker(Emitter emitter, String namespace, String appId, boolean base64Encoded) {
+        new Tracker(emitter, null, namespace, appId, base64Encoded);
+    }
+
+    public Tracker(Emitter emitter, Subject subject, String namespace, String appId, boolean base64Encoded) {
+        this.emitter = emitter;
+        this.appId = appId;
+        this.base64Encoded = base64Encoded;
+        this.namespace = namespace;
+        this.subject = subject;
+        this.setSchema(Constants.DEFAULT_VENDOR, Constants.DEFAULT_SCHEMA_TAG,
+                Constants.DEFAULT_SCHEMA_VERSION);
+    }
+
+    private Payload completePayload(Payload payload, Map context, double timestamp) {
+        payload.add(Parameter.APPID, this.appId);
+        payload.add(Parameter.NAMESPACE, this.namespace);
+        payload.add(Parameter.TIMESTAMP, Util.getTimestamp());
+
+        payload.add(Parameter.TRACKER_VERSION, Version.VERSION);
+
+        // If timestamp is set to 0, generate one
+        payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Util.getTimestamp() : timestamp));
+
+        // Encodes context data
+        if (context != null) {
+            Payload envelope = new TrackerPayload();
+            envelope.setSchema(contextSchema);
+            envelope.setData(context);
+            payload.addMap(context, this.base64Encoded, Parameter.CONTEXT_ENCODED,
+                    Parameter.CONTEXT);
+        }
+
+        if (subject != null) {
+            payload.addMap(subject.getSubject());
+        }
+
+        return payload;
+    }
+
+    private void addTrackerPayload(Payload payload) {
+        this.emitter.addToBuffer(payload);
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
+    public void setSchema(String vendor, String schemaTag, String version) {
+        this.contextSchema = vendor + "/contexts/" + schemaTag + version;
+        this.unstructSchema = vendor + "/unstruct_event/" + schemaTag + version;
+        this.baseSchemaPath = vendor;
+        this.schemaTag = schemaTag;
+    }
+
+    public void trackPageView(String pageUrl, String pageTitle, String referrer) {
+        trackPageView(pageUrl, pageTitle, referrer, null, 0);
+    }
+
+    public void trackPageView(String pageUrl, String pageTitle, String referrer, Map context) {
+        trackPageView(pageUrl,pageTitle, referrer, context, 0);
+    }
+
+    public void trackPageView(String pageUrl, String pageTitle, String referrer, double timestamp) {
+        trackPageView(pageUrl, pageTitle, referrer, null, timestamp);
+    }
+
+    public void trackPageView(String pageUrl, String pageTitle, String referrer,
+                              Map context, double timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(pageUrl);
+        Preconditions.checkArgument(!pageUrl.isEmpty(), "pageUrl cannot be empty");
+        Preconditions.checkArgument(!pageTitle.isEmpty(), "pageTitle cannot be empty");
+        Preconditions.checkArgument(!referrer.isEmpty(), "referrer cannot be empty");
+
+        Payload payload = new TrackerPayload();
+        payload.add(Parameter.EVENT, Constants.EVENT_PAGE_VIEW);
+        payload.add(Parameter.PAGE_URL, pageUrl);
+        payload.add(Parameter.PAGE_TITLE, pageTitle);
+        payload.add(Parameter.PAGE_REFR, referrer);
+
+        completePayload(payload, context, timestamp);
+
+        addTrackerPayload(payload);
+    }
+
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, String vendor, Map context, long timestamp) throws URISyntaxException, IOException;
+                                     int value) {
+        trackStructuredEvent(category, action, label, property, value, null, 0);
+    }
 
-    /**
-     * Track an unstructured event. Allowed to use String or Map<String,Object> as input
-     * @param eventVendor The vendor the the event information.
-     * @param eventName A name for the unstructured event being tracked.
-     * @param dictInfo The unstructured information being tracked in dictionary form.
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws IOException If there is an issue with the tracking call.
-     * @throws URISyntaxException If there is an issue with processing the HTTP GET
-     */
-    public void trackUnstructuredEvent(String eventVendor, String eventName, Map<String, Object> dictInfo, Map context, long timestamp)
-            throws IOException, URISyntaxException;
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, Map context) {
+        trackStructuredEvent(category, action, label, property, value, context, 0);
+    }
 
-    /**
-     * Track a screen view
-     * @param name The name of the screen view being tracked
-     * @param id The ID of the screen view being tracked.
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws IOException
-     * @throws URISyntaxException
-     */
-    public void trackScreenView(String name, String id, Map context, long timestamp)
-            throws IOException, URISyntaxException;
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, long timestamp) {
+        trackStructuredEvent(category, action, label, property, value, null, timestamp);
+    }
 
-    /**
-     * Track an Ecommerce Transaction
-     * Option to provide a Map of only strings of items in the transaction which can be used
-     * to track each individual ecommerce transaction item
-     * @param order_id The transaction ID, will be generated if left null
-     * @param total_value The total value of the transaction.
-     * @param affiliation Affiliations to the transaction (optional)
-     * @param tax_value Tax value of the transaction (optional)
-     * @param shipping Shipping costs of the transaction (optional)
-     * @param city The customers city.
-     * @param state The customers state.
-     * @param country The customers country.
-     * @param currency The currency used for the purchase
-     * @param items A list containing a Map of Strings. Each item must have order ID, sku, price, and quantity.
-     * @param context Additional JSON context for the tracking call (optional)
-     * @param timestamp User-input timestamp or 0
-     * @throws IOException
-     * @throws URISyntaxException
-     */
-    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation, Double tax_value,
-                                          Double shipping, String city, String state, String country, String currency, List<TransactionItem> items, Map context, long timestamp)
-            throws IOException, URISyntaxException;
+    public void trackStructuredEvent(String category, String action, String label, String property,
+                                     int value, Map context, long timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(label);
+        Preconditions.checkNotNull(property);
+        Preconditions.checkArgument(!label.isEmpty(), "label cannot be empty");
+        Preconditions.checkArgument(!property.isEmpty(), "property cannot be empty");
+        Preconditions.checkArgument(!category.isEmpty(), "property cannot be empty");
+        Preconditions.checkArgument(!action.isEmpty(), "property cannot be empty");
 
-    /**
-     * Set Contractors
-     *  Not required, but useful if you want to make a contractor with a custom checker for processing.
-     *  Requires three inputs, a contractor class of each type.
-     * @param stringContractor A contractory of type String
-     * @param dictionaryContractor A Contractor of type Map with key value of String, Object
-     */
-    public void setContractors(ContractManager<String> stringContractor,
-            ContractManager<Map<String, Object>> dictionaryContractor);
+        Payload payload = new TrackerPayload();
+        payload.add(Parameter.EVENT, Constants.EVENT_STRUCTURED);
+        payload.add(Parameter.SE_CATEGORY, category);
+        payload.add(Parameter.SE_ACTION, action);
+        payload.add(Parameter.SE_LABEL, label);
+        payload.add(Parameter.SE_PROPERTY, property);
+        payload.add(Parameter.SE_VALUE, value);
 
-    /**
-     * Used to add custom parameter. Be careful with use, must abide by snowplow table standards.
-     * See snowplow documentation
-     * @param param Parameter to be set.
-     * @param val Value for the parameter.
-     */
-    public void setParam(String param, String val);
+        completePayload(payload, context, timestamp);
 
-    /**
-     * Set the platform for the tracking instance. (optional)
-     * The default platform is PC.
-     * @param platform The platform being tracked, currently supports "pc", "tv", "mob", "cnsl", and "iot".
-     */
-    public void setPlatform(String platform);
+        addTrackerPayload(payload);
+    }
 
-    /**
-     * Set the uesrID parameter (optional)
-     * @param userID The User ID String.
-     */
-    public void setUserID(String userID);
+    public void trackUnstructuredEvent(Map<String, Object> eventData) {
+        trackUnstructuredEvent(eventData, null, 0);
+    }
 
-    /**
-     * Set the screen resolution width and height (optional)
-     * @param width Width of the screen in pixels.
-     * @param height Height of the screen in pixels.
-     */
-    public void setScreenResolution(int width, int height);
+    public void trackUnstructuredEvent(Map<String, Object> eventData, Map context) {
+        trackUnstructuredEvent(eventData, context, 0);
+    }
 
-    /**
-     * Set the viewport of the screen.
-     * @param width Width of the viewport in pixels.
-     * @param height Height of the viewport in pixels.
-     */
-    public void setViewport(int width, int height);
+    public void trackUnstructuredEvent(Map<String, Object> eventData, long timestamp) {
+        trackUnstructuredEvent(eventData, null, timestamp);
+    }
 
-    /**
-     * Set the color depth (optional)
-     * @param depth Depth of the color.
-     */
-    public void setColorDepth(int depth);
+    public void trackUnstructuredEvent(Map<String, Object> eventData, Map context, long timestamp) {
+        Payload payload = new TrackerPayload();
+        Payload envelope = new TrackerPayload();
 
-    /**
-     * Set the timezone (optioanl)
-     * @param timezone Timezone where tracking takes place.
-     */
-    public void setTimezone(String timezone);
+        envelope.setSchema(unstructSchema);
+        envelope.setData(eventData);
 
-    /**
-     * Set the language (optional)
-     * @param language Language for info tracked.
-     */
-    public void setLanguage(String language);
+        payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
+        payload.addMap(envelope.getMap(), base64Encoded,
+                Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
 
-    /**
-     * Get the payload, use if you want to understand how it is set up.
-     * @return Returns the payload, can be used with caution to customize parameters.
-     */
-    public PayloadMap getPayload();
+        completePayload(payload, context, timestamp);
+
+        addTrackerPayload(payload);
+    }
+
+    protected void trackEcommerceTransactionItem(String order_id, String sku, Double price,
+                                                 Integer quantity, String name, String category,
+                                                 String currency, Map context, long timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(name);
+        Preconditions.checkNotNull(category);
+        Preconditions.checkNotNull(currency);
+        Preconditions.checkArgument(!order_id.isEmpty(), "order_id cannot be empty");
+        Preconditions.checkArgument(!sku.isEmpty(), "sku cannot be empty");
+        Preconditions.checkArgument(!name.isEmpty(), "name cannot be empty");
+        Preconditions.checkArgument(!category.isEmpty(), "category cannot be empty");
+        Preconditions.checkArgument(!currency.isEmpty(), "currency cannot be empty");
+
+        Payload payload = new TrackerPayload();
+        payload.add(Parameter.EVENT, Constants.EVENT_ECOMM_ITEM);
+        payload.add(Parameter.TI_ITEM_ID, order_id);
+        payload.add(Parameter.TI_ITEM_SKU, sku);
+        payload.add(Parameter.TI_ITEM_NAME, name);
+        payload.add(Parameter.TI_ITEM_CATEGORY, category);
+        payload.add(Parameter.TI_ITEM_PRICE, price);
+        payload.add(Parameter.TI_ITEM_QUANTITY, quantity);
+        payload.add(Parameter.TI_ITEM_CURRENCY, currency);
+
+        completePayload(payload, context, timestamp);
+
+        addTrackerPayload(payload);
+    }
+
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
+                                          Double tax_value, Double shipping, String city,
+                                          String state, String country, String currency,
+                                          List<TransactionItem> items) {
+        trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
+                state, country, currency, items, null, 0);
+    }
+
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
+                                          Double tax_value, Double shipping, String city,
+                                          String state, String country, String currency,
+                                          List<TransactionItem> items, Map context) {
+        trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
+                state, country, currency, items, context, 0);
+    }
+
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
+                                          Double tax_value, Double shipping, String city,
+                                          String state, String country, String currency,
+                                          List<TransactionItem> items, long timestamp) {
+        trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
+                state, country, currency, items, null, timestamp);
+    }
+
+    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
+                                          Double tax_value, Double shipping, String city,
+                                          String state, String country, String currency,
+                                          List<TransactionItem> items, Map context,long timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(affiliation);
+        Preconditions.checkNotNull(city);
+        Preconditions.checkNotNull(state);
+        Preconditions.checkNotNull(country);
+        Preconditions.checkNotNull(currency);
+        Preconditions.checkArgument(!order_id.isEmpty(), "order_id cannot be empty");
+        Preconditions.checkArgument(!affiliation.isEmpty(), "affiliation cannot be empty");
+        Preconditions.checkArgument(!city.isEmpty(), "city cannot be empty");
+        Preconditions.checkArgument(!state.isEmpty(), "state cannot be empty");
+        Preconditions.checkArgument(!country.isEmpty(), "country cannot be empty");
+        Preconditions.checkArgument(!currency.isEmpty(), "currency cannot be empty");
+
+        Payload payload = new TrackerPayload();
+        payload.add(Parameter.EVENT, Constants.EVENT_ECOMM);
+        payload.add(Parameter.TR_ID, order_id);
+        payload.add(Parameter.TR_TOTAL, total_value);
+        payload.add(Parameter.TR_AFFILIATION, affiliation);
+        payload.add(Parameter.TR_TAX, tax_value);
+        payload.add(Parameter.TR_SHIPPING, shipping);
+        payload.add(Parameter.TR_CITY, city);
+        payload.add(Parameter.TR_STATE, state);
+        payload.add(Parameter.TR_COUNTRY, country);
+        payload.add(Parameter.TR_CURRENCY, currency);
+
+        completePayload(payload, context, timestamp);
+
+        for (TransactionItem item : items) {
+            trackEcommerceTransactionItem(
+                    (String) item.get(Parameter.TI_ITEM_ID),
+                    (String) item.get(Parameter.TI_ITEM_SKU),
+                    (Double) item.get(Parameter.TI_ITEM_PRICE),
+                    (Integer) item.get(Parameter.TI_ITEM_QUANTITY),
+                    (String) item.get(Parameter.TI_ITEM_NAME),
+                    (String) item.get(Parameter.TI_ITEM_CATEGORY),
+                    (String) item.get(Parameter.TI_ITEM_CURRENCY),
+                    (Map) item.get(Parameter.CONTEXT),
+                    timestamp);
+        }
+    }
+
+    public void trackScreenView(String name, String id) {
+        trackScreenView(name, id, null, 0);
+    }
+
+    public void trackScreenView(String name, String id, Map context) {
+        trackScreenView(name, id, context, 0);
+    }
+
+    public void trackScreenView(String name, String id, long timestamp) {
+        trackScreenView(name, id, null, timestamp);
+    }
+
+    public void trackScreenView(String name, String id, Map context, long timestamp) {
+        // Precondition checks
+        Preconditions.checkNotNull(id);
+        Preconditions.checkArgument(!name.isEmpty(), "name cannot be empty");
+        Preconditions.checkArgument(!id.isEmpty(), "id cannot be empty");
+
+        Map<String, String> screenViewProperties = new HashMap<String, String>();
+
+        screenViewProperties.put(Parameter.SV_NAME, name);
+        screenViewProperties.put(Parameter.SV_ID, id);
+
+        Payload payload = new TrackerPayload();
+
+        payload.setSchema( this.baseSchemaPath + "/contexts/" + this.schemaTag + Version.VERSION);
+        payload.setData(screenViewProperties);
+
+        trackUnstructuredEvent(payload.getMap(), context, timestamp);
+    }
 }

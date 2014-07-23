@@ -17,14 +17,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Random;
 
 public class Util {
+    private static final Logger logger = LoggerFactory.getLogger(Util.class);
     private static ObjectMapper sObjectMapper = new ObjectMapper();
     public static ObjectMapper defaultMapper() {
         return sObjectMapper;
@@ -59,7 +61,7 @@ public class Util {
      *  Map is then used to build "Associative array for getter function.
      *  Some use Base64 encoding
      */
-    public static String base64Encode(String string) throws UnsupportedEncodingException {
+    public static String base64Encode(String string) {
         return Base64.encodeBase64URLSafeString(string.getBytes(Charset.forName("US-ASCII")));
     }
 }
