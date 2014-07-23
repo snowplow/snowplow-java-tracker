@@ -33,6 +33,11 @@ public class Tracker {
     private Subject subject;
 
     public Tracker(Emitter emitter, Subject subject,
+                   String namespace, String appId) {
+        new Tracker(emitter, subject, namespace, appId, true);
+    }
+
+    public Tracker(Emitter emitter, Subject subject,
                    String namespace, String appId, boolean base64Encoded) {
         this.emitter = emitter;
         this.appId = appId;
