@@ -44,8 +44,6 @@ public interface Payload {
 
     public void setData(Object data);
 
-    public JsonNode getNode();
-
     public void setSchema(String schema);
 
     public Map getMap();

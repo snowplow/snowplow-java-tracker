@@ -103,7 +103,6 @@ public class TrackerPayload implements Payload {
         objectNode.put(Parameter.SCHEMA, schema);
     }
 
-    @Override
     public JsonNode getNode() {
         return objectNode;
     }
