@@ -32,13 +32,19 @@ public class Tracker {
     private String unstructSchema;
     private Subject subject;
 
-    public Tracker(Emitter emitter, Subject subject,
-                   String namespace, String appId) {
+    public Tracker(Emitter emitter, String namespace, String appId) {
+        new Tracker(emitter, null, namespace, appId, true);
+    }
+
+    public Tracker(Emitter emitter, Subject subject, String namespace, String appId) {
         new Tracker(emitter, subject, namespace, appId, true);
     }
 
-    public Tracker(Emitter emitter, Subject subject,
-                   String namespace, String appId, boolean base64Encoded) {
+    public Tracker(Emitter emitter, String namespace, String appId, boolean base64Encoded) {
+        new Tracker(emitter, null, namespace, appId, base64Encoded);
+    }
+
+    public Tracker(Emitter emitter, Subject subject, String namespace, String appId, boolean base64Encoded) {
         this.emitter = emitter;
         this.appId = appId;
         this.base64Encoded = base64Encoded;
@@ -67,13 +73,19 @@ public class Tracker {
                     Parameter.CONTEXT);
         }
 
-        payload.addMap(subject.getSubject());
+        if (subject != null) {
+            payload.addMap(subject.getSubject());
+        }
 
         return payload;
     }
 
     private void addTrackerPayload(Payload payload) {
         this.emitter.addToBuffer(payload);
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public void setSchema(String vendor, String schemaTag, String version) {
