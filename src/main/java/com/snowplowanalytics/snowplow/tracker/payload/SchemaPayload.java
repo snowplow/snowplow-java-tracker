@@ -11,16 +11,16 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.payload;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.snowplowanalytics.snowplow.tracker.Parameter;
+import com.snowplowanalytics.snowplow.tracker.Util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,62 +28,45 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class TrackerPayload implements Payload {
+public class SchemaPayload {
 
     private final ObjectMapper objectMapper = Util.defaultMapper();
-    private final Logger logger = LoggerFactory.getLogger(TrackerPayload.class);
+    private final Logger logger = LoggerFactory.getLogger(SchemaPayload.class);
     private ObjectNode objectNode = objectMapper.createObjectNode();
 
-    @Override
-    public void add(String key, String value) {
-        objectNode.put(key, value);
-    }
+    public SchemaPayload() { }
 
-    @Override
-    public void add(String key, Object value) {
-        objectNode.putPOJO(key, objectMapper.valueToTree(value));
-    }
+    public SchemaPayload(Payload payload) {
+        ObjectNode data;
 
-    @Override
-    public void addMap(Map<String, Object> map) {
-        // Return if we don't have a map
-        if (map == null)
-            return;
-
-        Set<String> keys = map.keySet();
-        for(String key : keys) {
-            objectNode.putPOJO(key, objectMapper.valueToTree(map.get(key)));
+        if (payload.getClass() == TrackerPayload.class) {
+            logger.debug("Payload class is a TrackerPayload instance.");
+            logger.debug("Trying getNode()");
+            data = (ObjectNode) ((TrackerPayload) payload).getNode();
+        } else {
+            logger.debug("Converting Payload map to ObjectNode.");
+            data = objectMapper.valueToTree(payload.getMap());
         }
+        objectNode.set(Parameter.DATA, data);
     }
 
-    @Override
-    public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
-        // Return if we don't have a map
-        if (map == null)
-            return;
-
-        String mapString;
-        try {
-            mapString = objectMapper.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return; // Return because we can't continue
-        }
-
-        if (base64_encoded) { // base64 encoded data
-            objectNode.put(type_encoded, Util.base64Encode(mapString));
-        } else { // add it as a child node
-            add(type_no_encoded, map);
-        }
+    public SchemaPayload setSchema(String schema) {
+        logger.debug("Setting schema: {}", schema);
+        objectNode.put(Parameter.SCHEMA, schema);
+        return this;
     }
 
-    public JsonNode getNode() {
-        return objectNode;
+    public SchemaPayload setData(Payload data) {
+        objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data.getMap()));
+        return this;
     }
 
-    @Override
+    public SchemaPayload setData(Object data) {
+        objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data));
+        return this;
+    }
+
     public Map getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         try {
@@ -98,8 +81,7 @@ public class TrackerPayload implements Payload {
         return map;
     }
 
-    @Override
-    public String toString() {
-        return objectNode.toString();
-    }
+    public JsonNode getNode() { return objectNode; }
+
+    public String toString() { return objectNode.toString(); }
 }

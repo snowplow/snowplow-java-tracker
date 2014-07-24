@@ -1,5 +1,9 @@
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;

@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
