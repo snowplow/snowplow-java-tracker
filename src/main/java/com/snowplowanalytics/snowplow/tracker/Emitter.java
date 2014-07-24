@@ -83,10 +83,10 @@ public class Emitter {
     public void flushBuffer() {
         if (httpMethod == HttpMethod.GET) {
             for (Payload payload : buffer) {
-                sendGetData((TrackerPayload) payload);
+                sendGetData((SchemaPayload) payload);
             }
         } else if (httpMethod == HttpMethod.POST) {
-            TrackerPayload postPayload = new TrackerPayload();
+            SchemaPayload postPayload = new SchemaPayload();
             postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
             postPayload.setData(buffer);
 
@@ -94,7 +94,7 @@ public class Emitter {
         }
     }
 
-    private void sendPostData(TrackerPayload payload) {
+    private void sendPostData(SchemaPayload payload) {
         HttpPost httpPost = new HttpPost(uri.toString());
         httpPost.addHeader("Content-Type", "application/json");
 
@@ -124,7 +124,7 @@ public class Emitter {
 
     }
 
-    private void sendGetData(TrackerPayload payload) {
+    private void sendGetData(SchemaPayload payload) {
         JsonNode eventMap = payload.getNode();
         Iterator<String> iterator = eventMap.fieldNames();
 

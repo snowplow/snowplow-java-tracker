@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.base.Preconditions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,10 +65,10 @@ public class Tracker {
 
         // Encodes context data
         if (context != null) {
-            Payload envelope = new TrackerPayload();
+            SchemaPayload envelope = new SchemaPayload(payload);
             envelope.setSchema(contextSchema);
             envelope.setData(context);
-            payload.addMap(context, this.base64Encoded, Parameter.CONTEXT_ENCODED,
+            payload.addMap(envelope.getMap(), this.base64Encoded, Parameter.CONTEXT_ENCODED,
                     Parameter.CONTEXT);
         }
 
@@ -178,7 +177,7 @@ public class Tracker {
 
     public void trackUnstructuredEvent(Map<String, Object> eventData, Map context, long timestamp) {
         Payload payload = new TrackerPayload();
-        Payload envelope = new TrackerPayload();
+        SchemaPayload envelope = new SchemaPayload();
 
         envelope.setSchema(unstructSchema);
         envelope.setData(eventData);
@@ -312,11 +311,11 @@ public class Tracker {
         screenViewProperties.put(Parameter.SV_NAME, name);
         screenViewProperties.put(Parameter.SV_ID, id);
 
-        Payload payload = new TrackerPayload();
+        SchemaPayload envelope = new SchemaPayload();
 
-        payload.setSchema( this.baseSchemaPath + "/contexts/" + this.schemaTag + Version.VERSION);
-        payload.setData(screenViewProperties);
+        envelope.setSchema(this.baseSchemaPath + "/contexts/" + this.schemaTag + Version.VERSION);
+        envelope.setData(screenViewProperties);
 
-        trackUnstructuredEvent(payload.getMap(), context, timestamp);
+        trackUnstructuredEvent(envelope.getMap(), context, timestamp);
     }
 }

@@ -71,7 +71,7 @@ public class TrackerPayloadTest extends TestCase {
 
     @Test
     public void testSetData() {
-        Payload payload;
+        TrackerPayload payload;
         String res;
         LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
@@ -81,27 +81,27 @@ public class TrackerPayloadTest extends TestCase {
         foo.put("mehh", bar);
         String myarray[] = {"arrayItem","arrayItem2"};
         payload = new TrackerPayload();
-        payload.setData(myarray);
+        payload.add("myarray", myarray);
 
-        res = "{\"data\":[\"arrayItem\",\"arrayItem2\"]}";
+        res = "{\"myarray\":[\"arrayItem\",\"arrayItem2\"]}";
         assertEquals(res, payload.toString());
 
         payload = new TrackerPayload();
-        payload.setData(foo);
+        payload.add("foo", foo);
 
-        res = "{\"data\":{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}}";
+        res = "{\"foo\":{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}}";
         assertEquals(res, payload.toString());
 
         payload = new TrackerPayload();
-        payload.setData(bar);
+        payload.add("bar", bar);
 
-        res = "{\"data\":[\"somebar\",\"somebar2\"]}";
+        res = "{\"bar\":[\"somebar\",\"somebar2\"]}";
         assertEquals(res, payload.toString());
     }
 
     @Test
     public void testSetSchema() throws Exception {
-        Payload payload = new TrackerPayload();
+        SchemaPayload payload = new SchemaPayload();
         payload.setSchema("iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0");
         String res = "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\"}";
         assertEquals(res, payload.toString());
@@ -114,7 +114,7 @@ public class TrackerPayloadTest extends TestCase {
 
     @Test
     public void testGetMap() throws Exception {
-        Payload payload;
+        SchemaPayload payload;
         String res;
         LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
@@ -124,7 +124,7 @@ public class TrackerPayloadTest extends TestCase {
         foo.put("mehh", bar);
         LinkedHashMap<String, Object> data = new LinkedHashMap<String, Object>();
         data.put("data", foo);
-        payload = new TrackerPayload();
+        payload = new SchemaPayload();
         payload.setData(foo);
 
         assertEquals(data, payload.getMap());

@@ -33,7 +33,7 @@ public class EmitterTest extends TestCase {
         foo.put("mehh", bar);
         String myarray[] = {"arrayItem","arrayItem2"};
         payload = new TrackerPayload();
-        payload.setData(myarray);
+        payload.add("myarray", myarray);
         payload.addMap(foo);
 
         emitter.addToBuffer(payload);
