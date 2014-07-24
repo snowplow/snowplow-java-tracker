@@ -111,7 +111,7 @@ public class TrackerPayload implements Payload {
     public Map getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         try {
-            map = objectMapper.readValue(objectNode.toString(), new TypeReference<HashMap<String,String>>(){});
+            map = objectMapper.readValue(objectNode.toString(), new TypeReference<Map>(){});
         } catch (JsonMappingException e) {
             e.printStackTrace();
         } catch (JsonParseException e) {

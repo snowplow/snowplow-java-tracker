@@ -114,6 +114,19 @@ public class TrackerPayloadTest extends TestCase {
 
     @Test
     public void testGetMap() throws Exception {
+        Payload payload;
+        String res;
+        LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
+        ArrayList<String> bar = new ArrayList<String>();
+        bar.add("somebar");
+        bar.add("somebar2");
+        foo.put("myKey", "my Value");
+        foo.put("mehh", bar);
+        LinkedHashMap<String, Object> data = new LinkedHashMap<String, Object>();
+        data.put("data", foo);
+        payload = new TrackerPayload();
+        payload.setData(foo);
 
+        assertEquals(data, payload.getMap());
     }
 }
