@@ -1,8 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 
 import junit.framework.TestCase;
 
@@ -25,7 +24,7 @@ public class EmitterTest extends TestCase {
     public void testFlushGet() throws Exception {
         Emitter emitter = new Emitter(localURL, HttpMethod.GET);
 
-        Payload payload;
+        SchemaPayload payload;
         String res;
         LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
@@ -34,8 +33,8 @@ public class EmitterTest extends TestCase {
         foo.put("myKey", "my Value");
         foo.put("mehh", bar);
         String myarray[] = {"arrayItem","arrayItem2"};
-        payload = new TrackerPayload();
-        payload.add("myarray", myarray);
+        payload = new SchemaPayload();
+        payload.setData(myarray);
         payload.addMap(foo);
 
         emitter.addToBuffer(payload);

@@ -47,7 +47,6 @@ public class TrackerPayload implements Payload {
         objectNode.putPOJO(key, objectMapper.valueToTree(value));
     }
 
-    @Override
     public void addMap(Map<String, Object> map) {
         // Return if we don't have a map
         if (map == null)
@@ -59,7 +58,6 @@ public class TrackerPayload implements Payload {
         }
     }
 
-    @Override
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
         // Return if we don't have a map
         if (map == null)

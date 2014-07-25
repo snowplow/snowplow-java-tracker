@@ -19,6 +19,7 @@ import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -39,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import sun.security.krb5.internal.PAData;
 
 public class Emitter {
 
@@ -85,7 +88,7 @@ public class Emitter {
     public void flushBuffer() {
         if (httpMethod == HttpMethod.GET) {
             for (Payload payload : buffer) {
-                sendGetData((SchemaPayload) payload);
+                sendGetData(payload);
             }
         } else if (httpMethod == HttpMethod.POST) {
             SchemaPayload postPayload = new SchemaPayload();
@@ -96,7 +99,7 @@ public class Emitter {
         }
     }
 
-    private void sendPostData(SchemaPayload payload) {
+    private void sendPostData(Payload payload) {
         HttpPost httpPost = new HttpPost(uri.toString());
         httpPost.addHeader("Content-Type", "application/json");
 
@@ -126,7 +129,7 @@ public class Emitter {
 
     }
 
-    private void sendGetData(SchemaPayload payload) {
+    private void sendGetData(Payload payload) {
         JsonNode eventMap = payload.getNode();
         Iterator<String> iterator = eventMap.fieldNames();
 

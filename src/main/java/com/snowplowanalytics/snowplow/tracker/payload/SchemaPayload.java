@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SchemaPayload {
+public class SchemaPayload implements Payload {
 
     private final ObjectMapper objectMapper = Util.defaultMapper();
     private final Logger logger = LoggerFactory.getLogger(SchemaPayload.class);
@@ -65,6 +65,26 @@ public class SchemaPayload {
     public SchemaPayload setData(Object data) {
         objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data));
         return this;
+    }
+
+    @Override
+    public void add(String key, String value) {
+
+    }
+
+    @Override
+    public void add(String key, Object value) {
+
+    }
+
+    @Override
+    public void addMap(Map<String, Object> map) {
+
+    }
+
+    @Override
+    public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
+
     }
 
     public Map getMap() {

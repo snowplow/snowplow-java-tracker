@@ -44,5 +44,7 @@ public interface Payload {
 
     public Map getMap();
 
+    public JsonNode getNode();
+
     public String toString();
 }
