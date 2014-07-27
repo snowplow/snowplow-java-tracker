@@ -56,10 +56,17 @@ public class Emitter {
 
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
+    /**
+     * @param URI The collector URL. Don't include "http://" - this is done automatically.
+     */
     public Emitter(String URI) {
         new Emitter(URI, HttpMethod.GET);
     }
 
+    /**
+     * @param URI The collector URL. Don't include "http://" - this is done automatically.
+     * @param httpMethod The HTTP request method
+     */
     public Emitter(String URI, HttpMethod httpMethod) {
         uri = new URIBuilder()
                 .setScheme("http")
@@ -69,16 +76,29 @@ public class Emitter {
         this.httpClient = HttpClients.createDefault();
     }
 
+    /**
+     * Sets whether the buffer should send events instantly or after the buffer has reached
+     * it's limit. By default, this is set to BufferOption Default.
+     * @param option Set the BufferOption enum to Instant send events upon creation.
+     */
     public void setBufferOption(BufferOption option) {
         this.option = option;
     }
 
+    /**
+     * @param option The HTTP request method
+     */
     public void setRequestMethod(RequestMethod option) {
         this.requestMethod = option;
         this.httpAsyncClient = HttpAsyncClients.createDefault();
         this.httpAsyncClient.start();
     }
 
+    /**
+     * Add event payloads to the emitter's buffer
+     * @param payload Payload to be added
+     * @return Returns the boolean value if the event was successfully added to the buffer
+     */
     public boolean addToBuffer(Payload payload) {
         boolean ret = buffer.add(payload);
         if (buffer.size() == option.getCode())
@@ -86,6 +106,9 @@ public class Emitter {
         return ret;
     }
 
+    /**
+     * Sends all events in the buffer to the collector.
+     */
     public void flushBuffer() {
         if (httpMethod == HttpMethod.GET) {
             for (Payload payload : buffer) {
