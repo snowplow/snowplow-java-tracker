@@ -38,6 +38,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -93,7 +94,12 @@ public class Emitter {
         } else if (httpMethod == HttpMethod.POST) {
             SchemaPayload postPayload = new SchemaPayload();
             postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
-            postPayload.setData(buffer);
+
+            ArrayList<Map> eventMaps = new ArrayList<Map>();
+            for (Payload payload : buffer) {
+                eventMaps.add(payload.getMap());
+            }
+            postPayload.setData(eventMaps);
 
             sendPostData(postPayload);
         }
