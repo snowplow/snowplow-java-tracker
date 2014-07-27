@@ -87,7 +87,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      * @return A completed Payload
      */
-    private Payload completePayload(Payload payload, Map context, double timestamp) {
+    private Payload completePayload(Payload payload, List<Map> context, double timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, Version.VERSION);
@@ -100,7 +100,7 @@ public class Tracker {
             SchemaPayload envelope = new SchemaPayload();
             envelope.setSchema(contextSchema);
             envelope.setData(context);
-            payload.addMap(context, this.base64Encoded, Parameter.CONTEXT_ENCODED,
+            payload.addMap(envelope.getMap(), this.base64Encoded, Parameter.CONTEXT_ENCODED,
                     Parameter.CONTEXT);
         }
 
@@ -145,7 +145,7 @@ public class Tracker {
      * @param referrer Referrer of the page
      * @param context Custom context for the event
      */
-    public void trackPageView(String pageUrl, String pageTitle, String referrer, Map context) {
+    public void trackPageView(String pageUrl, String pageTitle, String referrer, List<Map> context) {
         trackPageView(pageUrl,pageTitle, referrer, context, 0);
     }
 
@@ -167,7 +167,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
-                              Map context, double timestamp) {
+                              List<Map> context, double timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(pageUrl);
         Preconditions.checkArgument(!pageUrl.isEmpty(), "pageUrl cannot be empty");
@@ -206,7 +206,7 @@ public class Tracker {
      * @param context Custom context for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, Map context) {
+                                     int value, List<Map> context) {
         trackStructuredEvent(category, action, label, property, value, context, 0);
     }
 
@@ -233,7 +233,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, Map context, long timestamp) {
+                                     int value, List<Map> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(label);
         Preconditions.checkNotNull(property);
@@ -272,7 +272,7 @@ public class Tracker {
                         A "schema" field identifying the schema against which the data is validated
      * @param context Custom context for the event
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData, Map context) {
+    public void trackUnstructuredEvent(Map<String, Object> eventData, List<Map> context) {
         trackUnstructuredEvent(eventData, context, 0);
     }
 
@@ -295,7 +295,7 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData, Map context, long timestamp) {
+    public void trackUnstructuredEvent(Map<String, Object> eventData, List<Map> context, long timestamp) {
         Payload payload = new TrackerPayload();
         SchemaPayload envelope = new SchemaPayload();
 
@@ -325,7 +325,7 @@ public class Tracker {
      */
     protected void trackEcommerceTransactionItem(String order_id, String sku, Double price,
                                                  Integer quantity, String name, String category,
-                                                 String currency, Map context, long timestamp) {
+                                                 String currency, List<Map> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(name);
         Preconditions.checkNotNull(category);
@@ -387,7 +387,7 @@ public class Tracker {
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
-                                          List<TransactionItem> items, Map context) {
+                                          List<TransactionItem> items, List<Map> context) {
         trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
                 state, country, currency, items, context, 0);
     }
@@ -430,7 +430,7 @@ public class Tracker {
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
-                                          List<TransactionItem> items, Map context,long timestamp) {
+                                          List<TransactionItem> items, List<Map> context,long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(affiliation);
         Preconditions.checkNotNull(city);
@@ -467,7 +467,7 @@ public class Tracker {
                     (String) item.get(Parameter.TI_ITEM_NAME),
                     (String) item.get(Parameter.TI_ITEM_CATEGORY),
                     (String) item.get(Parameter.TI_ITEM_CURRENCY),
-                    (Map) item.get(Parameter.CONTEXT),
+                    (List<Map>) item.get(Parameter.CONTEXT),
                     timestamp);
         }
     }
@@ -485,7 +485,7 @@ public class Tracker {
      * @param id Screen view ID
      * @param context Custom context for the event
      */
-    public void trackScreenView(String name, String id, Map context) {
+    public void trackScreenView(String name, String id, List<Map> context) {
         trackScreenView(name, id, context, 0);
     }
 
@@ -504,7 +504,7 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackScreenView(String name, String id, Map context, long timestamp) {
+    public void trackScreenView(String name, String id, List<Map> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(id);
         Preconditions.checkArgument(!name.isEmpty(), "name cannot be empty");

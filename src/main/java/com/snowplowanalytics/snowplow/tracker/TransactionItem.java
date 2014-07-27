@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TransactionItem extends HashMap {
@@ -24,7 +25,7 @@ public class TransactionItem extends HashMap {
     }
 
     public TransactionItem (String order_id, String sku, double price, int quantity, String name,
-                            String category, String currency, Map context) {
+                            String category, String currency, List<Map> context) {
         put(Parameter.EVENT, "ti");
         put(Parameter.TI_ITEM_ID, order_id);
         put(Parameter.TI_ITEM_SKU, sku);
