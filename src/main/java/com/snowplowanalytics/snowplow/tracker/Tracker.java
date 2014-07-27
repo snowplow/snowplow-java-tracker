@@ -35,18 +35,42 @@ public class Tracker {
     private String unstructSchema;
     private Subject subject;
 
+    /**
+     * @param emitter Emitter to which events will be sent
+     * @param namespace Identifier for the Tracker instance
+     * @param appId Application ID
+     */
     public Tracker(Emitter emitter, String namespace, String appId) {
         new Tracker(emitter, null, namespace, appId, true);
     }
 
+    /**
+     * @param emitter Emitter to which events will be sent
+     * @param subject Subject to be tracked
+     * @param namespace Identifier for the Tracker instance
+     * @param appId Application ID
+     */
     public Tracker(Emitter emitter, Subject subject, String namespace, String appId) {
         new Tracker(emitter, subject, namespace, appId, true);
     }
 
+    /**
+     * @param emitter Emitter to which events will be sent
+     * @param namespace Identifier for the Tracker instance
+     * @param appId Application ID
+     * @param base64Encoded Whether JSONs in the payload should be base-64 encoded
+     */
     public Tracker(Emitter emitter, String namespace, String appId, boolean base64Encoded) {
         new Tracker(emitter, null, namespace, appId, base64Encoded);
     }
 
+    /**
+     * @param emitter Emitter to which events will be sent
+     * @param subject Subject to be tracked
+     * @param namespace Identifier for the Tracker instance
+     * @param appId Application ID
+     * @param base64Encoded Whether JSONs in the payload should be base-64 encoded
+     */
     public Tracker(Emitter emitter, Subject subject, String namespace, String appId, boolean base64Encoded) {
         this.emitter = emitter;
         this.appId = appId;
@@ -57,6 +81,12 @@ public class Tracker {
                 Constants.DEFAULT_SCHEMA_VERSION);
     }
 
+    /**
+     * @param payload Payload builder
+     * @param context Custom context for the event
+     * @param timestamp Optional user-provided timestamp for the event
+     * @return A completed Payload
+     */
     private Payload completePayload(Payload payload, Map context, double timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
@@ -83,10 +113,16 @@ public class Tracker {
         this.emitter.addToBuffer(payload);
     }
 
-    public void setSubject(Subject subject) {
+    private void setSubject(Subject subject) {
         this.subject = subject;
     }
 
+    /**
+     * Sets the JSON schema to be used mainly for self-describing JSON.
+     * @param vendor Schema vendor
+     * @param schemaTag Schema tag type
+     * @param version Schema version tag
+     */
     public void setSchema(String vendor, String schemaTag, String version) {
         this.contextSchema = vendor + "/contexts/" + schemaTag + version;
         this.unstructSchema = vendor + "/unstruct_event/" + schemaTag + version;
@@ -94,18 +130,42 @@ public class Tracker {
         this.schemaTag = schemaTag;
     }
 
+    /**
+     * @param pageUrl URL of the viewed page
+     * @param pageTitle Title of the viewed page
+     * @param referrer Referrer of the page
+     */
     public void trackPageView(String pageUrl, String pageTitle, String referrer) {
         trackPageView(pageUrl, pageTitle, referrer, null, 0);
     }
 
+    /**
+     * @param pageUrl URL of the viewed page
+     * @param pageTitle Title of the viewed page
+     * @param referrer Referrer of the page
+     * @param context Custom context for the event
+     */
     public void trackPageView(String pageUrl, String pageTitle, String referrer, Map context) {
         trackPageView(pageUrl,pageTitle, referrer, context, 0);
     }
 
+    /**
+     * @param pageUrl URL of the viewed page
+     * @param pageTitle Title of the viewed page
+     * @param referrer Referrer of the page
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackPageView(String pageUrl, String pageTitle, String referrer, double timestamp) {
         trackPageView(pageUrl, pageTitle, referrer, null, timestamp);
     }
 
+    /**
+     * @param pageUrl URL of the viewed page
+     * @param pageTitle Title of the viewed page
+     * @param referrer Referrer of the page
+     * @param context Custom context for the event
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
                               Map context, double timestamp) {
         // Precondition checks
@@ -125,21 +185,53 @@ public class Tracker {
         addTrackerPayload(payload);
     }
 
+    /**
+     * @param category Category of the event
+     * @param action The event itself
+     * @param label Refer to the object the action is performed on
+     * @param property Property associated with either the action or the object
+     * @param value A value associated with the user action
+     */
     public void trackStructuredEvent(String category, String action, String label, String property,
                                      int value) {
         trackStructuredEvent(category, action, label, property, value, null, 0);
     }
 
+    /**
+     * @param category Category of the event
+     * @param action The event itself
+     * @param label Refer to the object the action is performed on
+     * @param property Property associated with either the action or the object
+     * @param value A value associated with the user action
+     * @param context Custom context for the event
+     */
     public void trackStructuredEvent(String category, String action, String label, String property,
                                      int value, Map context) {
         trackStructuredEvent(category, action, label, property, value, context, 0);
     }
 
+    /**
+     * @param category Category of the event
+     * @param action The event itself
+     * @param label Refer to the object the action is performed on
+     * @param property Property associated with either the action or the object
+     * @param value A value associated with the user action
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackStructuredEvent(String category, String action, String label, String property,
                                      int value, long timestamp) {
         trackStructuredEvent(category, action, label, property, value, null, timestamp);
     }
 
+    /**
+     * @param category Category of the event
+     * @param action The event itself
+     * @param label Refer to the object the action is performed on
+     * @param property Property associated with either the action or the object
+     * @param value A value associated with the user action
+     * @param context Custom context for the event
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackStructuredEvent(String category, String action, String label, String property,
                                      int value, Map context, long timestamp) {
         // Precondition checks
@@ -163,18 +255,46 @@ public class Tracker {
         addTrackerPayload(payload);
     }
 
+    /**
+     *
+     * @param eventData The properties of the event. Has two field:
+                        A "data" field containing the event properties and
+                        A "schema" field identifying the schema against which the data is validated
+     */
     public void trackUnstructuredEvent(Map<String, Object> eventData) {
         trackUnstructuredEvent(eventData, null, 0);
     }
 
+    /**
+     *
+     * @param eventData The properties of the event. Has two field:
+                        A "data" field containing the event properties and
+                        A "schema" field identifying the schema against which the data is validated
+     * @param context Custom context for the event
+     */
     public void trackUnstructuredEvent(Map<String, Object> eventData, Map context) {
         trackUnstructuredEvent(eventData, context, 0);
     }
 
+    /**
+     *
+     * @param eventData The properties of the event. Has two field:
+                        A "data" field containing the event properties and
+                        A "schema" field identifying the schema against which the data is validated
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackUnstructuredEvent(Map<String, Object> eventData, long timestamp) {
         trackUnstructuredEvent(eventData, null, timestamp);
     }
 
+    /**
+     *
+     * @param eventData The properties of the event. Has two field:
+                        A "data" field containing the event properties and
+                        A "schema" field identifying the schema against which the data is validated
+     * @param context Custom context for the event
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackUnstructuredEvent(Map<String, Object> eventData, Map context, long timestamp) {
         Payload payload = new TrackerPayload();
         SchemaPayload envelope = new SchemaPayload();
@@ -191,6 +311,18 @@ public class Tracker {
         addTrackerPayload(payload);
     }
 
+    /**
+     * This is an internal method called by track_ecommerce_transaction. It is not for public use.
+     * @param order_id Order ID
+     * @param sku Item SKU
+     * @param price Item price
+     * @param quantity Item quantity
+     * @param name Item name
+     * @param category Item category
+     * @param currency The currency the price is expressed in
+     * @param context Custom context for the event
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     protected void trackEcommerceTransactionItem(String order_id, String sku, Double price,
                                                  Integer quantity, String name, String category,
                                                  String currency, Map context, long timestamp) {
@@ -219,6 +351,18 @@ public class Tracker {
         addTrackerPayload(payload);
     }
 
+    /**
+     * @param order_id ID of the eCommerce transaction
+     * @param total_value Total transaction value
+     * @param affiliation Transaction affiliation
+     * @param tax_value Transaction tax value
+     * @param shipping Delivery cost charged
+     * @param city Delivery address city
+     * @param state Delivery address state
+     * @param country Delivery address country
+     * @param currency The currency the price is expressed in
+     * @param items The items in the transaction
+     */
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
@@ -227,6 +371,19 @@ public class Tracker {
                 state, country, currency, items, null, 0);
     }
 
+    /**
+     * @param order_id ID of the eCommerce transaction
+     * @param total_value Total transaction value
+     * @param affiliation Transaction affiliation
+     * @param tax_value Transaction tax value
+     * @param shipping Delivery cost charged
+     * @param city Delivery address city
+     * @param state Delivery address state
+     * @param country Delivery address country
+     * @param currency The currency the price is expressed in
+     * @param items The items in the transaction
+     * @param context Custom context for the event
+     */
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
@@ -235,6 +392,19 @@ public class Tracker {
                 state, country, currency, items, context, 0);
     }
 
+    /**
+     * @param order_id ID of the eCommerce transaction
+     * @param total_value Total transaction value
+     * @param affiliation Transaction affiliation
+     * @param tax_value Transaction tax value
+     * @param shipping Delivery cost charged
+     * @param city Delivery address city
+     * @param state Delivery address state
+     * @param country Delivery address country
+     * @param currency The currency the price is expressed in
+     * @param items The items in the transaction
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
@@ -243,6 +413,20 @@ public class Tracker {
                 state, country, currency, items, null, timestamp);
     }
 
+    /**
+     * @param order_id ID of the eCommerce transaction
+     * @param total_value Total transaction value
+     * @param affiliation Transaction affiliation
+     * @param tax_value Transaction tax value
+     * @param shipping Delivery cost charged
+     * @param city Delivery address city
+     * @param state Delivery address state
+     * @param country Delivery address country
+     * @param currency The currency the price is expressed in
+     * @param items The items in the transaction
+     * @param context Custom context for the event
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
@@ -288,18 +472,38 @@ public class Tracker {
         }
     }
 
+    /**
+     * @param name The name of the screen view event
+     * @param id Screen view ID
+     */
     public void trackScreenView(String name, String id) {
         trackScreenView(name, id, null, 0);
     }
 
+    /**
+     * @param name The name of the screen view event
+     * @param id Screen view ID
+     * @param context Custom context for the event
+     */
     public void trackScreenView(String name, String id, Map context) {
         trackScreenView(name, id, context, 0);
     }
 
+    /**
+     * @param name The name of the screen view event
+     * @param id Screen view ID
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackScreenView(String name, String id, long timestamp) {
         trackScreenView(name, id, null, timestamp);
     }
 
+    /**
+     * @param name The name of the screen view event
+     * @param id Screen view ID
+     * @param context Custom context for the event
+     * @param timestamp Optional user-provided timestamp for the event
+     */
     public void trackScreenView(String name, String id, Map context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(id);
