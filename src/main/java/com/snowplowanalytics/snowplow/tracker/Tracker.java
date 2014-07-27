@@ -60,12 +60,10 @@ public class Tracker {
     private Payload completePayload(Payload payload, Map context, double timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
-        payload.add(Parameter.TIMESTAMP, Util.getTimestamp());
-
         payload.add(Parameter.TRACKER_VERSION, Version.VERSION);
 
         // If timestamp is set to 0, generate one
-        payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Util.getTimestamp() : timestamp));
+        payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Long.toString(Util.getTimestamp()) : timestamp));
 
         // Encodes context data
         if (context != null) {
@@ -76,9 +74,7 @@ public class Tracker {
                     Parameter.CONTEXT);
         }
 
-        if (subject != null) {
-            payload.addMap(subject.getSubject());
-        }
+        if (this.subject != null) payload.addMap(subject.getSubject());
 
         return payload;
     }
