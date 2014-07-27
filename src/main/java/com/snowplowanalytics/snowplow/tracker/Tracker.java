@@ -32,6 +32,7 @@ public class Tracker {
     private String contextSchema;
     private String baseSchemaPath;
     private String schemaTag;
+    private String schemaVersion;
     private String unstructSchema;
     private Subject subject;
 
@@ -124,10 +125,11 @@ public class Tracker {
      * @param version Schema version tag
      */
     public void setSchema(String vendor, String schemaTag, String version) {
-        this.contextSchema = vendor + "/contexts/" + schemaTag + version;
-        this.unstructSchema = vendor + "/unstruct_event/" + schemaTag + version;
+        this.contextSchema = vendor + "/contexts/" + schemaTag + "/" + version;
+        this.unstructSchema = vendor + "/unstruct_event/" + schemaTag + "/" + version;
         this.baseSchemaPath = vendor;
         this.schemaTag = schemaTag;
+        this.schemaVersion = version;
     }
 
     /**
@@ -517,7 +519,8 @@ public class Tracker {
 
         SchemaPayload payload = new SchemaPayload();
 
-        payload.setSchema( this.baseSchemaPath + "/contexts/" + this.schemaTag + Version.VERSION);
+        payload.setSchema( this.baseSchemaPath + "/contexts/" +
+                this.schemaTag + "/" + this.schemaVersion);
         payload.setData(screenViewProperties);
 
         trackUnstructuredEvent(payload.getMap(), context, timestamp);
