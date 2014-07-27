@@ -51,8 +51,8 @@ public class Util {
         return r.nextInt(999999-100000+1) + 100000;
     }
 
-    public static Long getTimestamp() {
-        return System.currentTimeMillis();
+    public static String getTimestamp() {
+        return Long.toString(System.currentTimeMillis());
     }
 
 

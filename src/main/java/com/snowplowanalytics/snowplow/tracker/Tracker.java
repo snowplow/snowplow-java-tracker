@@ -63,7 +63,7 @@ public class Tracker {
         payload.add(Parameter.TRACKER_VERSION, Version.VERSION);
 
         // If timestamp is set to 0, generate one
-        payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Long.toString(Util.getTimestamp()) : timestamp));
+        payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Util.getTimestamp() : timestamp));
 
         // Encodes context data
         if (context != null) {
