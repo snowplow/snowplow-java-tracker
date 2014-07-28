@@ -62,6 +62,6 @@ public class Util {
      *  Some use Base64 encoding
      */
     public static String base64Encode(String string) {
-        return Base64.encodeBase64URLSafeString(string.getBytes(Charset.forName("US-ASCII")));
+        return Base64.encodeBase64String(string.getBytes());
     }
 }
