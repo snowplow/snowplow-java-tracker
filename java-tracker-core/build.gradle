@@ -69,9 +69,6 @@ publishing {
 
 task generateSources {
     project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker")
-    println ("$rootDir")
-    println ("$projectDir")
-    println ("$buildDir")
     doFirst {
         def srcFile = new File((String)outputDir, "Version.java")
         srcFile.parentFile.mkdirs()
