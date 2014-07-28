@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,9 +45,11 @@ public class TrackerTest extends TestCase {
         emitter.setRequestMethod(RequestMethod.Asynchronous);
 
         Map<String, String> context = new HashMap<String, String>();
+        ArrayList<Map> contextList = new ArrayList<Map>();
         context.put("some key", "some value");
+        contextList.add(context);
 
-        tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", context, 0);
+        tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList, 0);
 
         emitter.flushBuffer();
     }
