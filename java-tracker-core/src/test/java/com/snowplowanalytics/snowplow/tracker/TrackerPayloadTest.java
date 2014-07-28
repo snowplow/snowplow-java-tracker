@@ -69,7 +69,7 @@ public class TrackerPayloadTest extends TestCase {
         Payload payload = new TrackerPayload();
         payload.addMap(foo, true, "cx", "co");
 
-        String res = "{\"cx\":\"eyJteUtleSI6Im15IFZhbHVlIiwibWVoaCI6WyJzb21lYmFyIiwic29tZWJhcjIiXX0\"}";
+        String res = "{\"cx\":\"eyJteUtleSI6Im15IFZhbHVlIiwibWVoaCI6WyJzb21lYmFyIiwic29tZWJhcjIiXX0=\"}";
         assertEquals(res, payload.toString());
     }
 
