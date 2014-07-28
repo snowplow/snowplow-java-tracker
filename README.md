@@ -46,6 +46,6 @@ limitations under the License.
 [contributing]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Contributing
 
 [travis]: https://travis-ci.org/snowplow/snowplow-java-tracker
-[travis-image]: https://travis-ci.org/snowplow/snowplow-java-tracker.svg?branch=develop
+[travis-image]: https://travis-ci.org/snowplow/snowplow-java-tracker.svg?branch=master
 
 [license]: http://www.apache.org/licenses/LICENSE-2.0
