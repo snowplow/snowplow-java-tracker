@@ -23,27 +23,10 @@ repositories {
 }
 
 group = 'com.snowplowanalytics'
-version = '0.4.0'
+version = '0.5.0'
 
 // Dependencies for our production and test code
 dependencies {
-
-    // Apache Commons
-    compile 'commons-codec:commons-codec:1.2'
-    compile 'commons-net:commons-net:3.3'
-
-    // Apache HTTP
-    compile 'org.apache.httpcomponents:httpclient:4.3.3'
-    compile 'org.apache.httpcomponents:httpasyncclient:4.0.1'
-
-    // SLF4J logging API
-    compile 'org.slf4j:slf4j-simple:1.7.7'
-
-    // Jackson JSON processor
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
-
-    // Contracts
-    compile 'com.google.guava:guava:17.0'
 
     testCompile 'junit:junit:4.11'
 }
@@ -69,34 +52,3 @@ publishing {
         }
     }
 }
-
-task generateSources {
-    project.ext.set("outputDir", "src/main/java/com/snowplowanalytics/snowplow/tracker")
-    doFirst {
-        def srcFile = new File((String)outputDir, "Version.java")
-        srcFile.parentFile.mkdirs()
-        srcFile.write(
-"""/*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
-
-package com.snowplowanalytics.snowplow.tracker;
-
-public class Version {
-    static final String VERSION = "java-$project.version";
-}
-""")
-    }
-}
-
-compileJava.dependsOn generateSources
-compileJava.source generateSources.outputs.files, sourceSets.main.java
