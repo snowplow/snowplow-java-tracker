@@ -14,5 +14,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 public class Version {
-    static final String VERSION = "java-0.5.0";
+    static final String TRACKER = "java-0.5.0";
+    static final String VERSION = "0.5.0";
 }

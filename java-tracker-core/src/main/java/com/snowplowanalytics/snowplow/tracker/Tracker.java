@@ -18,7 +18,6 @@ import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,13 +71,14 @@ public class Tracker {
      * @param appId Application ID
      * @param base64Encoded Whether JSONs in the payload should be base-64 encoded
      */
-    public Tracker(Emitter emitter, Subject subject, String namespace, String appId, boolean base64Encoded) {
+    public Tracker(Emitter emitter, Subject subject, String namespace, String appId,
+                   boolean base64Encoded) {
         this.emitter = emitter;
         this.appId = appId;
         this.base64Encoded = base64Encoded;
         this.namespace = namespace;
         this.subject = subject;
-        this.setSchema(Constants.DEFAULT_VENDOR, Constants.DEFAULT_SCHEMA_TAG,
+        this.setSchema(Constants.DEFAULT_IGLU_VENDOR, Constants.DEFAULT_SCHEMA_TAG,
                 Constants.DEFAULT_SCHEMA_VERSION);
     }
 
@@ -91,7 +91,7 @@ public class Tracker {
     private Payload completePayload(Payload payload, List<Map> context, double timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
-        payload.add(Parameter.TRACKER_VERSION, Version.VERSION);
+        payload.add(Parameter.TRACKER_VERSION, Version.TRACKER);
 
         // If timestamp is set to 0, generate one
         payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Util.getTimestamp() : timestamp));
@@ -157,7 +157,8 @@ public class Tracker {
      * @param referrer Referrer of the page
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackPageView(String pageUrl, String pageTitle, String referrer, double timestamp) {
+    public void trackPageView(String pageUrl, String pageTitle, String referrer,
+                              double timestamp) {
         trackPageView(pageUrl, pageTitle, referrer, null, timestamp);
     }
 
@@ -297,7 +298,8 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData, List<Map> context, long timestamp) {
+    public void trackUnstructuredEvent(Map<String, Object> eventData, List<Map> context,
+                                       long timestamp) {
         Payload payload = new TrackerPayload();
         SchemaPayload envelope = new SchemaPayload();
 
@@ -327,7 +329,8 @@ public class Tracker {
      */
     protected void trackEcommerceTransactionItem(String order_id, String sku, Double price,
                                                  Integer quantity, String name, String category,
-                                                 String currency, List<Map> context, long timestamp) {
+                                                 String currency, List<Map> context,
+                                                 long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(name);
         Preconditions.checkNotNull(category);
@@ -432,7 +435,8 @@ public class Tracker {
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
-                                          List<TransactionItem> items, List<Map> context,long timestamp) {
+                                          List<TransactionItem> items, List<Map> context,
+                                          long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(affiliation);
         Preconditions.checkNotNull(city);
