@@ -39,18 +39,22 @@ public class TrackerPayload implements Payload {
 
     @Override
     public void add(String key, String value) {
+        logger.debug("Adding new key: {} with value: {}", key, value);
         objectNode.put(key, value);
     }
 
     @Override
     public void add(String key, Object value) {
+        logger.debug("Adding new key: {} with object value: {}", key, value);
         objectNode.putPOJO(key, value.toString());
     }
 
     public void addMap(Map<String, Object> map) {
         // Return if we don't have a map
-        if (map == null)
+        if (map == null) {
+            logger.debug("Map passed in is null. Inserting nothing..");
             return;
+        }
 
         Set<String> keys = map.keySet();
         for(String key : keys) {
@@ -60,8 +64,10 @@ public class TrackerPayload implements Payload {
 
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
         // Return if we don't have a map
-        if (map == null)
+        if (map == null) {
+            logger.debug("Map passed in is null. Inserting nothing..");
             return;
+        }
 
         String mapString;
         try {
@@ -86,6 +92,7 @@ public class TrackerPayload implements Payload {
     public Map getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         try {
+            logger.debug("Attempting to create a Map structure from ObjectNode.");
             map = objectMapper.readValue(objectNode.toString(), new TypeReference<Map>(){});
         } catch (JsonMappingException e) {
             e.printStackTrace();
