@@ -65,10 +65,17 @@ public class Emitter {
      * @param httpMethod The HTTP request method
      */
     public Emitter(String URI, HttpMethod httpMethod) {
-        uri = new URIBuilder()
-                .setScheme("http")
-                .setHost(URI)
-                .setPath("/i");
+        if (httpMethod == HttpMethod.GET) {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(URI)
+                    .setPath("/i");
+        } else { // POST
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(URI)
+                    .setPath("/" + Constants.DEFAULT_VENDOR + "/tp2");
+        }
         this.httpMethod = httpMethod;
         this.httpClient = HttpClients.createDefault();
     }
