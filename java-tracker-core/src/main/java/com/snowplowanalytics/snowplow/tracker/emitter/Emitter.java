@@ -112,6 +112,11 @@ public class Emitter {
      * Sends all events in the buffer to the collector.
      */
     public void flushBuffer() {
+        if (buffer.isEmpty()) {
+            logger.debug("Buffer is empty, exiting flush operation..");
+            return;
+        }
+
         if (httpMethod == HttpMethod.GET) {
             for (Payload payload : buffer) {
                 sendGetData(payload);
