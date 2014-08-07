@@ -38,15 +38,15 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testTrackPageView3() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.GET);
+        Emitter emitter = new Emitter(localURL, HttpMethod.GET);
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", true);
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
         emitter.setRequestMethod(RequestMethod.Asynchronous);
 
         Map<String, String> context = new HashMap<String, String>();
         ArrayList<Map> contextList = new ArrayList<Map>();
-        context.put("some key", "some value");
+        context.put("somekey", "somevalue");
         contextList.add(context);
 
         tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList, 0);

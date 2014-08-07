@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker.payload;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,7 +44,7 @@ public class SchemaPayload implements Payload {
         if (payload.getClass() == TrackerPayload.class) {
             logger.debug("Payload class is a TrackerPayload instance.");
             logger.debug("Trying getNode()");
-            data = (ObjectNode) ((TrackerPayload) payload).getNode();
+            data = (ObjectNode) payload.getNode();
         } else {
             logger.debug("Converting Payload map to ObjectNode.");
             data = objectMapper.valueToTree(payload.getMap());
@@ -58,12 +59,20 @@ public class SchemaPayload implements Payload {
     }
 
     public SchemaPayload setData(Payload data) {
-        objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data.getMap()));
+        try {
+            objectNode.putPOJO(Parameter.DATA, objectMapper.writeValueAsString(data.getMap()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
     public SchemaPayload setData(Object data) {
-        objectNode.putPOJO(Parameter.DATA, objectMapper.valueToTree(data));
+        try {
+            objectNode.putPOJO(Parameter.DATA, objectMapper.writeValueAsString(data));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
@@ -105,9 +114,10 @@ public class SchemaPayload implements Payload {
     }
 
     public Map getMap() {
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap map = new HashMap();
         try {
-            map = objectMapper.readValue(objectNode.toString(), new TypeReference<Map>(){});
+            map = objectMapper.readValue(objectNode.toString(),
+                    new TypeReference<HashMap>(){});
         } catch (JsonMappingException e) {
             e.printStackTrace();
         } catch (JsonParseException e) {
