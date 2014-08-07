@@ -3,6 +3,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
@@ -89,10 +90,21 @@ public class EmitterTest extends TestCase {
 
     @Test
     public void testMaxBuffer() throws Exception {
-        Emitter emitter = new Emitter(testURL);
-        TrackerPayload payload = new TrackerPayload();
+        Emitter emitter = new Emitter(testURL, HttpMethod.GET);
+        emitter.setRequestMethod(RequestMethod.Asynchronous);
         for (int i=0; i < 10; i++) {
-            payload.add("key", "value" + i);
+            TrackerPayload payload;
+            LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
+            ArrayList<String> bar = new ArrayList<String>();
+            bar.add("somebar");
+            bar.add("somebar" + i);
+            foo.put("myKey", "my Value");
+            foo.put("mehh", bar);
+            String my_array[] = {"arrayItem","arrayItem " + i};
+            payload = new TrackerPayload();
+            payload.add("my_array", my_array);
+            payload.addMap(foo);
+
             emitter.addToBuffer(payload);
         }
     }
