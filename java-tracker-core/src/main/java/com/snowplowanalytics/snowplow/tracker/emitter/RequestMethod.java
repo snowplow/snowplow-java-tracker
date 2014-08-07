@@ -13,7 +13,17 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
+/**
+ * RequestMethod is used to choose how network requests should be sent.
+ * This can be used by <code>setRequestMethod(RequestMethod option)</code> to set accordingly.
+ */
 public enum RequestMethod {
+    /**
+     * Requests are sent synchronously, so it should be used with caution.
+     */
     Synchronous,
+    /**
+     * Requests are sent asynchronously using a background thread.
+     */
     Asynchronous
 }

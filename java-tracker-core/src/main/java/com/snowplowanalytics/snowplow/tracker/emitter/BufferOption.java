@@ -13,8 +13,20 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
+/**
+ * BufferOption is used to set the buffer size of your Emitter.
+ */
 public enum BufferOption {
+    /**
+     * Sends events immediately when being tracked. This may cause a lot of network traffic
+     * depending on it's usage.
+     */
     Instant(1),
+
+    /**
+     * Sends events in a group only after collecting 10 events. In a POST request, this is
+     * sent in one payload. For a GET request, individual requests are sent following each other.
+     */
     Default(10);
 
     private int code;

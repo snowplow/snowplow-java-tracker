@@ -13,7 +13,16 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
+/**
+ * HttpMethod is used to set the request method for your Emitter (i.e. GET or POST requests).
+ */
 public enum HttpMethod {
+    /**
+     * Each event is sent individually in separate GET requests.
+     */
     GET,
+    /**
+     * Events can be grouped together in a SchemaPayload and sent in one request if desired.
+     */
     POST
 }
