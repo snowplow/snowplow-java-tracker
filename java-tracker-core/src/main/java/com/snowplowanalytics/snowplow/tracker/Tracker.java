@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.base.Preconditions;
+import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
