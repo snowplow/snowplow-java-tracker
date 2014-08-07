@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -25,7 +26,14 @@ public class TrackerPayloadTest extends TestCase {
 
     @Test
     public void testAddObject() throws Exception {
+        Payload payload = new TrackerPayload();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("foo", "bar");
+        map.put("more foo", "more bar");
+        payload.add("map", map);
 
+        String res = "{\"map\":{\"more foo\":\"more bar\",\"foo\":\"bar\"}}";
+        assertEquals(res, payload.toString());
     }
 
     @Test
@@ -109,11 +117,6 @@ public class TrackerPayloadTest extends TestCase {
         payload.setSchema("iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0");
         String res = "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\"}";
         assertEquals(res, payload.toString());
-    }
-
-    @Test
-    public void testGetNode() throws Exception {
-
     }
 
     @Test
