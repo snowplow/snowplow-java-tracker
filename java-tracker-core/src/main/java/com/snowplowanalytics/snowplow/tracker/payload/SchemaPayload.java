@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.Parameter;
 import com.snowplowanalytics.snowplow.tracker.Util;
 
@@ -53,6 +54,9 @@ public class SchemaPayload implements Payload {
     }
 
     public SchemaPayload setSchema(String schema) {
+        Preconditions.checkNotNull(schema, "schema cannot be null");
+        Preconditions.checkArgument(!schema.isEmpty(), "schema cannot be empty.");
+
         logger.debug("Setting schema: {}", schema);
         objectNode.put(Parameter.SCHEMA, schema);
         return this;

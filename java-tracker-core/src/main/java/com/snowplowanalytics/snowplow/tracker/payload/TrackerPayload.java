@@ -39,12 +39,22 @@ public class TrackerPayload implements Payload {
 
     @Override
     public void add(String key, String value) {
+        if (value == null || value.isEmpty()) {
+            logger.debug("kv-value is empty. Returning out without adding key..");
+            return;
+        }
+
         logger.debug("Adding new key: {} with value: {}", key, value);
         objectNode.put(key, value);
     }
 
     @Override
     public void add(String key, Object value) {
+        if (value == null) {
+            logger.debug("kv-value is empty. Returning out without adding key..");
+            return;
+        }
+
         logger.debug("Adding new key: {} with object value: {}", key, value);
         try {
             objectNode.putPOJO(key, objectMapper.writeValueAsString(value));
@@ -53,10 +63,11 @@ public class TrackerPayload implements Payload {
         }
     }
 
+    @Override
     public void addMap(Map<String, Object> map) {
         // Return if we don't have a map
         if (map == null) {
-            logger.debug("Map passed in is null. Inserting nothing..");
+            logger.debug("Map passed in is null. Returning without adding map..");
             return;
         }
 
@@ -66,10 +77,11 @@ public class TrackerPayload implements Payload {
         }
     }
 
+    @Override
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
         // Return if we don't have a map
         if (map == null) {
-            logger.debug("Map passed in is null. Inserting nothing..");
+            logger.debug("Map passed in is null. Returning nothing..");
             return;
         }
 
