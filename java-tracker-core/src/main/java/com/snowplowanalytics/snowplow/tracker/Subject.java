@@ -63,7 +63,7 @@ public class Subject {
         this.standardPairs.put(Parameter.LANGUAGE, language);
     }
 
-    public Map getSubject() {
+    public Map<String, String> getSubject() {
         return this.standardPairs;
     }
 }

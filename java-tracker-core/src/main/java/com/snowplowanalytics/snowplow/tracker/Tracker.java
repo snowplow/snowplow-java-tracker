@@ -106,7 +106,7 @@ public class Tracker {
                     Parameter.CONTEXT);
         }
 
-        if (this.subject != null) payload.addMap(subject.getSubject());
+        if (this.subject != null) payload.addMap(new HashMap<String, Object>(subject.getSubject()));
 
         return payload;
     }
