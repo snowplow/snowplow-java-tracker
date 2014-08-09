@@ -117,8 +117,8 @@ public class SchemaPayload implements Payload {
         logger.debug("addMap(Map, Boolean, String, String) method called: Doing nothing.");
     }
 
-    public Map getMap() {
-        HashMap map = new HashMap();
+    public Map<String, Object> getMap() {
+        HashMap<String, Object> map = new HashMap<String, Object>();
         try {
             map = objectMapper.readValue(objectNode.toString(),
                     new TypeReference<HashMap>(){});
