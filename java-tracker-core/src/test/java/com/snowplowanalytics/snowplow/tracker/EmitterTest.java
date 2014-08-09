@@ -68,6 +68,7 @@ public class EmitterTest extends TestCase {
         trackerPayload.addMap(foo);
         trackerPayload.add("my_array", my_array);
         payload = new SchemaPayload();
+        payload.setSchema("iglu:com.snowplowanalytics.snowplow/some_bar/jsonschema/1-0-0");
         payload.setData(trackerPayload.getMap());
         payload.addMap(foo);
 
