@@ -1,10 +1,14 @@
 Version 0.5.0 (2014-0x-xx)
 --------------------------
-Refactored networking unit tests for mock testing (#40)
 Created unit tests for Subject class (#46)
 Created an EnvelopePayload class (#50)
-Fixed Tracker context to be a list of maps (#56)
+Tracker context is now a list of maps (#56)
+TODO Added support for callbacks for success/failure (#57)
+Allows user to configure buffer size (#58)
 Removed .md extension from CHANGELOG (#59)
+Changed base64 encoder to use UTF8 characters (#60)
+Changed collector endpoint to /<api-vendor>/<api-version> (#61)
+Added charset onto end of content type (#62) 
 
 Version 0.4.0 (2014-07-23)
 --------------------------
