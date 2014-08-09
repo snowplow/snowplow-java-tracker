@@ -25,6 +25,8 @@ public class Subject {
     public Subject() {
         standardPairs = new HashMap<String, String>();
 
+        this.standardPairs.put(Parameter.EID, Util.getEventId());
+
         // Default Platform
         this.setPlatform(DevicePlatform.Desktop);
 

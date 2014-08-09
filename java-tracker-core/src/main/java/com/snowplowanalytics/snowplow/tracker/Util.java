@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 public class Util {
     private static final Logger logger = LoggerFactory.getLogger(Util.class);
@@ -63,5 +64,9 @@ public class Util {
      */
     public static String base64Encode(String string) {
         return Base64.encodeBase64String(string.getBytes());
+    }
+
+    public static String getEventId() {
+        return UUID.randomUUID().toString();
     }
 }
