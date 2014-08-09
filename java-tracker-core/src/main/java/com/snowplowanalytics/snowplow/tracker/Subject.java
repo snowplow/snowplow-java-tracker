@@ -25,7 +25,7 @@ public class Subject {
     public Subject() {
         standardPairs = new HashMap<String, String>();
 
-        this.standardPairs.put(Parameter.EID, Util.getEventId());
+        this.setEventId(Util.getEventId());
 
         // Default Platform
         this.setPlatform(DevicePlatform.Desktop);
@@ -63,6 +63,10 @@ public class Subject {
 
     public void setLanguage(String language) {
         this.standardPairs.put(Parameter.LANGUAGE, language);
+    }
+
+    public void setEventId(String eventId) {
+        this.standardPairs.put(Parameter.EID, eventId);
     }
 
     public Map<String, String> getSubject() {
