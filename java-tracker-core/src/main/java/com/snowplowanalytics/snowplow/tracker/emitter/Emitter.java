@@ -137,7 +137,7 @@ public class Emitter {
 
     private void sendPostData(Payload payload) {
         HttpPost httpPost = new HttpPost(uri.toString());
-        httpPost.addHeader("Content-Type", "application/json");
+        httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
 
         try {
             StringEntity params = new StringEntity(payload.toString());
