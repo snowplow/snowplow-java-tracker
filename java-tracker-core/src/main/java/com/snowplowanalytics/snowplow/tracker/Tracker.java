@@ -89,7 +89,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      * @return A completed Payload
      */
-    private Payload completePayload(Payload payload, List<Map> context, double timestamp) {
+    protected Payload completePayload(Payload payload, List<Map> context, double timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, Version.TRACKER);
