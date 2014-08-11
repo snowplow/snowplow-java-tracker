@@ -59,8 +59,9 @@ public class Emitter {
     }
 
     /**
+     * Create an Emitter instance with a collector URL and HttpMethod to send requests.
      * @param URI The collector URL. Don't include "http://" - this is done automatically.
-     * @param httpMethod The HTTP request method
+     * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
      */
     public Emitter(String URI, HttpMethod httpMethod) {
         if (httpMethod == HttpMethod.GET) {
@@ -76,6 +77,9 @@ public class Emitter {
         }
         this.httpMethod = httpMethod;
         this.httpClient = HttpClients.createDefault();
+
+        if (httpMethod == HttpMethod.GET)
+            this.setBufferOption(BufferOption.Instant);
     }
 
     /**
@@ -88,6 +92,7 @@ public class Emitter {
     }
 
     /**
+     * Sets whether requests should be sent synchronously or asynchronously.
      * @param option The HTTP request method
      */
     public void setRequestMethod(RequestMethod option) {
