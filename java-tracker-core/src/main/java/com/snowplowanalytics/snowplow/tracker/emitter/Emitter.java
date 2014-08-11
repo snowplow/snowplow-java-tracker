@@ -52,6 +52,7 @@ public class Emitter {
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
     /**
+     * Create an Emitter instance with a collector URL.
      * @param URI The collector URL. Don't include "http://" - this is done automatically.
      */
     public Emitter(String URI) {
