@@ -35,6 +35,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -45,6 +46,7 @@ public class Emitter {
     private BufferOption option = BufferOption.Default;
     private HttpMethod httpMethod = HttpMethod.GET;
     private RequestMethod requestMethod = RequestMethod.Synchronous;
+    private RequestCallback requestCallback;
     private CloseableHttpClient httpClient;
     private CloseableHttpAsyncClient httpAsyncClient;
     private final ArrayList<Payload> buffer = new ArrayList<Payload>();
@@ -56,7 +58,15 @@ public class Emitter {
      * @param URI The collector URL. Don't include "http://" - this is done automatically.
      */
     public Emitter(String URI) {
-        new Emitter(URI, HttpMethod.GET);
+        this(URI, HttpMethod.GET, null);
+    }
+
+    public Emitter(String URI, RequestCallback callback) {
+        this(URI, HttpMethod.GET, callback);
+    }
+
+    public Emitter(String URI, HttpMethod httpMethod) {
+        this(URI, httpMethod, null);
     }
 
     /**
@@ -64,7 +74,7 @@ public class Emitter {
      * @param URI The collector URL. Don't include "http://" - this is done automatically.
      * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
      */
-    public Emitter(String URI, HttpMethod httpMethod) {
+    public Emitter(String URI, HttpMethod httpMethod, RequestCallback callback) {
         if (httpMethod == HttpMethod.GET) {
             uri = new URIBuilder()
                     .setScheme("http")
@@ -76,11 +86,14 @@ public class Emitter {
                     .setHost(URI)
                     .setPath("/" + Constants.DEFAULT_VENDOR + "/tp2");
         }
+        this.requestCallback = callback;
         this.httpMethod = httpMethod;
         this.httpClient = HttpClients.createDefault();
 
-        if (httpMethod == HttpMethod.GET)
+        if (httpMethod == HttpMethod.GET) {
             this.setBufferOption(BufferOption.Instant);
+        }
+
     }
 
     /**
@@ -124,10 +137,27 @@ public class Emitter {
         }
 
         if (httpMethod == HttpMethod.GET) {
+            int success_count = 0;
+            LinkedList<Payload> unsentPayloads = new LinkedList<Payload>();
+
             for (Payload payload : buffer) {
-                sendGetData(payload);
+                int status_code = sendGetData(payload).getStatusLine().getStatusCode();
+                if (status_code == 200)
+                    success_count++;
+                else
+                    unsentPayloads.add(payload);
             }
+
+            if (unsentPayloads.size() == 0) {
+                if (requestCallback != null)
+                    requestCallback.onRequestSuccess(success_count);
+            }
+            else if (requestCallback != null)
+                requestCallback.onRequestFailure(success_count, unsentPayloads);
+
         } else if (httpMethod == HttpMethod.POST) {
+            LinkedList<Payload> unsentPayload = new LinkedList<Payload>();
+
             SchemaPayload postPayload = new SchemaPayload();
             postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
 
@@ -137,17 +167,23 @@ public class Emitter {
             }
             postPayload.setData(eventMaps);
 
-            sendPostData(postPayload);
+            int status_code = sendPostData(postPayload).getStatusLine().getStatusCode();
+            if (status_code == 200 && requestCallback != null)
+                requestCallback.onRequestSuccess(buffer.size());
+            else if (requestCallback != null){
+                unsentPayload.add(postPayload);
+                requestCallback.onRequestFailure(0, unsentPayload);
+            }
         }
     }
 
-    private void sendPostData(Payload payload) {
+    private HttpResponse sendPostData(Payload payload) {
         HttpPost httpPost = new HttpPost(uri.toString());
         httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
+        HttpResponse httpResponse = null;
 
         try {
             StringEntity params = new StringEntity(payload.toString());
-            HttpResponse httpResponse;
             httpPost.setEntity(params);
             if (requestMethod == RequestMethod.Asynchronous) {
                 Future<HttpResponse> future = httpAsyncClient.execute(httpPost, null);
@@ -168,27 +204,28 @@ public class Emitter {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
+        return httpResponse;
     }
 
-    private void sendGetData(Payload payload) {
+    private HttpResponse sendGetData(Payload payload) {
         JsonNode eventMap = payload.getNode();
         Iterator<String> iterator = eventMap.fieldNames();
+        HttpResponse httpResponse = null;
 
         URIBuilder requestUri = uri;
         while (iterator.hasNext()) {
             String key = iterator.next();
             String value = eventMap.get(key).toString();
             // Removing the end quotes in 'value' is an ugly hack
-            if (value.charAt(0) ==  '\"')
-                value = value.substring(1,eventMap.get(key).toString().length()-1);
+            if (value.charAt(0) ==  '\"') {
+                value = value.substring(1, eventMap.get(key).toString().length()-1);
+            }
 
             requestUri.setParameter(key, value);
         }
 
         try {
             HttpGet httpGet = new HttpGet(requestUri.build());
-            HttpResponse httpResponse;
             if (requestMethod == RequestMethod.Asynchronous) {
                 Future<HttpResponse> future = httpAsyncClient.execute(httpGet, null);
                 httpResponse = future.get();
@@ -208,5 +245,6 @@ public class Emitter {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+        return httpResponse;
     }
 }

@@ -3,7 +3,9 @@ package com.snowplowanalytics.snowplow.tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
@@ -11,10 +13,9 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class EmitterTest extends TestCase {
 
@@ -33,14 +34,14 @@ public class EmitterTest extends TestCase {
 
     @Test
     public void testFlushGet() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.GET);
+        Emitter emitter = new Emitter(testURL);
 
         TrackerPayload payload;
         LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
         bar.add("somebar");
         bar.add("somebar2");
-        foo.put("myKey", "my Value");
+        foo.put("test", "testFlushGet");
         foo.put("mehh", bar);
         String my_array[] = {"arrayItem","arrayItem2"};
         payload = new TrackerPayload();
@@ -54,25 +55,22 @@ public class EmitterTest extends TestCase {
 
     @Test
     public void testFlushPost() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Emitter emitter = new Emitter(testURL, HttpMethod.POST, null);
 
-        SchemaPayload payload;
-        TrackerPayload trackerPayload = new TrackerPayload();
+        TrackerPayload payload;
         LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
         bar.add("somebar");
-        bar.add("somebar2");
-        foo.put("myKey", "my Value");
+        bar.add("somebar");
+        foo.put("test", "testMaxBuffer");
         foo.put("mehh", bar);
         String my_array[] = {"arrayItem","arrayItem2"};
-        trackerPayload.addMap(foo);
-        trackerPayload.add("my_array", my_array);
-        payload = new SchemaPayload();
-        payload.setSchema("iglu:com.snowplowanalytics.snowplow/some_bar/jsonschema/1-0-0");
-        payload.setData(trackerPayload.getMap());
+        payload = new TrackerPayload();
+        payload.add("my_array", my_array);
         payload.addMap(foo);
 
         emitter.addToBuffer(payload);
+
 
         emitter.flushBuffer();
     }
@@ -85,21 +83,50 @@ public class EmitterTest extends TestCase {
 
     @Test
     public void testFlushBuffer() throws Exception {
-        Emitter emitter = new Emitter(testURL);
+
+        Emitter emitter = new Emitter(testURL, HttpMethod.GET, new RequestCallback() {
+            @Override
+            public void onRequestSuccess(int bufferLength) {
+                System.out.println("Buffer length for POST/GET:" + bufferLength);
+            }
+
+            @Override
+            public void onRequestFailure(int successCount, List<Payload> failedEvent) {
+                System.out.println("Failure, successCount: " + successCount +
+                        "\nfailedEvent:\n" + failedEvent.toString());
+            }
+        });
+
+        emitter.setRequestMethod(RequestMethod.Asynchronous);
+        for (int i=0; i < 5; i++) {
+            TrackerPayload payload;
+            LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
+            ArrayList<String> bar = new ArrayList<String>();
+            bar.add("somebar");
+            bar.add("somebar" + i);
+            foo.put("test", "testFlushBuffer");
+            foo.put("mehh", bar);
+            String my_array[] = {"arrayItem","arrayItem " + i};
+            payload = new TrackerPayload();
+            payload.add("my_array", my_array);
+            payload.addMap(foo);
+
+            emitter.addToBuffer(payload);
+        }
         emitter.flushBuffer();
     }
 
     @Test
     public void testMaxBuffer() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.GET);
-        emitter.setRequestMethod(RequestMethod.Asynchronous);
+        Emitter emitter = new Emitter(testURL, HttpMethod.GET, null);
+//        emitter.setRequestMethod(RequestMethod.Asynchronous);
         for (int i=0; i < 10; i++) {
             TrackerPayload payload;
             LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
             ArrayList<String> bar = new ArrayList<String>();
             bar.add("somebar");
             bar.add("somebar" + i);
-            foo.put("myKey", "my Value");
+            foo.put("test", "testMaxBuffer");
             foo.put("mehh", bar);
             String my_array[] = {"arrayItem","arrayItem " + i};
             payload = new TrackerPayload();
