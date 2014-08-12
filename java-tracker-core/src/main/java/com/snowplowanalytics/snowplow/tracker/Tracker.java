@@ -42,7 +42,7 @@ public class Tracker {
      * @param appId Application ID
      */
     public Tracker(Emitter emitter, String namespace, String appId) {
-        new Tracker(emitter, null, namespace, appId, true);
+        this(emitter, null, namespace, appId, true);
     }
 
     /**
@@ -52,7 +52,7 @@ public class Tracker {
      * @param appId Application ID
      */
     public Tracker(Emitter emitter, Subject subject, String namespace, String appId) {
-        new Tracker(emitter, subject, namespace, appId, true);
+        this(emitter, subject, namespace, appId, true);
     }
 
     /**
@@ -62,7 +62,7 @@ public class Tracker {
      * @param base64Encoded Whether JSONs in the payload should be base-64 encoded
      */
     public Tracker(Emitter emitter, String namespace, String appId, boolean base64Encoded) {
-        new Tracker(emitter, null, namespace, appId, base64Encoded);
+        this(emitter, null, namespace, appId, base64Encoded);
     }
 
     /**
