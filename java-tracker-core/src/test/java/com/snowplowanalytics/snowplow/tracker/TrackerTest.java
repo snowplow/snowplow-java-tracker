@@ -3,6 +3,8 @@ package com.snowplowanalytics.snowplow.tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 
 import junit.framework.TestCase;
 
@@ -14,8 +16,8 @@ import java.util.Map;
 
 public class TrackerTest extends TestCase {
 
-//    private static String testURL = "segfault.ngrok.com";
-    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+    private static String testURL = "segfault.ngrok.com";
+//    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
 
     @Test
     public void testSetSchema() throws Exception {
@@ -42,15 +44,18 @@ public class TrackerTest extends TestCase {
         Emitter emitter = new Emitter(testURL, HttpMethod.POST);
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
         emitter.setRequestMethod(RequestMethod.Asynchronous);
 
-        Map<String, String> context = new HashMap<String, String>();
+        SchemaPayload context = new SchemaPayload();
+        Map<String, String> someContext = new HashMap<String, String>();
+        someContext.put("someContextKey", "someContextValue");
         ArrayList<Map> contextList = new ArrayList<Map>();
-        context.put("somekey", "somevalue");
-        contextList.add(context);
+        context.setSchema("setse");
+        context.setData(someContext);
+        contextList.add(context.getMap());
 
-        tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList, 0);
+        tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList);
 
         emitter.flushBuffer();
     }
