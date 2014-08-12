@@ -16,8 +16,8 @@ import java.util.Map;
 
 public class TrackerTest extends TestCase {
 
-    private static String testURL = "segfault.ngrok.com";
-//    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+//    private static String testURL = "segfault.ngrok.com";
+    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
 
     @Test
     public void testSetSchema() throws Exception {
@@ -50,10 +50,10 @@ public class TrackerTest extends TestCase {
         SchemaPayload context = new SchemaPayload();
         Map<String, String> someContext = new HashMap<String, String>();
         someContext.put("someContextKey", "someContextValue");
-        ArrayList<Map> contextList = new ArrayList<Map>();
+        ArrayList<SchemaPayload> contextList = new ArrayList<SchemaPayload>();
         context.setSchema("setse");
         context.setData(someContext);
-        contextList.add(context.getMap());
+        contextList.add(context);
 
         tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList);
 

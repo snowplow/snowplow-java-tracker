@@ -20,6 +20,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +90,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      * @return A completed Payload
      */
-    protected Payload completePayload(Payload payload, List<Map> context, double timestamp) {
+    protected Payload completePayload(Payload payload, List<SchemaPayload> context, double timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, Version.TRACKER);
@@ -101,7 +102,14 @@ public class Tracker {
         if (context != null) {
             SchemaPayload envelope = new SchemaPayload();
             envelope.setSchema(contextSchema);
-            envelope.setData(context);
+
+            // We can do better here, rather than re-iterate through the list
+            List<Map> contextDataList = new LinkedList<Map>();
+            for (SchemaPayload schemaPayload : context) {
+                contextDataList.add(schemaPayload.getMap());
+            }
+
+            envelope.setData(contextDataList);
             payload.addMap(envelope.getMap(), this.base64Encoded, Parameter.CONTEXT_ENCODED,
                     Parameter.CONTEXT);
         }
@@ -148,7 +156,7 @@ public class Tracker {
      * @param referrer Referrer of the page
      * @param context Custom context for the event
      */
-    public void trackPageView(String pageUrl, String pageTitle, String referrer, List<Map> context) {
+    public void trackPageView(String pageUrl, String pageTitle, String referrer, List<SchemaPayload> context) {
         trackPageView(pageUrl,pageTitle, referrer, context, 0);
     }
 
@@ -171,7 +179,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
-                              List<Map> context, double timestamp) {
+                              List<SchemaPayload> context, double timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(pageUrl);
         Preconditions.checkArgument(!pageUrl.isEmpty(), "pageUrl cannot be empty");
@@ -210,7 +218,7 @@ public class Tracker {
      * @param context Custom context for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, List<Map> context) {
+                                     int value, List<SchemaPayload> context) {
         trackStructuredEvent(category, action, label, property, value, context, 0);
     }
 
@@ -237,7 +245,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, List<Map> context, long timestamp) {
+                                     int value, List<SchemaPayload> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(label);
         Preconditions.checkNotNull(property);
@@ -276,7 +284,7 @@ public class Tracker {
                         A "schema" field identifying the schema against which the data is validated
      * @param context Custom context for the event
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData, List<Map> context) {
+    public void trackUnstructuredEvent(Map<String, Object> eventData, List<SchemaPayload> context) {
         trackUnstructuredEvent(eventData, context, 0);
     }
 
@@ -299,7 +307,7 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData, List<Map> context,
+    public void trackUnstructuredEvent(Map<String, Object> eventData, List<SchemaPayload> context,
                                        long timestamp) {
         Payload payload = new TrackerPayload();
         SchemaPayload envelope = new SchemaPayload();
@@ -330,7 +338,7 @@ public class Tracker {
      */
     protected void trackEcommerceTransactionItem(String order_id, String sku, Double price,
                                                  Integer quantity, String name, String category,
-                                                 String currency, List<Map> context,
+                                                 String currency, List<SchemaPayload> context,
                                                  long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(name);
@@ -393,7 +401,7 @@ public class Tracker {
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
-                                          List<TransactionItem> items, List<Map> context) {
+                                          List<TransactionItem> items, List<SchemaPayload> context) {
         trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
                 state, country, currency, items, context, 0);
     }
@@ -436,7 +444,7 @@ public class Tracker {
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
-                                          List<TransactionItem> items, List<Map> context,
+                                          List<TransactionItem> items, List<SchemaPayload> context,
                                           long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(affiliation);
@@ -474,7 +482,7 @@ public class Tracker {
                     (String) item.get(Parameter.TI_ITEM_NAME),
                     (String) item.get(Parameter.TI_ITEM_CATEGORY),
                     (String) item.get(Parameter.TI_ITEM_CURRENCY),
-                    (List<Map>) item.get(Parameter.CONTEXT),
+                    (List<SchemaPayload>) item.get(Parameter.CONTEXT),
                     timestamp);
         }
     }
@@ -492,7 +500,7 @@ public class Tracker {
      * @param id Screen view ID
      * @param context Custom context for the event
      */
-    public void trackScreenView(String name, String id, List<Map> context) {
+    public void trackScreenView(String name, String id, List<SchemaPayload> context) {
         trackScreenView(name, id, context, 0);
     }
 
@@ -511,7 +519,7 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackScreenView(String name, String id, List<Map> context, long timestamp) {
+    public void trackScreenView(String name, String id, List<SchemaPayload> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(id);
         Preconditions.checkArgument(!name.isEmpty(), "name cannot be empty");
