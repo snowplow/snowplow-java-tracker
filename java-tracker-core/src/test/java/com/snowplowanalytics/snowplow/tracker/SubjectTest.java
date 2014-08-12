@@ -12,37 +12,37 @@ public class SubjectTest extends TestCase {
     @Test
     public void testSetPlatform() throws Exception {
         Subject subject = new Subject();
-        subject.getSubject().get("p").toString();
-        assertEquals("pc", subject.getSubject().get("p").toString());
+        subject.getSubject().get("p");
+        assertEquals("pc", subject.getSubject().get("p"));
     }
 
     @Test
     public void testSetPlatform2() throws Exception {
         Subject subject = new Subject();
         subject.setPlatform(DevicePlatform.ConnectedTV);
-        subject.getSubject().get("p").toString();
-        assertEquals("tv", subject.getSubject().get("p").toString());
+        subject.getSubject().get("p");
+        assertEquals("tv", subject.getSubject().get("p"));
     }
 
     @Test
     public void testSetUserId() throws Exception {
         Subject subject = new Subject();
         subject.setUserId("user1");
-        assertEquals("user1", subject.getSubject().get("uid").toString());
+        assertEquals("user1", subject.getSubject().get("uid"));
     }
 
     @Test
     public void testSetScreenResolution() throws Exception {
         Subject subject = new Subject();
         subject.setScreenResolution(100, 150);
-        assertEquals("100x150", subject.getSubject().get("res").toString());
+        assertEquals("100x150", subject.getSubject().get("res"));
     }
 
     @Test
     public void testSetViewPort() throws Exception {
         Subject subject = new Subject();
         subject.setViewPort(150, 100);
-        assertEquals("150x100", subject.getSubject().get("vp").toString());
+        assertEquals("150x100", subject.getSubject().get("vp"));
 
     }
 
@@ -50,14 +50,14 @@ public class SubjectTest extends TestCase {
     public void testSetColorDepth() throws Exception {
         Subject subject = new Subject();
         subject.setColorDepth(10);
-        assertEquals("10", subject.getSubject().get("cd").toString());
+        assertEquals("10", subject.getSubject().get("cd"));
     }
 
     // Enable only if running locally, change assert to your local timezone
 //    @Test
 //    public void testSetTimezone() throws Exception {
 //        Subject subject = new Subject();
-//        assertEquals("America/Toronto", subject.getSubject().get("tz").toString());
+//        assertEquals("America/Toronto", subject.getSubject().get("tz"));
 //    }
 
     @Test
