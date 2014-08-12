@@ -19,8 +19,8 @@ import java.util.List;
 
 public class EmitterTest extends TestCase {
 
-    private static String testURL = "segfault.ngrok.com";
-//    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+//    private static String testURL = "segfault.ngrok.com";
+    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
 
     @Test
     public void testEmitterConstructor() throws Exception {
