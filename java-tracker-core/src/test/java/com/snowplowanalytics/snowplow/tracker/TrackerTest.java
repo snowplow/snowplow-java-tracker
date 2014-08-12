@@ -49,8 +49,8 @@ public class TrackerTest extends TestCase {
 
         SchemaPayload context = new SchemaPayload();
         Map<String, String> someContext = new HashMap<String, String>();
-        someContext.put("someContextKey", "someContextValue");
-        context.setSchema("setse");
+        someContext.put("someContextKey", "testTrackPageView3");
+        context.setSchema("iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0");
         context.setData(someContext);
         ArrayList<SchemaPayload> contextList = new ArrayList<SchemaPayload>();
         contextList.add(context);
@@ -127,7 +127,23 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testTrackScreenView() throws Exception {
+        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Subject subject = new Subject();
+        subject.setViewPort(320, 480);
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
+        emitter.setRequestMethod(RequestMethod.Asynchronous);
 
+        SchemaPayload context = new SchemaPayload();
+        Map<String, String> someContext = new HashMap<String, String>();
+        someContext.put("someContextKey", "testTrackPageView2");
+        context.setSchema("iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0");
+        context.setData(someContext);
+        ArrayList<SchemaPayload> contextList = new ArrayList<SchemaPayload>();
+        contextList.add(context);
+
+        tracker.trackScreenView(null, "screen_1", contextList, 0);
+
+        emitter.flushBuffer();
     }
 
     @Test

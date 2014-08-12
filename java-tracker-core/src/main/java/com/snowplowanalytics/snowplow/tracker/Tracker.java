@@ -90,7 +90,8 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      * @return A completed Payload
      */
-    protected Payload completePayload(Payload payload, List<SchemaPayload> context, double timestamp) {
+    protected Payload completePayload(Payload payload, List<SchemaPayload> context,
+                                      double timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, Version.TRACKER);
@@ -156,7 +157,8 @@ public class Tracker {
      * @param referrer Referrer of the page
      * @param context Custom context for the event
      */
-    public void trackPageView(String pageUrl, String pageTitle, String referrer, List<SchemaPayload> context) {
+    public void trackPageView(String pageUrl, String pageTitle, String referrer,
+                              List<SchemaPayload> context) {
         trackPageView(pageUrl,pageTitle, referrer, context, 0);
     }
 
@@ -519,22 +521,19 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackScreenView(String name, String id, List<SchemaPayload> context, long timestamp) {
-        // Precondition checks
-        Preconditions.checkNotNull(id);
-        Preconditions.checkArgument(!name.isEmpty(), "name cannot be empty");
-        Preconditions.checkArgument(!id.isEmpty(), "id cannot be empty");
+    public void trackScreenView(String name, String id, List<SchemaPayload> context,
+                                long timestamp) {
+        Preconditions.checkArgument(name != null || id != null);
+        TrackerPayload trackerPayload = new TrackerPayload();
 
-        Map<String, String> screenViewProperties = new HashMap<String, String>();
-
-        screenViewProperties.put(Parameter.SV_NAME, name);
-        screenViewProperties.put(Parameter.SV_ID, id);
+        trackerPayload.add(Parameter.SV_NAME, name);
+        trackerPayload.add(Parameter.SV_ID, id);
 
         SchemaPayload payload = new SchemaPayload();
 
         payload.setSchema( this.baseSchemaPath + "/contexts/" +
                 this.schemaTag + "/" + this.schemaVersion);
-        payload.setData(screenViewProperties);
+        payload.setData(trackerPayload);
 
         trackUnstructuredEvent(payload.getMap(), context, timestamp);
     }
