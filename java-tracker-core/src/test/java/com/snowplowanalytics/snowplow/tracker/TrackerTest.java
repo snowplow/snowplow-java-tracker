@@ -44,15 +44,15 @@ public class TrackerTest extends TestCase {
         Emitter emitter = new Emitter(testURL, HttpMethod.POST);
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
         emitter.setRequestMethod(RequestMethod.Asynchronous);
 
         SchemaPayload context = new SchemaPayload();
         Map<String, String> someContext = new HashMap<String, String>();
         someContext.put("someContextKey", "someContextValue");
-        ArrayList<SchemaPayload> contextList = new ArrayList<SchemaPayload>();
         context.setSchema("setse");
         context.setData(someContext);
+        ArrayList<SchemaPayload> contextList = new ArrayList<SchemaPayload>();
         contextList.add(context);
 
         tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList);

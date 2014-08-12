@@ -19,8 +19,8 @@ import java.util.List;
 
 public interface RequestCallback {
 
-    void onRequestSuccess(int bufferLength);
+    void onSuccess(int bufferLength);
 
-    void onRequestFailure(int successCount, List<Payload> failedEvent);
+    void onFailure(int successCount, List<Payload> failedEvent);
 
 }

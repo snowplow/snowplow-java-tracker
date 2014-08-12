@@ -86,12 +86,12 @@ public class EmitterTest extends TestCase {
 
         Emitter emitter = new Emitter(testURL, HttpMethod.GET, new RequestCallback() {
             @Override
-            public void onRequestSuccess(int bufferLength) {
+            public void onSuccess(int bufferLength) {
                 System.out.println("Buffer length for POST/GET:" + bufferLength);
             }
 
             @Override
-            public void onRequestFailure(int successCount, List<Payload> failedEvent) {
+            public void onFailure(int successCount, List<Payload> failedEvent) {
                 System.out.println("Failure, successCount: " + successCount +
                         "\nfailedEvent:\n" + failedEvent.toString());
             }

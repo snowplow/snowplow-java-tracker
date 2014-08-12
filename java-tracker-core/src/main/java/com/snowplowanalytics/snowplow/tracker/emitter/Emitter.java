@@ -161,10 +161,10 @@ public class Emitter {
 
             if (unsentPayloads.size() == 0) {
                 if (requestCallback != null)
-                    requestCallback.onRequestSuccess(success_count);
+                    requestCallback.onSuccess(success_count);
             }
             else if (requestCallback != null)
-                requestCallback.onRequestFailure(success_count, unsentPayloads);
+                requestCallback.onFailure(success_count, unsentPayloads);
 
         } else if (httpMethod == HttpMethod.POST) {
             LinkedList<Payload> unsentPayload = new LinkedList<Payload>();
@@ -180,10 +180,10 @@ public class Emitter {
 
             int status_code = sendPostData(postPayload).getStatusLine().getStatusCode();
             if (status_code == 200 && requestCallback != null)
-                requestCallback.onRequestSuccess(buffer.size());
+                requestCallback.onSuccess(buffer.size());
             else if (requestCallback != null){
                 unsentPayload.add(postPayload);
-                requestCallback.onRequestFailure(0, unsentPayload);
+                requestCallback.onFailure(0, unsentPayload);
             }
         }
     }
