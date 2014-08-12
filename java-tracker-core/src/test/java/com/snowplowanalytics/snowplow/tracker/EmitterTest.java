@@ -6,7 +6,6 @@ import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import junit.framework.TestCase;
@@ -86,8 +85,8 @@ public class EmitterTest extends TestCase {
 
         Emitter emitter = new Emitter(testURL, HttpMethod.GET, new RequestCallback() {
             @Override
-            public void onSuccess(int bufferLength) {
-                System.out.println("Buffer length for POST/GET:" + bufferLength);
+            public void onSuccess(int successCount) {
+                System.out.println("Buffer length for POST/GET:" + successCount);
             }
 
             @Override
