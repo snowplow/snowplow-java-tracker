@@ -1,4 +1,4 @@
-Version 0.5.0 (2014-0x-xx)
+Version 0.5.0 (2014-08-13)
 --------------------------
 Created unit tests for Subject class (#46)
 Created an EnvelopePayload class (#50)
