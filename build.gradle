@@ -16,7 +16,7 @@ apply plugin: 'java'
 // As per http://www.gradle.org/docs/current/userguide/publishing_maven.html
 apply plugin: 'maven-publish'
 
-subprojects {
+allprojects {
     apply plugin: 'java'
     group = 'com.snowplowanalytics'
     version = '0.5.0'
@@ -27,7 +27,7 @@ subprojects {
 }
 
 
-task sourceJar(type: Jar, dependsOn: ':generateSources') {
+task sourceJar(type: Jar, dependsOn: ':java-tracker-core:generateSources') {
     from sourceSets.main.allJava
 }
 

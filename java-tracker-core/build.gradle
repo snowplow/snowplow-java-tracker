@@ -16,6 +16,9 @@ apply plugin: 'java'
 // As per http://www.gradle.org/docs/current/userguide/publishing_maven.html
 apply plugin: 'maven-publish'
 
+group = 'com.snowplowanalytics'
+version = '0.5.0'
+
 // Where to find the dependencies of our project
 repositories {
     // Use 'maven central' for resolving our dependencies
@@ -45,7 +48,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
 }
 
-task sourceJar(type: Jar, dependsOn: ':generateSources') {
+task sourceJar(type: Jar, dependsOn: 'generateSources') {
     from sourceSets.main.allJava
 }
 
