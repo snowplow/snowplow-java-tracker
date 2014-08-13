@@ -12,4 +12,3 @@
  */
 
 rootProject.name = 'snowplow-java-tracker'
-include 'java-tracker-core'
