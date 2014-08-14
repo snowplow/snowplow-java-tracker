@@ -11,5 +11,16 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-rootProject.name = 'snowplow-java-tracker'
-include 'snowplow-java-tracker-core'
+package com.snowplowanalytics.snowplow.tracker.core.emitter;
+
+import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
+
+import java.util.List;
+
+public interface RequestCallback {
+
+    void onSuccess(int successCount);
+
+    void onFailure(int successCount, List<Payload> failedEvent);
+
+}

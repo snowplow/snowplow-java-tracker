@@ -16,6 +16,12 @@ apply plugin: 'java'
 // As per http://www.gradle.org/docs/current/userguide/publishing_maven.html
 apply plugin: 'maven-publish'
 
+apply plugin: 'war'
+
+dependencies {
+    runtime project(':snowplow-java-tracker-core')
+}
+
 allprojects {
     apply plugin: 'java'
     group = 'com.snowplowanalytics'
@@ -27,7 +33,7 @@ allprojects {
 }
 
 
-task sourceJar(type: Jar, dependsOn: ':java-tracker-core:generateSources') {
+task sourceJar(type: Jar) {
     from sourceSets.main.allJava
 }
 
@@ -55,8 +61,6 @@ task testAll(dependsOn: assemble) {
         
             // Dependencies for our production and test code
             dependencies {
-
-                testCompile 'junit:junit:4.11'
             }
         }
     }
