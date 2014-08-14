@@ -11,9 +11,9 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.core;
 
-import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
 
 import java.util.HashMap;
 import java.util.List;

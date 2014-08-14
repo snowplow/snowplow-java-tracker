@@ -11,9 +11,19 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.core.emitter;
 
-public class Version {
-    static final String TRACKER = "java-core-0.5.0";
-    static final String VERSION = "0.5.0";
+/**
+ * RequestMethod is used to choose how network requests should be sent.
+ * This can be used by <code>setRequestMethod(RequestMethod option)</code> to set accordingly.
+ */
+public enum RequestMethod {
+    /**
+     * Requests are sent synchronously, so it should be used with caution.
+     */
+    Synchronous,
+    /**
+     * Requests are sent asynchronously using a background thread.
+     */
+    Asynchronous
 }

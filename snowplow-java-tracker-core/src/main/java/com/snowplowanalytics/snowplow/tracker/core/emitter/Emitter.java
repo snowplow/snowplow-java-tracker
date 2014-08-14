@@ -11,12 +11,12 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.emitter;
+package com.snowplowanalytics.snowplow.tracker.core.emitter;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.snowplowanalytics.snowplow.tracker.Constants;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.core.Constants;
+import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;

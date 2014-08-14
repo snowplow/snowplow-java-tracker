@@ -1,12 +1,12 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestMethod;
+import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
 
 import junit.framework.TestCase;
 

@@ -1,5 +1,8 @@
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.core.Subject;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
