@@ -1,7 +1,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.snowplowanalytics.snowplow.tracker.core.Util;
 
 import junit.framework.TestCase;
 import org.junit.Test;

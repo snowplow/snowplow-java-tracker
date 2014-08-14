@@ -68,7 +68,7 @@ publishing {
 }
 
 task generateSources {
-    project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker/core")
+    project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker")
     doFirst {
         println outputDir
         def srcFile = new File((String)outputDir, "Version.java")
@@ -87,7 +87,7 @@ task generateSources {
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core;
+package com.snowplowanalytics.snowplow.tracker;
 
 public class Version {
     static final String TRACKER = "java-core-$project.version";

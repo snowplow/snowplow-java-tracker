@@ -11,13 +11,13 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core;
+package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.base.Preconditions;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
-import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.HashMap;
 import java.util.LinkedList;
