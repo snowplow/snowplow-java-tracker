@@ -34,6 +34,7 @@ public class Tracker {
     private String baseSchemaPath;
     private String schemaTag;
     private String schemaVersion;
+    private String trackerVersion;
     private String unstructSchema;
     private Subject subject;
 
@@ -80,6 +81,7 @@ public class Tracker {
         this.base64Encoded = base64Encoded;
         this.namespace = namespace;
         this.subject = subject;
+        this.trackerVersion = Version.TRACKER;
         this.setSchema(Constants.DEFAULT_IGLU_VENDOR, Constants.DEFAULT_SCHEMA_TAG,
                 Constants.DEFAULT_SCHEMA_VERSION);
     }
@@ -94,7 +96,7 @@ public class Tracker {
                                       double timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
-        payload.add(Parameter.TRACKER_VERSION, Version.TRACKER);
+        payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
 
         // If timestamp is set to 0, generate one
         payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Util.getTimestamp() : timestamp));
@@ -118,6 +120,10 @@ public class Tracker {
         if (this.subject != null) payload.addMap(new HashMap<String, Object>(subject.getSubject()));
 
         return payload;
+    }
+
+    protected void setTrackerVersion(String version) {
+        this.trackerVersion = version;
     }
 
     private void addTrackerPayload(Payload payload) {

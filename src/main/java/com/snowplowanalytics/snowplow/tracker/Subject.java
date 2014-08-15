@@ -13,5 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-public class Subject {
+public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject {
+
+    public Subject() {
+        super();
+    }
+
 }

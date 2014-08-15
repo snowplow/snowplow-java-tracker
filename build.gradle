@@ -19,6 +19,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'war'
 
 dependencies {
+    compile project(':snowplow-java-tracker-core')
     runtime project(':snowplow-java-tracker-core')
 }
 

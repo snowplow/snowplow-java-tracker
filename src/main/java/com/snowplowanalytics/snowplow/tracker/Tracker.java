@@ -13,6 +13,30 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-public class Tracker {
+import com.snowplowanalytics.snowplow.tracker.core.*;
+import com.snowplowanalytics.snowplow.tracker.core.Subject;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.*;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 
+public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker {
+
+    public Tracker(com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter emitter, String namespace, String appId) {
+        super(emitter, namespace, appId);
+        super.setTrackerVersion(Version.TRACKER);
+    }
+
+    public Tracker(Emitter emitter, com.snowplowanalytics.snowplow.tracker.core.Subject subject, String namespace, String appId) {
+        super(emitter, subject, namespace, appId);
+        super.setTrackerVersion(Version.TRACKER);
+    }
+
+    public Tracker(Emitter emitter, String namespace, String appId, boolean base64Encoded) {
+        super(emitter, namespace, appId, base64Encoded);
+        super.setTrackerVersion(Version.TRACKER);
+    }
+
+    public Tracker(Emitter emitter, Subject subject, String namespace, String appId, boolean base64Encoded) {
+        super(emitter, subject, namespace, appId, base64Encoded);
+        super.setTrackerVersion(Version.TRACKER);
+    }
 }

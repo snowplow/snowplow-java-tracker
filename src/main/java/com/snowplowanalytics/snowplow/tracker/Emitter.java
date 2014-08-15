@@ -13,5 +13,23 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-public class Emitter {
+import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestCallback;
+
+public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter {
+    public Emitter(String URI) {
+        super(URI);
+    }
+
+    public Emitter(String URI, RequestCallback callback) {
+        super(URI, callback);
+    }
+
+    public Emitter(String URI, HttpMethod httpMethod) {
+        super(URI, httpMethod);
+    }
+
+    public Emitter(String URI, HttpMethod httpMethod, RequestCallback callback) {
+        super(URI, httpMethod, callback);
+    }
 }
