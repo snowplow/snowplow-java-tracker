@@ -96,7 +96,7 @@ public class TrackerPayload implements Payload {
         if (base64_encoded) { // base64 encoded data
             objectNode.put(type_encoded, Util.base64Encode(mapString));
         } else { // add it as a child node
-            add(type_no_encoded, mapString);
+            add(type_no_encoded, map);
         }
     }
 
