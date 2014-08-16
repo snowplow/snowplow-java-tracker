@@ -17,18 +17,39 @@ import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestCallback;
 
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter {
+
+    /**
+     * Create an Emitter instance with a collector URL.
+     * @param URI The collector URL. Don't include "http://" - this is done automatically.
+     */
     public Emitter(String URI) {
         super(URI);
     }
 
+    /**
+     * Create an Emitter instance with a collector URL, and callback function.
+     * @param URI The collector URL. Don't include "http://" - this is done automatically.
+     * @param callback The callback function to handle success/failure cases when sending events.
+     */
     public Emitter(String URI, RequestCallback callback) {
         super(URI, callback);
     }
 
+    /**
+     * Create an Emitter instance with a collector URL,
+     * @param URI The collector URL. Don't include "http://" - this is done automatically.
+     * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
+     */
     public Emitter(String URI, HttpMethod httpMethod) {
         super(URI, httpMethod);
     }
 
+    /**
+     * Create an Emitter instance with a collector URL and HttpMethod to send requests.
+     * @param URI The collector URL. Don't include "http://" - this is done automatically.
+     * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
+     * @param callback The callback function to handle success/failure cases when sending events.
+     */
     public Emitter(String URI, HttpMethod httpMethod, RequestCallback callback) {
         super(URI, httpMethod, callback);
     }
