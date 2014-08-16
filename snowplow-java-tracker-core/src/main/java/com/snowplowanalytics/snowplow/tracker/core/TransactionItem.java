@@ -22,7 +22,7 @@ public class TransactionItem extends HashMap {
 
     public TransactionItem (String order_id, String sku, double price, int quantity, String name,
                             String category, String currency) {
-        new TransactionItem(order_id,sku, price, quantity, name, category, currency, null);
+        this(order_id,sku, price, quantity, name, category, currency, null);
     }
 
     public TransactionItem (String order_id, String sku, double price, int quantity, String name,
