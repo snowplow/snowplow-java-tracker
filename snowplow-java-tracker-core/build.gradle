@@ -16,23 +16,37 @@ apply plugin: 'java'
 // As per http://www.gradle.org/docs/current/userguide/publishing_maven.html
 apply plugin: 'maven-publish'
 
-apply plugin: 'war'
+group = 'com.snowplowanalytics'
+version = '0.1.0'
 
+// Where to find the dependencies of our project
+repositories {
+    // Use 'maven central' for resolving our dependencies
+    mavenCentral()
+}
+
+// Dependencies for our production and test code
 dependencies {
-    compile project(':snowplow-java-tracker-core')
-    runtime project(':snowplow-java-tracker-core')
-}
 
-allprojects {
-    apply plugin: 'java'
-    group = 'com.snowplowanalytics'
-    version = '0.5.0'
-    repositories {
-        // Use 'maven central' for resolving our dependencies
-        mavenCentral()
-    }
-}
+    // Apache Commons
+    compile 'commons-codec:commons-codec:1.2'
+    compile 'commons-net:commons-net:3.3'
 
+    // Apache HTTP
+    compile 'org.apache.httpcomponents:httpclient:4.3.3'
+    compile 'org.apache.httpcomponents:httpasyncclient:4.0.1'
+
+    // SLF4J logging API
+    compile 'org.slf4j:slf4j-simple:1.7.7'
+
+    // Jackson JSON processor
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
+
+    // Contracts
+    compile 'com.google.guava:guava:17.0'
+
+    testCompile 'junit:junit:4.11'
+}
 
 task sourceJar(type: Jar, dependsOn: 'generateSources') {
     from sourceSets.main.allJava
@@ -56,25 +70,14 @@ publishing {
     }
 }
 
-task testAll(dependsOn: assemble) {
-    subprojects.each {project ->
-        project.tasks.withType(Jar).each {
-        
-            // Dependencies for our production and test code
-            dependencies {
-            }
-        }
-    }
-}
-
 task generateSources {
-    project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker")
+    project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker/core")
     doFirst {
         println outputDir
         def srcFile = new File((String)outputDir, "Version.java")
         srcFile.parentFile.mkdirs()
         srcFile.write(
-                """/*
+"""/*
  * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
@@ -87,10 +90,10 @@ task generateSources {
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.core;
 
 public class Version {
-    static final String TRACKER = "java-$project.version";
+    static final String TRACKER = "java-core-$project.version";
     static final String VERSION = "$project.version";
 }
 """)

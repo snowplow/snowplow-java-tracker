@@ -11,5 +11,9 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-rootProject.name = 'snowplow-java-tracker'
-include 'snowplow-java-tracker-core'
+package com.snowplowanalytics.snowplow.tracker.core;
+
+public class Version {
+    static final String TRACKER = "java-core-0.1.0";
+    static final String VERSION = "0.1.0";
+}

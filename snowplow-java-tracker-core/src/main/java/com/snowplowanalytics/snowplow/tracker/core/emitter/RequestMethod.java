@@ -11,5 +11,19 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-rootProject.name = 'snowplow-java-tracker'
-include 'snowplow-java-tracker-core'
+package com.snowplowanalytics.snowplow.tracker.core.emitter;
+
+/**
+ * RequestMethod is used to choose how network requests should be sent.
+ * This can be used by <code>setRequestMethod(RequestMethod option)</code> to set accordingly.
+ */
+public enum RequestMethod {
+    /**
+     * Requests are sent synchronously, so it should be used with caution.
+     */
+    Synchronous,
+    /**
+     * Requests are sent asynchronously using a background thread.
+     */
+    Asynchronous
+}
