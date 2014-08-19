@@ -99,7 +99,8 @@ public class Tracker {
         payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
 
         // If timestamp is set to 0, generate one
-        payload.add(Parameter.TIMESTAMP, (timestamp == 0 ? Util.getTimestamp() : timestamp));
+        payload.add(Parameter.TIMESTAMP,
+                (timestamp == 0 ? Util.getTimestamp() : Double.toString(timestamp)));
 
         // Encodes context data
         if (context != null) {
@@ -268,7 +269,7 @@ public class Tracker {
         payload.add(Parameter.SE_ACTION, action);
         payload.add(Parameter.SE_LABEL, label);
         payload.add(Parameter.SE_PROPERTY, property);
-        payload.add(Parameter.SE_VALUE, value);
+        payload.add(Parameter.SE_VALUE, Double.toString(value));
 
         completePayload(payload, context, timestamp);
 
@@ -364,8 +365,8 @@ public class Tracker {
         payload.add(Parameter.TI_ITEM_SKU, sku);
         payload.add(Parameter.TI_ITEM_NAME, name);
         payload.add(Parameter.TI_ITEM_CATEGORY, category);
-        payload.add(Parameter.TI_ITEM_PRICE, price);
-        payload.add(Parameter.TI_ITEM_QUANTITY, quantity);
+        payload.add(Parameter.TI_ITEM_PRICE, Double.toString(price));
+        payload.add(Parameter.TI_ITEM_QUANTITY, Double.toString(quantity));
         payload.add(Parameter.TI_ITEM_CURRENCY, currency);
 
         completePayload(payload, context, timestamp);
@@ -449,6 +450,7 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
+    @SuppressWarnings("unchecked")
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
@@ -470,10 +472,10 @@ public class Tracker {
         Payload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_ECOMM);
         payload.add(Parameter.TR_ID, order_id);
-        payload.add(Parameter.TR_TOTAL, total_value);
+        payload.add(Parameter.TR_TOTAL, Double.toString(total_value));
         payload.add(Parameter.TR_AFFILIATION, affiliation);
-        payload.add(Parameter.TR_TAX, tax_value);
-        payload.add(Parameter.TR_SHIPPING, shipping);
+        payload.add(Parameter.TR_TAX, Double.toString(tax_value));
+        payload.add(Parameter.TR_SHIPPING, Double.toString(shipping));
         payload.add(Parameter.TR_CITY, city);
         payload.add(Parameter.TR_STATE, state);
         payload.add(Parameter.TR_COUNTRY, country);
@@ -493,6 +495,8 @@ public class Tracker {
                     (List<SchemaPayload>) item.get(Parameter.CONTEXT),
                     timestamp);
         }
+
+        addTrackerPayload(payload);
     }
 
     /**
