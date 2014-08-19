@@ -2,6 +2,8 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.snowplowanalytics.snowplow.tracker.core.Subject;
 import com.snowplowanalytics.snowplow.tracker.core.Tracker;
+import com.snowplowanalytics.snowplow.tracker.core.TransactionItem;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestMethod;
@@ -13,6 +15,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class TrackerTest extends TestCase {
@@ -108,7 +111,26 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testTrackEcommerceTransaction() throws Exception {
+        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Tracker tracker = new Tracker(emitter, "AF003", "cloudfront", false);
+        emitter.setRequestMethod(RequestMethod.Asynchronous);
 
+        SchemaPayload context = new SchemaPayload();
+        Map<String, String> someContext = new HashMap<String, String>();
+        someContext.put("someContextKey", "testTrackPageView2");
+        context.setSchema("iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0");
+        context.setData(someContext);
+        ArrayList<SchemaPayload> contextList = new ArrayList<SchemaPayload>();
+        contextList.add(context);
+
+        TransactionItem transactionItem = new TransactionItem("order-8", "no_sku",
+                34.0, 1, "Big Order", "Food", "USD", contextList);
+        LinkedList<TransactionItem> transactionItemLinkedList = new LinkedList<TransactionItem>();
+        transactionItemLinkedList.add(transactionItem);
+        tracker.trackEcommerceTransaction("order-7", 25.0, "no_affiliate", 0.0, 0.0, "Dover",
+                "Delaware", "US", "USD", transactionItemLinkedList);
+
+        emitter.flushBuffer();
     }
 
     @Test
@@ -133,6 +155,7 @@ public class TrackerTest extends TestCase {
         subject.setViewPort(320, 480);
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
         emitter.setRequestMethod(RequestMethod.Asynchronous);
+        emitter.setBufferOption(BufferOption.Instant);
 
         SchemaPayload context = new SchemaPayload();
         Map<String, String> someContext = new HashMap<String, String>();
@@ -143,8 +166,6 @@ public class TrackerTest extends TestCase {
         contextList.add(context);
 
         tracker.trackScreenView(null, "screen_1", contextList, 0);
-
-        emitter.flushBuffer();
     }
 
     @Test
