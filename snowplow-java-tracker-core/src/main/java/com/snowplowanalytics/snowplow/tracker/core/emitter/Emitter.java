@@ -13,7 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker.core.emitter;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.snowplowanalytics.snowplow.tracker.core.Constants;
 import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
@@ -34,6 +33,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -218,25 +218,20 @@ public class Emitter {
         return httpResponse;
     }
 
+    @SuppressWarnings("unchecked")
     private HttpResponse sendGetData(Payload payload) {
-        JsonNode eventMap = payload.getNode();
-        Iterator<String> iterator = eventMap.fieldNames();
+        HashMap hashMap = (HashMap) payload.getMap();
+        Iterator<String> iterator = hashMap.keySet().iterator();
         HttpResponse httpResponse = null;
 
-        URIBuilder requestUri = uri;
         while (iterator.hasNext()) {
             String key = iterator.next();
-            String value = eventMap.get(key).toString();
-            // Removing the end quotes in 'value' is an ugly hack
-            if (value.charAt(0) ==  '\"') {
-                value = value.substring(1, eventMap.get(key).toString().length()-1);
-            }
-
-            requestUri.setParameter(key, value);
+            String value = (String) hashMap.get(key);
+            uri.setParameter(key, value);
         }
 
         try {
-            HttpGet httpGet = new HttpGet(requestUri.build());
+            HttpGet httpGet = new HttpGet(uri.build());
             if (requestMethod == RequestMethod.Asynchronous) {
                 Future<HttpResponse> future = httpAsyncClient.execute(httpGet, null);
                 httpResponse = future.get();
