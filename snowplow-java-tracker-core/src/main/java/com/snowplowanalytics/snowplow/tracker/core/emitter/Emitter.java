@@ -54,6 +54,13 @@ public class Emitter {
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
     /**
+     * Default constructor does nothing.
+     */
+    public Emitter() {
+
+    }
+
+    /**
      * Create an Emitter instance with a collector URL.
      * @param URI The collector URL. Don't include "http://" - this is done automatically.
      */
@@ -188,7 +195,7 @@ public class Emitter {
         }
     }
 
-    private HttpResponse sendPostData(Payload payload) {
+    protected HttpResponse sendPostData(Payload payload) {
         HttpPost httpPost = new HttpPost(uri.toString());
         httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
         HttpResponse httpResponse = null;
@@ -219,7 +226,7 @@ public class Emitter {
     }
 
     @SuppressWarnings("unchecked")
-    private HttpResponse sendGetData(Payload payload) {
+    protected HttpResponse sendGetData(Payload payload) {
         HashMap hashMap = (HashMap) payload.getMap();
         Iterator<String> iterator = hashMap.keySet().iterator();
         HttpResponse httpResponse = null;
