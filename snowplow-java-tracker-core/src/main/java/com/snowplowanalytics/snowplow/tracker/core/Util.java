@@ -28,6 +28,15 @@ import java.util.UUID;
 public class Util {
     private static final Logger logger = LoggerFactory.getLogger(Util.class);
     private static ObjectMapper sObjectMapper = new ObjectMapper();
+    private static Util ourInstance = new Util();
+
+    public static Util getInstance() {
+        return ourInstance;
+    }
+
+    private Util() {
+    }
+
     public static ObjectMapper defaultMapper() {
         return sObjectMapper;
     }
@@ -61,7 +70,7 @@ public class Util {
      *  Map is then used to build "Associative array for getter function.
      *  Some use Base64 encoding
      */
-    public static String base64Encode(String string) {
+    public String base64Encode(String string) {
         return Base64.encodeBase64String(string.getBytes());
     }
 
