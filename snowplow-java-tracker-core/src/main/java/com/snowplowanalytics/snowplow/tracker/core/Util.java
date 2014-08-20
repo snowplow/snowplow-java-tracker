@@ -34,7 +34,7 @@ public class Util {
         return ourInstance;
     }
 
-    private Util() {
+    protected Util() {
     }
 
     public static ObjectMapper defaultMapper() {
