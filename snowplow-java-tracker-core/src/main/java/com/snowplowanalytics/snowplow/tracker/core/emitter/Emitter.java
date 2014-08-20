@@ -44,7 +44,6 @@ public class Emitter {
 
     private URIBuilder uri;
     private BufferOption option = BufferOption.Default;
-    private HttpMethod httpMethod = HttpMethod.GET;
     private RequestMethod requestMethod = RequestMethod.Synchronous;
     private RequestCallback requestCallback;
     private CloseableHttpClient httpClient;
@@ -52,6 +51,8 @@ public class Emitter {
     private final ArrayList<Payload> buffer = new ArrayList<Payload>();
 
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
+
+    protected HttpMethod httpMethod = HttpMethod.GET;
 
     /**
      * Default constructor does nothing.
