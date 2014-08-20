@@ -45,13 +45,13 @@ public class Emitter {
     private URIBuilder uri;
     private BufferOption option = BufferOption.Default;
     private RequestMethod requestMethod = RequestMethod.Synchronous;
-    private RequestCallback requestCallback;
     private CloseableHttpClient httpClient;
     private CloseableHttpAsyncClient httpAsyncClient;
     private final ArrayList<Payload> buffer = new ArrayList<Payload>();
 
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
+    protected RequestCallback requestCallback;
     protected HttpMethod httpMethod = HttpMethod.GET;
 
     /**
