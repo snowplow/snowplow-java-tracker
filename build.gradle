@@ -26,7 +26,7 @@ dependencies {
 allprojects {
     apply plugin: 'java'
     group = 'com.snowplowanalytics'
-    version = '0.5.0'
+    version = '0.5.1'
     repositories {
         // Use 'maven central' for resolving our dependencies
         mavenCentral()
@@ -59,7 +59,7 @@ publishing {
 task testAll(dependsOn: assemble) {
     subprojects.each {project ->
         project.tasks.withType(Jar).each {
-        
+
             // Dependencies for our production and test code
             dependencies {
             }
