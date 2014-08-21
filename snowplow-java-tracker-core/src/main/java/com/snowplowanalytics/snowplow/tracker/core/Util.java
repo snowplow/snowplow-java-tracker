@@ -16,11 +16,11 @@ package com.snowplowanalytics.snowplow.tracker.core;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -62,7 +62,12 @@ public class Util {
      *  Some use Base64 encoding
      */
     public static String base64Encode(String string) {
-        return Base64.encodeBase64String(string.getBytes());
+        try {
+            return Base64.encode(string.getBytes());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String getEventId() {
