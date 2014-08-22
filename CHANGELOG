@@ -1,4 +1,4 @@
-Version 0.5.1 (2014-08-21)
+Version 0.5.1 (2014-08-22)
 --------------------------
 Values are not properly stringified in POST (#69)
 TrackerPayload doesn't stringify doubles (#68)
