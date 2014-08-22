@@ -62,7 +62,7 @@ public class TrackerPayloadTest extends TestCase {
         Payload payload = new TrackerPayload();
         payload.addMap(foo, false, "cx", "co");
 
-        String res = "{\"co\":{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}}";
+        String res = "{\"co\":\"{\\\"myKey\\\":\\\"my Value\\\",\\\"mehh\\\":[\\\"somebar\\\",\\\"somebar2\\\"]}\"}";
         assertEquals(res, payload.toString());
     }
 

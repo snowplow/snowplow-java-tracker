@@ -37,14 +37,8 @@ public class EmitterTest extends TestCase {
 
         TrackerPayload payload;
         LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
-        ArrayList<String> bar = new ArrayList<String>();
-        bar.add("somebar");
-        bar.add("somebar2");
-        foo.put("test", "testFlushGet");
-        foo.put("mehh", bar);
-        String my_array[] = {"arrayItem","arrayItem2"};
+        foo.put("test", "testFlushBuffer");
         payload = new TrackerPayload();
-        payload.add("my_array", my_array);
         payload.addMap(foo);
 
         emitter.addToBuffer(payload);
@@ -63,9 +57,7 @@ public class EmitterTest extends TestCase {
         bar.add("somebar");
         foo.put("test", "testMaxBuffer");
         foo.put("mehh", bar);
-        String my_array[] = {"arrayItem","arrayItem2"};
         payload = new TrackerPayload();
-        payload.add("my_array", my_array);
         payload.addMap(foo);
 
         emitter.addToBuffer(payload);
@@ -100,14 +92,8 @@ public class EmitterTest extends TestCase {
         for (int i=0; i < 5; i++) {
             TrackerPayload payload;
             LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
-            ArrayList<String> bar = new ArrayList<String>();
-            bar.add("somebar");
-            bar.add("somebar" + i);
             foo.put("test", "testFlushBuffer");
-            foo.put("mehh", bar);
-            String my_array[] = {"arrayItem","arrayItem " + i};
             payload = new TrackerPayload();
-            payload.add("my_array", my_array);
             payload.addMap(foo);
 
             emitter.addToBuffer(payload);
@@ -118,18 +104,12 @@ public class EmitterTest extends TestCase {
     @Test
     public void testMaxBuffer() throws Exception {
         Emitter emitter = new Emitter(testURL, HttpMethod.GET, null);
-//        emitter.setRequestMethod(RequestMethod.Asynchronous);
+        emitter.setRequestMethod(RequestMethod.Asynchronous);
         for (int i=0; i < 10; i++) {
             TrackerPayload payload;
             LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
-            ArrayList<String> bar = new ArrayList<String>();
-            bar.add("somebar");
-            bar.add("somebar" + i);
-            foo.put("test", "testMaxBuffer");
-            foo.put("mehh", bar);
-            String my_array[] = {"arrayItem","arrayItem " + i};
+            foo.put("test", "testFlushBuffer");
             payload = new TrackerPayload();
-            payload.add("my_array", my_array);
             payload.addMap(foo);
 
             emitter.addToBuffer(payload);
