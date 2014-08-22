@@ -1,5 +1,9 @@
-Version 0.5.1 (2014-08-22)
---------------------------
+Java 0.5.1 (2014-08-22)
+-----------------------
+Bumped Core version to 0.1.1 (#71)
+
+Core 0.1.1 (2014-08-22)
+-----------------------
 Values are not properly stringified in POST (#69)
 TrackerPayload doesn't stringify doubles (#68)
 
