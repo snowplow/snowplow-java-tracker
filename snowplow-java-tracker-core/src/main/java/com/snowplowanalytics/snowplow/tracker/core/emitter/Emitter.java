@@ -43,7 +43,6 @@ import java.util.concurrent.Future;
 public class Emitter {
 
     private URIBuilder uri;
-    private BufferOption option = BufferOption.Default;
     private RequestMethod requestMethod = RequestMethod.Synchronous;
     private CloseableHttpClient httpClient;
     private CloseableHttpAsyncClient httpAsyncClient;
@@ -51,6 +50,7 @@ public class Emitter {
 
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
+    protected BufferOption option = BufferOption.Default;
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod = HttpMethod.GET;
 
