@@ -1,3 +1,8 @@
+Core 0.1.2 (2014-08-29)
+-----------------------
+Changed bufferOption from private to protected (#75)
+Fixed Tech Docs link in README (#77)
+
 Java 0.5.1 (2014-08-22)
 -----------------------
 Bumped Core version to 0.1.1 (#71)
