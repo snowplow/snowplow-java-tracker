@@ -289,8 +289,8 @@ public class Tracker {
     /**
      *
      * @param eventData The properties of the event. Has two field:
-                        A "data" field containing the event properties and
-                        A "schema" field identifying the schema against which the data is validated
+     *                   A "data" field containing the event properties and
+     *                   A "schema" field identifying the schema against which the data is validated
      * @param context Custom context for the event
      */
     public void trackUnstructuredEvent(Map<String, Object> eventData, List<SchemaPayload> context) {
@@ -300,8 +300,8 @@ public class Tracker {
     /**
      *
      * @param eventData The properties of the event. Has two field:
-                        A "data" field containing the event properties and
-                        A "schema" field identifying the schema against which the data is validated
+     *                   A "data" field containing the event properties and
+     *                   A "schema" field identifying the schema against which the data is validated
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackUnstructuredEvent(Map<String, Object> eventData, long timestamp) {
@@ -311,8 +311,8 @@ public class Tracker {
     /**
      *
      * @param eventData The properties of the event. Has two field:
-                        A "data" field containing the event properties and
-                        A "schema" field identifying the schema against which the data is validated
+     *                   A "data" field containing the event properties and
+     *                   A "schema" field identifying the schema against which the data is validated
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
