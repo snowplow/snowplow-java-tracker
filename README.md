@@ -40,7 +40,7 @@ limitations under the License.
 [roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[techdocs]: https://github.com/snowplow/snowplow/wiki/Java-Tracker
+[techdocs]: https://github.com/snowplow/snowplow/wiki/Android-and-Java-Tracker
 [setup]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Setup
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Contributing
