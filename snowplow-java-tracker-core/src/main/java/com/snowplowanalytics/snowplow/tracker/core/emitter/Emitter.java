@@ -194,6 +194,9 @@ public class Emitter {
                 requestCallback.onFailure(0, unsentPayload);
             }
         }
+
+        // Empties current buffer
+        buffer.clear();
     }
 
     protected HttpResponse sendPostData(Payload payload) {
