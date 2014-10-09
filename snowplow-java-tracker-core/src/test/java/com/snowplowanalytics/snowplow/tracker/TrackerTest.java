@@ -1,5 +1,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.snowplowanalytics.snowplow.tracker.core.Subject;
 import com.snowplowanalytics.snowplow.tracker.core.Tracker;
 import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
@@ -10,26 +11,32 @@ import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class TrackerTest extends TestCase {
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-//    private static String testURL = "segfault.ngrok.com";
-    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+public class TrackerTest {
+
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule();
+
+    private static String testURL = "localhost:8080";
+//    private static String testURL = "trial-collector.snplow.com";
 
     @Test
     public void testDefaultPlatform() throws Exception {
         Emitter emitter = new Emitter(testURL, HttpMethod.POST);
         Subject subject = new Subject();
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
-        assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
+        Assert.assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
     }
 
     @Test
@@ -38,7 +45,7 @@ public class TrackerTest extends TestCase {
         Subject subject = new Subject();
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
         tracker.setPlatform(DevicePlatform.ConnectedTV);
-        assertEquals(DevicePlatform.ConnectedTV, tracker.getPlatform());
+        Assert.assertEquals(DevicePlatform.ConnectedTV, tracker.getPlatform());
     }
 
     @Test
@@ -52,7 +59,7 @@ public class TrackerTest extends TestCase {
         Map<String, String> subjectPairs = new HashMap<String, String>();
         subjectPairs.put("tz", "Etc/UTC");
         subjectPairs.put("cd", "24");
-        assertEquals(subjectPairs, tracker.getSubject().getSubject());
+        Assert.assertEquals(subjectPairs, tracker.getSubject().getSubject());
     }
 
     @Test
@@ -94,6 +101,19 @@ public class TrackerTest extends TestCase {
         tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList);
 
         emitter.flushBuffer();
+
+        verify(postRequestedFor(urlEqualTo("/com.snowplowanalytics.snowplow/tp2"))
+                .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
+                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics." +
+                        "snowplow/payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"pv\"," +
+                        "\"url\":\"www.mypage.com\",\"page\":\"My Page\",\"refr\":" +
+                        "\"www.me.com\",\"aid\":\"cloudfront\",\"tna\":\"AF003\"," +
+                        "\"tv\":\"java-core-0.2.0\",\"co\":\"{\\\"schema\\\":" +
+                        "\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\"," +
+                        "\\\"data\\\":[{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\"," +
+                        "\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView3\\\"}}]}\"," +
+                        "\"tz\":\"America/Toronto\",\"p\":\"pc\",\"vp\":\"320x480\"}]}",
+                        JSONCompareMode.LENIENT)));
     }
 
     @Test
@@ -163,6 +183,45 @@ public class TrackerTest extends TestCase {
                 "Delaware", "US", "USD", transactionItemLinkedList);
 
         emitter.flushBuffer();
+
+        // Verifying this JSON:
+        // {
+        //     "schema": "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0",
+        //     "data": [{
+        //         "e": "ti",
+        //         "ti_id": "order-8",
+        //         "ti_sk": "no_sku",
+        //         "ti_nm": "Big Order",
+        //         "ti_ca": "Food",
+        //         "ti_pr": "34.0",
+        //         "ti_qu": "1.0",
+        //         "ti_cu": "USD",
+        //         "aid": "buttfront",
+        //         "tna": "AF003",
+        //         "tv": "java-core-0.2.0",
+        //         "dtm": "1414607597877",
+        //         "co": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\",\"data\":[{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"someContextKey\":\"testTrackPageView2\"}}]}"
+        //     }, {
+        //         "e": "tr",
+        //         "tr_id": "order-7",
+        //         "tr_tt": "25.0",
+        //         "tr_af": "no_affiliate",
+        //         "tr_tx": "0.0",
+        //         "tr_sh": "0.0",
+        //         "tr_ci": "Dover",
+        //         "tr_st": "Delaware",
+        //         "tr_co": "US",
+        //         "tr_cu": "USD",
+        //         "aid": "buttfront",
+        //         "tna": "AF003",
+        //         "tv": "java-core-0.2.0",
+        //         "dtm": "1414607597877"
+        //     }]
+        // }
+        verify(postRequestedFor(urlEqualTo("/com.snowplowanalytics.snowplow/tp2"))
+                .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
+                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"ti\",\"ti_id\":\"order-8\",\"ti_sk\":\"no_sku\",\"ti_nm\":\"Big Order\",\"ti_ca\":\"Food\",\"ti_pr\":\"34.0\",\"ti_qu\":\"1.0\",\"ti_cu\":\"USD\",\"aid\":\"cloudfront\",\"tna\":\"AF003\",\"tv\":\"java-core-0.2.0\",\"co\":\"{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\",\\\"data\\\":[{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\",\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView2\\\"}}]}\"},{\"e\":\"tr\",\"tr_id\":\"order-7\",\"tr_tt\":\"25.0\",\"tr_af\":\"no_affiliate\",\"tr_tx\":\"0.0\",\"tr_sh\":\"0.0\",\"tr_ci\":\"Dover\",\"tr_st\":\"Delaware\",\"tr_co\":\"US\",\"tr_cu\":\"USD\",\"aid\":\"cloudfront\",\"tna\":\"AF003\",\"tv\":\"java-core-0.2.0\"}]}",
+                        JSONCompareMode.LENIENT)));
     }
 
     @Test
@@ -198,6 +257,38 @@ public class TrackerTest extends TestCase {
         contextList.add(context);
 
         tracker.trackScreenView(null, "screen_1", contextList, 0);
+
+        // Verifying this JSON:
+        // {
+        //     "schema": "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0",
+        //     "data": [{
+        //         "e": "ue",
+        //         "ue_pr": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\",\"data\":{\"id\":\"screen_1\"}}}",
+        //         "aid": "buttfront",
+        //         "tna": "AF003",
+        //         "tv": "java-core-0.2.0",
+        //         "co": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\",\"data\":[{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"someContextKey\":\"testTrackPageView2\"}}]}",
+        //         "tz": "America/Toronto",
+        //         "p": "pc",
+        //         "vp": "320x480"
+        //     }]
+        // }
+
+        verify(postRequestedFor(urlEqualTo("/com.snowplowanalytics.snowplow/tp2"))
+                .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
+                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics.snowplow/" +
+                                "payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"ue\",\"ue_pr\":" +
+                                "\"{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/" +
+                                "unstruct_event/jsonschema/1-0-0\\\",\\\"data\\\":{\\\"schema\\\":" +
+                                "\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\"," +
+                                "\\\"data\\\":{\\\"id\\\":\\\"screen_1\\\"}}}\",\"aid\":\"cloudfront\"," +
+                                "\"tna\":\"AF003\",\"tv\":\"java-core-0.2.0\",\"co\":\"{\\\"schema\\\":" +
+                                "\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\"," +
+                                "\\\"data\\\":[{\\\"schema\\\":" +
+                                "\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\"," +
+                                "\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView2\\\"}}]}\"," +
+                                "\"tz\":\"America/Toronto\",\"p\":\"pc\",\"vp\":\"320x480\"}]}",
+                        JSONCompareMode.LENIENT)));
     }
 
     @Test
