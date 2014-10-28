@@ -27,6 +27,8 @@ allprojects {
     apply plugin: 'java'
     group = 'com.snowplowanalytics'
     version = '0.5.1'
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
     repositories {
         // Use 'maven central' for resolving our dependencies
         mavenCentral()
