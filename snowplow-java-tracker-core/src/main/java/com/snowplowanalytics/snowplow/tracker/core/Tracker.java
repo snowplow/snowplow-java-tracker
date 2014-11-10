@@ -93,14 +93,14 @@ public class Tracker {
      * @return A completed Payload
      */
     protected Payload completePayload(Payload payload, List<SchemaPayload> context,
-                                      double timestamp) {
+                                      long timestamp) {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
 
         // If timestamp is set to 0, generate one
         payload.add(Parameter.TIMESTAMP,
-                (timestamp == 0 ? Util.getTimestamp() : Double.toString(timestamp)));
+                (timestamp == 0 ? Util.getTimestamp() : Long.toString(timestamp)));
 
         // Encodes context data
         if (context != null) {
@@ -176,7 +176,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
-                              double timestamp) {
+                              long timestamp) {
         trackPageView(pageUrl, pageTitle, referrer, null, timestamp);
     }
 
@@ -188,7 +188,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
-                              List<SchemaPayload> context, double timestamp) {
+                              List<SchemaPayload> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(pageUrl);
         Preconditions.checkArgument(!pageUrl.isEmpty(), "pageUrl cannot be empty");
