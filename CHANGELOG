@@ -1,3 +1,7 @@
+Core 0.1.4 (2014-11-xx)
+-----------------------
+Fixed incorrectly casts timestamp from long to double (#84)
+
 Core 0.1.3 (2014-09-10)
 -----------------------
 Fixed flushBuffer doesn't clear the buffer (#79)
