@@ -97,6 +97,7 @@ public class Tracker {
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
+        payload.add(Parameter.EID, Util.getEventId());
 
         // If timestamp is set to 0, generate one
         payload.add(Parameter.TIMESTAMP,

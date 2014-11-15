@@ -82,11 +82,11 @@ public class SubjectTest extends TestCase {
         Subject subject = new Subject();
         Map<String, String> expected = new HashMap<String, String>();
         subject.setTimezone("America/Toronto");
-        subject.setEventId("6964d7b6-f25b-45c8-8868-a1574e71ed06");
+        subject.setUserId("user1");
 
         expected.put("tz", "America/Toronto");
         expected.put("p", "pc");
-        expected.put("eid", "6964d7b6-f25b-45c8-8868-a1574e71ed06");
+        expected.put("uid", "user1");
 
         assertEquals(expected, subject.getSubject());
     }
