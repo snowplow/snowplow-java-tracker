@@ -1,6 +1,7 @@
 Core 0.1.4 (2014-11-xx)
 -----------------------
 Fixed incorrectly casts timestamp from long to double (#84)
+Moved 'eid' from Subject to Tracker class to prevent duplicated event IDs (#95)
 
 Core 0.1.3 (2014-09-10)
 -----------------------
