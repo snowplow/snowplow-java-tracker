@@ -1,3 +1,7 @@
+Java 0.5.2 (2014-11-25)
+-----------------------
+Bumped Core version to 0.1.4 (#101)
+
 Core 0.1.4 (2014-11-25)
 -----------------------
 Fixed incorrectly casts timestamp from long to double (#84)
