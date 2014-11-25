@@ -260,8 +260,8 @@ public class Tracker {
         Preconditions.checkNotNull(property);
         Preconditions.checkArgument(!label.isEmpty(), "label cannot be empty");
         Preconditions.checkArgument(!property.isEmpty(), "property cannot be empty");
-        Preconditions.checkArgument(!category.isEmpty(), "property cannot be empty");
-        Preconditions.checkArgument(!action.isEmpty(), "property cannot be empty");
+        Preconditions.checkArgument(!category.isEmpty(), "category cannot be empty");
+        Preconditions.checkArgument(!action.isEmpty(), "action cannot be empty");
 
         Payload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_STRUCTURED);
