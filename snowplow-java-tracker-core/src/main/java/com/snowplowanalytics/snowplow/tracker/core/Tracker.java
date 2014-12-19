@@ -542,7 +542,7 @@ public class Tracker {
 
         SchemaPayload payload = new SchemaPayload();
 
-        payload.setSchema( this.baseSchemaPath + "/contexts/" +
+        payload.setSchema( this.baseSchemaPath + "/screen_view/" +
                 this.schemaTag + "/" + this.schemaVersion);
         payload.setData(trackerPayload);
 
