@@ -20,10 +20,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.core.Parameter;
 import com.snowplowanalytics.snowplow.tracker.core.Util;
-
+import com.snowplowanalytics.snowplow.tracker.core.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
