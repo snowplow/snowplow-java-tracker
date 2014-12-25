@@ -13,11 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker.core;
 
-import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.core.util.Preconditions;
 
 import java.util.HashMap;
 import java.util.LinkedList;
