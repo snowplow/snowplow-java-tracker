@@ -10,6 +10,7 @@ Removed Guava as a dependency, thanks @hamidp! (#105)
 Made eventData a SchemaPayload in trackUnstructuredEvent, thanks @jonalmeida! (#76)
 Added @Deprecated on the unused SchemaPayload methods, thanks @jonalmeida! (#85)
 Moved platform setting out of Subject into Tracker (#103)
+Made setSubject method on Tracker public (#109)
 
 Java 0.5.2 (2014-11-25)
 -----------------------

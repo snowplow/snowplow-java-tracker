@@ -42,6 +42,20 @@ public class TrackerTest extends TestCase {
     }
 
     @Test
+    public void testSetSubject() throws Exception {
+        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Subject s1 = new Subject();
+        Tracker tracker = new Tracker(emitter, s1, "AF003", "cloudfront", false);
+        Subject s2 = new Subject();
+        s2.setColorDepth(24);
+        tracker.setSubject(s2);
+        Map<String, String> subjectPairs = new HashMap<String, String>();
+        subjectPairs.put("tz", "Etc/UTC");
+        subjectPairs.put("cd", "24");
+        assertEquals(subjectPairs, tracker.getSubject().getSubject());
+    }
+
+    @Test
     public void testSetSchema() throws Exception {
 
     }

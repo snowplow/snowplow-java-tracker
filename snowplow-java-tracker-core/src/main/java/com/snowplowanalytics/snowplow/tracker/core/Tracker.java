@@ -144,8 +144,12 @@ public class Tracker {
         this.emitter.addToBuffer(payload);
     }
 
-    private void setSubject(Subject subject) {
+    public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public Subject getSubject() {
+        return this.subject;
     }
 
     /**
