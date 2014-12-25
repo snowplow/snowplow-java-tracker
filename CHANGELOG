@@ -1,9 +1,14 @@
+Java 0.6.0 (2014-12-XX)
+-----------------------
+Bumped Core version to 0.2.0 (#108)
+Added dedicated Vagrant setup (#106)
+
 Core 0.2.0 (2014-12-XX)
 -----------------------
 Fixed incorrect schema for trackScreenView, thanks @lixiaoyi! (#104)
 Removed Guava as a dependency, thanks @hamidp! (#105)
 Made eventData a SchemaPayload in trackUnstructuredEvent, thanks @jonalmeida! (#76)
-Added @Deprecated on the SchemaPayload methods not used, thanks @jonalmeida! (#85)
+Added @Deprecated on the unused SchemaPayload methods, thanks @jonalmeida! (#85)
 Moved platform setting out of Subject into Tracker (#103)
 
 Java 0.5.2 (2014-11-25)
