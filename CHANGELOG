@@ -1,6 +1,7 @@
 Java 0.6.0 (2014-12-XX)
 -----------------------
 Bumped Core version to 0.2.0 (#108)
+Added Quickstart section to README (#111)
 Added dedicated Vagrant setup (#106)
 
 Core 0.2.0 (2014-12-XX)
