@@ -25,16 +25,9 @@ public class Subject {
     public Subject() {
         standardPairs = new HashMap<String, String>();
 
-        // Default Platform
-        this.setPlatform(DevicePlatform.Desktop);
-
         // Default Timezone
         TimeZone tz = Calendar.getInstance().getTimeZone();
         this.setTimezone(tz.getID());
-    }
-
-    public void setPlatform(DevicePlatform platform) {
-        this.standardPairs.put(Parameter.PLATFORM, platform.toString());
     }
 
     public void setUserId(String userId) {

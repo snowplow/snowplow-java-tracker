@@ -2,6 +2,7 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.snowplowanalytics.snowplow.tracker.core.Subject;
 import com.snowplowanalytics.snowplow.tracker.core.Tracker;
+import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.core.TransactionItem;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
@@ -22,6 +23,23 @@ public class TrackerTest extends TestCase {
 
 //    private static String testURL = "segfault.ngrok.com";
     private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+
+    @Test
+    public void testDefaultPlatform() throws Exception {
+        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Subject subject = new Subject();
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
+        assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
+    }
+
+    @Test
+    public void testSetPlatform() throws Exception {
+        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Subject subject = new Subject();
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
+        tracker.setPlatform(DevicePlatform.ConnectedTV);
+        assertEquals(DevicePlatform.ConnectedTV, tracker.getPlatform());
+    }
 
     @Test
     public void testSetSchema() throws Exception {

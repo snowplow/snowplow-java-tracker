@@ -13,21 +13,6 @@ import java.util.Map;
 public class SubjectTest extends TestCase {
 
     @Test
-    public void testSetPlatform() throws Exception {
-        Subject subject = new Subject();
-        subject.getSubject().get("p");
-        assertEquals("pc", subject.getSubject().get("p"));
-    }
-
-    @Test
-    public void testSetPlatform2() throws Exception {
-        Subject subject = new Subject();
-        subject.setPlatform(DevicePlatform.ConnectedTV);
-        subject.getSubject().get("p");
-        assertEquals("tv", subject.getSubject().get("p"));
-    }
-
-    @Test
     public void testSetUserId() throws Exception {
         Subject subject = new Subject();
         subject.setUserId("user1");
@@ -46,7 +31,6 @@ public class SubjectTest extends TestCase {
         Subject subject = new Subject();
         subject.setViewPort(150, 100);
         assertEquals("150x100", subject.getSubject().get("vp"));
-
     }
 
     @Test
@@ -85,7 +69,6 @@ public class SubjectTest extends TestCase {
         subject.setUserId("user1");
 
         expected.put("tz", "America/Toronto");
-        expected.put("p", "pc");
         expected.put("uid", "user1");
 
         assertEquals(expected, subject.getSubject());

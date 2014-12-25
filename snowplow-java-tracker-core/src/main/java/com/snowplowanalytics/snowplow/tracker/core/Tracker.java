@@ -28,6 +28,7 @@ public class Tracker {
 
     private boolean base64Encoded = true;
     private Emitter emitter;
+    private DevicePlatform platform;
     private String appId;
     private String namespace;
     private String contextSchema;
@@ -82,6 +83,8 @@ public class Tracker {
         this.namespace = namespace;
         this.subject = subject;
         this.trackerVersion = Version.TRACKER;
+        this.platform = DevicePlatform.Desktop;
+
         this.setSchema(Constants.DEFAULT_IGLU_VENDOR, Constants.DEFAULT_SCHEMA_TAG,
                 Constants.DEFAULT_SCHEMA_VERSION);
     }
@@ -94,6 +97,7 @@ public class Tracker {
      */
     protected Payload completePayload(Payload payload, List<SchemaPayload> context,
                                       long timestamp) {
+        payload.add(Parameter.PLATFORM, this.platform.toString());
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
@@ -122,6 +126,14 @@ public class Tracker {
         if (this.subject != null) payload.addMap(new HashMap<String, Object>(subject.getSubject()));
 
         return payload;
+    }
+
+    public void setPlatform(DevicePlatform platform) {
+        this.platform = platform;
+    }
+
+    public DevicePlatform getPlatform() {
+        return this.platform;
     }
 
     protected void setTrackerVersion(String version) {
@@ -280,8 +292,8 @@ public class Tracker {
     /**
      *
      * @param eventData The properties of the event. Has two field:
-                        A "data" field containing the event properties and
-                        A "schema" field identifying the schema against which the data is validated
+     *                   A "data" field containing the event properties and
+     *                  A "schema" field identifying the schema against which the data is validated
      */
     public void trackUnstructuredEvent(SchemaPayload eventData) {
         trackUnstructuredEvent(eventData, null, 0);
