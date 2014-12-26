@@ -26,7 +26,7 @@ dependencies {
 allprojects {
     apply plugin: 'java'
     group = 'com.snowplowanalytics'
-    version = '0.5.2'
+    version = '0.6.0'
     sourceCompatibility = '1.6'
     targetCompatibility = '1.6'
     repositories {
