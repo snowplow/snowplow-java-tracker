@@ -89,6 +89,7 @@ task generateSources {
 
 package com.snowplowanalytics.snowplow.tracker.core;
 
+// DO NOT EDIT. AUTO-GENERATED.
 public class Version {
     static final String TRACKER = "java-core-$project.version";
     static final String VERSION = "$project.version";

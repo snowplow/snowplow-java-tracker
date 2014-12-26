@@ -14,6 +14,7 @@ Added @Deprecated on the unused SchemaPayload methods, thanks @jonalmeida! (#85)
 Moved platform setting out of Subject into Tracker (#103)
 Made setSubject method on Tracker public (#109)
 Tidied up approach to schema constants in Tracker (#110)
+Added warning that Version.java is auto-generated (#113)
 
 Java 0.5.2 (2014-11-25)
 -----------------------
