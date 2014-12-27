@@ -1,11 +1,11 @@
-Java 0.6.0 (2014-12-XX)
+Java 0.6.0 (2014-12-27)
 -----------------------
 Bumped Core version to 0.2.0 (#108)
 Added Quickstart section to README (#111)
 Added dedicated Vagrant setup (#106)
 Added warning that Version.java is auto-generated (#112)
 
-Core 0.2.0 (2014-12-XX)
+Core 0.2.0 (2014-12-27)
 -----------------------
 Fixed incorrect schema for trackScreenView, thanks @lixiaoyi! (#104)
 Removed Guava as a dependency, thanks @hamidp! (#105)
