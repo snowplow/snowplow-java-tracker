@@ -103,7 +103,7 @@ public class Emitter {
             uri = new URIBuilder()
                     .setScheme("http")
                     .setHost(URI)
-                    .setPath("/" + Constants.DEFAULT_VENDOR + "/tp2");
+                    .setPath("/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION);
         }
         this.requestCallback = callback;
         this.httpMethod = httpMethod;

@@ -4,9 +4,21 @@
 
 ## Overview
 
-Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Java] [java]** (Android support is coming soon).
+Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Java] [java]**. See also: **[Snowplow Android Tracker] [snowplow-android-tracker]**.
 
 With this tracker you can collect event data from your Java-based desktop and server apps, servlets and games. Supports JDK6+.
+
+## Quickstart
+
+Assuming git, **[Vagrant] [vagrant-install]** and **[VirtualBox] [virtualbox-install]** installed:
+
+```bash
+ host$ git clone https://github.com/snowplow/snowplow-java-tracker.git
+ host$ cd snowplow-java-tracker
+ host$ vagrant up && vagrant ssh
+guest$ cd /vagrant
+guest$ gradle test
+```
 
 ## Find out more
 
@@ -17,7 +29,7 @@ With this tracker you can collect event data from your Java-based desktop and se
 
 ## Copyright and license
 
-The Snowplow Java Tracker is copyright 2014 Snowplow Analytics Ltd.
+The Snowplow Java Tracker is copyright 2014-2015 Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0] [license]** (the "License");
 you may not use this software except in compliance with the License.
@@ -31,9 +43,10 @@ limitations under the License.
 [java]: http://www.java.com/en/
 
 [snowplow]: http://snowplowanalytics.com
+[snowplow-android-tracker]: https://github.com/snowplow/snowplow-android-tracker/
 
-[dependencies]: https://drive.google.com/folderview?id=0B9v7AAtH8DSpWWZ1c3RUZjU3WlU&usp=sharing
-[documentation]: https://gleasonk.github.io/Saggezza/JavaDoc/index.html
+[vagrant-install]: http://docs.vagrantup.com/v2/installation/index.html
+[virtualbox-install]: https://www.virtualbox.org/wiki/Downloads
 
 [techdocs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/techdocs.png
 [setup-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png

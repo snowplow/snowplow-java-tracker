@@ -53,3 +53,7 @@ local.properties
 
 # Ignoring Version.java since its auto-generated
 #Version.java
+
+# Vagrant
+.vagrant
+

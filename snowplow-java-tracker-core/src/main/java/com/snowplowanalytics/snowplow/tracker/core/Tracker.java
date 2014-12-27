@@ -13,11 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker.core;
 
-import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.core.util.Preconditions;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,14 +28,10 @@ public class Tracker {
 
     private boolean base64Encoded = true;
     private Emitter emitter;
+    private DevicePlatform platform;
     private String appId;
     private String namespace;
-    private String contextSchema;
-    private String baseSchemaPath;
-    private String schemaTag;
-    private String schemaVersion;
     private String trackerVersion;
-    private String unstructSchema;
     private Subject subject;
 
     /**
@@ -82,8 +78,7 @@ public class Tracker {
         this.namespace = namespace;
         this.subject = subject;
         this.trackerVersion = Version.TRACKER;
-        this.setSchema(Constants.DEFAULT_IGLU_VENDOR, Constants.DEFAULT_SCHEMA_TAG,
-                Constants.DEFAULT_SCHEMA_VERSION);
+        this.platform = DevicePlatform.Desktop;
     }
 
     /**
@@ -94,6 +89,7 @@ public class Tracker {
      */
     protected Payload completePayload(Payload payload, List<SchemaPayload> context,
                                       long timestamp) {
+        payload.add(Parameter.PLATFORM, this.platform.toString());
         payload.add(Parameter.APPID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
@@ -106,7 +102,7 @@ public class Tracker {
         // Encodes context data
         if (context != null) {
             SchemaPayload envelope = new SchemaPayload();
-            envelope.setSchema(contextSchema);
+            envelope.setSchema(Constants.SCHEMA_CONTEXTS);
 
             // We can do better here, rather than re-iterate through the list
             List<Map> contextDataList = new LinkedList<Map>();
@@ -124,6 +120,14 @@ public class Tracker {
         return payload;
     }
 
+    public void setPlatform(DevicePlatform platform) {
+        this.platform = platform;
+    }
+
+    public DevicePlatform getPlatform() {
+        return this.platform;
+    }
+
     protected void setTrackerVersion(String version) {
         this.trackerVersion = version;
     }
@@ -132,22 +136,12 @@ public class Tracker {
         this.emitter.addToBuffer(payload);
     }
 
-    private void setSubject(Subject subject) {
+    public void setSubject(Subject subject) {
         this.subject = subject;
     }
 
-    /**
-     * Sets the JSON schema to be used mainly for self-describing JSON.
-     * @param vendor Schema vendor
-     * @param schemaTag Schema tag type
-     * @param version Schema version tag
-     */
-    public void setSchema(String vendor, String schemaTag, String version) {
-        this.contextSchema = vendor + "/contexts/" + schemaTag + "/" + version;
-        this.unstructSchema = vendor + "/unstruct_event/" + schemaTag + "/" + version;
-        this.baseSchemaPath = vendor;
-        this.schemaTag = schemaTag;
-        this.schemaVersion = version;
+    public Subject getSubject() {
+        return this.subject;
     }
 
     /**
@@ -280,10 +274,10 @@ public class Tracker {
     /**
      *
      * @param eventData The properties of the event. Has two field:
-                        A "data" field containing the event properties and
-                        A "schema" field identifying the schema against which the data is validated
+     *                   A "data" field containing the event properties and
+     *                  A "schema" field identifying the schema against which the data is validated
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData) {
+    public void trackUnstructuredEvent(SchemaPayload eventData) {
         trackUnstructuredEvent(eventData, null, 0);
     }
 
@@ -294,7 +288,7 @@ public class Tracker {
      *                   A "schema" field identifying the schema against which the data is validated
      * @param context Custom context for the event
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData, List<SchemaPayload> context) {
+    public void trackUnstructuredEvent(SchemaPayload eventData, List<SchemaPayload> context) {
         trackUnstructuredEvent(eventData, context, 0);
     }
 
@@ -305,7 +299,7 @@ public class Tracker {
      *                   A "schema" field identifying the schema against which the data is validated
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData, long timestamp) {
+    public void trackUnstructuredEvent(SchemaPayload eventData, long timestamp) {
         trackUnstructuredEvent(eventData, null, timestamp);
     }
 
@@ -317,13 +311,13 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackUnstructuredEvent(Map<String, Object> eventData, List<SchemaPayload> context,
+    public void trackUnstructuredEvent(SchemaPayload eventData, List<SchemaPayload> context,
                                        long timestamp) {
         Payload payload = new TrackerPayload();
         SchemaPayload envelope = new SchemaPayload();
 
-        envelope.setSchema(unstructSchema);
-        envelope.setData(eventData);
+        envelope.setSchema(Constants.SCHEMA_UNSTRUCT_EVENT);
+        envelope.setData(eventData.getMap());
 
         payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
         payload.addMap(envelope.getMap(), base64Encoded,
@@ -541,11 +535,9 @@ public class Tracker {
         trackerPayload.add(Parameter.SV_ID, id);
 
         SchemaPayload payload = new SchemaPayload();
-
-        payload.setSchema( this.baseSchemaPath + "/contexts/" +
-                this.schemaTag + "/" + this.schemaVersion);
+        payload.setSchema(Constants.SCHEMA_SCREEN_VIEW);
         payload.setData(trackerPayload);
 
-        trackUnstructuredEvent(payload.getMap(), context, timestamp);
+        trackUnstructuredEvent(payload, context, timestamp);
     }
 }

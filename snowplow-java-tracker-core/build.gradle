@@ -17,7 +17,7 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 group = 'com.snowplowanalytics'
-version = '0.1.4'
+version = '0.2.0'
 
 // Where to find the dependencies of our project
 repositories {
@@ -41,9 +41,6 @@ dependencies {
 
     // Jackson JSON processor
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
-
-    // Contracts
-    compile 'com.google.guava:guava:17.0'
 
     testCompile 'junit:junit:4.11'
 }
@@ -92,6 +89,7 @@ task generateSources {
 
 package com.snowplowanalytics.snowplow.tracker.core;
 
+// DO NOT EDIT. AUTO-GENERATED.
 public class Version {
     static final String TRACKER = "java-core-$project.version";
     static final String VERSION = "$project.version";
