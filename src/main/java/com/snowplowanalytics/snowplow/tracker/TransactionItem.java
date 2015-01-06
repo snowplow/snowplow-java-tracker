@@ -13,19 +13,39 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 
+import java.util.HashMap;
 import java.util.List;
 
-public class TransactionItem extends com.snowplowanalytics.snowplow.tracker.core.TransactionItem {
+public class TransactionItem extends HashMap {
 
-    public TransactionItem(String order_id, String sku, double price, int quantity, String name,
-                           String category, String currency) {
-        super(order_id, sku, price, quantity, name, category, currency);
+    public TransactionItem (String order_id, String sku, double price, int quantity, String name,
+                            String category, String currency) {
+        this(order_id,sku, price, quantity, name, category, currency, null);
     }
 
-    public TransactionItem(String order_id, String sku, double price, int quantity, String name,
-                           String category, String currency, List<SchemaPayload> context) {
-        super(order_id, sku, price, quantity, name, category, currency, context);
+    public TransactionItem (String order_id, String sku, double price, int quantity, String name,
+                            String category, String currency, List<SchemaPayload> context) {
+        put(Parameter.EVENT, "ti");
+        put(Parameter.TI_ITEM_ID, order_id);
+        put(Parameter.TI_ITEM_SKU, sku);
+        put(Parameter.TI_ITEM_NAME, name);
+        put(Parameter.TI_ITEM_CATEGORY, category);
+        put(Parameter.TI_ITEM_PRICE, price);
+        put(Parameter.TI_ITEM_QUANTITY, quantity);
+        put(Parameter.TI_ITEM_CURRENCY, currency);
+
+        put(Parameter.CONTEXT, context);
+
+        put(Parameter.TIMESTAMP, Util.getTimestamp());
+    }
+
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    @Override
+    public Object put(Object key, Object value) {
+        if (value != null || value != "") return super.put(key, value);
+        else
+            return null;
     }
 }

@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow.tracker.core.util;
+package com.snowplowanalytics.snowplow.tracker.util;
 
 /**
  * Note:

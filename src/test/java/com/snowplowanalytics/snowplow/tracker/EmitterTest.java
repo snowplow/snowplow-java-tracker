@@ -1,8 +1,8 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.core.emitter.*;
-import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.emitter.*;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import org.junit.Test;
 
 import java.util.ArrayList;

@@ -13,10 +13,50 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject {
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
+
+public class Subject {
+
+    private HashMap<String, String> standardPairs;
 
     public Subject() {
-        super();
+        standardPairs = new HashMap<String, String>();
+
+        // Default Timezone
+        TimeZone tz = Calendar.getInstance().getTimeZone();
+        this.setTimezone(tz.getID());
     }
 
+    public void setUserId(String userId) {
+        this.standardPairs.put(Parameter.UID, userId);
+    }
+
+    public void setScreenResolution(int width, int height) {
+        String res = Integer.toString(width) + "x" + Integer.toString(height);
+        this.standardPairs.put(Parameter.RESOLUTION, res);
+    }
+
+    public void setViewPort(int width, int height) {
+        String res = Integer.toString(width) + "x" + Integer.toString(height);
+        this.standardPairs.put(Parameter.VIEWPORT, res);
+    }
+
+    public void setColorDepth(int depth) {
+        this.standardPairs.put(Parameter.COLOR_DEPTH, Integer.toString(depth));
+    }
+
+    public void setTimezone(String timezone) {
+        this.standardPairs.put(Parameter.TIMEZONE, timezone);
+    }
+
+    public void setLanguage(String language) {
+        this.standardPairs.put(Parameter.LANGUAGE, language);
+    }
+
+    public Map<String, String> getSubject() {
+        return this.standardPairs;
+    }
 }
