@@ -11,13 +11,10 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core;
+package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -26,7 +23,6 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Util {
-    private static final Logger logger = LoggerFactory.getLogger(Util.class);
     private static ObjectMapper sObjectMapper = new ObjectMapper();
     public static ObjectMapper defaultMapper() {
         return sObjectMapper;

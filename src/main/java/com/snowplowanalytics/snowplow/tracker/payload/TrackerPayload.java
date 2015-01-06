@@ -13,6 +13,113 @@
 
 package com.snowplowanalytics.snowplow.tracker.payload;
 
-public class TrackerPayload
-        extends com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload {
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.snowplowanalytics.snowplow.tracker.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class TrackerPayload implements Payload {
+
+    private final ObjectMapper objectMapper = Util.defaultMapper();
+    private final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
+    private ObjectNode objectNode = objectMapper.createObjectNode();
+
+    @Override
+    public void add(String key, String value) {
+        if (value == null || value.isEmpty()) {
+            LOGGER.debug("kv-value is empty. Returning out without adding key..");
+            return;
+        }
+
+        LOGGER.debug("Adding new key: {} with value: {}", key, value);
+        objectNode.put(key, value);
+    }
+
+    @Override
+    public void add(String key, Object value) {
+        if (value == null) {
+            LOGGER.debug("kv-value is empty. Returning out without adding key..");
+            return;
+        }
+
+        LOGGER.debug("Adding new key: {} with object value: {}", key, value);
+        try {
+            objectNode.putPOJO(key, objectMapper.writeValueAsString(value));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addMap(Map<String, Object> map) {
+        // Return if we don't have a map
+        if (map == null) {
+            LOGGER.debug("Map passed in is null. Returning without adding map..");
+            return;
+        }
+
+        Set<String> keys = map.keySet();
+        for(String key : keys) {
+            add(key, map.get(key));
+        }
+    }
+
+    @Override
+    public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
+        // Return if we don't have a map
+        if (map == null) {
+            LOGGER.debug("Map passed in is null. Returning nothing..");
+            return;
+        }
+
+        String mapString;
+        try {
+            mapString = objectMapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return; // Return because we can't continue
+        }
+
+        if (base64_encoded) { // base64 encoded data
+            objectNode.put(type_encoded, Util.base64Encode(mapString));
+        } else { // add it as a child node
+            add(type_no_encoded, mapString);
+        }
+    }
+
+    public JsonNode getNode() {
+        return objectNode;
+    }
+
+    @Override
+    public Map getMap() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        try {
+            LOGGER.debug("Attempting to create a Map structure from ObjectNode.");
+            map = objectMapper.readValue(objectNode.toString(), new TypeReference<Map>(){});
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    @Override
+    public String toString() {
+        return objectNode.toString();
+    }
 }

@@ -28,7 +28,7 @@
  * SUCH DAMAGE.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core;
+package com.snowplowanalytics.snowplow.tracker;
 
 import java.io.UnsupportedEncodingException;
 

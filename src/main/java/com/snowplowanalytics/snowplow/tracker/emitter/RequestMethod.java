@@ -11,18 +11,19 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core.emitter;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
 /**
- * HttpMethod is used to set the request method for your Emitter (i.e. GET or POST requests).
+ * RequestMethod is used to choose how network requests should be sent.
+ * This can be used by <code>setRequestMethod(RequestMethod option)</code> to set accordingly.
  */
-public enum HttpMethod {
+public enum RequestMethod {
     /**
-     * Each event is sent individually in separate GET requests.
+     * Requests are sent synchronously, so it should be used with caution.
      */
-    GET,
+    Synchronous,
     /**
-     * Events can be grouped together in a SchemaPayload and sent in one request if desired.
+     * Requests are sent asynchronously using a background thread.
      */
-    POST
+    Asynchronous
 }

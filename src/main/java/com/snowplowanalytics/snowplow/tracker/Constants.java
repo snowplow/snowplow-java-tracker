@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core;
+package com.snowplowanalytics.snowplow.tracker;
 
 public class Constants {
     public static final String PROTOCOL_VENDOR = "com.snowplowanalytics.snowplow";

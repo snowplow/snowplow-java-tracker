@@ -14,7 +14,6 @@
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
-apply plugin: 'war'
 
 
 group = 'com.snowplowanalytics'

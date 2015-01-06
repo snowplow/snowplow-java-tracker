@@ -11,10 +11,16 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// DO NOT EDIT. AUTO-GENERATED.
-public class Version {
-    static final String TRACKER = "java-core-0.2.0";
-    static final String VERSION = "0.2.0";
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+
+import java.util.List;
+
+public interface RequestCallback {
+
+    void onSuccess(int successCount);
+
+    void onFailure(int successCount, List<Payload> failedEvent);
+
 }
