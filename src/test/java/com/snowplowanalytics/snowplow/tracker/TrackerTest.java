@@ -1,32 +1,27 @@
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.core.Subject;
 import com.snowplowanalytics.snowplow.tracker.core.Tracker;
-import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.core.TransactionItem;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
-
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
-public class TrackerTest extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-//    private static String testURL = "segfault.ngrok.com";
-    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+public class TrackerTest {
+
+    private static String TESTURL = "d3rkrsqld9gmqf.cloudfront.net";
 
     @Test
     public void testDefaultPlatform() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject subject = new Subject();
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
         assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
@@ -34,7 +29,7 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testSetPlatform() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject subject = new Subject();
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
         tracker.setPlatform(DevicePlatform.ConnectedTV);
@@ -43,7 +38,8 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testSetSubject() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
+        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject s1 = new Subject();
         Tracker tracker = new Tracker(emitter, s1, "AF003", "cloudfront", false);
         Subject s2 = new Subject();
@@ -77,7 +73,7 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testTrackPageView3() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
@@ -143,7 +139,7 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testTrackEcommerceTransaction() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Tracker tracker = new Tracker(emitter, "AF003", "cloudfront", false);
         emitter.setRequestMethod(RequestMethod.Asynchronous);
 
@@ -182,7 +178,7 @@ public class TrackerTest extends TestCase {
 
     @Test
     public void testTrackScreenView() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
+        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);

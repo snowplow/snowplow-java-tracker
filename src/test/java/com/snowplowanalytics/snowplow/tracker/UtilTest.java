@@ -2,15 +2,16 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.snowplowanalytics.snowplow.tracker.core.Util;
-
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UtilTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class UtilTest {
     @Test
     public void testGetTimestamp() {
         assertNotNull(Util.getTimestamp());

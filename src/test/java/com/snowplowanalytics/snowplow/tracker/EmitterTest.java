@@ -1,24 +1,16 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestMethod;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.*;
 import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
-
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class EmitterTest extends TestCase {
+public class EmitterTest {
 
-//    private static String testURL = "segfault.ngrok.com";
     private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
 
     @Test
