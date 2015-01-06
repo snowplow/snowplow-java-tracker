@@ -1,16 +1,14 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.core.Subject;
-
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SubjectTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+public class SubjectTest {
 
     @Test
     public void testSetUserId() throws Exception {

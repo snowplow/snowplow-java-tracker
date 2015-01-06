@@ -11,28 +11,38 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-// Applying the java plugin to add support for Java
 apply plugin: 'java'
-// As per http://www.gradle.org/docs/current/userguide/publishing_maven.html
 apply plugin: 'maven-publish'
-
+apply plugin: 'idea'
 apply plugin: 'war'
 
-dependencies {
-    compile project(':snowplow-java-tracker-core')
-    runtime project(':snowplow-java-tracker-core')
+
+group = 'com.snowplowanalytics'
+version = '0.6.0'
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+repositories {
+    // Use 'maven central' for resolving our dependencies
+    mavenCentral()
 }
 
-allprojects {
-    apply plugin: 'java'
-    group = 'com.snowplowanalytics'
-    version = '0.6.0'
-    sourceCompatibility = '1.6'
-    targetCompatibility = '1.6'
-    repositories {
-        // Use 'maven central' for resolving our dependencies
-        mavenCentral()
-    }
+dependencies {
+
+    // Apache Commons
+    compile 'commons-codec:commons-codec:1.2'
+    compile 'commons-net:commons-net:3.3'
+
+    // Apache HTTP
+    compile 'org.apache.httpcomponents:httpclient:4.3.3'
+    compile 'org.apache.httpcomponents:httpasyncclient:4.0.1'
+
+    // SLF4J logging API
+    compile 'org.slf4j:slf4j-simple:1.7.7'
+
+    // Jackson JSON processor
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
+
+    testCompile 'junit:junit:4.11'
 }
 
 
@@ -58,16 +68,6 @@ publishing {
     }
 }
 
-task testAll(dependsOn: assemble) {
-    subprojects.each {project ->
-        project.tasks.withType(Jar).each {
-
-            // Dependencies for our production and test code
-            dependencies {
-            }
-        }
-    }
-}
 
 task generateSources {
     project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker")

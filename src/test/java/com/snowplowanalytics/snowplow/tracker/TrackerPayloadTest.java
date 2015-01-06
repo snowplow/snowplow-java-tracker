@@ -4,7 +4,6 @@ import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
 
-import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -13,7 +12,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TrackerPayloadTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+public class TrackerPayloadTest {
 
     @Test
     public void testAddString() throws Exception {
