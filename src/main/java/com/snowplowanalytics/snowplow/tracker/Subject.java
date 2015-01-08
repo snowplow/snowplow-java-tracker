@@ -23,7 +23,7 @@ public class Subject {
     private HashMap<String, String> standardPairs;
 
     public Subject() {
-        standardPairs = new HashMap<String, String>();
+        standardPairs = new HashMap<>();
 
         // Default Timezone
         TimeZone tz = Calendar.getInstance().getTimeZone();
