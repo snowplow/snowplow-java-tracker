@@ -20,13 +20,15 @@ import java.util.List;
 
 public class TransactionItem extends HashMap {
 
+    @Deprecated
+    @SuppressWarnings("unused")
     public TransactionItem (String order_id, String sku, double price, int quantity, String name,
                             String category, String currency) {
-        this(order_id,sku, price, quantity, name, category, currency, null);
+        this(order_id,sku, price, quantity, name, category, currency, String.valueOf(System.currentTimeMillis()), null);
     }
 
     public TransactionItem (String order_id, String sku, double price, int quantity, String name,
-                            String category, String currency, List<SchemaPayload> context) {
+                            String category, String currency, String timestamp, List<SchemaPayload> context) {
         put(Parameter.EVENT, "ti");
         put(Parameter.TI_ITEM_ID, order_id);
         put(Parameter.TI_ITEM_SKU, sku);
@@ -38,7 +40,7 @@ public class TransactionItem extends HashMap {
 
         put(Parameter.CONTEXT, context);
 
-        put(Parameter.TIMESTAMP, Util.getTimestamp());
+        put(Parameter.TIMESTAMP, timestamp);
     }
 
     @SuppressWarnings({"unchecked", "ConstantConditions"})
