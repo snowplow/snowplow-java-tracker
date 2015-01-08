@@ -17,24 +17,30 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {
 
+    public static final String EXPECTED_BASE64_CONTEXTS = "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==";
+    public static final String EXPECTED_EVENT_ID = "15e9b149-6029-4f6e-8447-5b9797c9e6be";
+    
     @Mock
     Emitter emitter;
-    
+
     @Mock
     Provider provider;
-        
+
     @Captor
     ArgumentCaptor<Map<String, Object>> captor;
-    
+
     Tracker tracker;
+    private List<SchemaPayload> contexts;
 
     @Before
     public void setUp() throws Exception {
+        TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
         when(provider.getTimestamp()).thenReturn(123456L);
         when(provider.getTransactionId()).thenReturn(1);
         when(provider.getUUID()).thenReturn(UUID.fromString("15e9b149-6029-4f6e-8447-5b9797c9e6be"));
@@ -42,26 +48,25 @@ public class TrackerTest {
         tracker = new Tracker(emitter, new Subject(), "AF003", "cloudfront");
         tracker.setProvider(provider);
 
+        contexts = Arrays.asList(
+                new SchemaPayload()
+                        .setSchema("schema")
+                        .setData(ImmutableMap.of("foo", "bar"))
+
+        );
     }
 
     @Test
     public void testEcommerceEvent() {
 
         // Given
-        List<SchemaPayload> contexts = Arrays.asList(
-                new SchemaPayload()
-                        .setSchema("schema")
-                        .setData(ImmutableMap.of("foo", "bar"))
-
-        );
-
         List<TransactionItem> items = Arrays.<TransactionItem>asList(
                 new TransactionItem("order_id", "sku", 1.0, 2, "name", "category", "currency", "12346", contexts)
         );
 
         // When
         tracker.trackEcommerceTransaction("order_id", 1.0, "affiliation", 2.0, 3.0, "city", "state", "country", "currency", items, contexts);
-        
+
         // Then
         verify(emitter, times(2)).addToBuffer(captor.capture());
         List<Map<String, Object>> allValues = captor.getAllValues();
@@ -69,13 +74,13 @@ public class TrackerTest {
                 .put("ti_nm", "name")
                 .put("ti_id", "order_id")
                 .put("e", "ti")
-                .put("cx", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==")
+                .put("cx", EXPECTED_BASE64_CONTEXTS)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
                 .put("ti_cu", "currency")
-                .put("eid", "15e9b149-6029-4f6e-8447-5b9797c9e6be")
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("dtm", "123456")
-                .put("tz", "Europe/Paris")
+                .put("tz", "Etc/UTC")
                 .put("ti_pr", "1.0")
                 .put("ti_qu", "2.0")
                 .put("p", "pc")
@@ -83,17 +88,17 @@ public class TrackerTest {
                 .put("ti_ca", "category")
                 .put("ti_sk", "sku")
                 .build(), allValues.get(0));
-        
+
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("e", "tr")
                 .put("tr_cu", "currency")
-                .put("cx", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==")
+                .put("cx", EXPECTED_BASE64_CONTEXTS)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
-                .put("eid", "15e9b149-6029-4f6e-8447-5b9797c9e6be")
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("tr_sh", "3.0")
                 .put("dtm", "123456")
-                .put("tz", "Europe/Paris")
+                .put("tz", "Etc/UTC")
                 .put("tr_co", "country")
                 .put("tv", "java-0.6.0")
                 .put("p", "pc")
@@ -105,38 +110,159 @@ public class TrackerTest {
                 .put("tr_st", "state")
                 .build(), allValues.get(1));
     }
-    
-    @Test
-    public void testUnstructuredEvent() {
 
-        // Given
-        ArrayList<SchemaPayload> context = Lists.newArrayList(
-                new SchemaPayload()
-                        .setSchema("context")
-                        .setData(ImmutableMap.of("bar", "foo"))
-        );
-        
+    @Test
+    public void testUnstructuredEventWithContext() {
+
         // When
         tracker.trackUnstructuredEvent(new SchemaPayload()
-        .setData(ImmutableMap.of("foo", "bar"))
-        .setSchema("payload"), context);
+                .setData(ImmutableMap.of("foo", "bar"))
+                .setSchema("payload"), contexts);
+
+        // Then
+        verify(emitter).addToBuffer(captor.capture());
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("dtm", "123456")
+                .put("tz", "Etc/UTC")
+                .put("e", "ue")
+                .put("tv", "java-0.6.0")
+                .put("p", "pc")
+                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYXIifX19")
+                .put("eid", EXPECTED_EVENT_ID)
+                .build(), captor.getValue());
+    }
+
+    @Test
+    public void testUnstructuredEventWithoutContext() {
+
+        // When
+        tracker.trackUnstructuredEvent(new SchemaPayload()
+                .setData(ImmutableMap.of("foo", "bar"))
+                .setSchema("payload"));
+
+        // Then
+        verify(emitter).addToBuffer(captor.capture());
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("dtm", "123456")
+                .put("tz", "Etc/UTC")
+                .put("e", "ue")
+                .put("tv", "java-0.6.0")
+                .put("p", "pc")
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYXIifX19")
+                .put("eid", "15e9b149-6029-4f6e-8447-5b9797c9e6be")
+                .build(), captor.getValue());
+    }
+    
+    @Test
+    public void testTrackPageView() {
+        
+        // When
+        tracker.trackPageView("url", "title", "referer", contexts);
         
         // Then
         verify(emitter).addToBuffer(captor.capture());
         assertEquals(ImmutableMap.<String, Object>builder()
-            .put("dtm", "123456")
-            .put("tz", "Europe/Paris")
-            .put("e", "ue")
-            .put("tv", "java-0.6.0")
-            .put("p", "pc")
-            .put("cx", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoiY29udGV4dCIsImRhdGEiOnsiYmFyIjoiZm9vIn19XX0=")
-            .put("tna", "AF003")
-            .put("aid", "cloudfront")
-            .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYXIifX19")
-            .put("eid", "15e9b149-6029-4f6e-8447-5b9797c9e6be")
-            .build(), captor.getValue());
+                .put("dtm", "123456")
+                .put("tz", "Etc/UTC")
+                .put("e", "pv")
+                .put("page", "title")
+                .put("tv", "java-0.6.0")
+                .put("p", "pc")
+                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("eid", EXPECTED_EVENT_ID)
+                .put("refr", "referer")
+                .put("url", "url")
+                .build(), captor.getValue());
+    }
+
+    @Test
+    public void testTrackScreenView() {
+        
+        // When
+        tracker.trackScreenView("name", "id", contexts);
+        
+        // Then
+        verify(emitter).addToBuffer(captor.capture());
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("dtm", "123456")
+                .put("tz", "Etc/UTC")
+                .put("e", "ue")
+                .put("tv", "java-0.6.0")
+                .put("p", "pc")
+                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJpZCI6ImlkIiwibmFtZSI6Im5hbWUifX19")
+                .put("eid", EXPECTED_EVENT_ID)
+                .build(), captor.getValue());
+    }
+
+    @Test
+    public void testTrackScreenViewWithDefaultContextAndTimestamp() {
+
+        // When
+        tracker.trackScreenView("name", "id");
+
+        // Then
+        verify(emitter).addToBuffer(captor.capture());
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("dtm", "123456")
+                .put("tz", "Etc/UTC")
+                .put("e", "ue")
+                .put("tv", "java-0.6.0")
+                .put("p", "pc")
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJpZCI6ImlkIiwibmFtZSI6Im5hbWUifX19")
+                .put("eid", EXPECTED_EVENT_ID)
+                .build(), captor.getValue());
+    }
+
+
+    @Test
+    public void testTrackScreenViewWithTimestamp() {
+
+        // When
+        tracker.trackScreenView("name", "id", contexts, 654321L);
+
+        // Then
+        verify(emitter).addToBuffer(captor.capture());
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("dtm", "654321")
+                .put("tz", "Etc/UTC")
+                .put("e", "ue")
+                .put("tv", "java-0.6.0")
+                .put("p", "pc")
+                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJpZCI6ImlkIiwibmFtZSI6Im5hbWUifX19")
+                .put("eid", EXPECTED_EVENT_ID)
+                .build(), captor.getValue());
     }
     
+    @Test
+    public void testCompletePayloadSetCustomTrackerVersion() {
+        
+        // Given
+        Map<String, Object> data = new HashMap<String, Object>(ImmutableMap.<String, Object>of("foo", "bar"));
+
+        // When
+        tracker.setTrackerVersion("abc");
+        
+        // Then
+        Map<String, Object> payload = tracker.completePayload(data, Lists.<SchemaPayload>newArrayList(), 123465L);
+        assertTrue(payload.containsKey("tv"));
+        assertEquals("abc", payload.get("tv"));
+    }
+
     
     @Test
     public void testDefaultPlatform() throws Exception {
@@ -187,23 +313,4 @@ public class TrackerTest {
         emitter.flushBuffer();
     }
 
-
-    @Test
-    public void testTrackScreenView() throws Exception {
-        Subject subject = new Subject();
-        subject.setViewPort(320, 480);
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
-        emitter.setRequestMethod(RequestMethod.Asynchronous);
-        emitter.setBufferOption(BufferOption.Instant);
-
-        SchemaPayload context = new SchemaPayload();
-        Map<String, String> someContext = new HashMap<String, String>();
-        someContext.put("someContextKey", "testTrackPageView2");
-        context.setSchema("iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0");
-        context.setData(someContext);
-        ArrayList<SchemaPayload> contextList = new ArrayList<SchemaPayload>();
-        contextList.add(context);
-
-        tracker.trackScreenView(null, "screen_1", contextList, 0);
-    }
 }
