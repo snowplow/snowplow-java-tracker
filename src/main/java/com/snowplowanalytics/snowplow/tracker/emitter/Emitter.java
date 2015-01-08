@@ -14,7 +14,6 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import com.snowplowanalytics.snowplow.tracker.Constants;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -37,14 +36,12 @@ import java.util.concurrent.Future;
 
 public class Emitter {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(Emitter.class);
     private URIBuilder uri;
     private RequestMethod requestMethod = RequestMethod.Synchronous;
     private CloseableHttpClient httpClient;
     private CloseableHttpAsyncClient httpAsyncClient;
-    private final ArrayList<Payload> buffer = new ArrayList<Payload>();
-
-    private final Logger logger = LoggerFactory.getLogger(Emitter.class);
-
+    private List<Map<String,Object>> buffer = new ArrayList<Map<String,Object>>();
     protected BufferOption option = BufferOption.Default;
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod = HttpMethod.GET;
@@ -134,10 +131,11 @@ public class Emitter {
      * @param payload Payload to be added
      * @return Returns the boolean value if the event was successfully added to the buffer
      */
-    public boolean addToBuffer(Payload payload) {
+    public boolean addToBuffer(Map<String, Object> payload) {
         boolean ret = buffer.add(payload);
-        if (buffer.size() == option.getCode())
+        if (buffer.size() == option.getCode()) {
             flushBuffer();
+        }
         return ret;
     }
 
@@ -146,46 +144,50 @@ public class Emitter {
      */
     public void flushBuffer() {
         if (buffer.isEmpty()) {
-            logger.debug("Buffer is empty, exiting flush operation..");
+            LOGGER.debug("Buffer is empty, exiting flush operation..");
             return;
         }
 
         if (httpMethod == HttpMethod.GET) {
             int success_count = 0;
-            LinkedList<Payload> unsentPayloads = new LinkedList<Payload>();
+            List<Map<String, Object>> unsentPayloads = new LinkedList<Map<String, Object>>();
 
-            for (Payload payload : buffer) {
+            for (Map<String, Object> payload : buffer) {
                 int status_code = sendGetData(payload).getStatusLine().getStatusCode();
-                if (status_code == 200)
+                if (status_code == 200) {
                     success_count++;
-                else
+                } else {
                     unsentPayloads.add(payload);
+                }
             }
 
             if (unsentPayloads.size() == 0) {
-                if (requestCallback != null)
+                if (requestCallback != null) {
                     requestCallback.onSuccess(success_count);
+                }
             }
-            else if (requestCallback != null)
+            else if (requestCallback != null) {
                 requestCallback.onFailure(success_count, unsentPayloads);
+            }
 
         } else if (httpMethod == HttpMethod.POST) {
-            LinkedList<Payload> unsentPayload = new LinkedList<Payload>();
+            List<Map<String, Object>> unsentPayload = new LinkedList<Map<String, Object>>();
 
             SchemaPayload postPayload = new SchemaPayload();
             postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
 
-            ArrayList<Map> eventMaps = new ArrayList<Map>();
-            for (Payload payload : buffer) {
-                eventMaps.add(payload.getMap());
+            List<Map<String, Object>> eventMaps = new ArrayList<Map<String, Object>>();
+            for (Map<String, Object> payload : buffer) {
+                eventMaps.add(payload);
             }
             postPayload.setData(eventMaps);
 
             int status_code = sendPostData(postPayload).getStatusLine().getStatusCode();
-            if (status_code == 200 && requestCallback != null)
+            if (status_code == 200 && requestCallback != null) {
                 requestCallback.onSuccess(buffer.size());
-            else if (requestCallback != null){
-                unsentPayload.add(postPayload);
+            }
+            else if (requestCallback != null) {
+                unsentPayload.add(postPayload.getMap());
                 requestCallback.onFailure(0, unsentPayload);
             }
         }
@@ -194,7 +196,7 @@ public class Emitter {
         buffer.clear();
     }
 
-    protected HttpResponse sendPostData(Payload payload) {
+    protected HttpResponse sendPostData(SchemaPayload payload) {
         HttpPost httpPost = new HttpPost(uri.toString());
         httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
         HttpResponse httpResponse = null;
@@ -208,16 +210,13 @@ public class Emitter {
             } else {
                 httpResponse = httpClient.execute(httpPost);
             }
-            logger.debug(httpResponse.getStatusLine().toString());
+            LOGGER.debug(httpResponse.getStatusLine().toString());
         } catch (UnsupportedEncodingException e) {
-            logger.error("Encoding exception with the payload.");
-            e.printStackTrace();
+            LOGGER.error("Encoding exception with the payload.");
         } catch (IOException e) {
-            logger.error("Error when sending HTTP POST.");
-            e.printStackTrace();
+            LOGGER.error("Error when sending HTTP POST.");
         } catch (InterruptedException e) {
-            logger.error("Interruption error when sending HTTP POST request.");
-            e.printStackTrace();
+            LOGGER.error("Interruption error when sending HTTP POST request.");
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
@@ -225,14 +224,13 @@ public class Emitter {
     }
 
     @SuppressWarnings("unchecked")
-    protected HttpResponse sendGetData(Payload payload) {
-        HashMap hashMap = (HashMap) payload.getMap();
-        Iterator<String> iterator = hashMap.keySet().iterator();
+    protected HttpResponse sendGetData(Map<String, Object> payload) {
+        Iterator<String> iterator = payload.keySet().iterator();
         HttpResponse httpResponse = null;
 
         while (iterator.hasNext()) {
             String key = iterator.next();
-            String value = (String) hashMap.get(key);
+            String value = (String) payload.get(key);
             uri.setParameter(key, value);
         }
 
@@ -244,18 +242,15 @@ public class Emitter {
             } else {
                 httpResponse = httpClient.execute(httpGet);
             }
-            logger.debug(httpResponse.getStatusLine().toString());
+            LOGGER.debug(httpResponse.getStatusLine().toString());
         } catch (IOException e) {
-            logger.error("Error when sending HTTP GET error.");
-            e.printStackTrace();
+            LOGGER.error("Error when sending HTTP GET error.");
         } catch (URISyntaxException e) {
-            logger.error("Error when creating HTTP GET request. Probably parsing error..");
-            e.printStackTrace();
+            LOGGER.error("Error when creating HTTP GET request. Probably parsing error..");
         } catch (InterruptedException e) {
-            logger.error("Interruption error when sending HTTP GET request.");
-            e.printStackTrace();
+            LOGGER.error("Interruption error when sending HTTP GET request.");
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            LOGGER.error("Execution exception", e);
         }
         return httpResponse;
     }

@@ -1,42 +1,154 @@
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
-
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule();
+    @Mock
+    Emitter emitter;
+    
+    @Mock
+    Provider provider;
+        
+    @Captor
+    ArgumentCaptor<Map<String, Object>> captor;
+    
+    Tracker tracker;
 
-    private static String TESTURL = "localhost:8080";
+    @Before
+    public void setUp() throws Exception {
+        when(provider.getTimestamp()).thenReturn(123456L);
+        when(provider.getTransactionId()).thenReturn(1);
+        when(provider.getUUID()).thenReturn(UUID.fromString("15e9b149-6029-4f6e-8447-5b9797c9e6be"));
+
+        tracker = new Tracker(emitter, new Subject(), "AF003", "cloudfront");
+        tracker.setProvider(provider);
+
+    }
 
     @Test
+    public void testEcommerceEvent() {
+
+        // Given
+        List<SchemaPayload> contexts = Arrays.asList(
+                new SchemaPayload()
+                        .setSchema("schema")
+                        .setData(ImmutableMap.of("foo", "bar"))
+
+        );
+
+        List<TransactionItem> items = Arrays.<TransactionItem>asList(
+                new TransactionItem("order_id", "sku", 1.0, 2, "name", "category", "currency", "12346", contexts)
+        );
+
+        // When
+        tracker.trackEcommerceTransaction("order_id", 1.0, "affiliation", 2.0, 3.0, "city", "state", "country", "currency", items, contexts);
+        
+        // Then
+        verify(emitter, times(2)).addToBuffer(captor.capture());
+        List<Map<String, Object>> allValues = captor.getAllValues();
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("ti_nm", "name")
+                .put("ti_id", "order_id")
+                .put("e", "ti")
+                .put("cx", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==")
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("ti_cu", "currency")
+                .put("eid", "15e9b149-6029-4f6e-8447-5b9797c9e6be")
+                .put("dtm", "123456")
+                .put("tz", "Europe/Paris")
+                .put("ti_pr", "1.0")
+                .put("ti_qu", "2.0")
+                .put("p", "pc")
+                .put("tv", "java-0.6.0")
+                .put("ti_ca", "category")
+                .put("ti_sk", "sku")
+                .build(), allValues.get(0));
+        
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("e", "tr")
+                .put("tr_cu", "currency")
+                .put("cx", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==")
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("eid", "15e9b149-6029-4f6e-8447-5b9797c9e6be")
+                .put("tr_sh", "3.0")
+                .put("dtm", "123456")
+                .put("tz", "Europe/Paris")
+                .put("tr_co", "country")
+                .put("tv", "java-0.6.0")
+                .put("p", "pc")
+                .put("tr_tx", "2.0")
+                .put("tr_af", "affiliation")
+                .put("tr_id", "order_id")
+                .put("tr_tt", "1.0")
+                .put("tr_ci", "city")
+                .put("tr_st", "state")
+                .build(), allValues.get(1));
+    }
+    
+    @Test
+    public void testUnstructuredEvent() {
+
+        // Given
+        ArrayList<SchemaPayload> context = Lists.newArrayList(
+                new SchemaPayload()
+                        .setSchema("context")
+                        .setData(ImmutableMap.of("bar", "foo"))
+        );
+        
+        // When
+        tracker.trackUnstructuredEvent(new SchemaPayload()
+        .setData(ImmutableMap.of("foo", "bar"))
+        .setSchema("payload"), context);
+        
+        // Then
+        verify(emitter).addToBuffer(captor.capture());
+        assertEquals(ImmutableMap.<String, Object>builder()
+            .put("dtm", "123456")
+            .put("tz", "Europe/Paris")
+            .put("e", "ue")
+            .put("tv", "java-0.6.0")
+            .put("p", "pc")
+            .put("cx", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoiY29udGV4dCIsImRhdGEiOnsiYmFyIjoiZm9vIn19XX0=")
+            .put("tna", "AF003")
+            .put("aid", "cloudfront")
+            .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYXIifX19")
+            .put("eid", "15e9b149-6029-4f6e-8447-5b9797c9e6be")
+            .build(), captor.getValue());
+    }
+    
+    
+    @Test
     public void testDefaultPlatform() throws Exception {
-        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject subject = new Subject();
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
         assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
     }
 
     @Test
     public void testSetPlatform() throws Exception {
-        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject subject = new Subject();
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
         tracker.setPlatform(DevicePlatform.ConnectedTV);
         assertEquals(DevicePlatform.ConnectedTV, tracker.getPlatform());
     }
@@ -44,9 +156,8 @@ public class TrackerTest {
     @Test
     public void testSetSubject() throws Exception {
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
-        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject s1 = new Subject();
-        Tracker tracker = new Tracker(emitter, s1, "AF003", "cloudfront", false);
+        Tracker tracker = new Tracker(emitter, s1, "AF003", "cloudfront");
         Subject s2 = new Subject();
         s2.setColorDepth(24);
         tracker.setSubject(s2);
@@ -57,32 +168,10 @@ public class TrackerTest {
     }
 
     @Test
-    public void testSetSchema() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackPageView() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackPageView1() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackPageView2() throws Exception {
-
-    }
-
-    @Test
     public void testTrackPageView3() throws Exception {
-        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject subject = new Subject();
-        subject.setTimezone("Etc/UTC");
         subject.setViewPort(320, 480);
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
         emitter.setRequestMethod(RequestMethod.Asynchronous);
 
         SchemaPayload context = new SchemaPayload();
@@ -96,149 +185,14 @@ public class TrackerTest {
         tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList);
 
         emitter.flushBuffer();
-
-        verify(postRequestedFor(urlEqualTo("/com.snowplowanalytics.snowplow/tp2"))
-                .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
-                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics." +
-                        "snowplow/payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"pv\"," +
-                        "\"url\":\"www.mypage.com\",\"page\":\"My Page\",\"refr\":" +
-                        "\"www.me.com\",\"aid\":\"cloudfront\",\"tna\":\"AF003\"," +
-                        "\"tv\":\"java-0.7.0\",\"co\":\"{\\\"schema\\\":" +
-                        "\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\"," +
-                        "\\\"data\\\":[{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\"," +
-                        "\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView3\\\"}}]}\"," +
-                        "\"tz\":\"Etc/UTC\",\"p\":\"pc\",\"vp\":\"320x480\"}]}",
-                        JSONCompareMode.LENIENT)));
     }
 
-    @Test
-    public void testTrackStructuredEvent() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackStructuredEvent1() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackStructuredEvent2() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackStructuredEvent3() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackUnstructuredEvent() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackUnstructuredEvent1() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackUnstructuredEvent2() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackUnstructuredEvent3() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackEcommerceTransactionItem() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackEcommerceTransaction() throws Exception {
-        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
-        Tracker tracker = new Tracker(emitter, "AF003", "cloudfront", false);
-        emitter.setRequestMethod(RequestMethod.Asynchronous);
-
-        SchemaPayload context = new SchemaPayload();
-        Map<String, String> someContext = new HashMap<String, String>();
-        someContext.put("someContextKey", "testTrackPageView2");
-        context.setSchema("iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0");
-        context.setData(someContext);
-        ArrayList<SchemaPayload> contextList = new ArrayList<SchemaPayload>();
-        contextList.add(context);
-
-        TransactionItem transactionItem = new TransactionItem("order-8", "no_sku",
-                34.0, 1, "Big Order", "Food", "USD", contextList);
-        LinkedList<TransactionItem> transactionItemLinkedList = new LinkedList<TransactionItem>();
-        transactionItemLinkedList.add(transactionItem);
-        tracker.trackEcommerceTransaction("order-7", 25.0, "no_affiliate", 0.0, 0.0, "Dover",
-                "Delaware", "US", "USD", transactionItemLinkedList);
-
-        emitter.flushBuffer();
-
-        // Verifying this JSON:
-        // {
-        //     "schema": "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0",
-        //     "data": [{
-        //         "e": "ti",
-        //         "ti_id": "order-8",
-        //         "ti_sk": "no_sku",
-        //         "ti_nm": "Big Order",
-        //         "ti_ca": "Food",
-        //         "ti_pr": "34.0",
-        //         "ti_qu": "1.0",
-        //         "ti_cu": "USD",
-        //         "tna": "AF003",
-        //         "tv": "java-0.7.0",
-        //         "dtm": "1414607597877",
-        //         "co": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\",\"data\":[{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"someContextKey\":\"testTrackPageView2\"}}]}"
-        //     }, {
-        //         "e": "tr",
-        //         "tr_id": "order-7",
-        //         "tr_tt": "25.0",
-        //         "tr_af": "no_affiliate",
-        //         "tr_tx": "0.0",
-        //         "tr_sh": "0.0",
-        //         "tr_ci": "Dover",
-        //         "tr_st": "Delaware",
-        //         "tr_co": "US",
-        //         "tr_cu": "USD",
-        //         "tna": "AF003",
-        //         "tv": "java-0.7.0",
-        //         "dtm": "1414607597877"
-        //     }]
-        // }
-        verify(postRequestedFor(urlEqualTo("/com.snowplowanalytics.snowplow/tp2"))
-                .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
-                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"ti\",\"ti_id\":\"order-8\",\"ti_sk\":\"no_sku\",\"ti_nm\":\"Big Order\",\"ti_ca\":\"Food\",\"ti_pr\":\"34.0\",\"ti_qu\":\"1.0\",\"ti_cu\":\"USD\",\"aid\":\"cloudfront\",\"tna\":\"AF003\",\"tv\":\"java-0.7.0\",\"co\":\"{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\",\\\"data\\\":[{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\",\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView2\\\"}}]}\"},{\"e\":\"tr\",\"tr_id\":\"order-7\",\"tr_tt\":\"25.0\",\"tr_af\":\"no_affiliate\",\"tr_tx\":\"0.0\",\"tr_sh\":\"0.0\",\"tr_ci\":\"Dover\",\"tr_st\":\"Delaware\",\"tr_co\":\"US\",\"tr_cu\":\"USD\",\"aid\":\"cloudfront\",\"tna\":\"AF003\",\"tv\":\"java-0.7.0\"}]}",
-                        JSONCompareMode.LENIENT)));
-    }
-
-    @Test
-    public void testTrackEcommerceTransaction1() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackEcommerceTransaction2() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackEcommerceTransaction3() throws Exception {
-
-    }
 
     @Test
     public void testTrackScreenView() throws Exception {
-        Emitter emitter = new Emitter(TESTURL, HttpMethod.POST);
         Subject subject = new Subject();
-        subject.setTimezone("Etc/UTC");
         subject.setViewPort(320, 480);
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront", false);
+        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
         emitter.setRequestMethod(RequestMethod.Asynchronous);
         emitter.setBufferOption(BufferOption.Instant);
 
@@ -251,50 +205,5 @@ public class TrackerTest {
         contextList.add(context);
 
         tracker.trackScreenView(null, "screen_1", contextList, 0);
-
-        // Verifying this JSON:
-        // {
-        //     "schema": "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0",
-        //     "data": [{
-        //         "e": "ue",
-        //         "ue_pr": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\",\"data\":{\"id\":\"screen_1\"}}}",
-        //         "tna": "AF003",
-        //         "tv": "java-0.7.0",
-        //         "co": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":[{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"someContextKey\":\"testTrackPageView2\"}}]}",
-        //         "tz": "Etc/UTC",
-        //         "p": "pc",
-        //         "vp": "320x480"
-        //     }]
-        // }
-        verify(postRequestedFor(urlEqualTo("/com.snowplowanalytics.snowplow/tp2"))
-                .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
-                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics.snowplow/" +
-                                "payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"ue\",\"ue_pr\":" +
-                                "\"{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/" +
-                                "unstruct_event/jsonschema/1-0-0\\\",\\\"data\\\":{\\\"schema\\\":" +
-                                "\\\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\\\"," +
-                                "\\\"data\\\":{\\\"id\\\":\\\"screen_1\\\"}}}\",\"aid\":\"cloudfront\"," +
-                                "\"tna\":\"AF003\",\"tv\":\"java-0.7.0\",\"co\":\"{\\\"schema\\\":" +
-                                "\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\"," +
-                                "\\\"data\\\":[{\\\"schema\\\":" +
-                                "\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\"," +
-                                "\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView2\\\"}}]}\"," +
-                                "\"tz\":\"Etc/UTC\",\"p\":\"pc\",\"vp\":\"320x480\"}]}",
-                        JSONCompareMode.LENIENT)));
-    }
-
-    @Test
-    public void testTrackScreenView1() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackScreenView2() throws Exception {
-
-    }
-
-    @Test
-    public void testTrackScreenView3() throws Exception {
-
     }
 }

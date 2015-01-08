@@ -11,15 +11,23 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.emitter;
+package com.snowplowanalytics.snowplow.tracker;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
-public interface RequestCallback {
+public class Provider {
 
-    void onSuccess(int successCount);
+    public Long getTimestamp() {
+        return System.currentTimeMillis();
+    }
 
-    void onFailure(int successCount, List<Map<String, Object>> failedEvent);
-
+    public int getTransactionId() {
+        Random r = new Random(); //NEED ID RANGE
+        return r.nextInt(999999-100000+1) + 100000;
+    }
+    
+    public UUID getUUID() {
+        return UUID.randomUUID();
+    }
 }
