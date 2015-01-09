@@ -11,10 +11,21 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
+buildscript {
+    repositories {
+        maven { url 'http://repo.spring.io/plugins-release' }
+    }
+    dependencies {
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
-
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-maven'
+apply plugin: 'propdeps-idea'
 
 group = 'com.snowplowanalytics'
 version = '0.7.0'
@@ -27,6 +38,18 @@ repositories {
     jcenter()
 }
 
+
+
+configurations {
+    provided
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+}
+
 dependencies {
 
     // Apache Commons
@@ -34,9 +57,12 @@ dependencies {
     compile 'commons-net:commons-net:3.3'
 
     // Apache HTTP
-    compile 'org.apache.httpcomponents:httpclient:4.3.3'
-    compile 'org.apache.httpcomponents:httpasyncclient:4.0.1'
-
+    optional 'org.apache.httpcomponents:httpclient:4.3.3'
+    optional 'org.apache.httpcomponents:httpasyncclient:4.0.1'
+    
+    // Square OK HTTP
+    optional 'com.squareup.okhttp:okhttp:2.2.0'
+    
     // SLF4J logging API
     compile 'org.slf4j:slf4j-simple:1.7.7'
 
@@ -51,6 +77,7 @@ dependencies {
     testCompile 'com.github.tomakehurst:wiremock:1.53'
     testCompile 'org.skyscreamer:jsonassert:1.2.3'
     testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'com.squareup.okhttp:mockwebserver:2.1.0'
 }
 
 

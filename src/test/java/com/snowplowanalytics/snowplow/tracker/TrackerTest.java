@@ -2,17 +2,16 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.*;
 
@@ -20,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(Parameterized.class)
 public class TrackerTest {
 
     public static final String EXPECTED_BASE64_CONTEXTS = "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==";
@@ -38,6 +37,7 @@ public class TrackerTest {
     Tracker tracker;
     private List<SchemaPayload> contexts;
 
+    
     @Before
     public void setUp() throws Exception {
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));

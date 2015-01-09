@@ -14,106 +14,47 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import com.snowplowanalytics.snowplow.tracker.Constants;
+import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Emitter {
 
     private final Logger LOGGER = LoggerFactory.getLogger(Emitter.class);
-    private URIBuilder uri;
     private RequestMethod requestMethod = RequestMethod.Synchronous;
-    private CloseableHttpClient httpClient;
-    private CloseableHttpAsyncClient httpAsyncClient;
     private List<Map<String,Object>> buffer = new ArrayList<Map<String,Object>>();
-    protected BufferOption option = BufferOption.Default;
+    private HttpClientAdapter httpClientAdapter;
+    protected Integer bufferSize = 10;
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod = HttpMethod.GET;
 
-    /**
-     * Default constructor does nothing.
-     */
-    public Emitter() {
 
-    }
-
-    /**
-     * Create an Emitter instance with a collector URL.
-     * @param URI The collector URL. Don't include "http://" - this is done automatically.
-     */
-    public Emitter(String URI) {
-        this(URI, HttpMethod.GET, null);
-    }
-
-    /**
-     * Create an Emitter instance with a collector URL, and callback function.
-     * @param URI The collector URL. Don't include "http://" - this is done automatically.
-     * @param callback The callback function to handle success/failure cases when sending events.
-     */
-    public Emitter(String URI, RequestCallback callback) {
-        this(URI, HttpMethod.GET, callback);
-    }
-
-    /**
-     * Create an Emitter instance with a collector URL,
-     * @param URI The collector URL. Don't include "http://" - this is done automatically.
-     * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
-     */
-    public Emitter(String URI, HttpMethod httpMethod) {
-        this(URI, httpMethod, null);
-    }
 
     /**
      * Create an Emitter instance with a collector URL and HttpMethod to send requests.
-     * @param URI The collector URL. Don't include "http://" - this is done automatically.
      * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
      * @param callback The callback function to handle success/failure cases when sending events.
      */
-    public Emitter(String URI, HttpMethod httpMethod, RequestCallback callback) {
-        if (httpMethod == HttpMethod.GET) {
-            uri = new URIBuilder()
-                    .setScheme("http")
-                    .setHost(URI)
-                    .setPath("/i");
-        } else { // POST
-            uri = new URIBuilder()
-                    .setScheme("http")
-                    .setHost(URI)
-                    .setPath("/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION);
-        }
+    public Emitter(HttpMethod httpMethod, RequestCallback callback, HttpClientAdapter httpClientAdapter) {
+
         this.requestCallback = callback;
         this.httpMethod = httpMethod;
-        this.httpClient = HttpClients.createDefault();
-
-        if (httpMethod == HttpMethod.GET) {
-            this.setBufferOption(BufferOption.Instant);
-        }
-
+        this.httpClientAdapter = httpClientAdapter;
     }
 
     /**
      * Sets whether the buffer should send events instantly or after the buffer has reached
      * it's limit. By default, this is set to BufferOption Default.
-     * @param option Set the BufferOption enum to Instant send events upon creation.
+     * @param size The size of the buffer
      */
-    public void setBufferOption(BufferOption option) {
-        this.option = option;
+    public void setBufferSize(int size) {
+        this.bufferSize = size;
     }
 
     /**
@@ -122,8 +63,6 @@ public class Emitter {
      */
     public void setRequestMethod(RequestMethod option) {
         this.requestMethod = option;
-        this.httpAsyncClient = HttpAsyncClients.createDefault();
-        this.httpAsyncClient.start();
     }
 
     /**
@@ -133,7 +72,7 @@ public class Emitter {
      */
     public boolean addToBuffer(Map<String, Object> payload) {
         boolean ret = buffer.add(payload);
-        if (buffer.size() == option.getCode()) {
+        if (buffer.size() == bufferSize) {
             flushBuffer();
         }
         return ret;
@@ -151,16 +90,14 @@ public class Emitter {
         if (httpMethod == HttpMethod.GET) {
             int success_count = 0;
             List<Map<String, Object>> unsentPayloads = new LinkedList<Map<String, Object>>();
-
             for (Map<String, Object> payload : buffer) {
-                int status_code = sendGetData(payload).getStatusLine().getStatusCode();
+                int status_code = httpClientAdapter.get(payload);
                 if (status_code == 200) {
                     success_count++;
                 } else {
                     unsentPayloads.add(payload);
                 }
             }
-
             if (unsentPayloads.size() == 0) {
                 if (requestCallback != null) {
                     requestCallback.onSuccess(success_count);
@@ -169,89 +106,26 @@ public class Emitter {
             else if (requestCallback != null) {
                 requestCallback.onFailure(success_count, unsentPayloads);
             }
-
         } else if (httpMethod == HttpMethod.POST) {
             List<Map<String, Object>> unsentPayload = new LinkedList<Map<String, Object>>();
 
-            SchemaPayload postPayload = new SchemaPayload();
-            postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
+            SchemaPayload selfDescribedJson = new SchemaPayload();
+            selfDescribedJson.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
 
             List<Map<String, Object>> eventMaps = new ArrayList<Map<String, Object>>();
             for (Map<String, Object> payload : buffer) {
                 eventMaps.add(payload);
             }
-            postPayload.setData(eventMaps);
-
-            int status_code = sendPostData(postPayload).getStatusLine().getStatusCode();
+            selfDescribedJson.setData(eventMaps);
+            int status_code = httpClientAdapter.post(selfDescribedJson);
             if (status_code == 200 && requestCallback != null) {
                 requestCallback.onSuccess(buffer.size());
-            }
-            else if (requestCallback != null) {
-                unsentPayload.add(postPayload.getMap());
+            } else if (requestCallback != null) {
+                unsentPayload.add(selfDescribedJson.getMap());
                 requestCallback.onFailure(0, unsentPayload);
             }
         }
-
-        // Empties current buffer
+        
         buffer.clear();
-    }
-
-    protected HttpResponse sendPostData(SchemaPayload payload) {
-        HttpPost httpPost = new HttpPost(uri.toString());
-        httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
-        HttpResponse httpResponse = null;
-
-        try {
-            StringEntity params = new StringEntity(payload.toString());
-            httpPost.setEntity(params);
-            if (requestMethod == RequestMethod.Asynchronous) {
-                Future<HttpResponse> future = httpAsyncClient.execute(httpPost, null);
-                httpResponse = future.get();
-            } else {
-                httpResponse = httpClient.execute(httpPost);
-            }
-            LOGGER.debug(httpResponse.getStatusLine().toString());
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("Encoding exception with the payload.");
-        } catch (IOException e) {
-            LOGGER.error("Error when sending HTTP POST.");
-        } catch (InterruptedException e) {
-            LOGGER.error("Interruption error when sending HTTP POST request.");
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return httpResponse;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected HttpResponse sendGetData(Map<String, Object> payload) {
-        Iterator<String> iterator = payload.keySet().iterator();
-        HttpResponse httpResponse = null;
-
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            String value = (String) payload.get(key);
-            uri.setParameter(key, value);
-        }
-
-        try {
-            HttpGet httpGet = new HttpGet(uri.build());
-            if (requestMethod == RequestMethod.Asynchronous) {
-                Future<HttpResponse> future = httpAsyncClient.execute(httpGet, null);
-                httpResponse = future.get();
-            } else {
-                httpResponse = httpClient.execute(httpGet);
-            }
-            LOGGER.debug(httpResponse.getStatusLine().toString());
-        } catch (IOException e) {
-            LOGGER.error("Error when sending HTTP GET error.");
-        } catch (URISyntaxException e) {
-            LOGGER.error("Error when creating HTTP GET request. Probably parsing error..");
-        } catch (InterruptedException e) {
-            LOGGER.error("Interruption error when sending HTTP GET request.");
-        } catch (ExecutionException e) {
-            LOGGER.error("Execution exception", e);
-        }
-        return httpResponse;
     }
 }
