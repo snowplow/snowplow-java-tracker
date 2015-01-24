@@ -23,6 +23,8 @@ version = '0.2.0'
 repositories {
     // Use 'maven central' for resolving our dependencies
     mavenCentral()
+    // Use 'jcenter' for resolving testing dependencies
+    jcenter()
 }
 
 // Dependencies for our production and test code
@@ -42,7 +44,9 @@ dependencies {
     // Jackson JSON processor
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
 
+    // Testing libraries
     testCompile 'junit:junit:4.11'
+    testCompile 'com.github.tomakehurst:wiremock:1.+'
 }
 
 task sourceJar(type: Jar, dependsOn: 'generateSources') {
