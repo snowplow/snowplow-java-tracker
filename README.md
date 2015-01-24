@@ -1,6 +1,6 @@
 # Java Analytics for Snowplow
 
-[ ![Build Status] [travis-image] ] [travis]
+[ ![Build Status] [travis-image] ] [travis] [ ![Release] [release-image] ] [releases] [ ![License] [license-image] ] [license]
 
 ## Overview
 
@@ -40,6 +40,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+[travis]: https://travis-ci.org/snowplow/snowplow-java-tracker
+[travis-image]: https://travis-ci.org/snowplow/snowplow-java-tracker.svg?branch=master
+
+[release-image]: http://img.shields.io/badge/release-0.6.0-blue.svg?style=flat
+[releases]: https://github.com/snowplow/snowplow-java-tracker/releases
+
+[license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
+[license]: http://www.apache.org/licenses/LICENSE-2.0
+
 [java]: http://www.java.com/en/
 
 [snowplow]: http://snowplowanalytics.com
@@ -57,8 +66,3 @@ limitations under the License.
 [setup]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Setup
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Contributing
-
-[travis]: https://travis-ci.org/snowplow/snowplow-java-tracker
-[travis-image]: https://travis-ci.org/snowplow/snowplow-java-tracker.svg?branch=master
-
-[license]: http://www.apache.org/licenses/LICENSE-2.0
