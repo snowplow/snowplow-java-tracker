@@ -23,6 +23,8 @@ targetCompatibility = '1.6'
 repositories {
     // Use 'maven central' for resolving our dependencies
     mavenCentral()
+    // Use 'jcenter' for resolving testing dependencies
+    jcenter()
 }
 
 dependencies {
@@ -44,7 +46,10 @@ dependencies {
     // Preconditions
     compile 'com.google.guava:guava:17.0'
 
+    // Testing libraries
     testCompile 'junit:junit:4.11'
+    testCompile 'com.github.tomakehurst:wiremock:1.53'
+    testCompile 'org.skyscreamer:jsonassert:1.2.3'
 }
 
 
