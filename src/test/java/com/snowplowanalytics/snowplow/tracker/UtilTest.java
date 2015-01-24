@@ -10,6 +10,10 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+// JSONassert
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.json.JSONException;
+
 public class UtilTest {
     @Test
     public void testGetTimestamp() {
@@ -32,7 +36,7 @@ public class UtilTest {
     }
 
     @Test
-    public void testMapToJsonNode2() {
+    public void testMapToJsonNode2() throws JSONException {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("foo", "bar");
 
@@ -44,6 +48,7 @@ public class UtilTest {
 
         JsonNode node = Util.mapToJsonNode(map);
 
-        assertEquals("{\"list\":[\"some\",\"stuff\"],\"foo\":\"bar\"}", node.toString());
+        // Have to stringify because JSONAssert works with json.org, not Jackson
+        JSONAssert.assertEquals("{\"list\":[\"some\",\"stuff\"],\"foo\":\"bar\"}", node.toString(), false);
     }
 }
