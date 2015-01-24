@@ -2,6 +2,7 @@ Java 0.7.0 (2015-01-24)
 -----------------------
 Consolidated Tracker Core module into Java Tracker, thanks @dstendardi! (#116)
 Removed war packaging from Gradle build, thanks @dstendardi! (#117)
+Hardcoded artifactId to prevent vagrant folder being used (#138)
 Updated Emitter and Tracker tests to use WireMock, thanks @jonalmeida! (#40)
 Added Java 6 and 8 to Travis build matrix (#132)
 Removed deprecated add() methods from SchemaPayload (#72)

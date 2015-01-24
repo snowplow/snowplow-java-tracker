@@ -61,6 +61,7 @@ task sourceJar(type: Jar, dependsOn: 'generateSources') {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId 'snowplow-java-tracker'
             from components.java
 
             artifact sourceJar {
