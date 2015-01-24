@@ -103,7 +103,7 @@ public class TrackerTest {
                         "snowplow/payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"pv\"," +
                         "\"url\":\"www.mypage.com\",\"page\":\"My Page\",\"refr\":" +
                         "\"www.me.com\",\"aid\":\"cloudfront\",\"tna\":\"AF003\"," +
-                        "\"tv\":\"java-0.6.0\",\"co\":\"{\\\"schema\\\":" +
+                        "\"tv\":\"java-0.7.0\",\"co\":\"{\\\"schema\\\":" +
                         "\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\"," +
                         "\\\"data\\\":[{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\"," +
                         "\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView3\\\"}}]}\"," +
@@ -192,7 +192,7 @@ public class TrackerTest {
         //         "ti_qu": "1.0",
         //         "ti_cu": "USD",
         //         "tna": "AF003",
-        //         "tv": "java-0.6.0",
+        //         "tv": "java-0.7.0",
         //         "dtm": "1414607597877",
         //         "co": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\",\"data\":[{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"someContextKey\":\"testTrackPageView2\"}}]}"
         //     }, {
@@ -207,13 +207,13 @@ public class TrackerTest {
         //         "tr_co": "US",
         //         "tr_cu": "USD",
         //         "tna": "AF003",
-        //         "tv": "java-0.6.0",
+        //         "tv": "java-0.7.0",
         //         "dtm": "1414607597877"
         //     }]
         // }
         verify(postRequestedFor(urlEqualTo("/com.snowplowanalytics.snowplow/tp2"))
                 .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
-                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"ti\",\"ti_id\":\"order-8\",\"ti_sk\":\"no_sku\",\"ti_nm\":\"Big Order\",\"ti_ca\":\"Food\",\"ti_pr\":\"34.0\",\"ti_qu\":\"1.0\",\"ti_cu\":\"USD\",\"aid\":\"cloudfront\",\"tna\":\"AF003\",\"tv\":\"java-0.6.0\",\"co\":\"{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\",\\\"data\\\":[{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\",\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView2\\\"}}]}\"},{\"e\":\"tr\",\"tr_id\":\"order-7\",\"tr_tt\":\"25.0\",\"tr_af\":\"no_affiliate\",\"tr_tx\":\"0.0\",\"tr_sh\":\"0.0\",\"tr_ci\":\"Dover\",\"tr_st\":\"Delaware\",\"tr_co\":\"US\",\"tr_cu\":\"USD\",\"aid\":\"cloudfront\",\"tna\":\"AF003\",\"tv\":\"java-0.6.0\"}]}",
+                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-0\",\"data\":[{\"e\":\"ti\",\"ti_id\":\"order-8\",\"ti_sk\":\"no_sku\",\"ti_nm\":\"Big Order\",\"ti_ca\":\"Food\",\"ti_pr\":\"34.0\",\"ti_qu\":\"1.0\",\"ti_cu\":\"USD\",\"aid\":\"cloudfront\",\"tna\":\"AF003\",\"tv\":\"java-0.7.0\",\"co\":\"{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\",\\\"data\\\":[{\\\"schema\\\":\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\",\\\"data\\\":{\\\"someContextKey\\\":\\\"testTrackPageView2\\\"}}]}\"},{\"e\":\"tr\",\"tr_id\":\"order-7\",\"tr_tt\":\"25.0\",\"tr_af\":\"no_affiliate\",\"tr_tx\":\"0.0\",\"tr_sh\":\"0.0\",\"tr_ci\":\"Dover\",\"tr_st\":\"Delaware\",\"tr_co\":\"US\",\"tr_cu\":\"USD\",\"aid\":\"cloudfront\",\"tna\":\"AF003\",\"tv\":\"java-0.7.0\"}]}",
                         JSONCompareMode.LENIENT)));
     }
 
@@ -259,7 +259,7 @@ public class TrackerTest {
         //         "e": "ue",
         //         "ue_pr": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\",\"data\":{\"id\":\"screen_1\"}}}",
         //         "tna": "AF003",
-        //         "tv": "java-0.6.0",
+        //         "tv": "java-0.7.0",
         //         "co": "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":[{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"someContextKey\":\"testTrackPageView2\"}}]}",
         //         "tz": "Etc/UTC",
         //         "p": "pc",
@@ -274,7 +274,7 @@ public class TrackerTest {
                                 "unstruct_event/jsonschema/1-0-0\\\",\\\"data\\\":{\\\"schema\\\":" +
                                 "\\\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\\\"," +
                                 "\\\"data\\\":{\\\"id\\\":\\\"screen_1\\\"}}}\",\"aid\":\"cloudfront\"," +
-                                "\"tna\":\"AF003\",\"tv\":\"java-0.6.0\",\"co\":\"{\\\"schema\\\":" +
+                                "\"tna\":\"AF003\",\"tv\":\"java-0.7.0\",\"co\":\"{\\\"schema\\\":" +
                                 "\\\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0\\\"," +
                                 "\\\"data\\\":[{\\\"schema\\\":" +
                                 "\\\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\\\"," +
