@@ -1,4 +1,4 @@
-Java 0.7.0 (2015-01-xx)
+Java 0.7.0 (2015-01-24)
 -----------------------
 Consolidated Tracker Core module into Java Tracker, thanks @dstendardi! (#116)
 Removed war packaging from Gradle build, thanks @dstendardi! (#117)
