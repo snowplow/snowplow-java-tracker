@@ -41,6 +41,9 @@ dependencies {
     // Jackson JSON processor
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
 
+    // Preconditions
+    compile 'com.google.guava:guava:17.0'
+
     testCompile 'junit:junit:4.11'
 }
 

@@ -22,9 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.snowplowanalytics.snowplow.tracker.Parameter;
 import com.snowplowanalytics.snowplow.tracker.Util;
-import com.snowplowanalytics.snowplow.tracker.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
 import java.util.HashMap;
