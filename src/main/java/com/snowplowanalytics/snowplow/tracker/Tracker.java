@@ -88,7 +88,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      * @return A completed Payload
      */
-    protected Payload completePayload(Payload payload, List<SchemaPayload> context,
+    protected Payload completePayload(TrackerPayload payload, List<SchemaPayload> context,
                                       long timestamp) {
         payload.add(Parameter.PLATFORM, this.platform.toString());
         payload.add(Parameter.APPID, this.appId);
@@ -191,7 +191,7 @@ public class Tracker {
         Preconditions.checkArgument(!pageTitle.isEmpty(), "pageTitle cannot be empty");
         Preconditions.checkArgument(!referrer.isEmpty(), "referrer cannot be empty");
 
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_PAGE_VIEW);
         payload.add(Parameter.PAGE_URL, pageUrl);
         payload.add(Parameter.PAGE_TITLE, pageTitle);
@@ -259,7 +259,7 @@ public class Tracker {
         Preconditions.checkArgument(!category.isEmpty(), "category cannot be empty");
         Preconditions.checkArgument(!action.isEmpty(), "action cannot be empty");
 
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_STRUCTURED);
         payload.add(Parameter.SE_CATEGORY, category);
         payload.add(Parameter.SE_ACTION, action);
@@ -314,7 +314,7 @@ public class Tracker {
      */
     public void trackUnstructuredEvent(SchemaPayload eventData, List<SchemaPayload> context,
                                        long timestamp) {
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         SchemaPayload envelope = new SchemaPayload();
 
         envelope.setSchema(Constants.SCHEMA_UNSTRUCT_EVENT);
@@ -355,7 +355,7 @@ public class Tracker {
         Preconditions.checkArgument(!category.isEmpty(), "category cannot be empty");
         Preconditions.checkArgument(!currency.isEmpty(), "currency cannot be empty");
 
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_ECOMM_ITEM);
         payload.add(Parameter.TI_ITEM_ID, order_id);
         payload.add(Parameter.TI_ITEM_SKU, sku);
@@ -465,7 +465,7 @@ public class Tracker {
         Preconditions.checkArgument(!country.isEmpty(), "country cannot be empty");
         Preconditions.checkArgument(!currency.isEmpty(), "currency cannot be empty");
 
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_ECOMM);
         payload.add(Parameter.TR_ID, order_id);
         payload.add(Parameter.TR_TOTAL, Double.toString(total_value));

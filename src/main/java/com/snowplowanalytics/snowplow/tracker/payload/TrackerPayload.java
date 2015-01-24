@@ -35,7 +35,11 @@ public class TrackerPayload implements Payload {
     private final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
     private ObjectNode objectNode = objectMapper.createObjectNode();
 
-    @Override
+    /**
+     * Add a basic parameter.
+     * @param key The parameter key
+     * @param value The parameter value as a String
+     */
     public void add(String key, String value) {
         if (value == null || value.isEmpty()) {
             LOGGER.debug("kv-value is empty. Returning out without adding key..");
@@ -46,7 +50,13 @@ public class TrackerPayload implements Payload {
         objectNode.put(key, value);
     }
 
-    @Override
+    /**
+     * Add a basic parameter.
+     * @param key The parameter key
+     * @param value The parameter value
+     */
+    // TODO: remove this. Tracker Payload is all Strings,
+    // so we shouldn't be passing in Objects
     public void add(String key, Object value) {
         if (value == null) {
             LOGGER.debug("kv-value is empty. Returning out without adding key..");
@@ -61,7 +71,13 @@ public class TrackerPayload implements Payload {
         }
     }
 
-    @Override
+    /**
+     * Add all the mappings from the specified map. The effect is the equivalent to that of calling
+     * add(String key, Object value) for each mapping for each key.
+     * @param map Mappings to be stored in this map
+     */
+    // TODO: remove this unless we have a good reason to add
+    // a uni-typed Map
     public void addMap(Map<String, Object> map) {
         // Return if we don't have a map
         if (map == null) {
@@ -75,7 +91,14 @@ public class TrackerPayload implements Payload {
         }
     }
 
-    @Override
+    /**
+     * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
+     * two keys provided.
+     * @param map Mapping to be stored
+     * @param base64_encoded The option you choose to encode the data
+     * @param type_encoded The key that would be set if the encoding option was set to true
+     * @param type_no_encoded They key that would be set if the encoding option was set to false
+     */
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
         // Return if we don't have a map
         if (map == null) {
