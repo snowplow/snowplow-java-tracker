@@ -80,47 +80,6 @@ public class SchemaPayload implements Payload {
         return this;
     }
 
-    @Deprecated
-    @Override
-    public void add(String key, String value) {
-        /*
-         * We intentionally do nothing because we do not want our SchemaPayload
-         * to do anything except accept a 'data' and 'schema'
-         */
-        LOGGER.debug("add(String, String) method called: Doing nothing.");
-    }
-
-    @Deprecated
-    @Override
-    public void add(String key, Object value) {
-        /*
-         * We intentionally do nothing because we do not want our SchemaPayload
-         * to do anything except accept a 'data' and 'schema'
-         */
-        LOGGER.debug("add(String, Object) method called: Doing nothing.");
-    }
-
-    @Deprecated
-    @Override
-    public void addMap(Map<String, Object> map) {
-        /*
-         * We intentionally do nothing because we do not want our SchemaPayload
-         * to do anything except accept a 'data' and 'schema'
-         */
-        LOGGER.debug("addMap(Map<String, Object>) method called: Doing nothing.");
-    }
-
-    @Deprecated
-    @Override
-    public void addMap(Map map, Boolean base64_encoded, String type_encoded,
-                       String type_no_encoded) {
-        /*
-         * We intentionally do nothing because we do not want our SchemaPayload
-         * to do anything except accept a 'data' and 'schema'
-         */
-        LOGGER.debug("addMap(Map, Boolean, String, String) method called: Doing nothing.");
-    }
-
     public Map<String, Object> getMap() {
         HashMap<String, Object> map = new HashMap<String, Object>();
         try {
