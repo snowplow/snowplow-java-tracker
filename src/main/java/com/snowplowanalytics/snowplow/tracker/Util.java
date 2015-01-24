@@ -11,23 +11,23 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core;
+package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
 public class Util {
-    private static final Logger logger = LoggerFactory.getLogger(Util.class);
     private static ObjectMapper sObjectMapper = new ObjectMapper();
+    
+    private static Base64 sBase64 = new Base64(true); // URL-safe variant
+
     public static ObjectMapper defaultMapper() {
         return sObjectMapper;
     }
@@ -62,12 +62,7 @@ public class Util {
      *  Some use Base64 encoding
      */
     public static String base64Encode(String string) {
-        try {
-            return Base64.encode(string.getBytes());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return sBase64.encodeBase64String(string.getBytes());
     }
 
     public static String getEventId() {

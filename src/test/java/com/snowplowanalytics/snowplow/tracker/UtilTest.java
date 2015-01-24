@@ -1,16 +1,20 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.snowplowanalytics.snowplow.tracker.core.Util;
-
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UtilTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+// JSONassert
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.json.JSONException;
+
+public class UtilTest {
     @Test
     public void testGetTimestamp() {
         assertNotNull(Util.getTimestamp());
@@ -32,7 +36,7 @@ public class UtilTest extends TestCase {
     }
 
     @Test
-    public void testMapToJsonNode2() {
+    public void testMapToJsonNode2() throws JSONException {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("foo", "bar");
 
@@ -44,6 +48,7 @@ public class UtilTest extends TestCase {
 
         JsonNode node = Util.mapToJsonNode(map);
 
-        assertEquals("{\"list\":[\"some\",\"stuff\"],\"foo\":\"bar\"}", node.toString());
+        // Have to stringify because JSONAssert works with json.org, not Jackson
+        JSONAssert.assertEquals("{\"list\":[\"some\",\"stuff\"],\"foo\":\"bar\"}", node.toString(), false);
     }
 }

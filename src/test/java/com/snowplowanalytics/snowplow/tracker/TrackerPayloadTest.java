@@ -1,11 +1,8 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
-import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
-
-import junit.framework.TestCase;
-
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -13,11 +10,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TrackerPayloadTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+public class TrackerPayloadTest {
 
     @Test
     public void testAddString() throws Exception {
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         payload.add("foo", "bar");
 
         String res = "{\"foo\":\"bar\"}";
@@ -26,7 +25,7 @@ public class TrackerPayloadTest extends TestCase {
 
     @Test
     public void testAddObject() throws Exception {
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         Map<String, String> map = new HashMap<String, String>();
         map.put("foo", "bar");
         map.put("more foo", "more bar");
@@ -44,7 +43,7 @@ public class TrackerPayloadTest extends TestCase {
         bar.add("somebar2");
         foo.put("myKey", "my Value");
         foo.put("mehh", bar);
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         payload.addMap(foo);
 
         String res = "{\"myKey\":\"my Value\",\"mehh\":[\"somebar\",\"somebar2\"]}";
@@ -59,7 +58,7 @@ public class TrackerPayloadTest extends TestCase {
         bar.add("somebar2");
         foo.put("myKey", "my Value");
         foo.put("mehh", bar);
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         payload.addMap(foo, false, "cx", "co");
 
         String res = "{\"co\":\"{\\\"myKey\\\":\\\"my Value\\\",\\\"mehh\\\":[\\\"somebar\\\",\\\"somebar2\\\"]}\"}";
@@ -74,7 +73,7 @@ public class TrackerPayloadTest extends TestCase {
         bar.add("somebar2");
         foo.put("myKey", "my Value");
         foo.put("mehh", bar);
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         payload.addMap(foo, true, "cx", "co");
 
         String res = "{\"cx\":\"eyJteUtleSI6Im15IFZhbHVlIiwibWVoaCI6WyJzb21lYmFyIiwic29tZWJhcjIiXX0=\"}";

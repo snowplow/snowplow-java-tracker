@@ -11,53 +11,27 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.core.payload;
+package com.snowplowanalytics.snowplow.tracker.payload;
 
 // Java
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.Map;
 
 // JSON
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Payload interface
  * The Payload is used to store all the parameters and configurations that are used
  * to send data via the HTTP GET/POST request.
+ *
+ * It allows the code for buffering events for sending to be agnostic of the event
+ * format (either a TrackerPayload or a SchemaPayload).
  * @version 0.5.0
  * @author Jonathan Almeida
  */
 public interface Payload {
-
-    /**
-     * Add a basic parameter.
-     * @param key The parameter key
-     * @param value The parameter value as a String
-     */
-    public void add(String key, String value);
-
-    /**
-     * Add a basic parameter.
-     * @param key The parameter key
-     * @param value The parameter value
-     */
-    public void add(String key, Object value);
-
-    /**
-     * Add all the mappings from the specified map. The effect is the equivalent to that of calling
-     * add(String key, Object value) for each mapping for each key.
-     * @param map Mappings to be stored in this map
-     */
-    public void addMap(Map<String, Object> map);
-
-    /**
-     * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
-     * two keys provided.
-     * @param map Mapping to be stored
-     * @param base64_encoded The option you choose to encode the data
-     * @param type_encoded The key that would be set if the encoding option was set to true
-     * @param type_no_encoded They key that would be set if the encoding option was set to false
-     */
-    public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded);
 
     /**
      * Returns the Payload as a HashMap.

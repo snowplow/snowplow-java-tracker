@@ -1,25 +1,25 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestMethod;
-import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.emitter.*;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-import junit.framework.TestCase;
-
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class EmitterTest extends TestCase {
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-//    private static String testURL = "segfault.ngrok.com";
-    private static String testURL = "d3rkrsqld9gmqf.cloudfront.net";
+public class EmitterTest {
+
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule();
+
+    private static String testURL = "localhost:8080";
 
     @Test
     public void testEmitterConstructor() throws Exception {
@@ -44,26 +44,33 @@ public class EmitterTest extends TestCase {
         emitter.addToBuffer(payload);
 
         emitter.flushBuffer();
+
+        verify(getRequestedFor(urlEqualTo("/i?test=testFlushBuffer")));
     }
 
     @Test
     public void testFlushPost() throws Exception {
-        Emitter emitter = new Emitter(testURL, HttpMethod.POST, null);
+        Emitter emitter = new Emitter(testURL, HttpMethod.POST);
 
-        TrackerPayload payload;
+        TrackerPayload payload = new TrackerPayload();
         LinkedHashMap<String, Object> foo = new LinkedHashMap<String, Object>();
         ArrayList<String> bar = new ArrayList<String>();
-        bar.add("somebar");
-        bar.add("somebar");
-        foo.put("test", "testMaxBuffer");
-        foo.put("mehh", bar);
-        payload = new TrackerPayload();
+        payload.add("someValue", "someKey");
+        ArrayList<String> anArray = new ArrayList<String>();
+        anArray.add("value1");
+        anArray.add("value2");
+        payload.add("values", anArray.toString());
         payload.addMap(foo);
 
         emitter.addToBuffer(payload);
 
-
         emitter.flushBuffer();
+
+        verify(postRequestedFor(urlEqualTo("/com.snowplowanalytics.snowplow/tp2"))
+                .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
+                .withRequestBody(equalToJson("{\"schema\":\"iglu:com.snowplowanalytics.snowplow/" +
+                    "payload_data/jsonschema/1-0-0\",\"data\":[{\"someValue\":\"someKey\"," +
+                    "\"values\":\"[value1, value2]\"}]}")));
     }
 
     @Test
@@ -75,10 +82,14 @@ public class EmitterTest extends TestCase {
     @Test
     public void testFlushBuffer() throws Exception {
 
+        stubFor(get(urlEqualTo("/i?test=testFlushBuffer"))
+            .willReturn(aResponse()
+            .withStatus(200)));
+
         Emitter emitter = new Emitter(testURL, HttpMethod.GET, new RequestCallback() {
             @Override
             public void onSuccess(int successCount) {
-                System.out.println("Buffer length for POST/GET:" + successCount);
+                System.out.println("Buffer length for successful POST/GET:" + successCount);
             }
 
             @Override
@@ -99,6 +110,8 @@ public class EmitterTest extends TestCase {
             emitter.addToBuffer(payload);
         }
         emitter.flushBuffer();
+
+        verify(getRequestedFor(urlEqualTo("/i?test=testFlushBuffer")));
     }
 
     @Test
@@ -113,6 +126,8 @@ public class EmitterTest extends TestCase {
             payload.addMap(foo);
 
             emitter.addToBuffer(payload);
+
+            verify(getRequestedFor(urlEqualTo("/i?test=testFlushBuffer")));
         }
     }
 }
