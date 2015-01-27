@@ -15,11 +15,10 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.io.BaseEncoding;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
-import org.apache.commons.codec.binary.Base64;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,7 +35,8 @@ public class Tracker {
     private String namespace;
     private ObjectMapper objectMapper;
     private Provider provider;
-    private final static Base64 BASE_64 = new Base64(true);
+
+    public final static BaseEncoding BASE_64 =  BaseEncoding.base64();
     
     /**
      * @param emitter Emitter to which events will be sent
@@ -119,7 +119,7 @@ public class Tracker {
     private String base64Json(SchemaPayload schemaPayload) {
         try {
             byte[] bytes = objectMapper.writeValueAsBytes(schemaPayload.getMap());
-            return new String(BASE_64.encode(bytes), Charsets.UTF_8);
+            return BASE_64.encode(bytes);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

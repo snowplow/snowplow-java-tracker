@@ -13,8 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker.payload;
 
+import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.Parameter;
-import com.snowplowanalytics.snowplow.tracker.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

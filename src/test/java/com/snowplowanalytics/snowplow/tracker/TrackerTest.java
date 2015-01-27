@@ -12,6 +12,7 @@ import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.*;
 
@@ -19,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
-@RunWith(Parameterized.class)
+@RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {
 
     public static final String EXPECTED_BASE64_CONTEXTS = "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==";
@@ -84,7 +85,7 @@ public class TrackerTest {
                 .put("ti_pr", "1.0")
                 .put("ti_qu", "2.0")
                 .put("p", "pc")
-                .put("tv", "java-0.6.0")
+                .put("tv", Version.TRACKER)
                 .put("ti_ca", "category")
                 .put("ti_sk", "sku")
                 .build(), allValues.get(0));
@@ -100,7 +101,7 @@ public class TrackerTest {
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("tr_co", "country")
-                .put("tv", "java-0.6.0")
+                .put("tv", Version.TRACKER)
                 .put("p", "pc")
                 .put("tr_tx", "2.0")
                 .put("tr_af", "affiliation")
@@ -125,7 +126,7 @@ public class TrackerTest {
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
-                .put("tv", "java-0.6.0")
+                .put("tv", Version.TRACKER)
                 .put("p", "pc")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
                 .put("tna", "AF003")
@@ -140,7 +141,7 @@ public class TrackerTest {
 
         // When
         tracker.trackUnstructuredEvent(new SchemaPayload()
-                .setData(ImmutableMap.of("foo", "bar"))
+                .setData(ImmutableMap.of("foo", "baær"))
                 .setSchema("payload"));
 
         // Then
@@ -149,15 +150,15 @@ public class TrackerTest {
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
-                .put("tv", "java-0.6.0")
+                .put("tv", Version.TRACKER)
                 .put("p", "pc")
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYXIifX19")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYcOmciJ9fX0=")
                 .put("eid", "15e9b149-6029-4f6e-8447-5b9797c9e6be")
                 .build(), captor.getValue());
     }
-    
+
     @Test
     public void testTrackPageView() {
         
@@ -171,7 +172,7 @@ public class TrackerTest {
                 .put("tz", "Etc/UTC")
                 .put("e", "pv")
                 .put("page", "title")
-                .put("tv", "java-0.6.0")
+                .put("tv", Version.TRACKER)
                 .put("p", "pc")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
                 .put("tna", "AF003")
@@ -194,7 +195,7 @@ public class TrackerTest {
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
-                .put("tv", "java-0.6.0")
+                .put("tv", Version.TRACKER)
                 .put("p", "pc")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
                 .put("tna", "AF003")
@@ -216,7 +217,7 @@ public class TrackerTest {
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
-                .put("tv", "java-0.6.0")
+                .put("tv", Version.TRACKER)
                 .put("p", "pc")
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
@@ -238,7 +239,7 @@ public class TrackerTest {
                 .put("dtm", "654321")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
-                .put("tv", "java-0.6.0")
+                .put("tv", Version.TRACKER)
                 .put("p", "pc")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
                 .put("tna", "AF003")
