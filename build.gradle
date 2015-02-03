@@ -28,7 +28,7 @@ apply plugin: 'propdeps-maven'
 apply plugin: 'propdeps-idea'
 
 group = 'com.snowplowanalytics'
-version = '0.7.0'
+version = '0.7.2'
 sourceCompatibility = '1.6'
 targetCompatibility = '1.6'
 repositories {

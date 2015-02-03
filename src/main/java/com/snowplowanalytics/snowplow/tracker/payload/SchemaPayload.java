@@ -13,6 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.payload;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.Parameter;
 import org.slf4j.Logger;
@@ -43,6 +44,11 @@ public class SchemaPayload {
         map.put(Parameter.DATA, data);
 
         return this;
+    }
+
+    @VisibleForTesting
+    public Object getData() {
+        return map.get(Parameter.DATA);
     }
 
     public Map<String, Object> getMap() {
