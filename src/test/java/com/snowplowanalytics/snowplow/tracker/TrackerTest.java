@@ -3,12 +3,10 @@ package com.snowplowanalytics.snowplow.tracker;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.payload.SchemaPayload;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -69,7 +67,7 @@ public class TrackerTest {
         tracker.trackEcommerceTransaction("order_id", 1.0, "affiliation", 2.0, 3.0, "city", "state", "country", "currency", items, contexts);
 
         // Then
-        verify(emitter, times(2)).addToBuffer(captor.capture());
+        verify(emitter, times(2)).emit(captor.capture());
         List<Map<String, Object>> allValues = captor.getAllValues();
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("ti_nm", "name")
@@ -121,7 +119,7 @@ public class TrackerTest {
                 .setSchema("payload"), contexts);
 
         // Then
-        verify(emitter).addToBuffer(captor.capture());
+        verify(emitter).emit(captor.capture());
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
@@ -145,7 +143,7 @@ public class TrackerTest {
                 .setSchema("payload"));
 
         // Then
-        verify(emitter).addToBuffer(captor.capture());
+        verify(emitter).emit(captor.capture());
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
@@ -166,7 +164,7 @@ public class TrackerTest {
         tracker.trackPageView("url", "title", "referer", contexts);
         
         // Then
-        verify(emitter).addToBuffer(captor.capture());
+        verify(emitter).emit(captor.capture());
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
@@ -190,7 +188,7 @@ public class TrackerTest {
         tracker.trackScreenView("name", "id", contexts);
         
         // Then
-        verify(emitter).addToBuffer(captor.capture());
+        verify(emitter).emit(captor.capture());
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
@@ -212,7 +210,7 @@ public class TrackerTest {
         tracker.trackScreenView("name", "id");
 
         // Then
-        verify(emitter).addToBuffer(captor.capture());
+        verify(emitter).emit(captor.capture());
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
@@ -234,7 +232,7 @@ public class TrackerTest {
         tracker.trackScreenView("name", "id", contexts, 654321L);
 
         // Then
-        verify(emitter).addToBuffer(captor.capture());
+        verify(emitter).emit(captor.capture());
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "654321")
                 .put("tz", "Etc/UTC")
@@ -299,7 +297,6 @@ public class TrackerTest {
         Subject subject = new Subject();
         subject.setViewPort(320, 480);
         Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
-        emitter.setRequestMethod(RequestMethod.Asynchronous);
 
         SchemaPayload context = new SchemaPayload();
         Map<String, String> someContext = new HashMap<String, String>();
@@ -310,8 +307,6 @@ public class TrackerTest {
         contextList.add(context);
 
         tracker.trackPageView("www.mypage.com", "My Page", "www.me.com", contextList);
-
-        emitter.flushBuffer();
     }
 
 }

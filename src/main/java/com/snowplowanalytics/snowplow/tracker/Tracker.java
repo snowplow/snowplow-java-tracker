@@ -138,7 +138,7 @@ public class Tracker {
     }
 
     private void addTrackerPayload(Map<String, Object> payload) {
-        this.emitter.addToBuffer(payload);
+        this.emitter.emit(payload);
     }
 
     public void setSubject(Subject subject) {
