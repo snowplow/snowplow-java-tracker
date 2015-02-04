@@ -6,7 +6,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
         return httpResponse.getStatusLine().getStatusCode();
     }
     
-    public int doPost(byte[] payload) {
+    public int doPost(String payload) {
 
         HttpResponse httpResponse;
         try {
@@ -52,7 +52,7 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
             HttpPost httpPost = new HttpPost(uriBuilder.setPath("/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION).build());
             httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
 
-            ByteArrayEntity params = new ByteArrayEntity(payload);
+            StringEntity params = new StringEntity(payload);
             httpPost.setEntity(params);
 
             httpResponse = httpClient.execute(httpPost);

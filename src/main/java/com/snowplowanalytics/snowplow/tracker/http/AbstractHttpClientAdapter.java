@@ -16,29 +16,36 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
         this.objectMapper = objectMapper;
     }
 
-    protected abstract int doPost(byte[] payload);
+    protected abstract int doPost(String payload);
 
     protected abstract int doGet(Map<String, Object> payload);
 
     @Override
-    public int post(SchemaPayload payload) {
+    public void post(SchemaPayload payload) {
         Preconditions.checkNotNull(payload);
         Preconditions.checkNotNull(payload.getMap());
         Preconditions.checkArgument(payload.getMap().size() > 0, "empty parameters given");
 
         try {
-            byte[] bytes = objectMapper.writeValueAsBytes(payload.getMap());
-            return doPost(bytes);
+            String body = objectMapper.writeValueAsString(payload.getMap());
+            int status = doPost(body);
+            if (200 != status) {
+                throw new RuntimeException(String.format("Failed to send event using POST. Got http response %d", status));
+            }
         } catch (JsonProcessingException e) {
            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public int get(Map<String, Object> payload) {
+    public void get(Map<String, Object> payload) {
         Preconditions.checkNotNull(payload);
         Preconditions.checkArgument(payload.size() > 0, "empty parameters given");
-        
-        return doGet(payload);
+
+        int status = doGet(payload);
+        if (200 != status) {
+            throw new RuntimeException(String.format("Failed to send event using GET. Got http response %d", status));
+        }
     }
+
 }

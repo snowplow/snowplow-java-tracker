@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface HttpClientAdapter {
 
-    int post(SchemaPayload payload);
-    int get(Map<String, Object> payload);
+    void post(SchemaPayload payload);
+    void get(Map<String, Object> payload);
 }

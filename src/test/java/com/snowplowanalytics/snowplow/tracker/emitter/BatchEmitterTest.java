@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
-public class EmitterTest {
+public class BatchEmitterTest {
 
     private HttpClientAdapter httpClientAdapter;
 
@@ -57,7 +57,6 @@ public class EmitterTest {
 
         // Given
         ArgumentCaptor<SchemaPayload> argumentCaptor = ArgumentCaptor.forClass(SchemaPayload.class);
-        when(httpClientAdapter.post(any(SchemaPayload.class))).thenReturn(200);
 
         List<Payload> payloads = createPayloads(11);
 
@@ -77,11 +76,11 @@ public class EmitterTest {
     }
 
     @Test
-    public void addToBuffer_withNot200ResponseStatus_shouldThrowRuntimeException() {
+    public void emit_withNot200ResponseStatus_shouldThrowRuntimeException() {
 
         // Given
-        when(httpClientAdapter.post(any(SchemaPayload.class))).thenReturn(500);
-        expectedException.expectMessage("Failed to emit event");
+        doThrow(RuntimeException.class).when(httpClientAdapter).post(any(SchemaPayload.class));
+        expectedException.expectMessage("Failed to emit 10 events");
 
         List<Payload> payloads = createPayloads(11);
 
@@ -89,6 +88,12 @@ public class EmitterTest {
         for (Payload payload : payloads) {
             emitter.emit(payload);
         }
+    }
+
+    @Test
+    public void setBufferSize_WithNegativeValue_ThrowInvalidArgumentException() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        emitter.setBufferSize(-1);
     }
 
     private List<Payload> createPayloads(int nbPayload) {

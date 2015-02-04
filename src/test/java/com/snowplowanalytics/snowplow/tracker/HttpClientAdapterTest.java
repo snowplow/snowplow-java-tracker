@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.internal.matchers.Null;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -70,7 +69,7 @@ public class HttpClientAdapterTest {
     }
 
     @Test
-    public void testGet() throws Exception {
+    public void get_withSuccessfulStatusCode_isOk() throws Exception {
 
         // Given
         mockWebServer.enqueue(
@@ -79,18 +78,17 @@ public class HttpClientAdapterTest {
         );
 
         // When
-        int code = adapter.get(ImmutableMap.<String, Object>of("foo", "bar"));
+        adapter.get(ImmutableMap.<String, Object>of("foo", "bar"));
 
         // Then
         assertEquals(1, mockWebServer.getRequestCount());
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals("/i?foo=bar", recordedRequest.getPath());
         assertEquals("GET", recordedRequest.getMethod());
-        assertEquals(200, code);
     }
 
     @Test
-    public void testPost() throws InterruptedException {
+    public void post_withSuccessfulStatusCode_isNotOk() throws InterruptedException {
         // Given
         mockWebServer.enqueue(
                 new MockResponse()
@@ -98,7 +96,7 @@ public class HttpClientAdapterTest {
         );
 
         // When
-        int code = adapter.post(new SchemaPayload().setData(ImmutableMap.of("foo", "bar")).setSchema("schema"));
+        adapter.post(new SchemaPayload().setData(ImmutableMap.of("foo", "bar")).setSchema("schema"));
 
         // Then
         assertEquals(1, mockWebServer.getRequestCount());
@@ -107,7 +105,21 @@ public class HttpClientAdapterTest {
         assertEquals("{\"schema\":\"schema\",\"data\":{\"foo\":\"bar\"}}", recordedRequest.getUtf8Body());
         assertEquals("POST", recordedRequest.getMethod());
         assertEquals("application/json; charset=utf-8", recordedRequest.getHeader("Content-Type"));
-        assertEquals(200, code);
+    }
+
+    @Test
+    public void post_withNotSuccessfulStatusCode_throwException() {
+        // Given
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(400)
+        );
+
+        expectedException.expectMessage("Failed to send event using POST. Got http response 400");
+
+        // When
+        adapter.post(new SchemaPayload().setData(ImmutableMap.of("foo", "bar")).setSchema("schema"));
+
     }
 
     @Test

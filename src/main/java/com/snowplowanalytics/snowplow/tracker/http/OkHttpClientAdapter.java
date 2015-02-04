@@ -46,7 +46,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         }
     }
 
-    public int doPost(byte[] payload) {
+    public int doPost(String payload) {
         try {
             RequestBody body = RequestBody.create(JSON, payload);
             Request request = new Request.Builder()
