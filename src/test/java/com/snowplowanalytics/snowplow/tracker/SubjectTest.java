@@ -37,13 +37,6 @@ public class SubjectTest {
         assertEquals("10", subject.getSubject().get("cd"));
     }
 
-    // Enable only if running locally, change assert to your local timezone
-//    @Test
-//    public void testSetTimezone() throws Exception {
-//        Subject subject = new Subject();
-//        assertEquals("America/Toronto", subject.getSubject().get("tz"));
-//    }
-
     @Test
     public void testSetTimezone2() throws Exception {
         Subject subject = new Subject();
