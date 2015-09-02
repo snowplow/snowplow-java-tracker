@@ -55,7 +55,9 @@ public class TrackerTest {
 
     @Before
     public void setUp() throws Exception {
-        tracker = new Tracker(emitter, new Subject(), "AF003", "cloudfront");
+        tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+                .subject(new Subject())
+                .build();
         tracker.getSubject().setTimezone("Etc/UTC");
         contexts = singletonList(new SelfDescribingJson("schema", ImmutableMap.of("foo", "bar")));
     }
@@ -346,14 +348,20 @@ public class TrackerTest {
     @Test
     public void testDefaultPlatform() throws Exception {
         Subject subject = new Subject();
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+                .subject(subject)
+                .build();
+
         assertEquals(DevicePlatform.ServerSideApp, tracker.getPlatform());
     }
 
     @Test
     public void testSetPlatform() throws Exception {
         Subject subject = new Subject();
-        Tracker tracker = new Tracker(emitter, subject, "AF003", "cloudfront");
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+                .subject(subject)
+                .build();
+
         tracker.setPlatform(DevicePlatform.ConnectedTV);
 
         assertEquals(DevicePlatform.ConnectedTV, tracker.getPlatform());
@@ -364,7 +372,9 @@ public class TrackerTest {
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
 
         Subject s1 = new Subject();
-        Tracker tracker = new Tracker(emitter, s1, "AF003", "cloudfront");
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+                .subject(s1)
+                .build();
 
         Subject s2 = new Subject();
         s2.setColorDepth(24);

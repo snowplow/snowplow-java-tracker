@@ -15,6 +15,9 @@ package com.snowplowanalytics.snowplow.tracker;
 // Java
 import java.util.*;
 
+// Google
+import com.google.common.base.Preconditions;
+
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
@@ -36,29 +39,89 @@ public class Tracker {
     private Subject subject;
     private String appId;
     private String namespace;
-    private DevicePlatform platform = DevicePlatform.ServerSideApp;
-    private boolean base64Encoded = true;
+    private DevicePlatform platform;
+    private boolean base64Encoded;
 
     /**
-     * @param emitter   Emitter to which events will be sent
-     * @param namespace Identifier for the Tracker instance
-     * @param appId     Application ID
+     * Creates a new Snowplow Tracker.
+     *
+     * @param builder The builder that constructs a tracker
      */
-    public Tracker(Emitter emitter, String namespace, String appId) {
-        this(emitter, null, namespace, appId);
+    private Tracker(TrackerBuilder builder) {
+
+        // Precondition checks
+        Preconditions.checkNotNull(builder.emitter);
+        Preconditions.checkNotNull(builder.namespace);
+        Preconditions.checkNotNull(builder.appId);
+        Preconditions.checkArgument(!builder.namespace.isEmpty(), "namespace cannot be empty");
+        Preconditions.checkArgument(!builder.appId.isEmpty(), "appId cannot be empty");
+
+        this.emitter = builder.emitter;
+        this.namespace = builder.namespace;
+        this.appId = builder.appId;
+        this.subject = builder.subject;
+        this.platform = builder.platform;
+        this.base64Encoded = builder.base64Encoded;
     }
 
     /**
-     * @param emitter   Emitter to which events will be sent
-     * @param subject   Subject to be tracked
-     * @param namespace Identifier for the Tracker instance
-     * @param appId     Application ID
+     * Builder for the Tracker
      */
-    public Tracker(Emitter emitter, Subject subject, String namespace, String appId) {
-        this.emitter = emitter;
-        this.appId = appId;
-        this.namespace = namespace;
-        this.subject = subject;
+    public static class TrackerBuilder {
+
+        private final Emitter emitter; // Required
+        private final String namespace; // Required
+        private final String appId; // Required
+        private Subject subject = null; // Optional
+        private DevicePlatform platform = DevicePlatform.ServerSideApp; // Optional
+        private boolean base64Encoded = true; // Optional
+
+        /**
+         * @param emitter Emitter to which events will be sent
+         * @param namespace Identifier for the Tracker instance
+         * @param appId Application ID
+         */
+        public TrackerBuilder(Emitter emitter, String namespace, String appId) {
+            this.emitter = emitter;
+            this.namespace = namespace;
+            this.appId = appId;
+        }
+
+        /**
+         * @param subject Subject to be tracked
+         * @return itself
+         */
+        public TrackerBuilder subject(Subject subject) {
+            this.subject = subject;
+            return this;
+        }
+
+        /**
+         * @param platform The device platform the tracker is running on
+         * @return itself
+         */
+        public TrackerBuilder platform(DevicePlatform platform) {
+            this.platform = platform;
+            return this;
+        }
+
+        /**
+         * @param base64 Whether JSONs in the payload should be base-64 encoded
+         * @return itself
+         */
+        public TrackerBuilder base64(Boolean base64) {
+            this.base64Encoded = base64;
+            return this;
+        }
+
+        /**
+         * Creates a new Tracker
+         *
+         * @return a new Tracker object
+         */
+        public Tracker build() {
+            return new Tracker(this);
+        }
     }
 
     // --- Helpers
