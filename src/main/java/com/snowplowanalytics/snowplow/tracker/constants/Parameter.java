@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.constants;
 
 public class Parameter {
     // General
@@ -21,7 +21,7 @@ public class Parameter {
     public static final String EID = "eid";
     public static final String TIMESTAMP = "dtm";
     public static final String TRACKER_VERSION = "tv";
-    public static final String APPID = "aid";
+    public static final String APP_ID = "aid";
     public static final String NAMESPACE = "tna";
 
     public static final String UID = "uid";

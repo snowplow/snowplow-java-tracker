@@ -12,19 +12,32 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
+// Java
+import java.util.List;
+
 // This library
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * Emitter interface.
+ * Provides a callback interface for reporting counts of successfully sent
+ * events and returning any failed events to be handled by the developer.
  */
-public interface Emitter {
+public interface RequestCallback {
 
     /**
-     * Adds a payload to the buffer and checks whether
-     * we have reached the buffer limit yet.
+     * If all events are sent successfully then the count
+     * of sent events are returned.
      *
-     * @param payload an event payload
+     * @param successCount the successful count
      */
-    void emit(TrackerPayload payload);
+    void onSuccess(int successCount);
+
+    /**
+     * If all/some events failed then the count of successful
+     * events is returned along with all the failed Payloads.
+     *
+     * @param successCount the successful count
+     * @param failedEvents the list of failed payloads
+     */
+    void onFailure(int successCount, List<TrackerPayload> failedEvents);
 }

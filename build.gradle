@@ -71,8 +71,8 @@ dependencies {
     // SLF4J logging API
     compile 'org.slf4j:slf4j-simple:1.7.7'
 
-    // Jackson JSON processor
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
+    // JSON
+    compile 'org.json:json:20141113'
 
     // Preconditions
     compile 'com.google.guava:guava:18.0'
@@ -108,7 +108,6 @@ publishing {
         }
     }
 }
-
 
 task generateSources {
     project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker")
