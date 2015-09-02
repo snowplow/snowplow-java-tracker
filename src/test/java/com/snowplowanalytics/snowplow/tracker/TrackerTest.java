@@ -56,7 +56,7 @@ public class TrackerTest {
     @Before
     public void setUp() throws Exception {
         tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
-                .subject(new Subject())
+                .subject(new Subject.SubjectBuilder().build())
                 .build();
         tracker.getSubject().setTimezone("Etc/UTC");
         contexts = singletonList(new SelfDescribingJson("schema", ImmutableMap.of("foo", "bar")));
@@ -347,7 +347,7 @@ public class TrackerTest {
 
     @Test
     public void testTrackTimingWithCategoryWithSubject() {
-        Subject s1 = new Subject();
+        Subject s1 = new Subject.SubjectBuilder().build();
         s1.setIpAddress("127.0.0.1");
         s1.setTimezone("Etc/UTC");
 
@@ -383,7 +383,7 @@ public class TrackerTest {
 
     @Test
     public void testDefaultPlatform() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
                 .subject(subject)
                 .build();
@@ -393,7 +393,7 @@ public class TrackerTest {
 
     @Test
     public void testSetPlatform() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
                 .subject(subject)
                 .build();
@@ -407,12 +407,12 @@ public class TrackerTest {
     public void testSetSubject() throws Exception {
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
 
-        Subject s1 = new Subject();
+        Subject s1 = new Subject.SubjectBuilder().build();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
                 .subject(s1)
                 .build();
 
-        Subject s2 = new Subject();
+        Subject s2 = new Subject.SubjectBuilder().build();
         s2.setColorDepth(24);
         tracker.setSubject(s2);
 

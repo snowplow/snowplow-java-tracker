@@ -24,77 +24,78 @@ public class SubjectTest {
 
     @Test
     public void testSetUserId() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setUserId("user1");
         assertEquals("user1", subject.getSubject().get("uid"));
     }
 
     @Test
     public void testSetScreenResolution() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setScreenResolution(100, 150);
         assertEquals("100x150", subject.getSubject().get("res"));
     }
 
     @Test
     public void testSetViewPort() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setViewPort(150, 100);
         assertEquals("150x100", subject.getSubject().get("vp"));
     }
 
     @Test
     public void testSetColorDepth() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setColorDepth(10);
         assertEquals("10", subject.getSubject().get("cd"));
     }
 
     @Test
     public void testSetTimezone2() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setTimezone("America/Toronto");
         assertEquals("America/Toronto", subject.getSubject().get("tz"));
     }
 
     @Test
     public void testSetLanguage() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setLanguage("EN");
         assertEquals("EN", subject.getSubject().get("lang"));
     }
 
     @Test
     public void testSetIpAddress() throws Exception {
-        Subject subject = new Subject();
-        subject.setIpAddress("127.0.0.1");
+        Subject subject = new Subject.SubjectBuilder()
+                .ipAddress("127.0.0.1")
+                .build();
         assertEquals("127.0.0.1", subject.getSubject().get("ip"));
     }
 
     @Test
     public void testSetUseragent() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setUseragent("useragent");
         assertEquals("useragent", subject.getSubject().get("ua"));
     }
 
     @Test
     public void testSetDuid() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setDomainUserId("duid");
         assertEquals("duid", subject.getSubject().get("duid"));
     }
 
     @Test
     public void testSetNuid() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         subject.setNetworkUserId("nuid");
         assertEquals("nuid", subject.getSubject().get("tnuid"));
     }
 
     @Test
     public void testGetSubject() throws Exception {
-        Subject subject = new Subject();
+        Subject subject = new Subject.SubjectBuilder().build();
         Map<String, String> expected = new HashMap<String, String>();
         subject.setTimezone("America/Toronto");
         subject.setUserId("user1");

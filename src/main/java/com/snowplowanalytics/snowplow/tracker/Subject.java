@@ -27,11 +27,143 @@ public class Subject {
     private HashMap<String, String> standardPairs = new HashMap<String, String>();
 
     /**
-     * Builds a new Subject object and sets:
-     * - the default timezone
+     * Creates a Subject which will add extra data to each event.
+     *
+     * @param builder The builder that constructs a subject
      */
-    public Subject() {
-        this.setTimezone(Utils.getTimezone());
+    private Subject(SubjectBuilder builder) {
+        this.setUserId(builder.userId);
+        this.setScreenResolution(builder.screenResWidth, builder.screenResHeight);
+        this.setViewPort(builder.viewPortWidth, builder.viewPortHeight);
+        this.setColorDepth(builder.colorDepth);
+        this.setTimezone(builder.timezone);
+        this.setLanguage(builder.language);
+        this.setIpAddress(builder.ipAddress);
+        this.setUseragent(builder.useragent);
+        this.setNetworkUserId(builder.networkUserId);
+        this.setDomainUserId(builder.domainUserId);
+    }
+
+    /**
+     * Builder for the Subject
+     */
+    public static class SubjectBuilder {
+
+        private String userId; // Optional
+        private int screenResWidth = 0; // Optional
+        private int screenResHeight = 0; // Optional
+        private int viewPortWidth = 0; // Optional
+        private int viewPortHeight = 0; // Optional
+        private int colorDepth = 0; // Optional
+        private String timezone = Utils.getTimezone(); // Optional
+        private String language; // Optional
+        private String ipAddress; // Optional
+        private String useragent; // Optional
+        private String networkUserId; // Optional
+        private String domainUserId; // Optional
+
+        /**
+         * @param userId a user id string
+         * @return itself
+         */
+        public SubjectBuilder userId(String userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        /**
+         * @param width a width integer
+         * @param height a height integer
+         * @return itself
+         */
+        public SubjectBuilder screenResolution(int width, int height) {
+            this.screenResWidth = width;
+            this.screenResHeight = height;
+            return this;
+        }
+
+        /**
+         * @param width a width integer
+         * @param height a height integer
+         * @return itself
+         */
+        public SubjectBuilder viewPort(int width, int height) {
+            this.viewPortWidth = width;
+            this.viewPortHeight = height;
+            return this;
+        }
+
+        /**
+         * @param depth a color depth integer
+         * @return itself
+         */
+        public SubjectBuilder colorDepth(int depth) {
+            this.colorDepth = depth;
+            return this;
+        }
+
+        /**
+         * @param timezone a timezone string
+         * @return itself
+         */
+        public SubjectBuilder timezone(String timezone) {
+            this.timezone = timezone;
+            return this;
+        }
+
+        /**
+         * @param language a language string
+         * @return itself
+         */
+        public SubjectBuilder language(String language) {
+            this.language = language;
+            return this;
+        }
+
+        /**
+         * @param ipAddress a ipAddress string
+         * @return itself
+         */
+        public SubjectBuilder ipAddress(String ipAddress) {
+            this.ipAddress = ipAddress;
+            return this;
+        }
+
+        /**
+         * @param useragent a useragent string
+         * @return itself
+         */
+        public SubjectBuilder useragent(String useragent) {
+            this.useragent = useragent;
+            return this;
+        }
+
+        /**
+         * @param networkUserId a networkUserId string
+         * @return itself
+         */
+        public SubjectBuilder networkUserId(String networkUserId) {
+            this.networkUserId = networkUserId;
+            return this;
+        }
+
+        /**
+         * @param domainUserId a domainUserId string
+         * @return itself
+         */
+        public SubjectBuilder domainUserId(String domainUserId) {
+            this.domainUserId = domainUserId;
+            return this;
+        }
+
+        /**
+         * Creates a new Subject
+         *
+         * @return a new Subject object
+         */
+        public Subject build() {
+            return new Subject(this);
+        }
     }
 
     /**
@@ -40,7 +172,9 @@ public class Subject {
      * @param userId a user id string
      */
     public void setUserId(String userId) {
-        this.standardPairs.put(Parameter.UID, userId);
+        if (userId != null) {
+            this.standardPairs.put(Parameter.UID, userId);
+        }
     }
 
     /**
@@ -50,8 +184,10 @@ public class Subject {
      * @param height a height integer
      */
     public void setScreenResolution(int width, int height) {
-        String res = Integer.toString(width) + "x" + Integer.toString(height);
-        this.standardPairs.put(Parameter.RESOLUTION, res);
+        if (width > 0 && height > 0) {
+            String res = Integer.toString(width) + "x" + Integer.toString(height);
+            this.standardPairs.put(Parameter.RESOLUTION, res);
+        }
     }
 
     /**
@@ -61,8 +197,10 @@ public class Subject {
      * @param height a height integer
      */
     public void setViewPort(int width, int height) {
-        String res = Integer.toString(width) + "x" + Integer.toString(height);
-        this.standardPairs.put(Parameter.VIEWPORT, res);
+        if (width > 0 && height > 0) {
+            String res = Integer.toString(width) + "x" + Integer.toString(height);
+            this.standardPairs.put(Parameter.VIEWPORT, res);
+        }
     }
 
     /**
@@ -71,7 +209,9 @@ public class Subject {
      * @param depth a color depth integer
      */
     public void setColorDepth(int depth) {
-        this.standardPairs.put(Parameter.COLOR_DEPTH, Integer.toString(depth));
+        if (depth > 0) {
+            this.standardPairs.put(Parameter.COLOR_DEPTH, Integer.toString(depth));
+        }
     }
 
     /**
@@ -80,7 +220,9 @@ public class Subject {
      * @param timezone a timezone string
      */
     public void setTimezone(String timezone) {
-        this.standardPairs.put(Parameter.TIMEZONE, timezone);
+        if (timezone != null) {
+            this.standardPairs.put(Parameter.TIMEZONE, timezone);
+        }
     }
 
     /**
@@ -89,7 +231,9 @@ public class Subject {
      * @param language a language string
      */
     public void setLanguage(String language) {
-        this.standardPairs.put(Parameter.LANGUAGE, language);
+        if (language != null) {
+            this.standardPairs.put(Parameter.LANGUAGE, language);
+        }
     }
 
     /**
@@ -99,7 +243,9 @@ public class Subject {
      * @param ipAddress an ip address
      */
     public void setIpAddress(String ipAddress) {
-        this.standardPairs.put(Parameter.IP_ADDRESS, ipAddress);
+        if (ipAddress != null) {
+            this.standardPairs.put(Parameter.IP_ADDRESS, ipAddress);
+        }
     }
 
     /**
@@ -109,7 +255,9 @@ public class Subject {
      * @param useragent a useragent
      */
     public void setUseragent(String useragent) {
-        this.standardPairs.put(Parameter.USERAGENT, useragent);
+        if (useragent != null) {
+            this.standardPairs.put(Parameter.USERAGENT, useragent);
+        }
     }
 
     /**
@@ -119,7 +267,9 @@ public class Subject {
      * @param domainUserId a domain user id
      */
     public void setDomainUserId(String domainUserId) {
-        this.standardPairs.put(Parameter.DOMAIN_UID, domainUserId);
+        if (domainUserId != null) {
+            this.standardPairs.put(Parameter.DOMAIN_UID, domainUserId);
+        }
     }
 
     /**
@@ -129,7 +279,9 @@ public class Subject {
      * @param networkUserId a network user id
      */
     public void setNetworkUserId(String networkUserId) {
-        this.standardPairs.put(Parameter.NETWORK_UID, networkUserId);
+        if (networkUserId != null) {
+            this.standardPairs.put(Parameter.NETWORK_UID, networkUserId);
+        }
     }
 
     /**
