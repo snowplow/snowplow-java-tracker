@@ -65,6 +65,13 @@ public class SubjectTest {
     }
 
     @Test
+    public void testSetIpAddress() throws Exception {
+        Subject subject = new Subject();
+        subject.setIpAddress("127.0.0.1");
+        assertEquals("127.0.0.1", subject.getSubject().get("ip"));
+    }
+
+    @Test
     public void testGetSubject() throws Exception {
         Subject subject = new Subject();
         Map<String, String> expected = new HashMap<>();

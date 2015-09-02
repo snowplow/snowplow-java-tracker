@@ -93,6 +93,16 @@ public class Subject {
     }
 
     /**
+     * User inputted ip address for the
+     * subject.
+     *
+     * @param ipAddress an ip address
+     */
+    public void setIpAddress(String ipAddress) {
+        this.standardPairs.put(Parameter.IP_ADDRESS, ipAddress);
+    }
+
+    /**
      * Gets the Subject pairs.
      *
      * @return the stored k-v pairs

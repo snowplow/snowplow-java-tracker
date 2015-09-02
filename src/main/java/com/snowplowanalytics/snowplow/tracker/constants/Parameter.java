@@ -37,6 +37,7 @@ public class Parameter {
     public static final String COLOR_DEPTH = "cd";
     public static final String TIMEZONE = "tz";
     public static final String LANGUAGE = "lang";
+    public static final String IP_ADDRESS = "ip";
 
     // Page View
     public static final String PAGE_URL = "url";
