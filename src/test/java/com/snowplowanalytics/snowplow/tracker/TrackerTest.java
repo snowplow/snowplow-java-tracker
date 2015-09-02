@@ -17,14 +17,13 @@ import java.util.*;
 import static java.util.Collections.singletonList;
 
 // JUnit
-import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
+import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 // Google
 import com.google.common.collect.ImmutableMap;
@@ -43,6 +42,7 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 public class TrackerTest {
 
     public static final String EXPECTED_BASE64_CONTEXTS = "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==";
+    public static final String EXPECTED_EVENT_ID = "15e9b149-6029-4f6e-8447-5b9797c9e6be";
 
     @Mock
     Emitter emitter;
@@ -63,44 +63,66 @@ public class TrackerTest {
     @Test
     public void testEcommerceEvent() {
         // Given
-        List<TransactionItem> items = singletonList(
-                new TransactionItem("order_id", "sku", 1.0, 2, "name", "category", "currency", contexts, "12346")
-        );
+        EcommerceTransactionItem item = EcommerceTransactionItem.builder()
+                .itemId("order_id")
+                .sku("sku")
+                .price(1.0)
+                .quantity(2)
+                .name("name")
+                .category("category")
+                .currency("currency")
+                .customContext(contexts)
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .build();
 
         // When
-        tracker.trackEcommerceTransaction("order_id", 1.0, "affiliation", 2.0, 3.0, "city", "state", "country",
-                "currency", items, contexts, 123456);
+        tracker.track(EcommerceTransaction.builder()
+                .orderId("order_id")
+                .totalValue(1.0)
+                .affiliation("affiliation")
+                .taxValue(2.0)
+                .shipping(3.0)
+                .city("city")
+                .state("state")
+                .country("country")
+                .currency("currency")
+                .items(item)
+                .customContext(contexts)
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .build());
 
         // Then
         verify(emitter, times(2)).emit(captor.capture());
         List<TrackerPayload> allValues = captor.getAllValues();
 
-        Map result1 = allValues.get(0).getMap();
-        result1.remove("eid");
+        Map result1 = allValues.get(1).getMap();
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("ti_nm", "name")
                 .put("ti_id", "order_id")
                 .put("e", "ti")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
                 .put("ti_cu", "currency")
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("ti_pr", "1.0")
-                .put("ti_qu", "2.0")
+                .put("ti_qu", "2")
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("ti_ca", "category")
                 .put("ti_sk", "sku")
                 .build(), result1);
 
-        Map result2 = allValues.get(1).getMap();
-        result2.remove("eid");
+        Map result2 = allValues.get(0).getMap();
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("e", "tr")
                 .put("tr_cu", "currency")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
                 .put("tr_sh", "3.0")
@@ -121,21 +143,26 @@ public class TrackerTest {
     @Test
     public void testUnstructuredEventWithContext() {
         // When
-        tracker.trackUnstructuredEvent(new SelfDescribingJson(
-                "payload",
-                ImmutableMap.of("foo", "bar")
-        ), contexts, 123456);
+        tracker.track(Unstructured.builder()
+                .eventData(new SelfDescribingJson(
+                        "payload",
+                        ImmutableMap.of("foo", "bar")
+                ))
+                .customContext(contexts)
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .build());
 
         // Then
         verify(emitter).emit(captor.capture());
 
         Map result = captor.getValue().getMap();
-        result.remove("eid");
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
                 .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYXIifX19")
@@ -147,18 +174,22 @@ public class TrackerTest {
     @Test
     public void testUnstructuredEventWithoutContext() {
         // When
-        tracker.trackUnstructuredEvent(new SelfDescribingJson(
-                "payload",
-                ImmutableMap.of("foo", "baær")
-        ), 123456);
+        tracker.track(Unstructured.builder()
+                .eventData(new SelfDescribingJson(
+                        "payload",
+                        ImmutableMap.of("foo", "baær")
+                ))
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .build());
 
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        result.remove("eid");
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("e", "ue")
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
@@ -171,12 +202,18 @@ public class TrackerTest {
     @Test
     public void testTrackPageView() {
         // When
-        tracker.trackPageView("url", "title", "referer", contexts, 123456);
+        tracker.track(PageView.builder()
+                .pageUrl("url")
+                .pageTitle("title")
+                .referrer("referer")
+                .customContext(contexts)
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .build());
 
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        result.remove("eid");
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
@@ -185,6 +222,7 @@ public class TrackerTest {
                 .put("tv", Version.TRACKER)
                 .put("p", "srv")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
                 .put("refr", "referer")
@@ -194,14 +232,18 @@ public class TrackerTest {
 
     @Test
     public void testTrackScreenView() {
-
         // When
-        tracker.trackScreenView("name", "id", contexts, 123456);
+        tracker.track(ScreenView.builder()
+                .name("name")
+                .id("id")
+                .customContext(contexts)
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .build());
 
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        result.remove("eid");
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
@@ -209,31 +251,36 @@ public class TrackerTest {
                 .put("tv", Version.TRACKER)
                 .put("p", "srv")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJuYW1lIjoibmFtZSIsImlkIjoiaWQifX19")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJlaWQiOiIxNWU5YjE0OS02MDI5LTRmNmUtODQ0Ny01Yjk3OTdjOWU2YmUiLCJuYW1lIjoibmFtZSIsImlkIjoiaWQiLCJkdG0iOiIxMjM0NTYifX19")
                 .build(), result);
     }
 
     @Test
     public void testTrackScreenViewWithDefaultContextAndTimestamp() {
-
         // When
-        tracker.trackScreenView("name", "id", 123456);
+        tracker.track(ScreenView.builder()
+                .name("name")
+                .id("id")
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .build());
 
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        result.remove("eid");
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
                 .put("tv", Version.TRACKER)
                 .put("p", "srv")
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJuYW1lIjoibmFtZSIsImlkIjoiaWQifX19")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJlaWQiOiIxNWU5YjE0OS02MDI5LTRmNmUtODQ0Ny01Yjk3OTdjOWU2YmUiLCJuYW1lIjoibmFtZSIsImlkIjoiaWQiLCJkdG0iOiIxMjM0NTYifX19")
                 .build(), result);
     }
 
@@ -241,20 +288,26 @@ public class TrackerTest {
     @Test
     public void testTrackScreenViewWithTimestamp() {
         // When
-        tracker.trackScreenView("name", "id", contexts, 123456);
+        tracker.track(ScreenView.builder()
+                .name("name")
+                .id("id")
+                .customContext(contexts)
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .build());
 
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        result.remove("eid");
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
                 .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJuYW1lIjoibmFtZSIsImlkIjoiaWQifX19")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJlaWQiOiIxNWU5YjE0OS02MDI5LTRmNmUtODQ0Ny01Yjk3OTdjOWU2YmUiLCJuYW1lIjoibmFtZSIsImlkIjoiaWQiLCJkdG0iOiIxMjM0NTYifX19")
                 .put("dtm", "123456")
                 .put("aid", "cloudfront")
                 .build(), result);
