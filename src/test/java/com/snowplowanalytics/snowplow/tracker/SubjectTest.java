@@ -79,6 +79,13 @@ public class SubjectTest {
     }
 
     @Test
+    public void testSetDuid() throws Exception {
+        Subject subject = new Subject();
+        subject.setDomainUserId("duid");
+        assertEquals("duid", subject.getSubject().get("duid"));
+    }
+
+    @Test
     public void testGetSubject() throws Exception {
         Subject subject = new Subject();
         Map<String, String> expected = new HashMap<>();

@@ -113,6 +113,16 @@ public class Subject {
     }
 
     /**
+     * User inputted Domain User Id for the
+     * subject.
+     *
+     * @param domainUserId a domain user id
+     */
+    public void setDomainUserId(String domainUserId) {
+        this.standardPairs.put(Parameter.DOMAIN_UID, domainUserId);
+    }
+
+    /**
      * Gets the Subject pairs.
      *
      * @return the stored k-v pairs

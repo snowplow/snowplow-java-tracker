@@ -39,6 +39,7 @@ public class Parameter {
     public static final String LANGUAGE = "lang";
     public static final String IP_ADDRESS = "ip";
     public static final String USERAGENT = "ua";
+    public static final String DOMAIN_UID = "duid";
 
     // Page View
     public static final String PAGE_URL = "url";
