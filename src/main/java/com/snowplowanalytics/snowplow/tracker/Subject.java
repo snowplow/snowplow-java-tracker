@@ -103,6 +103,16 @@ public class Subject {
     }
 
     /**
+     * User inputted useragent for the
+     * subject.
+     *
+     * @param useragent a useragent
+     */
+    public void setUseragent(String useragent) {
+        this.standardPairs.put(Parameter.USERAGENT, useragent);
+    }
+
+    /**
      * Gets the Subject pairs.
      *
      * @return the stored k-v pairs

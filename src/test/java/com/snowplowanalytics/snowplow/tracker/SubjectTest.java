@@ -72,6 +72,13 @@ public class SubjectTest {
     }
 
     @Test
+    public void testSetUseragent() throws Exception {
+        Subject subject = new Subject();
+        subject.setUseragent("useragent");
+        assertEquals("useragent", subject.getSubject().get("ua"));
+    }
+
+    @Test
     public void testGetSubject() throws Exception {
         Subject subject = new Subject();
         Map<String, String> expected = new HashMap<>();

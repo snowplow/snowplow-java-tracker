@@ -38,6 +38,7 @@ public class Parameter {
     public static final String TIMEZONE = "tz";
     public static final String LANGUAGE = "lang";
     public static final String IP_ADDRESS = "ip";
+    public static final String USERAGENT = "ua";
 
     // Page View
     public static final String PAGE_URL = "url";
