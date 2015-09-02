@@ -77,7 +77,7 @@ public class Tracker {
         private boolean base64Encoded = true; // Optional
 
         /**
-         * @param emitter Emitter to which events will be sent
+         * @param emitter AbstractEmitter to which events will be sent
          * @param namespace Identifier for the Tracker instance
          * @param appId Application ID
          */

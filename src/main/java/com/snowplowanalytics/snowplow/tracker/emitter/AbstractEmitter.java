@@ -13,26 +13,71 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
 // This library
+import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * Abstract Emitter class.
+ * Base AbstractEmitter class.
  */
-abstract class AbstractEmitter implements Emitter {
+public class AbstractEmitter implements Emitter {
 
-    protected final HttpClientAdapter httpClientAdapter;
+    protected HttpClientAdapter httpClientAdapter;
     protected RequestCallback requestCallback;
 
-    /**
-     * Returns an Emitter with a selected HttpAdapter
-     *
-     * @param httpClientAdapter the chosen http client to use
-     * @param requestCallback Request callback functions
-     */
-    public AbstractEmitter(HttpClientAdapter httpClientAdapter, RequestCallback requestCallback) {
-        this.httpClientAdapter = httpClientAdapter;
-        this.requestCallback = requestCallback;
+    public static abstract class Builder<T extends Builder<T>> {
+
+        private HttpClientAdapter httpClientAdapter; // Required
+        private RequestCallback requestCallback = null; // Optional
+
+        protected abstract T self();
+
+        /**
+         * Adds the HttpClientAdapter to the AbstractEmitter
+         *
+         * @param httpClientAdapter the adapter to use
+         * @return itself
+         */
+        public T httpClientAdapter(HttpClientAdapter httpClientAdapter) {
+            this.httpClientAdapter = httpClientAdapter;
+            return self();
+        }
+
+        /**
+         * An optional Request Callback for adding the ability to
+         * handle failure cases for sending.
+         *
+         * @param requestCallback the emitter request callback
+         * @return itself
+         */
+        public T requestCallback(RequestCallback requestCallback) {
+            this.requestCallback = requestCallback;
+            return self();
+        }
+
+        public AbstractEmitter build() {
+            return new AbstractEmitter(this);
+        }
+    }
+
+    private static class Builder2 extends Builder<Builder2> {
+        @Override
+        protected Builder2 self() {
+            return this;
+        }
+    }
+
+    public static Builder<?> builder() {
+        return new Builder2();
+    }
+
+    protected AbstractEmitter(Builder<?> builder) {
+
+        // Precondition checks
+        Preconditions.checkNotNull(builder.httpClientAdapter);
+
+        this.httpClientAdapter = builder.httpClientAdapter;
+        this.requestCallback = builder.requestCallback;
     }
 
     /**
@@ -42,7 +87,7 @@ abstract class AbstractEmitter implements Emitter {
      * @param payload an event payload
      */
     @Override
-    public abstract void emit(TrackerPayload payload);
+    public void emit(TrackerPayload payload) {}
 
     /**
      * Checks whether the response code was a success or not.

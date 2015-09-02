@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // This library
-import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.ArrayList;
@@ -31,15 +30,25 @@ public class SimpleEmitter extends AbstractEmitter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
 
-    /**
-     * Builds a SimpleEmitter which send events
-     * via GET requests
-     *
-     * @param httpClientAdapter the http adapter to use
-     * @param requestCallback Request callback functions
-     */
-    public SimpleEmitter(HttpClientAdapter httpClientAdapter, RequestCallback requestCallback) {
-        super(httpClientAdapter, requestCallback);
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
+        public SimpleEmitter build() {
+            return new SimpleEmitter(this);
+        }
+    }
+
+    private static class Builder2 extends Builder<Builder2> {
+        @Override
+        protected Builder2 self() {
+            return this;
+        }
+    }
+
+    public static Builder<?> builder() {
+        return new Builder2();
+    }
+
+    protected SimpleEmitter(Builder<?> builder) {
+        super(builder);
     }
 
     /**
@@ -55,7 +64,7 @@ public class SimpleEmitter extends AbstractEmitter {
 
         int code = httpClientAdapter.get(payload);
         if (!isSuccessfulSend(code)) {
-            LOGGER.error("Batch Emitter failed to send {} events: code: {}", 1, code);
+            LOGGER.error("Batch AbstractEmitter failed to send {} events: code: {}", 1, code);
             failure += 1;
         } else {
             success += 1;

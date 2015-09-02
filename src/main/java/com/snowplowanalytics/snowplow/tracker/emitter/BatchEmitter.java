@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
-import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
@@ -40,17 +39,44 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
     private List<TrackerPayload> buffer = new ArrayList<TrackerPayload>();
-    private int bufferSize = 10;
+    private int bufferSize;
 
-    /**
-     * Builds a BatchEmitter which will combine many
-     * events into one for sending as a POST.
-     *
-     * @param httpClientAdapter the http adapter to use
-     * @param requestCallback Request callback functions
-     */
-    public BatchEmitter(HttpClientAdapter httpClientAdapter, RequestCallback requestCallback) {
-        super(httpClientAdapter, requestCallback);
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
+
+        private int bufferSize = 10; // Optional
+
+        /**
+         * @param bufferSize The count of events to buffer before sending
+         * @return itself
+         */
+        public T bufferSize(int bufferSize) {
+            this.bufferSize = bufferSize;
+            return self();
+        }
+
+        public BatchEmitter build() {
+            return new BatchEmitter(this);
+        }
+    }
+
+    private static class Builder2 extends Builder<Builder2> {
+        @Override
+        protected Builder2 self() {
+            return this;
+        }
+    }
+
+    public static Builder<?> builder() {
+        return new Builder2();
+    }
+
+    protected BatchEmitter(Builder<?> builder) {
+        super(builder);
+
+        // Precondition checks
+        Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize cannot be less than or equal to 0");
+
+        this.bufferSize = builder.bufferSize;
     }
 
     /**
@@ -93,7 +119,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         int code = httpClientAdapter.post(selfDescribingJson);
         if (!isSuccessfulSend(code)) {
-            LOGGER.error("Batch Emitter failed to send {} events: code: {}", buffer.size(), code);
+            LOGGER.error("Batch AbstractEmitter failed to send {} events: code: {}", buffer.size(), code);
             failure += buffer.size();
         } else {
             success += buffer.size();

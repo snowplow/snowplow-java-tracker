@@ -17,9 +17,6 @@ import java.util.*;
 import static java.util.Collections.singletonList;
 
 // JUnit
-import com.snowplowanalytics.snowplow.tracker.events.*;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +34,9 @@ import static org.mockito.Mockito.*;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
+import com.snowplowanalytics.snowplow.tracker.events.*;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {

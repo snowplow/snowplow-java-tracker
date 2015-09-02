@@ -48,7 +48,9 @@ public class BatchEmitterTest {
     @Before
     public void setUp() throws Exception {
         httpClientAdapter = mock(HttpClientAdapter.class);
-        emitter = spy(new BatchEmitter(httpClientAdapter, null));
+        emitter = spy(BatchEmitter.builder()
+                .httpClientAdapter(httpClientAdapter)
+                .build());
     }
 
     @Test
