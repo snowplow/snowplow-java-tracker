@@ -31,8 +31,8 @@ apply plugin: 'propdeps-idea'
 
 group = 'com.snowplowanalytics'
 version = '0.7.2'
-sourceCompatibility = '1.7'
-targetCompatibility = '1.7'
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
 
 repositories {
     // Use 'maven central' for resolving our dependencies
@@ -72,7 +72,7 @@ dependencies {
     compile 'org.slf4j:slf4j-simple:1.7.7'
 
     // JSON
-    compile 'org.json:json:20141113'
+    compile 'org.json:json:20131018'
 
     // Preconditions
     compile 'com.google.guava:guava:18.0'

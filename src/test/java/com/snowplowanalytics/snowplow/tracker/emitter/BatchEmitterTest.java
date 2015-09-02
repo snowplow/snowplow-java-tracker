@@ -90,7 +90,7 @@ public class BatchEmitterTest {
         verify(emitter).flushBuffer();
         verify(httpClientAdapter).post(argumentCaptor.capture());
 
-        List<Map> payloadMaps = new ArrayList<>();
+        List<Map> payloadMaps = new ArrayList<Map>();
         for (TrackerPayload payload : payloads) {
             payloadMaps.add(payload.getMap());
         }

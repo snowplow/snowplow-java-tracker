@@ -163,7 +163,7 @@ public class Tracker {
      * many contexts inside
      */
     private SelfDescribingJson getFinalContext(List<SelfDescribingJson> contexts) {
-        List<Map> contextMaps = new LinkedList<>();
+        List<Map> contextMaps = new LinkedList<Map>();
         for (SelfDescribingJson selfDescribingJson : contexts) {
             contextMaps.add(selfDescribingJson.getMap());
         }

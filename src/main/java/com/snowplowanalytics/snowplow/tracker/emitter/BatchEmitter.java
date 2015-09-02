@@ -39,7 +39,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
-    private List<TrackerPayload> buffer = new ArrayList<>();
+    private List<TrackerPayload> buffer = new ArrayList<TrackerPayload>();
     private int bufferSize = 10;
 
     /**
@@ -78,7 +78,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         }
 
         // Build POST String
-        final List<Map> toSendPayloads = new ArrayList<>();
+        final List<Map> toSendPayloads = new ArrayList<Map>();
         for (TrackerPayload payload : buffer) {
             toSendPayloads.add(payload.getMap());
         }

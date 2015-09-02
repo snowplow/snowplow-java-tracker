@@ -24,7 +24,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
  */
 public class Subject {
 
-    private HashMap<String, String> standardPairs = new HashMap<>();
+    private HashMap<String, String> standardPairs = new HashMap<String, String>();
 
     /**
      * Builds a new Subject object and sets:

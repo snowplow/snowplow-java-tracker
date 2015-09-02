@@ -64,7 +64,7 @@ public class SimpleEmitter extends AbstractEmitter {
         // Send the callback if available
         if (requestCallback != null) {
             if (failure != 0) {
-                List<TrackerPayload> temp = new ArrayList<>();
+                List<TrackerPayload> temp = new ArrayList<TrackerPayload>();
                 temp.add(payload);
                 requestCallback.onFailure(success, temp);
             } else {

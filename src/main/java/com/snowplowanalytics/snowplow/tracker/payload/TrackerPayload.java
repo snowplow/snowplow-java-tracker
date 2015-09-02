@@ -30,7 +30,7 @@ import com.snowplowanalytics.snowplow.tracker.Utils;
 public class TrackerPayload implements Payload {
 
     private final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
-    private final HashMap<String, Object> payload = new HashMap<>();
+    private final HashMap<String, Object> payload = new HashMap<String, Object>();
 
     /**
      * Add a basic parameter.

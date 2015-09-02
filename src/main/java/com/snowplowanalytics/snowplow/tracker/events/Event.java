@@ -41,7 +41,7 @@ public class Event {
 
     public static abstract class Builder<T extends Builder<T>> {
 
-        private List<SelfDescribingJson> context = new LinkedList<>();
+        private List<SelfDescribingJson> context = new LinkedList<SelfDescribingJson>();
         private long timestamp = System.currentTimeMillis();
         private String eventId = Utils.getEventId();
 
@@ -113,7 +113,7 @@ public class Event {
      * @return the events custom context
      */
     public List<SelfDescribingJson> getContext() {
-        return new ArrayList<>(this.context);
+        return new ArrayList<SelfDescribingJson>(this.context);
     }
 
     /**

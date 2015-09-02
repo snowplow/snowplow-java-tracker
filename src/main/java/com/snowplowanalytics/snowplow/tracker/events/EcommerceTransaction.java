@@ -146,7 +146,7 @@ public class EcommerceTransaction extends Event {
          * @return itself
          */
         public T items(EcommerceTransactionItem... itemArgs) {
-            List<EcommerceTransactionItem> items = new ArrayList<>();
+            List<EcommerceTransactionItem> items = new ArrayList<EcommerceTransactionItem>();
             Collections.addAll(items, itemArgs);
             this.items = items;
             return self();

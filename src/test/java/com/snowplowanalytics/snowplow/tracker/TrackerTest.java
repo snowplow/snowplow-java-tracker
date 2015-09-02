@@ -380,7 +380,7 @@ public class TrackerTest {
         s2.setColorDepth(24);
         tracker.setSubject(s2);
 
-        Map<String, String> subjectPairs = new HashMap<>();
+        Map<String, String> subjectPairs = new HashMap<String, String>();
         subjectPairs.put("tz", "Etc/UTC");
         subjectPairs.put("cd", "24");
 

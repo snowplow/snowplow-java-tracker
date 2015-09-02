@@ -95,7 +95,7 @@ public class SubjectTest {
     @Test
     public void testGetSubject() throws Exception {
         Subject subject = new Subject();
-        Map<String, String> expected = new HashMap<>();
+        Map<String, String> expected = new HashMap<String, String>();
         subject.setTimezone("America/Toronto");
         subject.setUserId("user1");
 
