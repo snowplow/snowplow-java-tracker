@@ -41,7 +41,7 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 @RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {
 
-    public static final String EXPECTED_BASE64_CONTEXTS = "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==";
+    public static final String EXPECTED_BASE64_CONTEXTS = "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0xIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==";
     public static final String EXPECTED_EVENT_ID = "15e9b149-6029-4f6e-8447-5b9797c9e6be";
 
     @Mock
