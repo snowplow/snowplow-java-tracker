@@ -73,4 +73,10 @@ public class Parameter {
     // Screen View
     public static final String SV_ID = "id";
     public static final String SV_NAME = "name";
+
+    // User Timing
+    public static final String UT_CATEGORY = "category";
+    public static final String UT_VARIABLE = "variable";
+    public static final String UT_TIMING = "timing";
+    public static final String UT_LABEL = "label";
 }

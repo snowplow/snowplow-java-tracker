@@ -294,4 +294,18 @@ public class Tracker {
                 .eventId(event.getEventId())
                 .build());
     }
+
+    /**
+     * Tracks a TimingWithCategory Event.
+     *
+     * @param event the TimingWithCategory event.
+     */
+    public void track(TimingWithCategory event) {
+        this.track(Unstructured.builder()
+                .eventData(event.getSelfDescribingJson())
+                .customContext(event.getContext())
+                .timestamp(event.getTimestamp())
+                .eventId(event.getEventId())
+                .build());
+    }
 }
