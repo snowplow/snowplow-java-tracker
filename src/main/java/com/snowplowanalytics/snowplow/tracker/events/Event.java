@@ -21,6 +21,7 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 
 // This library
+import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -38,12 +39,14 @@ public class Event {
     protected final List<SelfDescribingJson> context;
     protected final long timestamp;
     protected final String eventId;
+    protected final Subject subject;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private List<SelfDescribingJson> context = new LinkedList<SelfDescribingJson>();
         private long timestamp = System.currentTimeMillis();
         private String eventId = Utils.getEventId();
+        private Subject subject = null;
 
         protected abstract T self();
 
@@ -81,6 +84,17 @@ public class Event {
             return self();
         }
 
+        /**
+         * A custom subject for the event.
+         *
+         * @param subject the eventId
+         * @return itself
+         */
+        public T subject(Subject subject) {
+            this.subject = subject;
+            return self();
+        }
+
         public Event build() {
             return new Event(this);
         }
@@ -107,6 +121,7 @@ public class Event {
         this.context = builder.context;
         this.timestamp = builder.timestamp;
         this.eventId = builder.eventId;
+        this.subject = builder.subject;
     }
 
     /**
@@ -128,6 +143,13 @@ public class Event {
      */
     public String getEventId() {
         return this.eventId;
+    }
+
+    /**
+     * @return the event subject
+     */
+    public Subject getSubject() {
+        return this.subject;
     }
 
     /**

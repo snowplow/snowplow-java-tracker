@@ -129,10 +129,11 @@ public class Tracker {
     /**
      * Builds and Adds a finalised payload which is ready for sending.
      *
-     * @param payload   The raw event Payload
-     * @param contexts  Custom context for the event
+     * @param payload The raw event Payload
+     * @param contexts Custom context for the event
+     * @param eventSubject An optional event specific Subject
      */
-    private void addTrackerPayload(TrackerPayload payload, List<SelfDescribingJson> contexts) {
+    private void addTrackerPayload(TrackerPayload payload, List<SelfDescribingJson> contexts, Subject eventSubject) {
 
         // Add default parameters to the payload
         payload.add(Parameter.PLATFORM, platform.toString());
@@ -147,8 +148,10 @@ public class Tracker {
         }
 
         // Add subject if available
-        if (this.subject != null) {
-            payload.addMap(new HashMap<String, Object>(subject.getSubject()));
+        if (eventSubject != null) {
+            payload.addMap(new HashMap<String, Object>(eventSubject.getSubject()));
+        } else if (this.subject != null) {
+            payload.addMap(new HashMap<String, Object>(this.subject.getSubject()));
         }
 
         // Send the event!
@@ -288,7 +291,8 @@ public class Tracker {
     public void track(PageView event) {
         List<SelfDescribingJson> context = event.getContext();
         TrackerPayload payload = event.getPayload();
-        addTrackerPayload(payload, context);
+        Subject subject = event.getSubject();
+        addTrackerPayload(payload, context, subject);
     }
 
     /**
@@ -299,7 +303,8 @@ public class Tracker {
     public void track(Structured event) {
         List<SelfDescribingJson> context = event.getContext();
         TrackerPayload payload = event.getPayload();
-        addTrackerPayload(payload, context);
+        Subject subject = event.getSubject();
+        addTrackerPayload(payload, context, subject);
     }
 
     /**
@@ -312,7 +317,8 @@ public class Tracker {
     public void track(EcommerceTransaction event) {
         List<SelfDescribingJson> context = event.getContext();
         TrackerPayload payload = event.getPayload();
-        addTrackerPayload(payload, context);
+        Subject subject = event.getSubject();
+        addTrackerPayload(payload, context, subject);
 
         // Track each TransactionItem individually
         long timestamp = event.getTimestamp();
@@ -330,7 +336,8 @@ public class Tracker {
     private void track(EcommerceTransactionItem event, long timestamp) {
         List<SelfDescribingJson> context = event.getContext();
         TrackerPayload payload = event.getPayload(timestamp);
-        addTrackerPayload(payload, context);
+        Subject subject = event.getSubject();
+        addTrackerPayload(payload, context, subject);
     }
 
     /**
@@ -341,7 +348,8 @@ public class Tracker {
     public void track(Unstructured event) {
         List<SelfDescribingJson> context = event.getContext();
         TrackerPayload payload = event.getPayload(base64Encoded);
-        addTrackerPayload(payload, context);
+        Subject subject = event.getSubject();
+        addTrackerPayload(payload, context, subject);
     }
 
     /**
@@ -355,6 +363,7 @@ public class Tracker {
                 .customContext(event.getContext())
                 .timestamp(event.getTimestamp())
                 .eventId(event.getEventId())
+                .subject(event.getSubject())
                 .build());
     }
 
@@ -369,6 +378,7 @@ public class Tracker {
                 .customContext(event.getContext())
                 .timestamp(event.getTimestamp())
                 .eventId(event.getEventId())
+                .subject(event.getSubject())
                 .build());
     }
 }

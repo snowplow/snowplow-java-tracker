@@ -346,6 +346,42 @@ public class TrackerTest {
     }
 
     @Test
+    public void testTrackTimingWithCategoryWithSubject() {
+        Subject s1 = new Subject();
+        s1.setIpAddress("127.0.0.1");
+        s1.setTimezone("Etc/UTC");
+
+        // When
+        tracker.track(TimingWithCategory.builder()
+                .category("category")
+                .label("label")
+                .variable("variable")
+                .timing(10)
+                .customContext(contexts)
+                .timestamp(123456)
+                .eventId(EXPECTED_EVENT_ID)
+                .subject(s1)
+                .build());
+
+        // Then
+        verify(emitter).emit(captor.capture());
+        Map result = captor.getValue().getMap();
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("p", "srv")
+                .put("tv", Version.TRACKER)
+                .put("e", "ue")
+                .put("ip", "127.0.0.1")
+                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("eid", EXPECTED_EVENT_ID)
+                .put("tna", "AF003")
+                .put("tz", "Etc/UTC")
+                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy90aW1pbmcvanNvbnNjaGVtYS8xLTAtMCIsImRhdGEiOnsiZWlkIjoiMTVlOWIxNDktNjAyOS00ZjZlLTg0NDctNWI5Nzk3YzllNmJlIiwidGltaW5nIjoiMTAiLCJ2YXJpYWJsZSI6InZhcmlhYmxlIiwibGFiZWwiOiJsYWJlbCIsImNhdGVnb3J5IjoiY2F0ZWdvcnkiLCJkdG0iOiIxMjM0NTYifX19")
+                .put("dtm", "123456")
+                .put("aid", "cloudfront")
+                .build(), result);
+    }
+
+    @Test
     public void testDefaultPlatform() throws Exception {
         Subject subject = new Subject();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
