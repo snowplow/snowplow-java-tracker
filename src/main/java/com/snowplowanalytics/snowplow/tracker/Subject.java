@@ -123,6 +123,16 @@ public class Subject {
     }
 
     /**
+     * User inputted Network User Id for the
+     * subject.
+     *
+     * @param networkUserId a network user id
+     */
+    public void setNetworkUserId(String networkUserId) {
+        this.standardPairs.put(Parameter.NETWORK_UID, networkUserId);
+    }
+
+    /**
      * Gets the Subject pairs.
      *
      * @return the stored k-v pairs

@@ -40,6 +40,7 @@ public class Parameter {
     public static final String IP_ADDRESS = "ip";
     public static final String USERAGENT = "ua";
     public static final String DOMAIN_UID = "duid";
+    public static final String NETWORK_UID = "tnuid";
 
     // Page View
     public static final String PAGE_URL = "url";
