@@ -15,9 +15,11 @@ package com.snowplowanalytics.snowplow.tracker.http;
 // Java
 import java.util.Map;
 
+// Google
+import com.google.common.base.Preconditions;
+
 // Apache
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+import com.snowplowanalytics.snowplow.tracker.Utils;
 
 /**
  * A HttpClient built using Apache to send events via
@@ -48,6 +51,10 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
      * @param httpClient the closeable httpclient
      */
     public ApacheHttpClientAdapter(String uri, CloseableHttpClient httpClient) {
+        // Precondition checks
+        Preconditions.checkArgument(Utils.isValidUrl(uri));
+        Preconditions.checkNotNull(httpClient);
+
         this.uri = uri;
         this.httpClient = httpClient;
     }

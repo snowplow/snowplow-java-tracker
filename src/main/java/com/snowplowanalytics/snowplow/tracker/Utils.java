@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.tracker;
 
 // Java
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.util.*;
 
 // Json
@@ -65,6 +66,25 @@ public class Utils {
     public static int getTransactionId() {
         Random r = new Random();
         return r.nextInt(999999 - 100000 + 1) + 100000;
+    }
+
+    // Emitter Utils
+
+    /**
+     * Validates a uri and checks that it is valid
+     * before being used by the emitter.
+     *
+     * @param url the uri to validate
+     * @return whether the uri is valid or not
+     */
+    public static boolean isValidUrl(String url) {
+        try {
+            new URL(url).toURI();
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("URI {} is not valid: {}", url, e.getMessage());
+            return false;
+        }
     }
 
     // Subject Utils

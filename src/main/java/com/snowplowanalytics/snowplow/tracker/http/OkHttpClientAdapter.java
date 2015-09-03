@@ -16,6 +16,9 @@ package com.snowplowanalytics.snowplow.tracker.http;
 import java.util.Iterator;
 import java.util.Map;
 
+// Google
+import com.google.common.base.Preconditions;
+
 // SquareUp
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+import com.snowplowanalytics.snowplow.tracker.Utils;
 
 /**
  * A HttpClient built using OkHttp to send events via
@@ -48,6 +52,10 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      * @param httpClient the closeable httpclient
      */
     public OkHttpClientAdapter(String uri, OkHttpClient httpClient) {
+        // Precondition checks
+        Preconditions.checkArgument(Utils.isValidUrl(uri));
+        Preconditions.checkNotNull(httpClient);
+
         this.uri = uri;
         this.httpClient = httpClient;
     }
