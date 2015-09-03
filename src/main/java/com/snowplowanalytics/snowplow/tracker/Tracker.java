@@ -284,6 +284,16 @@ public class Tracker {
     // --- Event Tracking Functions
 
     /**
+     * Used for either Tracking a custom TrackerPayload or
+     * for re-sending a failed event.
+     *
+     * @param payload the payload to track
+     */
+    public void track(TrackerPayload payload) {
+        this.emitter.emit(payload);
+    }
+
+    /**
      * Tracks a PageView event
      *
      * @param event the PageView event.

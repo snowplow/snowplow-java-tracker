@@ -17,6 +17,7 @@ import java.util.Map;
 
 // Apache
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -59,7 +60,6 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
      * @return the HttpResponse for the Request
      */
     public int doGet(Map<String, Object> payload) {
-        HttpResponse httpResponse;
         try {
             URIBuilder uriBuilder = new URIBuilder(uri);
             for (String key : payload.keySet()) {
@@ -67,11 +67,13 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
                 uriBuilder.setParameter(key, value);
             }
             HttpGet httpGet = new HttpGet(uriBuilder.setPath("/i").build());
-            httpResponse = httpClient.execute(httpGet);
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+            httpGet.releaseConnection();
+            return httpResponse.getStatusLine().getStatusCode();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.error("ApacheHttpClient GET Request failed: {}", e.getMessage());
+            return -1;
         }
-        return httpResponse.getStatusLine().getStatusCode();
     }
 
     /**
@@ -82,21 +84,18 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
      * @return the HttpResponse for the Request
      */
     public int doPost(String payload) {
-        HttpResponse httpResponse;
         try {
             URIBuilder uriBuilder = new URIBuilder(uri);
             HttpPost httpPost = new HttpPost(uriBuilder.setPath("/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION).build());
             httpPost.addHeader("Content-Type", Constants.POST_CONTENT_TYPE);
-
             StringEntity params = new StringEntity(payload);
             httpPost.setEntity(params);
-
-            httpResponse = httpClient.execute(httpPost);
-            LOGGER.debug(httpResponse.getStatusLine().toString());
-
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+            httpPost.releaseConnection();
+            return httpResponse.getStatusLine().getStatusCode();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.error("ApacheHttpClient POST Request failed: {}", e.getMessage());
+            return -1;
         }
-        return httpResponse.getStatusLine().getStatusCode();
     }
 }

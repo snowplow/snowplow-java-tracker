@@ -43,7 +43,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
-        private int bufferSize = 10; // Optional
+        private int bufferSize = 50; // Optional
 
         /**
          * @param bufferSize The count of events to buffer before sending
@@ -74,7 +74,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize cannot be less than or equal to 0");
+        Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize must be greater than 0");
 
         this.bufferSize = builder.bufferSize;
     }
@@ -98,44 +98,66 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * initiated.
      */
     void flushBuffer() {
-        if (buffer.isEmpty()) {
-            LOGGER.debug("Buffer is empty, exiting flush operation.");
-            return;
-        }
+        execute(getRequestRunnable(buffer));
+        buffer = new ArrayList<TrackerPayload>();
+    }
 
-        // Build POST String
-        final List<Map> toSendPayloads = new ArrayList<Map>();
+    /**
+     * Returns a Runnable POST Request operation
+     *
+     * @param buffer the event buffer to be sent
+     * @return the new Callable object
+     */
+    private Runnable getRequestRunnable(final List<TrackerPayload> buffer) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                if (buffer.size() == 0) {
+                    return;
+                }
+
+                SelfDescribingJson post = getFinalPost(buffer);
+                int code = httpClientAdapter.post(post);
+
+                // Process results
+                int success = 0;
+                int failure = 0;
+                if (!isSuccessfulSend(code)) {
+                    LOGGER.error("BatchEmitter failed to send {} events: code: {}", buffer.size(), code);
+                    failure += buffer.size();
+                } else {
+                    LOGGER.info("BatchEmitter successfully sent {} events: code: {}", buffer.size(), code);
+                    success += buffer.size();
+                }
+
+                // Send the callback if available
+                if (requestCallback != null) {
+                    if (failure != 0) {
+                        requestCallback.onFailure(success, buffer);
+                    } else {
+                        requestCallback.onSuccess(success);
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * Constructs the SelfDescribingJson to be sent
+     * to the endpoint
+     *
+     * @return the constructed POST payload
+     */
+    private SelfDescribingJson getFinalPost(List<TrackerPayload> buffer) {
+        List<Map> toSendPayloads = new ArrayList<Map>();
         for (TrackerPayload payload : buffer) {
             toSendPayloads.add(payload.getMap());
         }
-        final SelfDescribingJson selfDescribingJson = new SelfDescribingJson(
+
+        return new SelfDescribingJson(
                 Constants.SCHEMA_PAYLOAD_DATA,
                 toSendPayloads
         );
-
-        // Process result of send
-        int success = 0;
-        int failure = 0;
-
-        int code = httpClientAdapter.post(selfDescribingJson);
-        if (!isSuccessfulSend(code)) {
-            LOGGER.error("Batch AbstractEmitter failed to send {} events: code: {}", buffer.size(), code);
-            failure += buffer.size();
-        } else {
-            success += buffer.size();
-        }
-
-        // Send the callback if available
-        if (requestCallback != null) {
-            if (failure != 0) {
-                List<TrackerPayload> temp = buffer;
-                requestCallback.onFailure(success, temp);
-            } else {
-                requestCallback.onSuccess(success);
-            }
-        }
-
-        buffer.clear();
     }
 
     /**

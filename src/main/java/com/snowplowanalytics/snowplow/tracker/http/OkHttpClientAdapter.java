@@ -23,6 +23,10 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.RequestBody;
 
+// Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 
@@ -32,6 +36,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Constants;
  */
 public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientAdapter.class);
     private final MediaType JSON = MediaType.parse(Constants.POST_CONTENT_TYPE);
     private final String uri;
     private OkHttpClient httpClient;
@@ -71,7 +76,8 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
             Response response = httpClient.newCall(request).execute();
             return response.code();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.error("OkHttpClient GET Request failed: {}", e.getMessage());
+            return -1;
         }
     }
 
@@ -93,7 +99,8 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
             Response response = httpClient.newCall(request).execute();
             return response.code();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.error("OkHttpClient POST Request failed: {}", e.getMessage());
+            return -1;
         }
     }
 }

@@ -12,8 +12,14 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// This library
+// Java
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+// Google
 import com.google.common.base.Preconditions;
+
+// This library
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
@@ -24,11 +30,13 @@ public class AbstractEmitter implements Emitter {
 
     protected HttpClientAdapter httpClientAdapter;
     protected RequestCallback requestCallback;
+    protected ExecutorService executor;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private HttpClientAdapter httpClientAdapter; // Required
         private RequestCallback requestCallback = null; // Optional
+        private int threadCount = 50; // Optional
 
         protected abstract T self();
 
@@ -55,6 +63,17 @@ public class AbstractEmitter implements Emitter {
             return self();
         }
 
+        /**
+         * Sets the Thread Count for the ExecutorService
+         *
+         * @param threadCount the size of the thread pool
+         * @return itself
+         */
+        public T threadCount(int threadCount) {
+            this.threadCount = threadCount;
+            return self();
+        }
+
         public AbstractEmitter build() {
             return new AbstractEmitter(this);
         }
@@ -75,9 +94,11 @@ public class AbstractEmitter implements Emitter {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.httpClientAdapter);
+        Preconditions.checkArgument(builder.threadCount > 0, "threadCount must be greater than 0");
 
         this.httpClientAdapter = builder.httpClientAdapter;
         this.requestCallback = builder.requestCallback;
+        this.executor = Executors.newScheduledThreadPool(builder.threadCount);
     }
 
     /**
@@ -88,6 +109,15 @@ public class AbstractEmitter implements Emitter {
      */
     @Override
     public void emit(TrackerPayload payload) {}
+
+    /**
+     * Sends a runnable to the executor service.
+     *
+     * @param runnable the runnable to be queued
+     */
+    protected void execute(Runnable runnable) {
+        this.executor.execute(runnable);
+    }
 
     /**
      * Checks whether the response code was a success or not.

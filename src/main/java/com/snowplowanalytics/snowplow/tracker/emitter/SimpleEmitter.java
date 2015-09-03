@@ -12,15 +12,16 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
+// Java
+import java.util.ArrayList;
+import java.util.List;
+
 // Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An emitter which sends events as soon as they are received via
@@ -58,27 +59,43 @@ public class SimpleEmitter extends AbstractEmitter {
      */
     @Override
     public void emit(TrackerPayload payload) {
-        // Process result of send
-        int success = 0;
-        int failure = 0;
+        execute(getRequestRunnable(payload));
+    }
 
-        int code = httpClientAdapter.get(payload);
-        if (!isSuccessfulSend(code)) {
-            LOGGER.error("Batch AbstractEmitter failed to send {} events: code: {}", 1, code);
-            failure += 1;
-        } else {
-            success += 1;
-        }
+    /**
+     * Returns a Runnable GET Request operation
+     *
+     * @param payload the event to be sent
+     * @return the new Callable object
+     */
+    private Runnable getRequestRunnable(final TrackerPayload payload) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                int code = httpClientAdapter.get(payload);
 
-        // Send the callback if available
-        if (requestCallback != null) {
-            if (failure != 0) {
-                List<TrackerPayload> temp = new ArrayList<TrackerPayload>();
-                temp.add(payload);
-                requestCallback.onFailure(success, temp);
-            } else {
-                requestCallback.onSuccess(success);
+                // Process results
+                int success = 0;
+                int failure = 0;
+                if (!isSuccessfulSend(code)) {
+                    LOGGER.error("SimpleEmitter failed to send {} events: code: {}", 1, code);
+                    failure += 1;
+                } else {
+                    LOGGER.info("SimpleEmitter successfully sent {} events: code: {}", 1, code);
+                    success += 1;
+                }
+
+                // Send the callback if available
+                if (requestCallback != null) {
+                    if (failure != 0) {
+                        List<TrackerPayload> buffer = new ArrayList<TrackerPayload>();
+                        buffer.add(payload);
+                        requestCallback.onFailure(success, buffer);
+                    } else {
+                        requestCallback.onSuccess(success);
+                    }
+                }
             }
-        }
+        };
     }
 }
