@@ -13,7 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker.payload;
 
 // Java
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 // Google
@@ -35,7 +35,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 public class SelfDescribingJson implements Payload {
 
     private final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
-    private final HashMap<String, Object> payload = new HashMap<String, Object>();
+    private final LinkedHashMap<String, Object> payload = new LinkedHashMap<String, Object>();
 
     /**
      * Creates a SelfDescribingJson with only a Schema
@@ -44,7 +44,7 @@ public class SelfDescribingJson implements Payload {
      * @param schema the schema string
      */
     public SelfDescribingJson(String schema) {
-        this(schema, new HashMap<String, Object>());
+        this(schema, new LinkedHashMap<String, Object>());
     }
 
     /**
@@ -131,7 +131,7 @@ public class SelfDescribingJson implements Payload {
      *
      * @param data the payload to add to the SelfDescribingJson
      */
-    private SelfDescribingJson setData(SelfDescribingJson data) {
+    public SelfDescribingJson setData(SelfDescribingJson data) {
         if (payload == null) {
             return this;
         }
@@ -188,6 +188,6 @@ public class SelfDescribingJson implements Payload {
      * @return A string value of the Payload.
      */
     public String toString() {
-        return Utils.mapToJSONObject(payload).toString();
+        return Utils.mapToJSONString(payload);
     }
 }

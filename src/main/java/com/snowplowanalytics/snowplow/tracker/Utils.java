@@ -13,14 +13,12 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.*;
 
-// Json
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+// Jackson
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 // Slf4j
 import org.slf4j.Logger;
@@ -35,6 +33,7 @@ import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 public class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // Tracker Utils
 
@@ -113,80 +112,20 @@ public class Utils {
     }
 
     /**
-     *  Converts a Map to a JSONObject
+     * Processes a Map into a JSON String or returns an empty
+     * String if it fails
      *
-     *  @param map The map to convert
-     *  @return The JSONObject
+     * @param map the map to process into a JSON String
+     * @return the final JSON String
      */
-    @SuppressWarnings("unchecked")
-    public static JSONObject mapToJSONObject(Map map) {
-        LOGGER.debug("Converting a map to a JSONObject: %s", map);
-        JSONObject retObject = new JSONObject();
-        Set<Map.Entry> entries = map.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            Object value = getJsonSafeObject(entry.getValue());
-            try {
-                retObject.put(key, value);
-            } catch (JSONException e) {
-                LOGGER.debug("Could not put key {} and value {} into new JSONObject: {}", key, value, e);
-                e.printStackTrace();
-            }
+    public static String mapToJSONString(Map map) {
+        String jString = "";
+        try {
+            jString = objectMapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            LOGGER.error("Could not process Map {} into JSON String: {}", map, e.getMessage());
         }
-        return retObject;
-    }
-
-    /**
-     * Returns a Json Safe object for situations
-     * where the Build Version is too old.
-     *
-     * @param o The object to check and convert
-     * @return the json safe object
-     */
-    private static Object getJsonSafeObject(Object o) {
-        if (o == null) {
-            return new Object() {
-                @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-                @Override
-                public boolean equals(Object o) {
-                    return o == this || o == null;
-                }
-                @Override
-                public String toString() {
-                    return "null";
-                }
-            };
-        } else if (o instanceof JSONObject || o instanceof JSONArray) {
-            return o;
-        } else if (o instanceof Collection) {
-            JSONArray retArray = new JSONArray();
-            for (Object entry : (Collection) o) {
-                retArray.put(getJsonSafeObject(entry));
-            }
-            return retArray;
-        } else if (o.getClass().isArray()) {
-            JSONArray retArray = new JSONArray();
-            int length = Array.getLength(o);
-            for (int i = 0; i < length; i++) {
-                retArray.put(getJsonSafeObject(Array.get(o, i)));
-            }
-            return retArray;
-        } else if (o instanceof Map) {
-            return mapToJSONObject((Map)o);
-        } else  if (o instanceof Boolean ||
-                o instanceof Byte ||
-                o instanceof Character ||
-                o instanceof Double ||
-                o instanceof Float ||
-                o instanceof Integer ||
-                o instanceof Long ||
-                o instanceof Short ||
-                o instanceof String) {
-            return o;
-        } else if (o.getClass().getPackage().getName().startsWith("java.")) {
-            return o.toString();
-        }
-        return null;
+        return jString;
     }
 
     /**

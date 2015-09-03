@@ -13,7 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker.payload;
 
 // Java
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 // Slf4j
@@ -30,7 +30,7 @@ import com.snowplowanalytics.snowplow.tracker.Utils;
 public class TrackerPayload implements Payload {
 
     private final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
-    private final HashMap<String, Object> payload = new HashMap<String, Object>();
+    private final LinkedHashMap<String, Object> payload = new LinkedHashMap<String, Object>();
 
     /**
      * Add a basic parameter.
@@ -92,7 +92,7 @@ public class TrackerPayload implements Payload {
             return;
         }
 
-        String mapString = Utils.mapToJSONObject(map).toString();
+        String mapString = Utils.mapToJSONString(map);
         LOGGER.info("Adding new map: {}", map);
 
         if (base64_encoded) {
@@ -127,6 +127,6 @@ public class TrackerPayload implements Payload {
      * @return A string value of the Payload.
      */
     public String toString() {
-        return Utils.mapToJSONObject(payload).toString();
+        return Utils.mapToJSONString(payload);
     }
 }

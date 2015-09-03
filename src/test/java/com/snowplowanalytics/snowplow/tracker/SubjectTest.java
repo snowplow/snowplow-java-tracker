@@ -66,9 +66,8 @@ public class SubjectTest {
 
     @Test
     public void testSetIpAddress() throws Exception {
-        Subject subject = new Subject.SubjectBuilder()
-                .ipAddress("127.0.0.1")
-                .build();
+        Subject subject = new Subject.SubjectBuilder().build();
+        subject.setIpAddress("127.0.0.1");
         assertEquals("127.0.0.1", subject.getSubject().get("ip"));
     }
 

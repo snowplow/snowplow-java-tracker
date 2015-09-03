@@ -71,8 +71,8 @@ dependencies {
     // SLF4J logging API
     compile 'org.slf4j:slf4j-simple:1.7.7'
 
-    // JSON
-    compile 'org.json:json:20131018'
+    // Jackson JSON processor
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
 
     // Preconditions
     compile 'com.google.guava:guava:18.0'
@@ -84,7 +84,6 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'com.squareup.okhttp:mockwebserver:2.1.0'
 }
-
 
 task sourceJar(type: Jar, dependsOn: 'generateSources') {
     from sourceSets.main.allJava

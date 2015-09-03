@@ -50,6 +50,7 @@ public class BatchEmitterTest {
         httpClientAdapter = mock(HttpClientAdapter.class);
         emitter = spy(BatchEmitter.builder()
                 .httpClientAdapter(httpClientAdapter)
+                .bufferSize(10)
                 .build());
     }
 
@@ -77,16 +78,16 @@ public class BatchEmitterTest {
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
     public void addToBuffer_withMore10Payloads_shouldFlushBuffer() throws Exception {
-
         // Given
         ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
-
         List<TrackerPayload> payloads = createPayloads(10);
 
         // When
         for (TrackerPayload payload : payloads) {
             emitter.emit(payload);
         }
+
+        Thread.sleep(500);
 
         // Then
         verify(emitter).flushBuffer();

@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 // Google
 import com.google.common.collect.ImmutableMap;
@@ -41,7 +42,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 @RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {
 
-    public static final String EXPECTED_BASE64_CONTEXTS = "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9jb250ZXh0cy9qc29uc2NoZW1hLzEtMC0xIiwiZGF0YSI6W3sic2NoZW1hIjoic2NoZW1hIiwiZGF0YSI6eyJmb28iOiJiYXIifX1dfQ==";
+    public static final String EXPECTED_BASE64_CONTEXTS = "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-1\",\"data\":[{\"schema\":\"schema\",\"data\":{\"foo\":\"bar\"}}]}";
     public static final String EXPECTED_EVENT_ID = "15e9b149-6029-4f6e-8447-5b9797c9e6be";
 
     @Mock
@@ -57,10 +58,13 @@ public class TrackerTest {
     public void setUp() throws Exception {
         tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
                 .subject(new Subject.SubjectBuilder().build())
+                .base64(false)
                 .build();
         tracker.getSubject().setTimezone("Etc/UTC");
         contexts = singletonList(new SelfDescribingJson("schema", ImmutableMap.of("foo", "bar")));
     }
+
+    // --- Event Tests
 
     @Test
     public void testEcommerceEvent() {
@@ -99,31 +103,11 @@ public class TrackerTest {
         verify(emitter, times(2)).emit(captor.capture());
         List<TrackerPayload> allValues = captor.getAllValues();
 
-        Map result1 = allValues.get(1).getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
-                .put("ti_nm", "name")
-                .put("ti_id", "order_id")
-                .put("e", "ti")
-                .put("cx", EXPECTED_BASE64_CONTEXTS)
-                .put("eid", EXPECTED_EVENT_ID)
-                .put("tna", "AF003")
-                .put("aid", "cloudfront")
-                .put("ti_cu", "currency")
-                .put("dtm", "123456")
-                .put("tz", "Etc/UTC")
-                .put("ti_pr", "1.0")
-                .put("ti_qu", "2")
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("ti_ca", "category")
-                .put("ti_sk", "sku")
-                .build(), result1);
-
-        Map result2 = allValues.get(0).getMap();
+        Map result1 = allValues.get(0).getMap();
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("e", "tr")
                 .put("tr_cu", "currency")
-                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_BASE64_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
@@ -139,6 +123,26 @@ public class TrackerTest {
                 .put("tr_tt", "1.0")
                 .put("tr_ci", "city")
                 .put("tr_st", "state")
+                .build(), result1);
+
+        Map result2 = allValues.get(1).getMap();
+        assertEquals(ImmutableMap.<String, Object>builder()
+                .put("ti_nm", "name")
+                .put("ti_id", "order_id")
+                .put("e", "ti")
+                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("eid", EXPECTED_EVENT_ID)
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("ti_cu", "currency")
+                .put("dtm", "123456")
+                .put("tz", "Etc/UTC")
+                .put("ti_pr", "1.0")
+                .put("ti_qu", "2")
+                .put("p", "srv")
+                .put("tv", Version.TRACKER)
+                .put("ti_ca", "category")
+                .put("ti_sk", "sku")
                 .build(), result2);
     }
 
@@ -163,11 +167,11 @@ public class TrackerTest {
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
-                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_BASE64_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYXIifX19")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"payload\",\"data\":{\"foo\":\"bar\"}}}")
                 .put("dtm", "123456")
                 .put("aid", "cloudfront")
                 .build(), result);
@@ -195,7 +199,7 @@ public class TrackerTest {
                 .put("e", "ue")
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJwYXlsb2FkIiwiZGF0YSI6eyJmb28iOiJiYcOmciJ9fX0=")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"payload\",\"data\":{\"foo\":\"baær\"}}}")
                 .put("dtm", "123456")
                 .put("aid", "cloudfront")
                 .build(), result);
@@ -223,7 +227,7 @@ public class TrackerTest {
                 .put("page", "title")
                 .put("tv", Version.TRACKER)
                 .put("p", "srv")
-                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_BASE64_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
@@ -252,16 +256,16 @@ public class TrackerTest {
                 .put("e", "ue")
                 .put("tv", Version.TRACKER)
                 .put("p", "srv")
-                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_BASE64_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJlaWQiOiIxNWU5YjE0OS02MDI5LTRmNmUtODQ0Ny01Yjk3OTdjOWU2YmUiLCJuYW1lIjoibmFtZSIsImlkIjoiaWQiLCJkdG0iOiIxMjM0NTYifX19")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
                 .build(), result);
     }
 
     @Test
-    public void testTrackScreenViewWithDefaultContextAndTimestamp() {
+    public void testTrackScreenViewWithTimestamp() {
         // When
         tracker.track(ScreenView.builder()
                 .name("name")
@@ -282,13 +286,12 @@ public class TrackerTest {
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJlaWQiOiIxNWU5YjE0OS02MDI5LTRmNmUtODQ0Ny01Yjk3OTdjOWU2YmUiLCJuYW1lIjoibmFtZSIsImlkIjoiaWQiLCJkdG0iOiIxMjM0NTYifX19")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
                 .build(), result);
     }
 
-
     @Test
-    public void testTrackScreenViewWithTimestamp() {
+    public void testTrackScreenViewWithDefaultContextAndTimestamp() {
         // When
         tracker.track(ScreenView.builder()
                 .name("name")
@@ -305,11 +308,11 @@ public class TrackerTest {
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
-                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_BASE64_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy9zY3JlZW5fdmlldy9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJlaWQiOiIxNWU5YjE0OS02MDI5LTRmNmUtODQ0Ny01Yjk3OTdjOWU2YmUiLCJuYW1lIjoibmFtZSIsImlkIjoiaWQiLCJkdG0iOiIxMjM0NTYifX19")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
                 .put("dtm", "123456")
                 .put("aid", "cloudfront")
                 .build(), result);
@@ -335,11 +338,11 @@ public class TrackerTest {
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
-                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_BASE64_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy90aW1pbmcvanNvbnNjaGVtYS8xLTAtMCIsImRhdGEiOnsiZWlkIjoiMTVlOWIxNDktNjAyOS00ZjZlLTg0NDctNWI5Nzk3YzllNmJlIiwidGltaW5nIjoiMTAiLCJ2YXJpYWJsZSI6InZhcmlhYmxlIiwibGFiZWwiOiJsYWJlbCIsImNhdGVnb3J5IjoiY2F0ZWdvcnkiLCJkdG0iOiIxMjM0NTYifX19")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":\"10\",\"variable\":\"variable\"}}}")
                 .put("dtm", "123456")
                 .put("aid", "cloudfront")
                 .build(), result);
@@ -347,6 +350,7 @@ public class TrackerTest {
 
     @Test
     public void testTrackTimingWithSubject() {
+        // Make Subject
         Subject s1 = new Subject.SubjectBuilder().build();
         s1.setIpAddress("127.0.0.1");
         s1.setTimezone("Etc/UTC");
@@ -368,58 +372,76 @@ public class TrackerTest {
         Map result = captor.getValue().getMap();
         assertEquals(ImmutableMap.<String, Object>builder()
                 .put("p", "srv")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":\"10\",\"variable\":\"variable\"}}}")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
                 .put("ip", "127.0.0.1")
-                .put("cx", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_BASE64_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
-                .put("ue_px", "eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy91bnN0cnVjdF9ldmVudC9qc29uc2NoZW1hLzEtMC0wIiwiZGF0YSI6eyJzY2hlbWEiOiJpZ2x1OmNvbS5zbm93cGxvd2FuYWx5dGljcy5zbm93cGxvdy90aW1pbmcvanNvbnNjaGVtYS8xLTAtMCIsImRhdGEiOnsiZWlkIjoiMTVlOWIxNDktNjAyOS00ZjZlLTg0NDctNWI5Nzk3YzllNmJlIiwidGltaW5nIjoiMTAiLCJ2YXJpYWJsZSI6InZhcmlhYmxlIiwibGFiZWwiOiJsYWJlbCIsImNhdGVnb3J5IjoiY2F0ZWdvcnkiLCJkdG0iOiIxMjM0NTYifX19")
                 .put("dtm", "123456")
                 .put("aid", "cloudfront")
                 .build(), result);
     }
 
-    @Test
-    public void testDefaultPlatform() throws Exception {
-        Subject subject = new Subject.SubjectBuilder().build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
-                .subject(subject)
-                .build();
+    // --- Tracker Setter & Getter Tests
 
-        assertEquals(DevicePlatform.ServerSideApp, tracker.getPlatform());
+    @Test
+    public void testGetTrackerVersion() throws Exception {
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "an-app-id").build();
+        assertEquals("java-0.8.0", tracker.getTrackerVersion());
     }
 
     @Test
-    public void testSetPlatform() throws Exception {
-        Subject subject = new Subject.SubjectBuilder().build();
+    public void testSetDefaultPlatform() throws Exception {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
-                .subject(subject)
+                .platform(DevicePlatform.Desktop)
                 .build();
-
+        assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
         tracker.setPlatform(DevicePlatform.ConnectedTV);
-
         assertEquals(DevicePlatform.ConnectedTV, tracker.getPlatform());
     }
 
     @Test
     public void testSetSubject() throws Exception {
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
-
         Subject s1 = new Subject.SubjectBuilder().build();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
                 .subject(s1)
                 .build();
-
         Subject s2 = new Subject.SubjectBuilder().build();
         s2.setColorDepth(24);
         tracker.setSubject(s2);
-
         Map<String, String> subjectPairs = new HashMap<String, String>();
         subjectPairs.put("tz", "Etc/UTC");
         subjectPairs.put("cd", "24");
-
         assertEquals(subjectPairs, tracker.getSubject().getSubject());
+    }
+
+    @Test
+    public void testSetBase64Encoded() throws Exception {
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+                .base64(false)
+                .build();
+        assertTrue(!tracker.getBase64Encoded());
+        tracker.setBase64Encoded(true);
+        assertTrue(tracker.getBase64Encoded());
+    }
+
+    @Test
+    public void testSetAppId() throws Exception {
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "an-app-id").build();
+        assertEquals("an-app-id", tracker.getAppId());
+        tracker.setAppId("cloudfront");
+        assertEquals("cloudfront", tracker.getAppId());
+    }
+
+    @Test
+    public void testSetNamespace() throws Exception {
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "an-app-id").build();
+        assertEquals("namespace", tracker.getNamespace());
+        tracker.setNamespace("cloudfront");
+        assertEquals("cloudfront", tracker.getNamespace());
     }
 }

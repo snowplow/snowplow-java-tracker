@@ -102,7 +102,7 @@ public class HttpClientAdapterTest {
     }
 
     @Test
-    public void post_withSuccessfulStatusCode_isNotOk() throws InterruptedException {
+    public void post_withSuccessfulStatusCode_isOk() throws InterruptedException {
         // Given
         mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
