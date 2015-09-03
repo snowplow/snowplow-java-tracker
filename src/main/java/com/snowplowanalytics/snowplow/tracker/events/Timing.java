@@ -21,7 +21,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-public class TimingWithCategory extends Event {
+public class Timing extends Event {
 
     private final String category;
     private final String variable;
@@ -71,8 +71,8 @@ public class TimingWithCategory extends Event {
             return self();
         }
 
-        public TimingWithCategory build() {
-            return new TimingWithCategory(this);
+        public Timing build() {
+            return new Timing(this);
         }
     }
 
@@ -87,7 +87,7 @@ public class TimingWithCategory extends Event {
         return new Builder2();
     }
 
-    protected TimingWithCategory(Builder<?> builder) {
+    protected Timing(Builder<?> builder) {
         super(builder);
 
         // Precondition checks

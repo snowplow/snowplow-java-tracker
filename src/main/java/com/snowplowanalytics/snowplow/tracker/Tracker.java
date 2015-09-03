@@ -27,7 +27,7 @@ import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
-import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
+import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
@@ -378,11 +378,11 @@ public class Tracker {
     }
 
     /**
-     * Tracks a TimingWithCategory Event.
+     * Tracks a Timing Event.
      *
-     * @param event the TimingWithCategory event.
+     * @param event the Timing event.
      */
-    public void track(TimingWithCategory event) {
+    public void track(Timing event) {
         this.track(Unstructured.builder()
                 .eventData(event.getSelfDescribingJson())
                 .customContext(event.getContext())

@@ -316,9 +316,9 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackTimingWithCategory() {
+    public void testTrackTiming() {
         // When
-        tracker.track(TimingWithCategory.builder()
+        tracker.track(Timing.builder()
                 .category("category")
                 .label("label")
                 .variable("variable")
@@ -346,13 +346,13 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackTimingWithCategoryWithSubject() {
+    public void testTrackTimingWithSubject() {
         Subject s1 = new Subject.SubjectBuilder().build();
         s1.setIpAddress("127.0.0.1");
         s1.setTimezone("Etc/UTC");
 
         // When
-        tracker.track(TimingWithCategory.builder()
+        tracker.track(Timing.builder()
                 .category("category")
                 .label("label")
                 .variable("variable")
