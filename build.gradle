@@ -30,7 +30,7 @@ apply plugin: 'propdeps-maven'
 apply plugin: 'propdeps-idea'
 
 group = 'com.snowplowanalytics'
-version = '0.7.2'
+version = '0.8.0'
 sourceCompatibility = '1.6'
 targetCompatibility = '1.6'
 
@@ -116,7 +116,7 @@ task generateSources {
         srcFile.parentFile.mkdirs()
         srcFile.write(
                 """/*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.

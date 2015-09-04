@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -15,6 +15,6 @@ package com.snowplowanalytics.snowplow.tracker;
 
 // DO NOT EDIT. AUTO-GENERATED.
 public class Version {
-    static final String TRACKER = "java-0.7.2";
-    static final String VERSION = "0.7.2";
+    static final String TRACKER = "java-0.8.0";
+    static final String VERSION = "0.8.0";
 }
