@@ -21,12 +21,12 @@ import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-public class ScreenView extends Event {
+public class ScreenView extends AbstractEvent {
 
     private final String name;
     private final String id;
 
-    public static abstract class Builder<T extends Builder<T>> extends Event.Builder<T> {
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
         private String name;
         private String id;
@@ -76,24 +76,14 @@ public class ScreenView extends Event {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @return the payload to be sent.
-     */
-    public TrackerPayload getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameter.SV_ID, this.id);
-        payload.add(Parameter.SV_NAME, this.name);
-        return payload;
-    }
-
-    /**
      * Return the payload wrapped into a SelfDescribingJson.
      *
      * @return the payload as a SelfDescribingJson.
      */
-    public SelfDescribingJson getSelfDescribingJson() {
-        return new SelfDescribingJson(Constants.SCHEMA_SCREEN_VIEW, getPayload());
+    public SelfDescribingJson getPayload() {
+        TrackerPayload payload = new TrackerPayload();
+        payload.add(Parameter.SV_ID, this.id);
+        payload.add(Parameter.SV_NAME, this.name);
+        return new SelfDescribingJson(Constants.SCHEMA_SCREEN_VIEW, payload);
     }
 }

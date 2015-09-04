@@ -25,7 +25,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-public class EcommerceTransaction extends Event {
+public class EcommerceTransaction extends AbstractEvent {
 
     private final String orderId;
     private final Double totalValue;
@@ -38,7 +38,7 @@ public class EcommerceTransaction extends Event {
     private final String currency;
     private final List<EcommerceTransactionItem> items;
 
-    public static abstract class Builder<T extends Builder<T>> extends Event.Builder<T> {
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
         private String orderId;
         private Double totalValue;

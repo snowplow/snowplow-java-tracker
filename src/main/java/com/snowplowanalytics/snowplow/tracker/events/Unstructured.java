@@ -24,11 +24,12 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 /**
  * Constructs an Unstructured event object.
  */
-public class Unstructured extends Event {
+public class Unstructured extends AbstractEvent {
 
     private final SelfDescribingJson eventData;
+    private boolean base64Encode;
 
-    public static abstract class Builder<T extends Builder<T>> extends Event.Builder<T> {
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
         private SelfDescribingJson eventData;
 
@@ -69,18 +70,24 @@ public class Unstructured extends Event {
     }
 
     /**
+     * @param base64Encode whether to base64Encode the event data
+     */
+    public void setBase64Encode(boolean base64Encode) {
+        this.base64Encode = base64Encode;
+    }
+
+    /**
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
-     * @param base64Encoded whether or not to encode in base64
      * @return the payload to be sent.
      */
-    public TrackerPayload getPayload(boolean base64Encoded) {
+    public TrackerPayload getPayload() {
         TrackerPayload payload = new TrackerPayload();
         SelfDescribingJson envelope = new SelfDescribingJson(
                 Constants.SCHEMA_UNSTRUCT_EVENT, this.eventData.getMap());
         payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
-        payload.addMap(envelope.getMap(), base64Encoded,
+        payload.addMap(envelope.getMap(), this.base64Encode,
                 Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
         return putDefaultParams(payload);
     }

@@ -23,7 +23,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 /**
  * Constructs a Structured event object.
  */
-public class Structured extends Event {
+public class Structured extends AbstractEvent {
 
     private final String category;
     private final String action;
@@ -31,7 +31,7 @@ public class Structured extends Event {
     private final String property;
     private final Double value;
 
-    public static abstract class Builder<T extends Builder<T>> extends Event.Builder<T> {
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
         private String category;
         private String action;

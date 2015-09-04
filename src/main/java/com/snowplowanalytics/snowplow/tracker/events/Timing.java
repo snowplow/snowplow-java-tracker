@@ -21,14 +21,14 @@ import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-public class Timing extends Event {
+public class Timing extends AbstractEvent {
 
     private final String category;
     private final String variable;
     private final Integer timing;
     private final String label;
 
-    public static abstract class Builder<T extends Builder<T>> extends Event.Builder<T> {
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
         private String category;
         private String variable;
@@ -104,26 +104,16 @@ public class Timing extends Event {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Return the payload wrapped into a SelfDescribingJson.
      *
-     * @return the payload to be sent.
+     * @return the payload as a SelfDescribingJson.
      */
-    public TrackerPayload getPayload() {
+    public SelfDescribingJson getPayload() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameter.UT_CATEGORY, this.category);
         payload.add(Parameter.UT_LABEL, this.label);
         payload.add(Parameter.UT_TIMING, Integer.toString(this.timing));
         payload.add(Parameter.UT_VARIABLE, this.variable);
-        return payload;
-    }
-
-    /**
-     * Return the payload wrapped into a SelfDescribingJson.
-     *
-     * @return the payload as a SelfDescribingJson.
-     */
-    public SelfDescribingJson getSelfDescribingJson() {
-        return new SelfDescribingJson(Constants.SCHEMA_USER_TIMINGS, getPayload());
+        return new SelfDescribingJson(Constants.SCHEMA_USER_TIMINGS, payload);
     }
 }

@@ -20,7 +20,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-public class EcommerceTransactionItem extends Event {
+public class EcommerceTransactionItem extends AbstractEvent {
 
     private final String itemId;
     private final String sku;
@@ -30,7 +30,7 @@ public class EcommerceTransactionItem extends Event {
     private final String category;
     private final String currency;
 
-    public static abstract class Builder<T extends Builder<T>> extends Event.Builder<T> {
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
         private String itemId;
         private String sku;
@@ -140,16 +140,21 @@ public class EcommerceTransactionItem extends Event {
     }
 
     /**
+     * @param timestamp the new timestamp
+     */
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
-     * @param timestamp The timestamp of the transaction
      * @return the payload to be sent.
      */
-    public TrackerPayload getPayload(long timestamp) {
+    public TrackerPayload getPayload() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameter.EVENT, Constants.EVENT_ECOMM_ITEM);
-        payload.add(Parameter.TIMESTAMP, Long.toString(timestamp));
         payload.add(Parameter.TI_ITEM_ID, this.itemId);
         payload.add(Parameter.TI_ITEM_SKU, this.sku);
         payload.add(Parameter.TI_ITEM_NAME, this.name);

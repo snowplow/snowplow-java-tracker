@@ -23,13 +23,13 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 /**
  * Constructs a PageView event object.
  */
-public class PageView extends Event {
+public class PageView extends AbstractEvent {
 
     private final String pageUrl;
     private final String pageTitle;
     private final String referrer;
 
-    public static abstract class Builder<T extends Builder<T>> extends Event.Builder<T> {
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
         private String pageUrl;
         private String pageTitle;
