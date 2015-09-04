@@ -26,13 +26,15 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.RequestBody;
 
+// Apache
+import org.apache.http.impl.client.CloseableHttpClient;
+
 // Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
-import com.snowplowanalytics.snowplow.tracker.Utils;
 
 /**
  * A HttpClient built using OkHttp to send events via
@@ -42,22 +44,54 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
 
     private final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientAdapter.class);
     private final MediaType JSON = MediaType.parse(Constants.POST_CONTENT_TYPE);
-    private final String uri;
     private OkHttpClient httpClient;
 
-    /**
-     * Builds and returns a new ApacheHttpClient.
-     *
-     * @param uri the collector uri to use for sending
-     * @param httpClient the closeable httpclient
-     */
-    public OkHttpClientAdapter(String uri, OkHttpClient httpClient) {
-        // Precondition checks
-        Preconditions.checkArgument(Utils.isValidUrl(uri));
-        Preconditions.checkNotNull(httpClient);
+    public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
-        this.uri = uri;
-        this.httpClient = httpClient;
+        private OkHttpClient httpClient; // Required
+
+        /**
+         * @param httpClient The Apache HTTP Client to use
+         * @return itself
+         */
+        public T httpClient(OkHttpClient httpClient) {
+            this.httpClient = httpClient;
+            return self();
+        }
+
+        public OkHttpClientAdapter build() {
+            return new OkHttpClientAdapter(this);
+        }
+    }
+
+    private static class Builder2 extends Builder<Builder2> {
+        @Override
+        protected Builder2 self() {
+            return this;
+        }
+    }
+
+    public static Builder<?> builder() {
+        return new Builder2();
+    }
+
+    protected OkHttpClientAdapter(Builder<?> builder) {
+        super(builder);
+
+        // Precondition checks
+        Preconditions.checkNotNull(builder.httpClient);
+
+        this.httpClient = builder.httpClient;
+    }
+
+    /**
+     * Returns the HttpClient in use; it is up to the developer
+     * to cast it back to its original class.
+     *
+     * @return the http client
+     */
+    public Object getHttpClient() {
+        return this.httpClient;
     }
 
     /**
@@ -68,7 +102,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      * @return the HttpResponse for the Request
      */
     public int doGet(Map<String, Object> payload) {
-        StringBuilder urlBuilder = new StringBuilder(uri).append("/i?");
+        StringBuilder urlBuilder = new StringBuilder(this.url).append("/i?");
 
         Iterator<String> iterator = payload.keySet().iterator();
         while (iterator.hasNext()) {
@@ -100,7 +134,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         try {
             RequestBody body = RequestBody.create(JSON, payload);
             Request request = new Request.Builder()
-                    .url(uri + "/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION)
+                    .url(this.url + "/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION)
                     .addHeader("Content-Type", Constants.POST_CONTENT_TYPE)
                     .post(body)
                     .build();

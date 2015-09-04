@@ -14,11 +14,19 @@ package com.snowplowanalytics.snowplow.tracker.http;
 
 // Java
 import java.util.Map;
+import java.util.Objects;
+
+// SquareUp
+import com.squareup.okhttp.OkHttpClient;
+
+// Apache
+import org.apache.http.impl.client.CloseableHttpClient;
 
 // Google
 import com.google.common.base.Preconditions;
 
 // This library
+import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
@@ -27,10 +35,52 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
  */
 public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
 
+    protected final String url;
+
+    public static abstract class Builder<T extends Builder<T>> {
+
+        private String url; // Required
+        protected abstract T self();
+
+        /**
+         * Adds a URI to the Client Adapter
+         *
+         * @param url the emitter url
+         * @return itself
+         */
+        public T url(String url) {
+            this.url = url;
+            return self();
+        }
+    }
+
+    private static class Builder2 extends Builder<Builder2> {
+        @Override
+        protected Builder2 self() {
+            return this;
+        }
+    }
+
+    public static Builder<?> builder() {
+        return new Builder2();
+    }
+
+    protected AbstractHttpClientAdapter(Builder<?> builder) {
+        // Precondition checks
+        Preconditions.checkArgument(Utils.isValidUrl(builder.url));
+
+        this.url = builder.url;
+    }
+
     /**
-     * Builds a new HttpClientAdapter
+     * Returns the HttpClient URI
+     *
+     * @return the uri String
      */
-    protected AbstractHttpClientAdapter() {}
+    @Override
+    public String getUrl() {
+        return this.url;
+    }
 
     /**
      * Sends a payload via a POST request.
@@ -39,7 +89,6 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
      */
     @Override
     public int post(SelfDescribingJson payload) {
-        Preconditions.checkNotNull(payload);
         String body = payload.toString();
         return doPost(body);
     }
@@ -52,9 +101,16 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
     @Override
     @SuppressWarnings("unchecked")
     public int get(TrackerPayload payload) {
-        Preconditions.checkNotNull(payload);
         return doGet(payload.getMap());
     }
+
+    /**
+     * Returns the HttpClient in use; it is up to the developer
+     * to cast it back to its original class.
+     *
+     * @return the http client
+     */
+    public abstract Object getHttpClient();
 
     /**
      * Sends the SelfDescribingJson string containing

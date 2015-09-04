@@ -12,6 +12,12 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
+// SquareUp
+import com.squareup.okhttp.OkHttpClient;
+
+// Apache
+import org.apache.http.impl.client.CloseableHttpClient;
+
 // This library
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
@@ -36,4 +42,19 @@ public interface HttpClientAdapter {
      * @param payload the event payload
      */
     int get(TrackerPayload payload);
+
+    /**
+     * Returns the HttpClient URI
+     *
+     * @return the uri String
+     */
+    String getUrl();
+
+    /**
+     * Returns the HttpClient in use; it is up to the developer
+     * to cast it back to its original class.
+     *
+     * @return the http client
+     */
+    Object getHttpClient();
 }

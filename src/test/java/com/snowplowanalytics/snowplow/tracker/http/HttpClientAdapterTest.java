@@ -61,7 +61,10 @@ public class HttpClientAdapterTest {
                 {new HttpClientAdapterProvider() {
                     @Override
                     public HttpClientAdapter provide(String url) {
-                        return new ApacheHttpClientAdapter(url, HttpClients.createDefault());
+                        return ApacheHttpClientAdapter.builder()
+                                .url(url)
+                                .httpClient(HttpClients.createDefault())
+                                .build();
                     }
                 }},
                 {new HttpClientAdapterProvider() {
@@ -71,7 +74,10 @@ public class HttpClientAdapterTest {
                         httpClient.setConnectTimeout(1, TimeUnit.SECONDS);
                         httpClient.setReadTimeout(1, TimeUnit.SECONDS);
                         httpClient.setWriteTimeout(1, TimeUnit.SECONDS);
-                        return new OkHttpClientAdapter(url, httpClient);
+                        return OkHttpClientAdapter.builder()
+                                .url(url)
+                                .httpClient(httpClient)
+                                .build();
                     }
                 }
             }
