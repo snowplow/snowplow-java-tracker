@@ -13,6 +13,8 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
 // Java
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,20 +26,22 @@ import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * Base AbstractEmitter class.
+ * AbstractEmitter class which contains common elements to
+ * the emitters wrapped in a builder format.
  */
-public class AbstractEmitter implements Emitter {
+public abstract class AbstractEmitter implements Emitter {
 
     protected HttpClientAdapter httpClientAdapter;
     protected RequestCallback requestCallback;
     protected ExecutorService executor;
+    protected List<TrackerPayload> buffer = new ArrayList<TrackerPayload>();
+    protected int bufferSize = 1;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private HttpClientAdapter httpClientAdapter; // Required
         private RequestCallback requestCallback = null; // Optional
         private int threadCount = 50; // Optional
-
         protected abstract T self();
 
         /**
@@ -73,10 +77,6 @@ public class AbstractEmitter implements Emitter {
             this.threadCount = threadCount;
             return self();
         }
-
-        public AbstractEmitter build() {
-            return new AbstractEmitter(this);
-        }
     }
 
     private static class Builder2 extends Builder<Builder2> {
@@ -108,7 +108,42 @@ public class AbstractEmitter implements Emitter {
      * @param payload an event payload
      */
     @Override
-    public void emit(TrackerPayload payload) {}
+    public abstract void emit(TrackerPayload payload);
+
+    /**
+     * Customize the emitter buffer size to any valid integer
+     * greater than zero.
+     * - Will only effect the BatchEmitter
+     *
+     * @param bufferSize number of events to collect before
+     *                   sending
+     */
+    @Override
+    public void setBufferSize(int bufferSize) {
+        Preconditions.checkArgument(bufferSize > 0, "bufferSize must be greater than 0");
+        this.bufferSize = bufferSize;
+    }
+
+    /**
+     * Gets the Emitter Buffer Size
+     * - Will always be 1 for SimpleEmitter
+     *
+     * @return the buffer size
+     */
+    @Override
+    public int getBufferSize() {
+        return this.bufferSize;
+    }
+
+    /**
+     * Returns the List of Payloads that are in the buffer.
+     *
+     * @return the buffer payloads
+     */
+    @Override
+    public List<TrackerPayload> getBuffer() {
+        return this.buffer;
+    }
 
     /**
      * Sends a runnable to the executor service.

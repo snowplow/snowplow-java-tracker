@@ -20,7 +20,6 @@ import java.util.Map;
 
 // Google
 import com.google.common.base.Preconditions;
-import com.google.common.annotations.VisibleForTesting;
 
 // Slf4j
 import org.slf4j.Logger;
@@ -38,8 +37,6 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
-    private List<TrackerPayload> buffer = new ArrayList<TrackerPayload>();
-    private int bufferSize;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
@@ -167,27 +164,4 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     public void close() {
         flushBuffer();
     }
-
-    /**
-     * Customize the emitter buffer size to any valid integer
-     * greater than zero.
-     *
-     * @param bufferSize number of events to collect before
-     *                   sending
-     */
-    public void setBufferSize(int bufferSize) {
-        Preconditions.checkArgument(bufferSize > 0);
-        this.bufferSize = bufferSize;
-    }
-
-    /**
-     * Returns the List of Payloads that are in the buffer.
-     *
-     * @return the buffer payloads
-     */
-    @VisibleForTesting
-    public List<TrackerPayload> getBuffer() {
-        return buffer;
-    }
 }
-
