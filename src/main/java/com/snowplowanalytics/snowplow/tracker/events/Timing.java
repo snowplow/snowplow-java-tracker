@@ -112,10 +112,10 @@ public class Timing extends Event {
     public TrackerPayload getPayload() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameter.UT_CATEGORY, this.category);
-        payload.add(Parameter.UT_VARIABLE, this.variable);
-        payload.add(Parameter.UT_TIMING, Integer.toString(this.timing));
         payload.add(Parameter.UT_LABEL, this.label);
-        return putDefaultParams(payload);
+        payload.add(Parameter.UT_TIMING, Integer.toString(this.timing));
+        payload.add(Parameter.UT_VARIABLE, this.variable);
+        return payload;
     }
 
     /**
