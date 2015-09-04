@@ -52,7 +52,7 @@ com_crashlytics_export_strings.xml
 local.properties
 
 # Ignoring Version.java since its auto-generated
-#Version.java
+Version.java
 
 # Vagrant
 .vagrant
