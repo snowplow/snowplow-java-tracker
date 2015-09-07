@@ -51,7 +51,7 @@ public class TrackerPayloadTest {
 
     @Test
     public void testAddMap() {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, String> data = new HashMap<String, String>();
         data.put("key", "value");
         TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
@@ -61,8 +61,28 @@ public class TrackerPayloadTest {
     }
 
     @Test
+    public void testAddMapWithNullValue() {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("key", null);
+        TrackerPayload payload = new TrackerPayload();
+        payload.addMap(data);
+        assertNotNull(payload);
+        assertTrue(!payload.getMap().containsKey("key"));
+    }
+
+    @Test
+    public void testAddMapWithEmptyValue() {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("key", "");
+        TrackerPayload payload = new TrackerPayload();
+        payload.addMap(data);
+        assertNotNull(payload);
+        assertTrue(!payload.getMap().containsKey("key"));
+    }
+
+    @Test
     public void testAddMapEncoded() {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, String> data = new HashMap<String, String>();
         data.put("key", "value");
         TrackerPayload payload = new TrackerPayload();
         payload.addMap(data, true, "encoded", "non_encoded");
@@ -73,7 +93,7 @@ public class TrackerPayloadTest {
 
     @Test
     public void testAddMapNonEncoded() {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, String> data = new HashMap<String, String>();
         data.put("key", "value");
         TrackerPayload payload = new TrackerPayload();
         payload.addMap(data, false, "encoded", "non_encoded");

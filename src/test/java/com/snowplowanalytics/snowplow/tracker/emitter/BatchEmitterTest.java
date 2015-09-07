@@ -118,7 +118,7 @@ public class BatchEmitterTest {
 
     private TrackerPayload createPayload() {
         TrackerPayload payload = new TrackerPayload();
-        payload.add("id", UUID.randomUUID());
+        payload.add("id", UUID.randomUUID().toString());
         return payload;
     }
 }

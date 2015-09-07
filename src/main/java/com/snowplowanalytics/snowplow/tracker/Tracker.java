@@ -306,9 +306,9 @@ public class Tracker {
 
         // Add subject if available
         if (eventSubject != null) {
-            payload.addMap(new HashMap<String, Object>(eventSubject.getSubject()));
+            payload.addMap(new HashMap<String, String>(eventSubject.getSubject()));
         } else if (this.subject != null) {
-            payload.addMap(new HashMap<String, Object>(this.subject.getSubject()));
+            payload.addMap(new HashMap<String, String>(this.subject.getSubject()));
         }
 
         // Send the event!

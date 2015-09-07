@@ -22,7 +22,9 @@ import java.util.Map;
 public interface Payload {
 
     /**
-     * Add a basic parameter.
+     * Add a key-value pair to the payload:
+     * - Checks that the key is not null or empty
+     * - Checks that the value is not null or empty
      *
      * @param key The parameter key
      * @param value The parameter value as a String
@@ -30,31 +32,23 @@ public interface Payload {
     void add(String key, String value);
 
     /**
-     * Add a basic parameter.
+     * Add all the mappings from the specified map. The effect is the equivalent to that of calling:
+     *  - add(String key, String value) for each key value pair.
      *
-     * @param key The parameter key
-     * @param value The parameter value
+     * @param map Key-Value pairs to be stored in this payload
      */
-    void add(String key, Object value);
-
-    /**
-     * Add all the mappings from the specified map. The effect is the equivalent to that of calling
-     * add(String key, Object value) for each mapping for each key.
-     *
-     * @param map Mappings to be stored in this map
-     */
-    void addMap(Map<String, Object> map);
+    void addMap(Map<String, String> map);
 
     /**
      * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
      * two keys provided.
      *
-     * @param map Mapping to be stored
-     * @param base64_encoded The option you choose to encode the data
-     * @param type_encoded The key that would be set if the encoding option was set to true
-     * @param type_no_encoded They key that would be set if the encoding option was set to false
+     * @param map Map to be converted to a String and stored as a value
+     * @param base64Encoded The option you choose to encode the data
+     * @param typeEncoded The key that would be set if the encoding option was set to true
+     * @param typeNotEncoded They key that would be set if the encoding option was set to false
      */
-    void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded);
+    void addMap(Map map, boolean base64Encoded, String typeEncoded, String typeNotEncoded);
 
     /**
      * Returns the Payload as a HashMap.

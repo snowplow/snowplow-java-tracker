@@ -42,7 +42,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 @RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {
 
-    public static final String EXPECTED_BASE64_CONTEXTS = "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-1\",\"data\":[{\"schema\":\"schema\",\"data\":{\"foo\":\"bar\"}}]}";
+    public static final String EXPECTED_CONTEXTS = "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-1\",\"data\":[{\"schema\":\"schema\",\"data\":{\"foo\":\"bar\"}}]}";
     public static final String EXPECTED_EVENT_ID = "15e9b149-6029-4f6e-8447-5b9797c9e6be";
 
     @Mock
@@ -104,10 +104,10 @@ public class TrackerTest {
         List<TrackerPayload> allValues = captor.getAllValues();
 
         Map result1 = allValues.get(0).getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("e", "tr")
                 .put("tr_cu", "currency")
-                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
@@ -126,11 +126,11 @@ public class TrackerTest {
                 .build(), result1);
 
         Map result2 = allValues.get(1).getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("ti_nm", "name")
                 .put("ti_id", "order_id")
                 .put("e", "ti")
-                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
@@ -163,11 +163,11 @@ public class TrackerTest {
         verify(emitter).emit(captor.capture());
 
         Map result = captor.getValue().getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
-                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
@@ -192,7 +192,7 @@ public class TrackerTest {
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("eid", EXPECTED_EVENT_ID)
@@ -220,14 +220,14 @@ public class TrackerTest {
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "pv")
                 .put("page", "title")
                 .put("tv", Version.TRACKER)
                 .put("p", "srv")
-                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
@@ -250,13 +250,13 @@ public class TrackerTest {
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
                 .put("tv", Version.TRACKER)
                 .put("p", "srv")
-                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("aid", "cloudfront")
@@ -277,7 +277,7 @@ public class TrackerTest {
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
@@ -304,11 +304,11 @@ public class TrackerTest {
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
-                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
@@ -334,11 +334,11 @@ public class TrackerTest {
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
-                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
@@ -370,13 +370,13 @@ public class TrackerTest {
         // Then
         verify(emitter).emit(captor.capture());
         Map result = captor.getValue().getMap();
-        assertEquals(ImmutableMap.<String, Object>builder()
+        assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":\"10\",\"variable\":\"variable\"}}}")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
                 .put("ip", "127.0.0.1")
-                .put("co", EXPECTED_BASE64_CONTEXTS)
+                .put("co", EXPECTED_CONTEXTS)
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")

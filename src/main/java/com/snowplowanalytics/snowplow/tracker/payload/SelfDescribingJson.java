@@ -34,7 +34,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
  */
 public class SelfDescribingJson implements Payload {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(SelfDescribingJson.class);
     private final LinkedHashMap<String, Object> payload = new LinkedHashMap<String, Object>();
 
     /**
@@ -142,32 +142,27 @@ public class SelfDescribingJson implements Payload {
     @Deprecated
     @Override
     public void add(String key, String value) {
-        LOGGER.debug("Payload: add(String, String) method called - Doing nothing.");
+        LOGGER.info("Payload: add(String, String) method called - Doing nothing.");
     }
 
     @Deprecated
     @Override
-    public void add(String key, Object value) {
-        LOGGER.debug("Payload: add(String, Object) method called - Doing nothing.");
+    public void addMap(Map<String, String> map) {
+        LOGGER.info("Payload: addMap(Map<String, Object>) method called - Doing nothing.");
     }
 
     @Deprecated
     @Override
-    public void addMap(Map<String, Object> map) {
-        LOGGER.debug("Payload: addMap(Map<String, Object>) method called - Doing nothing.");
-    }
-
-    @Deprecated
-    @Override
-    public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
-        LOGGER.debug("Payload: addMap(Map, Boolean, String, String) method called - Doing nothing.");
+    public void addMap(Map map, boolean base64Encoded, String typeEncoded, String typeNotEncoded) {
+        LOGGER.info("Payload: addMap(Map, boolean, String, String) method called - Doing nothing.");
     }
 
     /**
-     * Returns the Payload as a HashMap.
+     * Returns the Payload as a Map.
      *
-     * @return A HashMap
+     * @return A Map of all the key-value entries
      */
+    @Override
     public Map getMap() {
         return payload;
     }
@@ -177,6 +172,7 @@ public class SelfDescribingJson implements Payload {
      *
      * @return A long representing the byte size of the payload.
      */
+    @Override
     public long getByteSize() {
         return Utils.getUTF8Length(toString());
     }
@@ -187,6 +183,7 @@ public class SelfDescribingJson implements Payload {
      *
      * @return A string value of the Payload.
      */
+    @Override
     public String toString() {
         return Utils.mapToJSONString(payload);
     }
