@@ -12,12 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-// SquareUp
-import com.squareup.okhttp.OkHttpClient;
-
-// Apache
-import org.apache.http.impl.client.CloseableHttpClient;
-
 // This library
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;

@@ -94,9 +94,9 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * When the buffer limit is reached sending of the buffer is
      * initiated.
      */
-    void flushBuffer() {
+    public void flushBuffer() {
         execute(getRequestRunnable(buffer));
-        buffer = new ArrayList<TrackerPayload>();
+        buffer = new ArrayList<>();
     }
 
     /**
@@ -146,7 +146,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @return the constructed POST payload
      */
     private SelfDescribingJson getFinalPost(List<TrackerPayload> buffer) {
-        List<Map> toSendPayloads = new ArrayList<Map>();
+        List<Map> toSendPayloads = new ArrayList<>();
         for (TrackerPayload payload : buffer) {
             toSendPayloads.add(payload.getMap());
         }

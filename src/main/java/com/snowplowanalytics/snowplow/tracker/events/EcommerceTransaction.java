@@ -146,7 +146,7 @@ public class EcommerceTransaction extends AbstractEvent {
          * @return itself
          */
         public T items(EcommerceTransactionItem... itemArgs) {
-            List<EcommerceTransactionItem> items = new ArrayList<EcommerceTransactionItem>();
+            List<EcommerceTransactionItem> items = new ArrayList<>();
             Collections.addAll(items, itemArgs);
             this.items = items;
             return self();

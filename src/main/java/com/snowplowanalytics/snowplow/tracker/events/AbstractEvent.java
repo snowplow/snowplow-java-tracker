@@ -45,7 +45,7 @@ public abstract class AbstractEvent implements Event {
 
     public static abstract class Builder<T extends Builder<T>> {
 
-        private List<SelfDescribingJson> context = new LinkedList<SelfDescribingJson>();
+        private List<SelfDescribingJson> context = new LinkedList<>();
         private long timestamp = System.currentTimeMillis();
         private String eventId = Utils.getEventId();
         private Subject subject = null;
@@ -127,7 +127,7 @@ public abstract class AbstractEvent implements Event {
      */
     @Override
     public List<SelfDescribingJson> getContext() {
-        return new ArrayList<SelfDescribingJson>(this.context);
+        return new ArrayList<>(this.context);
     }
 
     /**

@@ -41,6 +41,14 @@ public interface Emitter {
     void setBufferSize(int bufferSize);
 
     /**
+     * When the buffer limit is reached sending of the buffer is
+     * initiated.
+     *
+     * This can be used to manually start sending.
+     */
+    void flushBuffer();
+
+    /**
      * Gets the Emitter Buffer Size
      * - Will always be 1 for SimpleEmitter
      *

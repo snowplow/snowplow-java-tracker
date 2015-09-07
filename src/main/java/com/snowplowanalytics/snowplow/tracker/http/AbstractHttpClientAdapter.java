@@ -14,13 +14,6 @@ package com.snowplowanalytics.snowplow.tracker.http;
 
 // Java
 import java.util.Map;
-import java.util.Objects;
-
-// SquareUp
-import com.squareup.okhttp.OkHttpClient;
-
-// Apache
-import org.apache.http.impl.client.CloseableHttpClient;
 
 // Google
 import com.google.common.base.Preconditions;

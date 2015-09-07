@@ -63,6 +63,14 @@ public class SimpleEmitter extends AbstractEmitter {
     }
 
     /**
+     * When the buffer limit is reached sending of the buffer is
+     * initiated.
+     */
+    public void flushBuffer() {
+        // Do nothing!
+    }
+
+    /**
      * Returns a Runnable GET Request operation
      *
      * @param payload the event to be sent
@@ -88,7 +96,7 @@ public class SimpleEmitter extends AbstractEmitter {
                 // Send the callback if available
                 if (requestCallback != null) {
                     if (failure != 0) {
-                        List<TrackerPayload> buffer = new ArrayList<TrackerPayload>();
+                        List<TrackerPayload> buffer = new ArrayList<>();
                         buffer.add(payload);
                         requestCallback.onFailure(success, buffer);
                     } else {

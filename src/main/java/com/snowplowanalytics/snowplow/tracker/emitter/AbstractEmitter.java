@@ -34,7 +34,7 @@ public abstract class AbstractEmitter implements Emitter {
     protected HttpClientAdapter httpClientAdapter;
     protected RequestCallback requestCallback;
     protected ExecutorService executor;
-    protected List<TrackerPayload> buffer = new ArrayList<TrackerPayload>();
+    protected List<TrackerPayload> buffer = new ArrayList<>();
     protected int bufferSize = 1;
 
     public static abstract class Builder<T extends Builder<T>> {
@@ -123,6 +123,13 @@ public abstract class AbstractEmitter implements Emitter {
         Preconditions.checkArgument(bufferSize > 0, "bufferSize must be greater than 0");
         this.bufferSize = bufferSize;
     }
+
+    /**
+     * When the buffer limit is reached sending of the buffer is
+     * initiated.
+     */
+    @Override
+    public abstract void flushBuffer();
 
     /**
      * Gets the Emitter Buffer Size

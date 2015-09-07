@@ -413,7 +413,7 @@ public class TrackerTest {
         Subject s2 = new Subject.SubjectBuilder().build();
         s2.setColorDepth(24);
         tracker.setSubject(s2);
-        Map<String, String> subjectPairs = new HashMap<String, String>();
+        Map<String, String> subjectPairs = new HashMap<>();
         subjectPairs.put("tz", "Etc/UTC");
         subjectPairs.put("cd", "24");
         assertEquals(subjectPairs, tracker.getSubject().getSubject());

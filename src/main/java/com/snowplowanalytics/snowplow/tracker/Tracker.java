@@ -306,9 +306,9 @@ public class Tracker {
 
         // Add subject if available
         if (eventSubject != null) {
-            payload.addMap(new HashMap<String, String>(eventSubject.getSubject()));
+            payload.addMap(new HashMap<>(eventSubject.getSubject()));
         } else if (this.subject != null) {
-            payload.addMap(new HashMap<String, String>(this.subject.getSubject()));
+            payload.addMap(new HashMap<>(this.subject.getSubject()));
         }
 
         // Send the event!
@@ -323,7 +323,7 @@ public class Tracker {
      * many contexts inside
      */
     private SelfDescribingJson getFinalContext(List<SelfDescribingJson> contexts) {
-        List<Map> contextMaps = new LinkedList<Map>();
+        List<Map> contextMaps = new LinkedList<>();
         for (SelfDescribingJson selfDescribingJson : contexts) {
             contextMaps.add(selfDescribingJson.getMap());
         }

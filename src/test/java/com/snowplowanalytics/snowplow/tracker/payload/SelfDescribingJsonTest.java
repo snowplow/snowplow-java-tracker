@@ -34,7 +34,7 @@ public class SelfDescribingJsonTest {
 
     @Test
     public void testMakeSdjWithObject() {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         data.put("key", "value");
         SelfDescribingJson sdj = new SelfDescribingJson("schema_string", data);
         String expected = "{\"schema\":\"schema_string\",\"data\":{\"key\":\"value\"}}";

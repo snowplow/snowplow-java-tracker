@@ -18,9 +18,6 @@ import java.util.Map;
 // Google
 import com.google.common.base.Preconditions;
 
-// SquareUp
-import com.squareup.okhttp.OkHttpClient;
-
 // Apache
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;

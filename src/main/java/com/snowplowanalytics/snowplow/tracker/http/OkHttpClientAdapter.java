@@ -26,9 +26,6 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.RequestBody;
 
-// Apache
-import org.apache.http.impl.client.CloseableHttpClient;
-
 // Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
