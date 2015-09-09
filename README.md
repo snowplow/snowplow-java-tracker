@@ -6,7 +6,7 @@
 
 Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Java] [java]**. See also: **[Snowplow Android Tracker] [snowplow-android-tracker]**.
 
-With this tracker you can collect event data from your Java-based desktop and server apps, servlets and games. Supports JDK6+.
+With this tracker you can collect event data from your Java-based desktop and server apps, servlets and games. Supports JDK7+.
 
 ## Quickstart
 
@@ -62,7 +62,7 @@ limitations under the License.
 [roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[techdocs]: https://github.com/snowplow/snowplow/wiki/Android-and-Java-Tracker
+[techdocs]: https://github.com/snowplow/snowplow/wiki/Java-Tracker
 [setup]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Setup
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Contributing
