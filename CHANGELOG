@@ -1,4 +1,4 @@
-Java 0.8.0 (2015-xx-xx)
+Java 0.8.0 (2015-09-14)
 -----------------------
 Moved Version.java into gitignored sub-package (#135)
 Added builder pattern for Tracker (#148)
