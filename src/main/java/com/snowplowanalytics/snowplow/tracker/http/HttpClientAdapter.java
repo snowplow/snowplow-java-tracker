@@ -10,34 +10,45 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.tracker.emitter;
-
-// Java
-import java.util.List;
+package com.snowplowanalytics.snowplow.tracker.http;
 
 // This library
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * Provides a callback interface for reporting counts of successfully sent
- * events and returning any failed events to be handled by the developer.
+ * Interface for all HttpClients
  */
-public interface RequestCallback {
+public interface HttpClientAdapter {
 
     /**
-     * If all events are sent successfully then the count
-     * of sent events are returned.
+     * Sends a group of events compressed into a
+     * single SelfDescribingJson payload
      *
-     * @param successCount the successful count
+     * @param payload the final event payload
      */
-    void onSuccess(int successCount);
+    int post(SelfDescribingJson payload);
 
     /**
-     * If all/some events failed then the count of successful
-     * events is returned along with all the failed Payloads.
+     * Sends a single TrackerPayload via a
+     * GET request
      *
-     * @param successCount the successful count
-     * @param failedEvents the list of failed payloads
+     * @param payload the event payload
      */
-    void onFailure(int successCount, List<TrackerPayload> failedEvents);
+    int get(TrackerPayload payload);
+
+    /**
+     * Returns the HttpClient URI
+     *
+     * @return the uri String
+     */
+    String getUrl();
+
+    /**
+     * Returns the HttpClient in use; it is up to the developer
+     * to cast it back to its original class.
+     *
+     * @return the http client
+     */
+    Object getHttpClient();
 }

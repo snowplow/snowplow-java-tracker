@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.constants;
 
 public class Parameter {
     // General
@@ -21,7 +21,7 @@ public class Parameter {
     public static final String EID = "eid";
     public static final String TIMESTAMP = "dtm";
     public static final String TRACKER_VERSION = "tv";
-    public static final String APPID = "aid";
+    public static final String APP_ID = "aid";
     public static final String NAMESPACE = "tna";
 
     public static final String UID = "uid";
@@ -37,6 +37,10 @@ public class Parameter {
     public static final String COLOR_DEPTH = "cd";
     public static final String TIMEZONE = "tz";
     public static final String LANGUAGE = "lang";
+    public static final String IP_ADDRESS = "ip";
+    public static final String USERAGENT = "ua";
+    public static final String DOMAIN_UID = "duid";
+    public static final String NETWORK_UID = "tnuid";
 
     // Page View
     public static final String PAGE_URL = "url";
@@ -73,4 +77,10 @@ public class Parameter {
     // Screen View
     public static final String SV_ID = "id";
     public static final String SV_NAME = "name";
+
+    // User Timing
+    public static final String UT_CATEGORY = "category";
+    public static final String UT_VARIABLE = "variable";
+    public static final String UT_TIMING = "timing";
+    public static final String UT_LABEL = "label";
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -10,45 +10,65 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-
 package com.snowplowanalytics.snowplow.tracker.payload;
 
 // Java
-
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.Map;
 
-// JSON
-
 /**
- * Payload interface
  * The Payload is used to store all the parameters and configurations that are used
  * to send data via the HTTP GET/POST request.
- *
- * It allows the code for buffering events for sending to be agnostic of the event
- * format (either a TrackerPayload or a SchemaPayload).
- * @version 0.5.0
- * @author Jonathan Almeida
  */
 public interface Payload {
 
     /**
-     * Returns the Payload as a HashMap.
-     * @return A HashMap
+     * Add a key-value pair to the payload:
+     * - Checks that the key is not null or empty
+     * - Checks that the value is not null or empty
+     *
+     * @param key The parameter key
+     * @param value The parameter value as a String
      */
-    public Map getMap();
+    void add(String key, String value);
 
     /**
-     * Returns the Payload using Jackson JSON to return a JsonNode.
-     * @return A JsonNode
+     * Add all the mappings from the specified map. The effect is the equivalent to that of calling:
+     *  - add(String key, String value) for each key value pair.
+     *
+     * @param map Key-Value pairs to be stored in this payload
      */
-    public JsonNode getNode();
+    void addMap(Map<String, String> map);
+
+    /**
+     * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
+     * two keys provided.
+     *
+     * @param map Map to be converted to a String and stored as a value
+     * @param base64Encoded The option you choose to encode the data
+     * @param typeEncoded The key that would be set if the encoding option was set to true
+     * @param typeNotEncoded They key that would be set if the encoding option was set to false
+     */
+    void addMap(Map map, boolean base64Encoded, String typeEncoded, String typeNotEncoded);
+
+    /**
+     * Returns the Payload as a HashMap.
+     *
+     * @return A HashMap
+     */
+    Map getMap();
+
+    /**
+     * Returns the byte size of a payload.
+     *
+     * @return A long representing the byte size of the payload.
+     */
+    long getByteSize();
 
     /**
      * Returns the Payload as a string. This is essentially the toString from the ObjectNode used
      * to store the Payload.
+     *
      * @return A string value of the Payload.
      */
-    public String toString();
+    String toString();
 }
