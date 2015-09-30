@@ -390,7 +390,7 @@ public class TrackerTest {
     @Test
     public void testGetTrackerVersion() throws Exception {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "an-app-id").build();
-        assertEquals("java-0.8.0", tracker.getTrackerVersion());
+        assertEquals("java-0.8.1", tracker.getTrackerVersion());
     }
 
     @Test
