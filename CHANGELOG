@@ -1,3 +1,7 @@
+Java 0.8.1 (2015-09-30)
+-----------------------
+Timing event field is incorrectly converted to a String (#166)
+
 Java 0.8.0 (2015-09-14)
 -----------------------
 Moved Version.java into gitignored sub-package (#135)
