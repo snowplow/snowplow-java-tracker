@@ -17,7 +17,8 @@ Assuming git, **[Vagrant] [vagrant-install]** and **[VirtualBox] [virtualbox-ins
  host$ cd snowplow-java-tracker
  host$ vagrant up && vagrant ssh
 guest$ cd /vagrant
-guest$ gradle test
+guest$ ./gradlew clean build
+guest$ ./gradlew test
 ```
 
 ## Find out more
