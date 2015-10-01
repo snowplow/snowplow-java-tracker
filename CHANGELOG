@@ -1,4 +1,4 @@
-Java 0.8.1 (2015-09-30)
+Java 0.8.1 (2015-10-01)
 -----------------------
 Timing event field is incorrectly converted to a String (#166)
 
