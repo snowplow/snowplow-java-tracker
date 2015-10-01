@@ -342,7 +342,7 @@ public class TrackerTest {
                 .put("eid", EXPECTED_EVENT_ID)
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":\"10\",\"variable\":\"variable\"}}}")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}")
                 .put("dtm", "123456")
                 .put("aid", "cloudfront")
                 .build(), result);
@@ -372,7 +372,7 @@ public class TrackerTest {
         Map result = captor.getValue().getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":\"10\",\"variable\":\"variable\"}}}")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}")
                 .put("tv", Version.TRACKER)
                 .put("e", "ue")
                 .put("ip", "127.0.0.1")
@@ -390,7 +390,7 @@ public class TrackerTest {
     @Test
     public void testGetTrackerVersion() throws Exception {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "an-app-id").build();
-        assertEquals("java-0.8.0", tracker.getTrackerVersion());
+        assertEquals("java-0.8.1", tracker.getTrackerVersion());
     }
 
     @Test

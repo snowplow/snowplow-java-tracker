@@ -12,6 +12,9 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
+// Java
+import java.util.LinkedHashMap;
+
 // Google
 import com.google.common.base.Preconditions;
 
@@ -19,7 +22,6 @@ import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public class Timing extends AbstractEvent {
 
@@ -109,11 +111,11 @@ public class Timing extends AbstractEvent {
      * @return the payload as a SelfDescribingJson.
      */
     public SelfDescribingJson getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameter.UT_CATEGORY, this.category);
-        payload.add(Parameter.UT_LABEL, this.label);
-        payload.add(Parameter.UT_TIMING, Integer.toString(this.timing));
-        payload.add(Parameter.UT_VARIABLE, this.variable);
+        LinkedHashMap<String,Object> payload = new LinkedHashMap<>();
+        payload.put(Parameter.UT_CATEGORY, this.category);
+        payload.put(Parameter.UT_LABEL, this.label);
+        payload.put(Parameter.UT_TIMING, this.timing);
+        payload.put(Parameter.UT_VARIABLE, this.variable);
         return new SelfDescribingJson(Constants.SCHEMA_USER_TIMINGS, payload);
     }
 }
