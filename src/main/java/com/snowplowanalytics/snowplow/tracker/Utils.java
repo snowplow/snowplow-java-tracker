@@ -13,8 +13,9 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
-import java.net.URL;
 import java.util.*;
+import java.net.URL;
+import java.net.URLEncoder;
 
 // Jackson
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -126,6 +127,49 @@ public class Utils {
             LOGGER.error("Could not process Map {} into JSON String: {}", map, e.getMessage());
         }
         return jString;
+    }
+
+    /**
+     * Builds a QueryString from a Map of Name-Value pairs.
+     * 
+     * @param map The map to convert
+     * @return the QueryString ready for sending
+     */
+    public static String mapToQueryString(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder();
+        for (String key : map.keySet()) {
+            if (sb.length() > 0) {
+                sb.append("&");
+            }
+
+            String encodedKey = urlEncodeUTF8(key);
+            String encodedVal = urlEncodeUTF8(map.get(key));
+
+            // Do not add empty Keys
+            if (encodedKey != null && !encodedKey.isEmpty()) {
+                sb.append(String.format("%s=%s", encodedKey, encodedVal));
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Encodes an Object in UTF-8.  
+     * Will attempt to cast the object to a String and then encode.
+     *
+     * @param o The object to encode
+     * @return either the encoded String or an empty
+     *         String if it fails.
+     */
+    public static String urlEncodeUTF8(Object o) {
+        try {
+            String s = (String) o;
+            String encoded = URLEncoder.encode(s, "UTF-8");
+            return encoded.replaceAll("\\+", "%20");
+        } catch (Exception e) {
+            LOGGER.error("Object {} could not be encoded: {}", o, e.getMessage());
+            return "";
+        }
     }
 
     /**

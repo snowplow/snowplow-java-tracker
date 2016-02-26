@@ -94,17 +94,12 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
      * Attempts to send a group of payloads with a
      * GET request to the configured endpoint.
      *
-     * @param payload the payload map to send
+     * @param url the URL send
      * @return the HttpResponse for the Request
      */
-    public int doGet(Map<String, Object> payload) {
+    public int doGet(String url) {
         try {
-            URIBuilder uriBuilder = new URIBuilder(this.url);
-            for (String key : payload.keySet()) {
-                String value = (String) payload.get(key);
-                uriBuilder.setParameter(key, value);
-            }
-            HttpGet httpGet = new HttpGet(uriBuilder.setPath("/i").build());
+            HttpGet httpGet = new HttpGet(url);
             HttpResponse httpResponse = httpClient.execute(httpGet);
             httpGet.releaseConnection();
             return httpResponse.getStatusLine().getStatusCode();
@@ -118,13 +113,13 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
      * Attempts to send a group of payloads with a
      * POST request to the configured endpoint.
      *
+     * @param url the URL to send to
      * @param payload the payload to send
      * @return the HttpResponse for the Request
      */
-    public int doPost(String payload) {
+    public int doPost(String url, String payload) {
         try {
-            URIBuilder uriBuilder = new URIBuilder(this.url);
-            HttpPost httpPost = new HttpPost(uriBuilder.setPath("/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION).build());
+            HttpPost httpPost = new HttpPost(url);
             httpPost.addHeader("Content-Type", Constants.POST_CONTENT_TYPE);
             StringEntity params = new StringEntity(payload);
             httpPost.setEntity(params);

@@ -95,21 +95,11 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      * Attempts to send a group of payloads with a
      * GET request to the configured endpoint.
      *
-     * @param payload the payload map to send
+     * @param url the URL send
      * @return the HttpResponse for the Request
      */
-    public int doGet(Map<String, Object> payload) {
-        StringBuilder urlBuilder = new StringBuilder(this.url).append("/i?");
-
-        Iterator<String> iterator = payload.keySet().iterator();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            urlBuilder.append(key).append("=").append(payload.get(key));
-            if (iterator.hasNext()) {
-                urlBuilder.append("&");
-            }
-        }
-        Request request = new Request.Builder().url(urlBuilder.toString()).build();
+    public int doGet(String url) {
+        Request request = new Request.Builder().url(url).build();
 
         try {
             Response response = httpClient.newCall(request).execute();
@@ -124,14 +114,15 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      * Attempts to send a group of payloads with a
      * POST request to the configured endpoint.
      *
+     * @param url the URL to send to
      * @param payload the payload to send
      * @return the HttpResponse for the Request
      */
-    public int doPost(String payload) {
+    public int doPost(String url, String payload) {
         try {
             RequestBody body = RequestBody.create(JSON, payload);
             Request request = new Request.Builder()
-                    .url(this.url + "/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION)
+                    .url(url)
                     .addHeader("Content-Type", Constants.POST_CONTENT_TYPE)
                     .post(body)
                     .build();
