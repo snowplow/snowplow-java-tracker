@@ -18,6 +18,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+// Java
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class UtilsTest {
 
     @Test
@@ -53,6 +57,24 @@ public class UtilsTest {
         assertTrue(!Utils.isValidUrl(badUri1));
         String badUri2 = "http://";
         assertTrue(!Utils.isValidUrl(badUri2));
+    }
+
+    @Test
+    public void testMapToQueryString() {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("k1", "v1");
+        payload.put("k2", "s p a c e");
+        payload.put("k3", "s+p+a+c+e");
+
+        assertEquals("k1=v1&k2=s%20p%20a%20c%20e&k3=s%2Bp%2Ba%2Bc%2Be", Utils.mapToQueryString(payload));
+    }
+
+    @Test
+    public void testObjectToUTF8() {
+        assertEquals("", Utils.urlEncodeUTF8(null));
+        assertEquals(
+            "%3C%20%3E%20%23%20%25%20%7B%20%7D%20%7C%20%5C%20%5E%20%7E%20%5B%20%5D%20%60%20%3B%20%2F%20%3F%20%3A%20%40%20%3D%20%26%20%24%20%2B%20%22", 
+            Utils.urlEncodeUTF8("< > # % { } | \\ ^ ~ [ ] ` ; / ? : @ = & $ + \""));
     }
 
     @Test

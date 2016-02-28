@@ -19,6 +19,7 @@ import java.util.Map;
 import com.google.common.base.Preconditions;
 
 // This library
+import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
@@ -82,8 +83,9 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
      */
     @Override
     public int post(SelfDescribingJson payload) {
+        String url = this.url + "/" + Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION;
         String body = payload.toString();
-        return doPost(body);
+        return doPost(url, body);
     }
 
     /**
@@ -94,7 +96,8 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
     @Override
     @SuppressWarnings("unchecked")
     public int get(TrackerPayload payload) {
-        return doGet(payload.getMap());
+        String url = this.url + "/i?" + Utils.mapToQueryString(payload.getMap());
+        return doGet(url);
     }
 
     /**
@@ -109,17 +112,18 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
      * Sends the SelfDescribingJson string containing
      * the events as a POST request to the endpoint.
      *
+     * @param url the URL to send to
      * @param payload the event payload String
      * @return the result of the send
      */
-    protected abstract int doPost(String payload);
+    protected abstract int doPost(String url, String payload);
 
     /**
      * Sends the Map of key-value pairs for the event
      * as a GET request to the endpoint.
      *
-     * @param payload the event payload Map
+     * @param url the URL to send
      * @return the result of the send
      */
-    protected abstract int doGet(Map<String, Object> payload);
+    protected abstract int doGet(String url);
 }

@@ -98,12 +98,13 @@ public class HttpClientAdapterTest {
         // When
         TrackerPayload data = new TrackerPayload();
         data.add("foo", "bar");
+        data.add("space", "b a r");
         adapter.get(data);
 
         // Then
         assertEquals(1, mockWebServer.getRequestCount());
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertEquals("/i?foo=bar", recordedRequest.getPath());
+        assertEquals("/i?foo=bar&space=b%20a%20r", recordedRequest.getPath());
         assertEquals("GET", recordedRequest.getMethod());
     }
 

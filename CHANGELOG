@@ -1,3 +1,8 @@
+Java 0.8.2 (2016-02-28)
+-----------------------
+Fixed GET requests not being properly encoded (#174)
+Upgraded commons-codec version (#172)
+
 Java 0.8.1 (2015-10-01)
 -----------------------
 Timing event field is incorrectly converted to a String (#166)

@@ -30,7 +30,7 @@ apply plugin: 'propdeps-maven'
 apply plugin: 'propdeps-idea'
 
 group = 'com.snowplowanalytics'
-version = '0.8.1'
+version = '0.8.2'
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
@@ -58,7 +58,7 @@ sourceSets {
 dependencies {
 
     // Apache Commons
-    compile 'commons-codec:commons-codec:1.2'
+    compile 'commons-codec:commons-codec:1.10'
     compile 'commons-net:commons-net:3.3'
 
     // Apache HTTP
