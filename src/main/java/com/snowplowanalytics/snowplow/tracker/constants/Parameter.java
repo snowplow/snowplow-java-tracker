@@ -19,7 +19,14 @@ public class Parameter {
     public static final String DATA = "data";
     public static final String EVENT = "e";
     public static final String EID = "eid";
-    public static final String TIMESTAMP = "dtm";
+
+    public static final String TRUE_TIMESTAMP = "ttm";
+
+    public static final String DEVICE_CREATED_TIMESTAMP = "dtm";
+
+    /** deprecated Indicate the specific timestamp to use. This is kept for compatibility with older versions. */
+    @Deprecated
+    public static final String TIMESTAMP = DEVICE_CREATED_TIMESTAMP;
     public static final String TRACKER_VERSION = "tv";
     public static final String APP_ID = "aid";
     public static final String NAMESPACE = "tna";
