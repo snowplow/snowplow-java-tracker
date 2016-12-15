@@ -141,13 +141,13 @@ public class SelfDescribingJson implements Payload {
 
     @Deprecated
     @Override
-    public void add(String key, String value) {
+    public void add(String key, Object value) {
         LOGGER.info("Payload: add(String, String) method called - Doing nothing.");
     }
 
     @Deprecated
     @Override
-    public void addMap(Map<String, String> map) {
+    public void addMap(Map<String, Object> map) {
         LOGGER.info("Payload: addMap(Map<String, Object>) method called - Doing nothing.");
     }
 

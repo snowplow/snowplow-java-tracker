@@ -30,7 +30,7 @@ import com.snowplowanalytics.snowplow.tracker.Utils;
 public class TrackerPayload implements Payload {
 
     private final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
-    private final LinkedHashMap<String, String> payload = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Object> payload = new LinkedHashMap<>();
 
     /**
      * Add a key-value pair to the payload:
@@ -41,8 +41,8 @@ public class TrackerPayload implements Payload {
      * @param value The parameter value as a String
      */
     @Override
-    public void add(String key, String value) {
-        if (key == null || key.isEmpty() || value == null || value.isEmpty()) {
+    public void add(String key, Object value) {
+        if (key == null || key.isEmpty() || value == null ) {
             LOGGER.error("Invalid kv pair detected: {}->{}", key, value);
             return;
         }
@@ -57,13 +57,13 @@ public class TrackerPayload implements Payload {
      * @param map Key-Value pairs to be stored in this payload
      */
     @Override
-    public void addMap(Map<String, String> map) {
+    public void addMap(Map<String, Object> map) {
         if (map == null) {
             LOGGER.debug("Map passed in is null, returning without adding map.");
             return;
         }
         LOGGER.info("Adding new map: {}", map);
-        for (Map.Entry<String, String> entry : map.entrySet()) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
             add(entry.getKey(), entry.getValue());
         }
     }

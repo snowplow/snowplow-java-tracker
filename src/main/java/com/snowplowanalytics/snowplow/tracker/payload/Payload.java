@@ -29,7 +29,7 @@ public interface Payload {
      * @param key The parameter key
      * @param value The parameter value as a String
      */
-    void add(String key, String value);
+    void add(String key, Object value);
 
     /**
      * Add all the mappings from the specified map. The effect is the equivalent to that of calling:
@@ -37,7 +37,7 @@ public interface Payload {
      *
      * @param map Key-Value pairs to be stored in this payload
      */
-    void addMap(Map<String, String> map);
+    void addMap(Map<String, Object> map);
 
     /**
      * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
