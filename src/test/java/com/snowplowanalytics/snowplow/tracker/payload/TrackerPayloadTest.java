@@ -51,7 +51,7 @@ public class TrackerPayloadTest {
 
     @Test
     public void testAddMap() {
-        Map<String, String> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         data.put("key", "value");
         TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
@@ -62,7 +62,7 @@ public class TrackerPayloadTest {
 
     @Test
     public void testAddMapWithNullValue() {
-        Map<String, String> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         data.put("key", null);
         TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
@@ -72,7 +72,7 @@ public class TrackerPayloadTest {
 
     @Test
     public void testAddMapWithEmptyValue() {
-        Map<String, String> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         data.put("key", "");
         TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
