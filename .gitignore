@@ -57,3 +57,5 @@ Version.java
 # Vagrant
 .vagrant
 
+# OS file
+.DS_Store

@@ -17,6 +17,7 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 // Google
 import com.google.common.base.Preconditions;
@@ -37,6 +38,8 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
+
+    private long closeTimeout = 5;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
@@ -163,5 +166,16 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     @Override
     public void close() {
         flushBuffer();
+        if (executor != null) {
+            executor.shutdown();
+            try {
+                boolean e = executor.awaitTermination(closeTimeout, TimeUnit.SECONDS);
+                if (e == false) {
+                    LOGGER.debug("Executor service shut down after time out");
+                }
+            } catch (InterruptedException e) {
+            }
+            executor = null;
+        }
     }
 }
