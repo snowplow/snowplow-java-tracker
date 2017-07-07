@@ -169,11 +169,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         if (executor != null) {
             executor.shutdown();
             try {
-                boolean e = executor.awaitTermination(closeTimeout, TimeUnit.SECONDS);
-                if (e == false) {
-                    LOGGER.debug("Executor service shut down after time out");
+                while (!executor.awaitTermination(closeTimeout, TimeUnit.SECONDS)) {
+                    LOGGER.debug("Executor doesn't shut down yet");
                 }
+                LOGGER.debug("Executor service shut down");
             } catch (InterruptedException e) {
+                LOGGER.error("Encounter an interrupted exception", e);
             }
             executor = null;
         }
