@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 // Java
+import java.nio.charset.Charset;
 import java.util.*;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -108,8 +109,8 @@ public class Utils {
      * @param string the string too encode
      * @return a Base64 encoded string
      */
-    public static String base64Encode(String string) {
-        return encodeBase64String(string.getBytes());
+    public static String base64Encode(String string, Charset charset) {
+        return encodeBase64String(string.getBytes(charset));
     }
 
     /**
