@@ -1,16 +1,16 @@
 # Java Analytics for Snowplow
 
-[ ![Build Status] [travis-image] ] [travis] [ ![Release] [release-image] ] [releases] [ ![License] [license-image] ] [license]
+[![Build Status][travis-image]][travis] [![Release][release-image]][releases] [![License][license-image]][license]
 
 ## Overview
 
-Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Java] [java]**. See also: **[Snowplow Android Tracker] [snowplow-android-tracker]**.
+Add analytics to your Java software with the **[Snowplow][snowplow]** event tracker for **[Java][java]**. See also: **[Snowplow Android Tracker][snowplow-android-tracker]**.
 
 With this tracker you can collect event data from your Java-based desktop and server apps, servlets and games. Supports JDK7+.
 
 ## Quickstart
 
-Assuming git, **[Vagrant] [vagrant-install]** and **[VirtualBox] [virtualbox-install]** installed:
+Assuming git, **[Vagrant][vagrant-install]** and **[VirtualBox][virtualbox-install]** installed:
 
 ```bash
  host$ git clone https://github.com/snowplow/snowplow-java-tracker.git
@@ -25,14 +25,14 @@ guest$ ./gradlew test
 
 | Technical Docs                  | Setup Guide               | Roadmap                 | Contributing                      |
 |---------------------------------|---------------------------|-------------------------|-----------------------------------|
-| ![i1] [techdocs-image]          | ![i2] [setup-image]       | ![i3] [roadmap-image]   | ![i4] [contributing-image]        |
-| **[Technical Docs] [techdocs]** | **[Setup Guide] [setup]** | **[Roadmap] [roadmap]** | **[Contributing] [contributing]** |
+| ![i1][techdocs-image]           | ![i2][setup-image]        | ![i3][roadmap-image]    | ![i4][contributing-image]         |
+| **[Technical Docs][techdocs]**  | **[Setup Guide][setup]**  | **[Roadmap][roadmap]**  | **[Contributing][contributing]**  |
 
 ## Copyright and license
 
 The Snowplow Java Tracker is copyright 2014-2015 Snowplow Analytics Ltd.
 
-Licensed under the **[Apache License, Version 2.0] [license]** (the "License");
+Licensed under the **[Apache License, Version 2.0][license]** (the "License");
 you may not use this software except in compliance with the License.
 
 Unless required by applicable law or agreed to in writing, software
