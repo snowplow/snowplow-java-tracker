@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker.payload;
 
 // Java
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -88,7 +89,7 @@ public class TrackerPayload implements Payload {
         LOGGER.info("Adding new map: {}", map);
 
         if (base64Encoded) {
-            add(typeEncoded, Utils.base64Encode(mapString));
+            add(typeEncoded, Utils.base64Encode(mapString, StandardCharsets.UTF_8));
         } else {
             add(typeNotEncoded, mapString);
         }

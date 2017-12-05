@@ -23,6 +23,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 
@@ -121,7 +122,7 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
         try {
             HttpPost httpPost = new HttpPost(url);
             httpPost.addHeader("Content-Type", Constants.POST_CONTENT_TYPE);
-            StringEntity params = new StringEntity(payload);
+            StringEntity params = new StringEntity(payload, ContentType.APPLICATION_JSON);
             httpPost.setEntity(params);
             HttpResponse httpResponse = httpClient.execute(httpPost);
             httpPost.releaseConnection();

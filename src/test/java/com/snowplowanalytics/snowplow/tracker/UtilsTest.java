@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 // Java
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -85,9 +86,10 @@ public class UtilsTest {
 
     @Test
     public void testBase64Encode() {
-        String expected = "aGVsbG93b3JsZHRlc3RiNjQ=";
-        String b64encoded = Utils.base64Encode("helloworldtestb64");
+        String expected = "aGVsbG93b3JsZHRlc3RiNjR3aXRodXRmOGNoYXJzw7TDqcOgw6c=";
+        String b64encoded = Utils.base64Encode("helloworldtestb64withutf8charsôéàç", StandardCharsets.UTF_8);
         assertEquals(expected, b64encoded);
+
     }
 
     @Test
