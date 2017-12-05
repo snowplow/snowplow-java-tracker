@@ -1,0 +1,29 @@
+apply plugin: 'java'
+group = 'com.snowplowanalytics'
+version = '0.0.1'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://maven.snplow.com/releases"
+    }
+}
+
+dependencies {
+    compile 'com.google.code.gson:gson:2.8+'
+    compile 'com.snowplowanalytics:snowplow-java-tracker:0.8.0'
+    testCompile 'junit:junit:4.12'
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'simple-console',
+                'Implementation-Version': version,
+                'Main-Class': 'com.snowplowanalytics.Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+tasks.jar.dependsOn(fatJar)
