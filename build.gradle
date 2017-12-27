@@ -19,6 +19,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
     }
 }
 
@@ -28,6 +29,8 @@ apply plugin: 'idea'
 apply plugin: 'propdeps'
 apply plugin: 'propdeps-maven'
 apply plugin: 'propdeps-idea'
+apply plugin: "com.jfrog.artifactory"
+
 
 group = 'com.snowplowanalytics'
 version = '0.8.2'
@@ -53,6 +56,31 @@ sourceSets {
     main {
         compileClasspath += configurations.provided
     }
+}
+
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
+    publish {
+        repository {
+            repoKey = 'libs-release-local'
+            maven = true
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+
+        }
+        defaults {
+            publishConfigs('archives', 'published')
+            publications('mavenJava')
+        }
+    }
+    resolve {
+        repository {
+            repoKey = 'libs-release'
+            maven = true
+
+        }
+    }
+
 }
 
 dependencies {
@@ -101,11 +129,11 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            url "$buildDir/repo" // change to point to your repo, e.g. http://my.org/repo
-        }
-    }
+//    repositories {
+//        maven {
+//            url "$buildDir/repo" // change to point to your repo, e.g. http://my.org/repo
+//        }
+//    }
 }
 
 task generateSources {
@@ -141,3 +169,5 @@ public class Version {
 
 compileJava.dependsOn generateSources
 compileJava.source generateSources.outputs.files, sourceSets.main.java
+
+artifactoryPublish.dependsOn publishToMavenLocal
