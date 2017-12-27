@@ -68,6 +68,10 @@ artifactory {
             password = "${artifactory_password}"
 
         }
+        defaults {
+            publishConfigs('archives', 'published')
+            publications('mavenJava')
+        }
     }
     resolve {
         repository {
@@ -76,6 +80,7 @@ artifactory {
 
         }
     }
+
 }
 
 dependencies {
