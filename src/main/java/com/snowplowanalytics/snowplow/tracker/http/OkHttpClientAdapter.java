@@ -13,8 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker.http;
 
 // Java
-import java.util.Iterator;
-import java.util.Map;
+import java.io.IOException;
 
 // Google
 import com.google.common.base.Preconditions;
@@ -27,6 +26,7 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.RequestBody;
 
 // Slf4j
+import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,19 +96,27 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      * GET request to the configured endpoint.
      *
      * @param url the URL send
-     * @return the HttpResponse for the Request
+     * @return the HttpResponse code for the Request or -1 if exception is caught
      */
     public int doGet(String url) {
+
+        Response response = null;
+        int returnValue = -1;
+
         Request request = new Request.Builder().url(url).build();
 
         try {
-            Response response = httpClient.newCall(request).execute();
-            return response.code();
+            response = httpClient.newCall(request).execute();
+            returnValue = response.code();
         } catch (Exception e) {
             LOGGER.error("OkHttpClient GET Request failed: {}", e.getMessage());
-            return -1;
+        } finally {
+            closeResponseBody(response);
         }
+
+        return returnValue;
     }
+
 
     /**
      * Attempts to send a group of payloads with a
@@ -116,21 +124,42 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      *
      * @param url the URL to send to
      * @param payload the payload to send
-     * @return the HttpResponse for the Request
+     * @return the HttpResponse code for the Request or -1 if exception is caught
      */
     public int doPost(String url, String payload) {
+        Response response = null;
+        int returnValue = -1;
+
         try {
             RequestBody body = RequestBody.create(JSON, payload);
             Request request = new Request.Builder()
                     .url(url)
-                    .addHeader("Content-Type", Constants.POST_CONTENT_TYPE)
+                    .addHeader(HttpHeaders.CONTENT_TYPE, Constants.POST_CONTENT_TYPE)
                     .post(body)
                     .build();
-            Response response = httpClient.newCall(request).execute();
-            return response.code();
+            response = httpClient.newCall(request).execute();
+            returnValue = response.code();
         } catch (Exception e) {
             LOGGER.error("OkHttpClient POST Request failed: {}", e.getMessage());
-            return -1;
+        } finally {
+            closeResponseBody(response);
         }
+
+        return returnValue;
+    }
+
+
+    /**
+     * Closes response body as required by OkHttpClient documentation
+     *
+     * @param response OkHttpClient response
+     */
+    private void closeResponseBody(Response response) {
+        if (response != null && response.body()!=null)
+            try {
+                response.body().close();
+            } catch (IOException e) {
+                LOGGER.error("OkHttpClient response body closing failed: {}", e.getMessage());
+            }
     }
 }
