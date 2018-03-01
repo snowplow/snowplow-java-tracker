@@ -155,7 +155,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      * @param response OkHttpClient response
      */
     private void closeResponseBody(Response response) {
-        if (response != null && response.body()!=null)
+        if (response != null && response.body() != null)
             try {
                 response.body().close();
             } catch (IOException e) {
