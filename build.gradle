@@ -70,7 +70,7 @@ dependencies {
     
     // SLF4J logging API
     compile 'org.slf4j:slf4j-api:1.7.7'
-    runtime 'org.slf4j:slf4j-simple:1.7.7'
+    testRuntime 'org.slf4j:slf4j-simple:1.7.7'
 
     // Jackson JSON processor
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
