@@ -46,7 +46,7 @@ public class TrackerPayload implements Payload {
             LOGGER.error("Invalid kv pair detected: {}->{}", key, value);
             return;
         }
-        LOGGER.info("Adding new kv pair: {}->{}", key, value);
+        LOGGER.debug("Adding new kv pair: {}->{}", key, value);
         payload.put(key, value);
     }
 
@@ -62,7 +62,7 @@ public class TrackerPayload implements Payload {
             LOGGER.debug("Map passed in is null, returning without adding map.");
             return;
         }
-        LOGGER.info("Adding new map: {}", map);
+        LOGGER.debug("Adding new map: {}", map);
         for (Map.Entry<String, String> entry : map.entrySet()) {
             add(entry.getKey(), entry.getValue());
         }
@@ -85,7 +85,7 @@ public class TrackerPayload implements Payload {
         }
 
         String mapString = Utils.mapToJSONString(map);
-        LOGGER.info("Adding new map: {}", map);
+        LOGGER.debug("Adding new map: {}", map);
 
         if (base64Encoded) {
             add(typeEncoded, Utils.base64Encode(mapString));

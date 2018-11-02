@@ -123,7 +123,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                     LOGGER.error("BatchEmitter failed to send {} events: code: {}", buffer.size(), code);
                     failure += buffer.size();
                 } else {
-                    LOGGER.info("BatchEmitter successfully sent {} events: code: {}", buffer.size(), code);
+                    LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", buffer.size(), code);
                     success += buffer.size();
                 }
 
