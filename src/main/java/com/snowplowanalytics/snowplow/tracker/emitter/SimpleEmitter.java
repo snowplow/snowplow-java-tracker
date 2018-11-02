@@ -89,7 +89,7 @@ public class SimpleEmitter extends AbstractEmitter {
                     LOGGER.error("SimpleEmitter failed to send {} events: code: {}", 1, code);
                     failure += 1;
                 } else {
-                    LOGGER.info("SimpleEmitter successfully sent {} events: code: {}", 1, code);
+                    LOGGER.debug("SimpleEmitter successfully sent {} events: code: {}", 1, code);
                     success += 1;
                 }
 
