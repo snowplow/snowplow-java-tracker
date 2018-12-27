@@ -1,3 +1,17 @@
+Java 0.8.3 (2019-01-02)
+-----------------------
+Change some info statements to debug (#202)
+Change `slf4j-simple` to a test runtime dependency (#188)
+Close ResponseBody (#195)
+Use UTF-8 encoding in events (#181)
+Make tracker exit cleanly (#187)
+Add simple-console sample project (#191)
+Fix README.md formatting (#190)
+Remove JDK7 and add OpenJDK8 in Travis build matrix (#205)
+Change sourceCompatibility and targetCompatibility to 1.8 (#204)
+Update Gradle to 5.0 (#203)
+Add Java 11 to Travis build matrix (#207)
+
 Java 0.8.2 (2016-02-28)
 -----------------------
 Fixed GET requests not being properly encoded (#174)
