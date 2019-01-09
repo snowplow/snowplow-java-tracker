@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2017 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -11,8 +11,6 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-wrapper.gradleVersion = '5.0'
-
 buildscript {
     repositories {
         maven { url 'http://repo.spring.io/plugins-release' }
@@ -22,6 +20,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.jfrog.bintray" version "1.8.4"
+}
+
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
@@ -29,10 +31,14 @@ apply plugin: 'propdeps'
 apply plugin: 'propdeps-maven'
 apply plugin: 'propdeps-idea'
 
-group = 'com.snowplowanalytics'
+wrapper.gradleVersion = '5.0.0'
+
+archivesBaseName = 'snowplow-java-tracker'
 version = '0.8.3'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
+
+def javaVersion = JavaVersion.VERSION_1_8
 
 repositories {
     // Use 'maven central' for resolving our dependencies
@@ -42,6 +48,8 @@ repositories {
 }
 
 configure([compileJava, compileTestJava]) {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
     options.encoding = 'UTF-8'
 }
 
@@ -56,7 +64,6 @@ sourceSets {
 }
 
 dependencies {
-
     // Apache Commons
     compile 'commons-codec:commons-codec:1.10'
     compile 'commons-net:commons-net:3.3'
@@ -64,10 +71,10 @@ dependencies {
     // Apache HTTP
     optional 'org.apache.httpcomponents:httpclient:4.3.3'
     optional 'org.apache.httpcomponents:httpasyncclient:4.0.1'
-    
+
     // Square OK HTTP
     optional 'com.squareup.okhttp:okhttp:2.2.0'
-    
+
     // SLF4J logging API
     compile 'org.slf4j:slf4j-api:1.7.7'
     testRuntime 'org.slf4j:slf4j-simple:1.7.7'
@@ -90,34 +97,15 @@ task sourceJar(type: Jar, dependsOn: 'generateSources') {
     from sourceSets.main.allJava
 }
 
-// Publishing
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId 'snowplow-java-tracker'
-            from components.java
-
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
-    repositories {
-        maven {
-            url "$buildDir/repo" // change to point to your repo, e.g. http://my.org/repo
-        }
-    }
-}
-
 task generateSources {
     project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker")
     doFirst {
         println outputDir
-        def srcFile = new File((String)outputDir, "Version.java")
+        def srcFile = new File((String) outputDir, "Version.java")
         srcFile.parentFile.mkdirs()
         srcFile.write(
                 """/*
- * Copyright (c) 2014-2015 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2018 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -128,9 +116,7 @@ task generateSources {
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-
 package com.snowplowanalytics.snowplow.tracker;
-
 // DO NOT EDIT. AUTO-GENERATED.
 public class Version {
     static final String TRACKER = "java-$project.version";
@@ -142,3 +128,110 @@ public class Version {
 
 compileJava.dependsOn generateSources
 compileJava.source generateSources.outputs.files, sourceSets.main.java
+
+
+task printVersion {
+    doLast {
+        print "$project.version"
+    }
+}
+
+// custom tasks for creating source/javadoc jars
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.artifactId = 'snowplow-java-tracker'
+        pom.version = "$project.version"
+        pom.project {
+            name = 'snowplow-java-tracker'
+            description = 'Snowplow event tracker for Java. Add analytics to your Java desktop and server apps, servlets and games.'
+            url = 'https://github.com/snowplow/snowplow-java-tracker/'
+            inceptionYear = '2014'
+
+            packaging = 'jar'
+            groupId = 'com.snowplowanalytics'
+
+            licenses {
+                license {
+                    name = 'The Apache Software License, Version 2.0'
+                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution = 'repo'
+                }
+            }
+            scm {
+                connection = 'https://github.com/snowplow/snowplow-java-tracker.git'
+                url = 'https://github.com/snowplow/snowplow-java-tracker'
+            }
+            developers {
+                developer {
+                    name = 'Snowplow Analytics Ltd'
+                    email = 'support@snowplowanalytics.com'
+                    organization = 'Snowplow Analytics Ltd'
+                    organizationUrl = 'http://snowplowanalytics.com'
+                }
+            }
+            organization {
+                name = 'com.snowplowanalytics'
+                url = 'http://snowplowanalytics.com'
+            }
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_SNOWPLOW_MAVEN_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_SNOWPLOW_MAVEN_API_KEY')
+
+    configurations = ['archives']
+
+    publish = true
+
+    pkg {
+        repo = 'snowplow-maven'
+        name = 'snowplow-java-tracker'
+
+        group = 'com.snowplowanalytics'
+        userOrg = 'snowplow'
+
+        websiteUrl = 'https://github.com/snowplow/snowplow-java-tracker'
+        vcsUrl = 'https://github.com/snowplow/snowplow-java-tracker'
+        issueTrackerUrl = 'https://github.com/snowplow/snowplow-java-tracker/issues'
+
+        licenses = ['Apache-2.0']
+
+        version.name = "$project.version"
+
+        version {
+            mavenCentralSync {
+                sync = true
+                user = project.hasProperty('SONA_USER') ? project.property('SONA_USER') : System.getenv('SONA_USER')
+                password = project.hasProperty('SONA_PASS') ? project.property('SONA_PASS') : System.getenv('SONA_PASS')
+                close = '1'
+            }
+        }
+    }
+}
