@@ -5,6 +5,14 @@ jdk:
 - oraclejdk8
 - openjdk11
 - oraclejdk11
+script:
+- "./gradlew build"
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: "./.travis/deploy.sh $TRAVIS_TAG"
+  on:
+    tags: true
 env:
   global:
   # BINTRAY_SNOWPLOW_MAVEN_USER
