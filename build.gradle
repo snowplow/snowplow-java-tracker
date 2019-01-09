@@ -35,7 +35,7 @@ wrapper.gradleVersion = '5.0.0'
 
 group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
-version = '0.8.3'
+version = '0.8.4'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 

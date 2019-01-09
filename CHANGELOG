@@ -1,3 +1,9 @@
+Java 0.8.4 (2019-01-09)
+-----------------------
+Add deployment to build process (close #183)
+Add sonatype credentials to .travis.yml (closes #209)
+Add Bintray credentials to .travis.yml (closes #208)
+
 Java 0.8.3 (2019-01-02)
 -----------------------
 Change some info statements to debug (#202)
