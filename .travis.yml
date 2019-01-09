@@ -1,9 +1,13 @@
 sudo: false
-
 language: java
-
 jdk:
- - openjdk8
- - oraclejdk8
- - openjdk11
- - oraclejdk11
+- openjdk8
+- oraclejdk8
+- openjdk11
+- oraclejdk11
+env:
+  global:
+  # BINTRAY_SNOWPLOW_MAVEN_USER
+  - secure: Sk7Xf0TEXyDKtZxICiDVZkDEnDkSSe3m2+j1FWhLNEVfVDGqY9j4mo84S9qNOGjblJ6LbLa91NPhGFaNa1E0WAb9Zlf7e82nELTufGmoOn006Tw/nSEy8Vpvbjh+OZ+wweGYSghWYvjYKmUtlwpwBDyHezblVmpBa9tLg/2Ajzw=
+  # BINTRAY_SNOWPLOW_MAVEN_API_KEY
+  - secure: aqeXPiW/VAZNQJiE9z2S8Z/bshyVXiepczXIDlyesKe//qNaQ3X6A5Ozh8r0KCk1TCJESW5fFzBzD1kla/aDK7clW9GFQ3U29aWgXcGcLDu4plslKK+sGt/yDhMVEpD1qjLhI9mIwj6enDCvIlEtjVnrVkqaN2pjXreemE+F2UU=
