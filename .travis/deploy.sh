@@ -5,7 +5,7 @@ tag_version=$1
 cd $TRAVIS_BUILD_DIR
 pwd
 
-project_version=`cat VERSION`
+project_version=`./gradlew -q printVersion`
 if [ "${project_version}" == "${tag_version}" ]; then
     ./gradlew bintrayUpload
 else

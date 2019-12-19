@@ -33,6 +33,7 @@ apply plugin: 'propdeps-idea'
 
 wrapper.gradleVersion = '5.0.0'
 
+group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
 version = '0.8.4'
 sourceCompatibility = '1.8'
@@ -158,6 +159,9 @@ publishing {
             from components.java
             artifact sourcesJar
             artifact javadocJar
+            groupId group
+            artifactId 'snowplow-java-tracker'
+            version version
         }
     }
 }
@@ -203,10 +207,8 @@ install {
 }
 
 bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_SNOWPLOW_MAVEN_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_SNOWPLOW_MAVEN_API_KEY')
-
-    configurations = ['archives']
+    user = System.getenv('BINTRAY_SNOWPLOW_MAVEN_USER')
+    key = System.getenv('BINTRAY_SNOWPLOW_MAVEN_API_KEY')
 
     publish = true
 
@@ -222,14 +224,17 @@ bintray {
         issueTrackerUrl = 'https://github.com/snowplow/snowplow-java-tracker/issues'
 
         licenses = ['Apache-2.0']
-
-        version.name = "$project.version"
+        publications = ['mavenJava']
 
         version {
+            name = "$project.version"
+            gpg {
+                sign = true
+            }
             mavenCentralSync {
                 sync = true
-                user = project.hasProperty('SONA_USER') ? project.property('SONA_USER') : System.getenv('SONA_USER')
-                password = project.hasProperty('SONA_PASS') ? project.property('SONA_PASS') : System.getenv('SONA_PASS')
+                user = System.getenv('SONA_USER')
+                password = System.getenv('SONA_PASS')
                 close = '1'
             }
         }
