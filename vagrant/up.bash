@@ -13,7 +13,7 @@ apt-get install -y language-pack-en git unzip libyaml-dev python3-pip python-yam
 echo "==============="
 echo "INSTALLING PERU"
 echo "---------------"
-sudo pip3 install peru
+sudo pip3 install peru==1.1.4
 
 echo "======================================="
 echo "CLONING ANSIBLE AND PLAYBOOKS WITH PERU"
