@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker.events;
 
 // Google
+
 import com.google.common.base.Preconditions;
 
 // This library
@@ -141,9 +142,25 @@ public class EcommerceTransactionItem extends AbstractEvent {
 
     /**
      * @param timestamp the new timestamp
+     * @deprecated Use {@link #setTrueTimestamp(long)} or {@link #setTrueTimestamp(long)}
      */
+    @Deprecated
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        setDeviceCreatedTimestamp(timestamp);
+    }
+
+    /**
+     * @param timestamp the new timestamp
+     */
+    public void setTrueTimestamp(long timestamp) {
+        this.trueTimestamp = timestamp;
+    }
+
+    /**
+     * @param timestamp the new timestamp
+     */
+    public void setDeviceCreatedTimestamp(Long timestamp) {
+        this.deviceCreatedTimestamp = timestamp;
     }
 
     /**
