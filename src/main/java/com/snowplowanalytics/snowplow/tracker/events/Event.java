@@ -32,7 +32,7 @@ public interface Event {
 
     /**
      * @return the event's timestamp
-     * @Deprecated Use {@link #getTrueTimestamp()} or {@link #getDeviceCreatedTimestamp()}
+     * Use {@link #getTrueTimestamp()} or {@link #getDeviceCreatedTimestamp()}
      */
     @Deprecated
     long getTimestamp();
