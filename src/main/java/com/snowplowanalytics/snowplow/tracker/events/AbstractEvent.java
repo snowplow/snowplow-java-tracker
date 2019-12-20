@@ -39,14 +39,22 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 public abstract class AbstractEvent implements Event {
 
     protected final List<SelfDescribingJson> context;
-    protected long timestamp;
+
+    protected long deviceCreatedTimestamp;
+
+    /**
+     * The true timestamp may be null if none is set.
+     */
+    protected Long trueTimestamp;
+
     protected final String eventId;
     protected final Subject subject;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private List<SelfDescribingJson> context = new LinkedList<>();
-        private long timestamp = System.currentTimeMillis();
+        private long deviceCreatedTimestamp = System.currentTimeMillis();
+        protected Long trueTimestamp = null;
         private String eventId = Utils.getEventId();
         private Subject subject = null;
 
@@ -69,9 +77,34 @@ public abstract class AbstractEvent implements Event {
          * @param timestamp the event timestamp as
          *                  unix epoch
          * @return itself
+         * @deprecated Use {@link #trueTimestamp} or {@link #deviceCreatedTimestamp}
          */
+        @Deprecated
         public T timestamp(long timestamp) {
-            this.timestamp = timestamp;
+            return deviceCreatedTimestamp(timestamp);
+        }
+
+        /**
+         * Adjust the device-created timestamp. This is usually not what you want, check {@link #trueTimestamp}.
+         *
+         * @param timestamp the event timestamp as
+         *                  unix epoch
+         * @return itself
+         */
+        public T deviceCreatedTimestamp(long timestamp) {
+            this.deviceCreatedTimestamp = timestamp;
+            return self();
+        }
+
+        /**
+         * The true timestamp of that event (as determined by the user).
+         *
+         * @param timestamp the event timestamp as
+         *                  unix epoch
+         * @return itself
+         */
+        public T trueTimestamp(Long timestamp) {
+            this.trueTimestamp = timestamp;
             return self();
         }
 
@@ -117,7 +150,8 @@ public abstract class AbstractEvent implements Event {
         Preconditions.checkArgument(!builder.eventId.isEmpty(), "eventId cannot be empty");
 
         this.context = builder.context;
-        this.timestamp = builder.timestamp;
+        this.deviceCreatedTimestamp = builder.deviceCreatedTimestamp;
+        this.trueTimestamp = builder.trueTimestamp;
         this.eventId = builder.eventId;
         this.subject = builder.subject;
     }
@@ -131,11 +165,28 @@ public abstract class AbstractEvent implements Event {
     }
 
     /**
-     * @return the events timestamp
+     * @return the event's timestamp
+     * @deprecated Use {@link #getTrueTimestamp()} or {@link #getDeviceCreatedTimestamp()}
      */
     @Override
     public long getTimestamp() {
-        return this.timestamp;
+        return this.deviceCreatedTimestamp;
+    }
+
+    /**
+     * @return the event's device created timestamp.
+     */
+    @Override
+    public long getDeviceCreatedTimestamp() {
+        return deviceCreatedTimestamp;
+    }
+
+    /**
+     * @return the event's true timestamp.
+     */
+    @Override
+    public Long getTrueTimestamp() {
+        return trueTimestamp;
     }
 
     /**
@@ -168,7 +219,10 @@ public abstract class AbstractEvent implements Event {
      */
     protected TrackerPayload putDefaultParams(TrackerPayload payload) {
         payload.add(Parameter.EID, getEventId());
-        payload.add(Parameter.TIMESTAMP, Long.toString(getTimestamp()));
+        if (getTrueTimestamp()!=null) {
+            payload.add(Parameter.TRUE_TIMESTAMP, Long.toString(getTrueTimestamp()));
+        }
+        payload.add(Parameter.DEVICE_CREATED_TIMESTAMP, Long.toString(getDeviceCreatedTimestamp()));
         return payload;
     }
 }

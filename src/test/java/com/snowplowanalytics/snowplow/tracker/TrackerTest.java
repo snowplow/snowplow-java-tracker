@@ -78,7 +78,8 @@ public class TrackerTest {
                 .category("category")
                 .currency("currency")
                 .customContext(contexts)
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .build();
 
@@ -95,7 +96,8 @@ public class TrackerTest {
                 .currency("currency")
                 .items(item)
                 .customContext(contexts)
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .build());
 
@@ -113,6 +115,7 @@ public class TrackerTest {
                 .put("aid", "cloudfront")
                 .put("tr_sh", "3.0")
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("tz", "Etc/UTC")
                 .put("tr_co", "country")
                 .put("tv", Version.TRACKER)
@@ -136,6 +139,7 @@ public class TrackerTest {
                 .put("aid", "cloudfront")
                 .put("ti_cu", "currency")
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("tz", "Etc/UTC")
                 .put("ti_pr", "1.0")
                 .put("ti_qu", "2")
@@ -155,7 +159,8 @@ public class TrackerTest {
                         ImmutableMap.of("foo", "bar")
                 ))
                 .customContext(contexts)
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .build());
 
@@ -173,6 +178,7 @@ public class TrackerTest {
                 .put("tz", "Etc/UTC")
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"payload\",\"data\":{\"foo\":\"bar\"}}}")
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("aid", "cloudfront")
                 .build(), result);
     }
@@ -185,7 +191,37 @@ public class TrackerTest {
                         "payload",
                         ImmutableMap.of("foo", "baær")
                 ))
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
+                .eventId(EXPECTED_EVENT_ID)
+                .build());
+
+        // Then
+        verify(emitter).emit(captor.capture());
+        Map result = captor.getValue().getMap();
+        assertEquals(ImmutableMap.<String, String>builder()
+                .put("p", "srv")
+                .put("tv", Version.TRACKER)
+                .put("eid", EXPECTED_EVENT_ID)
+                .put("e", "ue")
+                .put("tna", "AF003")
+                .put("tz", "Etc/UTC")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"payload\",\"data\":{\"foo\":\"baær\"}}}")
+                .put("dtm", "123456")
+                .put("ttm", "456789")
+                .put("aid", "cloudfront")
+                .build(), result);
+    }
+
+    @Test
+    public void testUnstructuredEventWithoutTrueTimestamp() {
+        // When
+        tracker.track(Unstructured.builder()
+                .eventData(new SelfDescribingJson(
+                        "payload",
+                        ImmutableMap.of("foo", "baær")
+                ))
+                .deviceCreatedTimestamp(123456)
                 .eventId(EXPECTED_EVENT_ID)
                 .build());
 
@@ -213,7 +249,8 @@ public class TrackerTest {
                 .pageTitle("title")
                 .referrer("referer")
                 .customContext(contexts)
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .build());
 
@@ -222,6 +259,7 @@ public class TrackerTest {
         Map result = captor.getValue().getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("tz", "Etc/UTC")
                 .put("e", "pv")
                 .put("page", "title")
@@ -243,7 +281,8 @@ public class TrackerTest {
                 .name("name")
                 .id("id")
                 .customContext(contexts)
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .build());
 
@@ -252,6 +291,7 @@ public class TrackerTest {
         Map result = captor.getValue().getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
                 .put("tv", Version.TRACKER)
@@ -270,7 +310,8 @@ public class TrackerTest {
         tracker.track(ScreenView.builder()
                 .name("name")
                 .id("id")
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .build());
 
@@ -279,6 +320,7 @@ public class TrackerTest {
         Map result = captor.getValue().getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("tz", "Etc/UTC")
                 .put("e", "ue")
                 .put("tv", Version.TRACKER)
@@ -297,7 +339,8 @@ public class TrackerTest {
                 .name("name")
                 .id("id")
                 .customContext(contexts)
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .build());
 
@@ -314,6 +357,7 @@ public class TrackerTest {
                 .put("tz", "Etc/UTC")
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("aid", "cloudfront")
                 .build(), result);
     }
@@ -327,7 +371,8 @@ public class TrackerTest {
                 .variable("variable")
                 .timing(10)
                 .customContext(contexts)
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .build());
 
@@ -344,6 +389,7 @@ public class TrackerTest {
                 .put("tz", "Etc/UTC")
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}")
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("aid", "cloudfront")
                 .build(), result);
     }
@@ -362,7 +408,8 @@ public class TrackerTest {
                 .variable("variable")
                 .timing(10)
                 .customContext(contexts)
-                .timestamp(123456)
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
                 .eventId(EXPECTED_EVENT_ID)
                 .subject(s1)
                 .build());
@@ -381,6 +428,7 @@ public class TrackerTest {
                 .put("tna", "AF003")
                 .put("tz", "Etc/UTC")
                 .put("dtm", "123456")
+                .put("ttm", "456789")
                 .put("aid", "cloudfront")
                 .build(), result);
     }

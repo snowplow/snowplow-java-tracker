@@ -274,7 +274,8 @@ public class Tracker {
             this.track(Unstructured.builder()
                     .eventData((SelfDescribingJson) event.getPayload())
                     .customContext(context)
-                    .timestamp(event.getTimestamp())
+                    .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
+                    .trueTimestamp(event.getTrueTimestamp())
                     .eventId(event.getEventId())
                     .subject(subject)
                     .build());
