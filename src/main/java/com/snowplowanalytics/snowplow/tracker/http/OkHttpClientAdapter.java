@@ -39,7 +39,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Constants;
  */
 public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientAdapter.class);
     private final MediaType JSON = MediaType.parse(Constants.POST_CONTENT_TYPE);
     private OkHttpClient httpClient;
 
