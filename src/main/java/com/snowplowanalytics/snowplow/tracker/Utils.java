@@ -107,6 +107,7 @@ public class Utils {
      * Encodes a string into Base64.
      *
      * @param string the string too encode
+     * @param charset the charset used when base64 encoding string
      * @return a Base64 encoded string
      */
     public static String base64Encode(String string, Charset charset) {

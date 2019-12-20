@@ -90,6 +90,7 @@ public class SelfDescribingJson implements Payload {
      * Sets the Schema for the SelfDescribingJson
      *
      * @param schema a valid schema string
+     * @return this SelfDescribingJson
      */
     public SelfDescribingJson setSchema(String schema) {
         Preconditions.checkNotNull(schema, "schema cannot be null");
@@ -103,6 +104,7 @@ public class SelfDescribingJson implements Payload {
      * - Accepts a TrackerPayload object
      *
      * @param data the data to be added to the SelfDescribingJson
+     * @return this SelfDescribingJson
      */
     public SelfDescribingJson setData(TrackerPayload data) {
         if (data == null) {
@@ -116,6 +118,7 @@ public class SelfDescribingJson implements Payload {
      * Adds data to the SelfDescribingJson
      *
      * @param data the data to be added to the SelfDescribingJson
+     * @return this SelfDescribingJson
      */
     public SelfDescribingJson setData(Object data) {
         if (data == null) {
@@ -130,6 +133,7 @@ public class SelfDescribingJson implements Payload {
      * without copying over the Schema.
      *
      * @param data the payload to add to the SelfDescribingJson
+     * @return this SelfDescribingJson
      */
     public SelfDescribingJson setData(SelfDescribingJson data) {
         if (payload == null) {
