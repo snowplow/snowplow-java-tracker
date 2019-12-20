@@ -77,7 +77,7 @@ public abstract class AbstractEvent implements Event {
          * @param timestamp the event timestamp as
          *                  unix epoch
          * @return itself
-         * @deprecated Use {@link #trueTimestamp} or {@link #deviceCreatedTimestamp}
+         * Use {@link #trueTimestamp} or {@link #deviceCreatedTimestamp}
          */
         @Deprecated
         public T timestamp(long timestamp) {

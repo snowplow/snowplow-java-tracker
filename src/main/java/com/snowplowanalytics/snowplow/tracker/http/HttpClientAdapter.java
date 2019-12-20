@@ -26,6 +26,7 @@ public interface HttpClientAdapter {
      * single SelfDescribingJson payload
      *
      * @param payload the final event payload
+     * @return status code
      */
     int post(SelfDescribingJson payload);
 
@@ -34,6 +35,7 @@ public interface HttpClientAdapter {
      * GET request
      *
      * @param payload the event payload
+     * @return status code
      */
     int get(TrackerPayload payload);
 

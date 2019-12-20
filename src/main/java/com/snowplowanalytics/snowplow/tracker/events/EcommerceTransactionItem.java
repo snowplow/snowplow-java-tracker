@@ -142,7 +142,7 @@ public class EcommerceTransactionItem extends AbstractEvent {
 
     /**
      * @param timestamp the new timestamp
-     * @deprecated Use {@link #setTrueTimestamp(long)} or {@link #setTrueTimestamp(long)}
+     * Use {@link #setTrueTimestamp(long)} or {@link #setTrueTimestamp(long)}
      */
     @Deprecated
     public void setTimestamp(long timestamp) {
