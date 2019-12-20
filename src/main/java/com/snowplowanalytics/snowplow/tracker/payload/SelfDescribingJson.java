@@ -34,7 +34,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
  */
 public class SelfDescribingJson implements Payload {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(SelfDescribingJson.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SelfDescribingJson.class);
     private final LinkedHashMap<String, Object> payload = new LinkedHashMap<>();
 
     /**

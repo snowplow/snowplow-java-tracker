@@ -40,7 +40,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Constants;
  */
 public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(ApacheHttpClientAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApacheHttpClientAdapter.class);
     private CloseableHttpClient httpClient;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
