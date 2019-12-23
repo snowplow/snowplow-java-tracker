@@ -12,9 +12,11 @@ repositories {
 dependencies {
     compile 'com.google.code.gson:gson:2.8+'
     compile 'com.snowplowanalytics:snowplow-java-tracker:0.8.4'
-    optional 'com.squareup.okhttp3:okhttp:4.2.2'
+    compile 'com.squareup.okhttp3:okhttp:4.2.2'
     compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'org.slf4j:slf4j-simple:1.7.7'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
+    compile 'com.google.guava:guava:18.0'
     testCompile 'junit:junit:4.12'
 }
 
