@@ -43,8 +43,12 @@ public class TrackerPayload implements Payload {
      */
     @Override
     public void add(String key, String value) {
-        if (key == null || key.isEmpty() || value == null || value.isEmpty()) {
-            LOGGER.error("Invalid kv pair detected: {}->{}", key, value);
+        if (key == null || key.isEmpty()) {
+            LOGGER.error("Invalid key detected: {}", key);
+            return;
+        }
+        if (value == null || value.isEmpty()) { 
+            LOGGER.info("null or empty value detected: {}", value);
             return;
         }
         LOGGER.debug("Adding new kv pair: {}->{}", key, value);
