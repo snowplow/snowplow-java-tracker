@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
 
-    private static final int PAGEVIEW_COUNT = 20;
+    private static final int PAGEVIEW_COUNT = 10;
 
     public static String getUrlFromArgs(String[] args) {
         if (args == null || args.length < 1) {
@@ -91,13 +91,14 @@ public class Main {
                 .platform(DevicePlatform.ServerSideApp)
                 .build();
 
-        // This is a sample page view event, many other event types (such as self-describing events) are available
-        PageView pageViewEvent = PageView.builder()
-                .pageTitle("Hello world")
-                .pageUrl("http://helloworld.com")
-                .build();
-
         for (int i = 0; i < PAGEVIEW_COUNT; i++) {
+            // This is a sample page view event, many other event types (such as self-describing events) are available
+            PageView pageViewEvent = PageView.builder()
+                .pageTitle("Hello world " + i)
+                .pageUrl("https://www.snowplowanalytics.com")
+                .referrer("https://www.google.com")
+                .build();
+            
             tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
         }
 
