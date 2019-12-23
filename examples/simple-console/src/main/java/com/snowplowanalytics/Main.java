@@ -22,7 +22,7 @@ import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.squareup.okhttp.OkHttpClient;
+import okhttp3.OkHttpClient;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -40,11 +40,11 @@ public class Main {
 
     public static HttpClientAdapter getClient(String url) {
         // use okhttp to send events
-        OkHttpClient client = new OkHttpClient();
-
-        client.setConnectTimeout(5, TimeUnit.SECONDS);
-        client.setReadTimeout(5, TimeUnit.SECONDS);
-        client.setWriteTimeout(5, TimeUnit.SECONDS);
+        OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .writeTimeout(5, TimeUnit.SECONDS)
+            .build();
 
         return OkHttpClientAdapter.builder()
                 .url(url)

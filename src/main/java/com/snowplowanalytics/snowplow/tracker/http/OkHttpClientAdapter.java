@@ -19,11 +19,11 @@ import java.io.IOException;
 import com.google.common.base.Preconditions;
 
 // SquareUp
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.RequestBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.MediaType;
+import okhttp3.Response;
+import okhttp3.RequestBody;
 
 // Slf4j
 import org.apache.http.HttpHeaders;
@@ -40,7 +40,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientAdapter.class);
-    private final MediaType JSON = MediaType.parse(Constants.POST_CONTENT_TYPE);
+    private final MediaType JSON = MediaType.get(Constants.POST_CONTENT_TYPE);
     private OkHttpClient httpClient;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
@@ -99,19 +99,18 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      * @return the HttpResponse code for the Request or -1 if exception is caught
      */
     public int doGet(String url) {
-
-        Response response = null;
         int returnValue = -1;
 
         Request request = new Request.Builder().url(url).build();
 
-        try {
-            response = httpClient.newCall(request).execute();
-            returnValue = response.code();
-        } catch (Exception e) {
+        try (Response response = httpClient.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                LOGGER.error("OkHttpClient GET Request failed: {}", response);
+            } else {
+                returnValue = response.code();
+            }
+        } catch (IOException e) {
             LOGGER.error("OkHttpClient GET Request failed: {}", e.getMessage());
-        } finally {
-            closeResponseBody(response);
         }
 
         return returnValue;
@@ -127,39 +126,24 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
      * @return the HttpResponse code for the Request or -1 if exception is caught
      */
     public int doPost(String url, String payload) {
-        Response response = null;
         int returnValue = -1;
 
-        try {
-            RequestBody body = RequestBody.create(JSON, payload);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .addHeader(HttpHeaders.CONTENT_TYPE, Constants.POST_CONTENT_TYPE)
-                    .post(body)
-                    .build();
-            response = httpClient.newCall(request).execute();
-            returnValue = response.code();
-        } catch (Exception e) {
-            LOGGER.error("OkHttpClient POST Request failed: {}", e.getMessage());
-        } finally {
-            closeResponseBody(response);
-        }
-
-        return returnValue;
-    }
-
-
-    /**
-     * Closes response body as required by OkHttpClient documentation
-     *
-     * @param response OkHttpClient response
-     */
-    private void closeResponseBody(Response response) {
-        if (response != null && response.body() != null)
-            try {
-                response.body().close();
-            } catch (IOException e) {
-                LOGGER.error("OkHttpClient response body closing failed: {}", e.getMessage());
+        RequestBody body = RequestBody.create(JSON, payload);
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader(HttpHeaders.CONTENT_TYPE, Constants.POST_CONTENT_TYPE)
+                .post(body)
+                .build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                LOGGER.error("OkHttpClient POST Request failed: {}", response);
+            } else {
+                returnValue = response.code();
             }
+        } catch (IOException e) {
+            LOGGER.error("OkHttpClient POST Request failed: {}", e.getMessage());
+        }
+        
+        return returnValue;
     }
 }
