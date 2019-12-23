@@ -43,7 +43,7 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
          * @return itself
          */
         public T url(String url) {
-            this.url = url;
+            this.url = url.replaceFirst("/*$", "");
             return self();
         }
     }

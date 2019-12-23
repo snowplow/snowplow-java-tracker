@@ -22,10 +22,10 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.collect.ImmutableMap;
 
 // SquareUp
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import okhttp3.OkHttpClient;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 
 // Apache
 import org.apache.http.impl.client.HttpClients;
@@ -70,10 +70,11 @@ public class HttpClientAdapterTest {
                 {new HttpClientAdapterProvider() {
                     @Override
                     public HttpClientAdapter provide(String url) {
-                        OkHttpClient httpClient = new OkHttpClient();
-                        httpClient.setConnectTimeout(1, TimeUnit.SECONDS);
-                        httpClient.setReadTimeout(1, TimeUnit.SECONDS);
-                        httpClient.setWriteTimeout(1, TimeUnit.SECONDS);
+                        OkHttpClient httpClient = new OkHttpClient.Builder()
+                            .connectTimeout(1, TimeUnit.SECONDS)
+                            .readTimeout(1, TimeUnit.SECONDS)
+                            .writeTimeout(1, TimeUnit.SECONDS)
+                            .build();
                         return OkHttpClientAdapter.builder()
                                 .url(url)
                                 .httpClient(httpClient)
@@ -86,8 +87,8 @@ public class HttpClientAdapterTest {
 
     public HttpClientAdapterTest(HttpClientAdapterProvider httpClientAdapterProvider) throws IOException {
         mockWebServer = new MockWebServer();
-        mockWebServer.play();
-        adapter = httpClientAdapterProvider.provide(mockWebServer.getUrl("").toString());
+        mockWebServer.start();
+        adapter = httpClientAdapterProvider.provide(mockWebServer.url("/").toString());
     }
 
     @Test

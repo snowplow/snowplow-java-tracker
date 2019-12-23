@@ -74,7 +74,7 @@ dependencies {
     optional 'org.apache.httpcomponents:httpasyncclient:4.0.1'
 
     // Square OK HTTP
-    optional 'com.squareup.okhttp:okhttp:2.2.0'
+    optional 'com.squareup.okhttp3:okhttp:4.2.2'
 
     // SLF4J logging API
     compile 'org.slf4j:slf4j-api:1.7.7'
@@ -90,8 +90,8 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'com.github.tomakehurst:wiremock:1.53'
     testCompile 'org.skyscreamer:jsonassert:1.2.3'
-    testCompile 'org.mockito:mockito-core:1.9.5'
-    testCompile 'com.squareup.okhttp:mockwebserver:2.1.0'
+    testCompile 'org.mockito:mockito-core:3.2.4'
+    testCompile 'com.squareup.okhttp3:mockwebserver:4.2.1'
 }
 
 task sourceJar(type: Jar, dependsOn: 'generateSources') {

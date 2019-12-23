@@ -57,3 +57,5 @@ Version.java
 # Vagrant
 .vagrant
 
+#macOS
+.DS_Store
