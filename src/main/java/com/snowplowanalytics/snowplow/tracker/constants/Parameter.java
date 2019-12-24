@@ -23,6 +23,7 @@ public class Parameter {
     public static final String TRUE_TIMESTAMP = "ttm";
 
     public static final String DEVICE_CREATED_TIMESTAMP = "dtm";
+    public static final String DEVICE_SENT_TIMESTAMP = "stm";
 
     /** deprecated Indicate the specific timestamp to use. This is kept for compatibility with older versions. */
     @Deprecated

@@ -35,6 +35,7 @@ import static org.mockito.Mockito.*;
 // This library
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 
 public class BatchEmitterTest {
@@ -106,6 +107,29 @@ public class BatchEmitterTest {
     public void setBufferSize_WithNegativeValue_ThrowInvalidArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         emitter.setBufferSize(-1);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getFinalPost_shouldAddSTMParameter() throws Exception {
+        // Given
+        ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
+        List<TrackerPayload> payloads = createPayloads(10);
+
+        // When
+        for (TrackerPayload payload : payloads) {
+            emitter.emit(payload);
+        }
+
+        Thread.sleep(500);
+
+        // Then
+        verify(httpClientAdapter).post(argumentCaptor.capture());
+
+        ArrayList<Map<String, String>> dataList = (ArrayList<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
+        for (Map<String, String> payloadMap : dataList) {
+            Assert.assertTrue(payloadMap.containsKey(Parameter.DEVICE_SENT_TIMESTAMP));
+        }
     }
 
     private List<TrackerPayload> createPayloads(int nbPayload) {
