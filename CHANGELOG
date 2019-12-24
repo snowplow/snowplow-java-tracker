@@ -1,3 +1,14 @@
+Java 0.9.0 (2019-12-24)
+-----------------------
+Bump OkHttp to OkHttp3 version 4 (close #175)
+Add STM to outbound events (close #169) 
+Add support for attaching true timestamp to events (close #178) 
+Update all non-static Loggers to static (close #213)
+Fix events sent by example simple-console (close #221)
+Alter logging for invalid keys only when adding to TrackerPayload (close #186)
+Fix Peru version so vagrant up succeeds (close #216)
+Fix Javadoc generation warnings (close #219)
+
 Java 0.8.4 (2019-01-09)
 -----------------------
 Add deployment to build process (close #183)

@@ -35,7 +35,7 @@ wrapper.gradleVersion = '5.0.0'
 
 group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
-version = '0.8.4'
+version = '0.9.0'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -106,7 +106,7 @@ task generateSources {
         srcFile.parentFile.mkdirs()
         srcFile.write(
                 """/*
- * Copyright (c) 2014-2018 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2019 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
