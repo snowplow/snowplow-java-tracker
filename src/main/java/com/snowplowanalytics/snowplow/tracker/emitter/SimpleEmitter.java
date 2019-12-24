@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 
 /**
  * An emitter which sends events as soon as they are received via
@@ -48,7 +49,7 @@ public class SimpleEmitter extends AbstractEmitter {
         return new Builder2();
     }
 
-    protected SimpleEmitter(Builder<?> builder) {
+    protected SimpleEmitter(final Builder<?> builder) {
         super(builder);
     }
 
@@ -58,13 +59,12 @@ public class SimpleEmitter extends AbstractEmitter {
      * @param payload an event payload
      */
     @Override
-    public void emit(TrackerPayload payload) {
+    public void emit(final TrackerPayload payload) {
         execute(getRequestRunnable(payload));
     }
 
     /**
-     * When the buffer limit is reached sending of the buffer is
-     * initiated.
+     * When the buffer limit is reached sending of the buffer is initiated.
      */
     public void flushBuffer() {
         // Do nothing!
@@ -80,7 +80,8 @@ public class SimpleEmitter extends AbstractEmitter {
         return new Runnable() {
             @Override
             public void run() {
-                int code = httpClientAdapter.get(payload);
+                payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
+                final int code = httpClientAdapter.get(payload);
 
                 // Process results
                 int success = 0;
@@ -96,7 +97,7 @@ public class SimpleEmitter extends AbstractEmitter {
                 // Send the callback if available
                 if (requestCallback != null) {
                     if (failure != 0) {
-                        List<TrackerPayload> buffer = new ArrayList<>();
+                        final List<TrackerPayload> buffer = new ArrayList<>();
                         buffer.add(payload);
                         requestCallback.onFailure(success, buffer);
                     } else {

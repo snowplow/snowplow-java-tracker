@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
@@ -39,7 +40,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
 
-    private long closeTimeout = 5;
+    private final long closeTimeout = 5;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
@@ -49,7 +50,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
          * @param bufferSize The count of events to buffer before sending
          * @return itself
          */
-        public T bufferSize(int bufferSize) {
+        public T bufferSize(final int bufferSize) {
             this.bufferSize = bufferSize;
             return self();
         }
@@ -70,7 +71,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         return new Builder2();
     }
 
-    protected BatchEmitter(Builder<?> builder) {
+    protected BatchEmitter(final Builder<?> builder) {
         super(builder);
 
         // Precondition checks
@@ -80,13 +81,13 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Adds a payload to the buffer and checks whether
-     * we have reached the buffer limit yet.
+     * Adds a payload to the buffer and checks whether we have reached the buffer
+     * limit yet.
      *
      * @param payload an event payload
      */
     @Override
-    public synchronized void emit(TrackerPayload payload) {
+    public synchronized void emit(final TrackerPayload payload) {
         buffer.add(payload);
         if (buffer.size() >= bufferSize) {
             flushBuffer();
@@ -94,8 +95,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * When the buffer limit is reached sending of the buffer is
-     * initiated.
+     * When the buffer limit is reached sending of the buffer is initiated.
      */
     public void flushBuffer() {
         execute(getRequestRunnable(buffer));
@@ -116,8 +116,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                     return;
                 }
 
-                SelfDescribingJson post = getFinalPost(buffer);
-                int code = httpClientAdapter.post(post);
+                final SelfDescribingJson post = getFinalPost(buffer);
+                final int code = httpClientAdapter.post(post);
 
                 // Process results
                 int success = 0;
@@ -143,21 +143,18 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Constructs the SelfDescribingJson to be sent
-     * to the endpoint
+     * Constructs the SelfDescribingJson to be sent to the endpoint
      *
      * @return the constructed POST payload
      */
-    private SelfDescribingJson getFinalPost(List<TrackerPayload> buffer) {
-        List<Map> toSendPayloads = new ArrayList<>();
-        for (TrackerPayload payload : buffer) {
+    private SelfDescribingJson getFinalPost(final List<TrackerPayload> buffer) {
+        final List<Map> toSendPayloads = new ArrayList<>();
+        for (final TrackerPayload payload : buffer) {
+            payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
             toSendPayloads.add(payload.getMap());
         }
 
-        return new SelfDescribingJson(
-                Constants.SCHEMA_PAYLOAD_DATA,
-                toSendPayloads
-        );
+        return new SelfDescribingJson(Constants.SCHEMA_PAYLOAD_DATA, toSendPayloads);
     }
 
     /**
@@ -174,7 +171,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                     if (!executor.awaitTermination(closeTimeout, TimeUnit.SECONDS))
                         LOGGER.warn("Executor did not terminate");
                 }
-            } catch (InterruptedException ie) {
+            } catch (final InterruptedException ie) {
                 executor.shutdownNow();
                 Thread.currentThread().interrupt();
             }

@@ -50,19 +50,19 @@ public abstract class AbstractEmitter implements Emitter {
          * @param httpClientAdapter the adapter to use
          * @return itself
          */
-        public T httpClientAdapter(HttpClientAdapter httpClientAdapter) {
+        public T httpClientAdapter(final HttpClientAdapter httpClientAdapter) {
             this.httpClientAdapter = httpClientAdapter;
             return self();
         }
 
         /**
-         * An optional Request Callback for adding the ability to
-         * handle failure cases for sending.
+         * An optional Request Callback for adding the ability to handle failure cases
+         * for sending.
          *
          * @param requestCallback the emitter request callback
          * @return itself
          */
-        public T requestCallback(RequestCallback requestCallback) {
+        public T requestCallback(final RequestCallback requestCallback) {
             this.requestCallback = requestCallback;
             return self();
         }
@@ -73,7 +73,7 @@ public abstract class AbstractEmitter implements Emitter {
          * @param threadCount the size of the thread pool
          * @return itself
          */
-        public T threadCount(int threadCount) {
+        public T threadCount(final int threadCount) {
             this.threadCount = threadCount;
             return self();
         }
@@ -90,7 +90,7 @@ public abstract class AbstractEmitter implements Emitter {
         return new Builder2();
     }
 
-    protected AbstractEmitter(Builder<?> builder) {
+    protected AbstractEmitter(final Builder<?> builder) {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.httpClientAdapter);
@@ -102,8 +102,8 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * Adds a payload to the buffer and checks whether
-     * we have reached the buffer limit yet.
+     * Adds a payload to the buffer and checks whether we have reached the buffer
+     * limit yet.
      *
      * @param payload an event payload
      */
@@ -111,29 +111,25 @@ public abstract class AbstractEmitter implements Emitter {
     public abstract void emit(TrackerPayload payload);
 
     /**
-     * Customize the emitter buffer size to any valid integer
-     * greater than zero.
-     * - Will only effect the BatchEmitter
+     * Customize the emitter buffer size to any valid integer greater than zero. -
+     * Will only effect the BatchEmitter
      *
-     * @param bufferSize number of events to collect before
-     *                   sending
+     * @param bufferSize number of events to collect before sending
      */
     @Override
-    public void setBufferSize(int bufferSize) {
+    public void setBufferSize(final int bufferSize) {
         Preconditions.checkArgument(bufferSize > 0, "bufferSize must be greater than 0");
         this.bufferSize = bufferSize;
     }
 
     /**
-     * When the buffer limit is reached sending of the buffer is
-     * initiated.
+     * When the buffer limit is reached sending of the buffer is initiated.
      */
     @Override
     public abstract void flushBuffer();
 
     /**
-     * Gets the Emitter Buffer Size
-     * - Will always be 1 for SimpleEmitter
+     * Gets the Emitter Buffer Size - Will always be 1 for SimpleEmitter
      *
      * @return the buffer size
      */
@@ -157,7 +153,7 @@ public abstract class AbstractEmitter implements Emitter {
      *
      * @param runnable the runnable to be queued
      */
-    protected void execute(Runnable runnable) {
+    protected void execute(final Runnable runnable) {
         this.executor.execute(runnable);
     }
 
@@ -167,7 +163,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @param code the response code
      * @return whether it is in the success range
      */
-    protected boolean isSuccessfulSend(int code) {
+    protected boolean isSuccessfulSend(final int code) {
         return code >= 200 && code < 300;
     }
 }
