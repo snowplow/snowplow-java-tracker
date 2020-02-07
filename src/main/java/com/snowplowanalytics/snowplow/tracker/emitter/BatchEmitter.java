@@ -21,16 +21,16 @@ import java.util.concurrent.TimeUnit;
 
 // Google
 import com.google.common.base.Preconditions;
+// This library
+import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
+import com.snowplowanalytics.snowplow.tracker.payload.LazyLoadedTrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 // Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-// This library
-import com.snowplowanalytics.snowplow.tracker.constants.Constants;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 /**
  * An emitter that emit a batch of events in a single call
@@ -87,7 +87,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @param payload an event payload
      */
     @Override
-    public synchronized void emit(final TrackerPayload payload) {
+    public void emit(final TrackerPayload payload) {
         buffer.add(payload);
         if (buffer.size() >= bufferSize) {
             flushBuffer();
@@ -96,10 +96,13 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     /**
      * When the buffer limit is reached sending of the buffer is initiated.
+     * The reference to the existing buffer is copied to a local variable which is passed to the request Runnable,
+     * after the buffer has been reset. Therefore, the emit method does not have to be synchronized.
      */
     public void flushBuffer() {
-        execute(getRequestRunnable(buffer));
+        List<TrackerPayload> copiedBuffer = buffer;
         buffer = new ArrayList<>();
+        execute(getRequestRunnable(copiedBuffer));
     }
 
     /**
@@ -149,7 +152,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     private SelfDescribingJson getFinalPost(final List<TrackerPayload> buffer) {
         final List<Map> toSendPayloads = new ArrayList<>();
-        for (final TrackerPayload payload : buffer) {
+        for (TrackerPayload payload : buffer) {
+            if(payload instanceof LazyLoadedTrackerPayload){
+              LazyLoadedTrackerPayload lazyLoadedTrackerPayload = (LazyLoadedTrackerPayload) payload;
+              lazyLoadedTrackerPayload.fillPayload();
+              payload = lazyLoadedTrackerPayload.getTrackerPayload();
+            }
             payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
             toSendPayloads.add(payload.getMap());
         }
