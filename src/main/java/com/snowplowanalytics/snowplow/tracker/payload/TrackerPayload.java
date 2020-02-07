@@ -17,12 +17,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+// This library
+import com.snowplowanalytics.snowplow.tracker.Utils;
+
 // Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-// This library
-import com.snowplowanalytics.snowplow.tracker.Utils;
 
 /**
  * Returns a standard Tracker Payload consisting of
@@ -31,7 +31,7 @@ import com.snowplowanalytics.snowplow.tracker.Utils;
 public class TrackerPayload implements Payload {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
-    private final LinkedHashMap<String, String> payload = new LinkedHashMap<>();
+    protected final LinkedHashMap<String, String> payload = new LinkedHashMap<>();
 
     /**
      * Add a key-value pair to the payload:
@@ -47,7 +47,7 @@ public class TrackerPayload implements Payload {
             LOGGER.error("Invalid key detected: {}", key);
             return;
         }
-        if (value == null || value.isEmpty()) { 
+        if (value == null || value.isEmpty()) {
             LOGGER.info("null or empty value detected: {}", value);
             return;
         }
