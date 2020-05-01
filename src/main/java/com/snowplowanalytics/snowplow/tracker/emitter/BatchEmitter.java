@@ -87,7 +87,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @param payload an event payload
      */
     @Override
-    public void emit(final TrackerPayload payload) {
+    public synchronized void emit(final TrackerPayload payload) {
         buffer.add(payload);
         if (buffer.size() >= bufferSize) {
             flushBuffer();
@@ -100,9 +100,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * after the buffer has been reset. Therefore, the emit method does not have to be synchronized.
      */
     public void flushBuffer() {
-        List<TrackerPayload> copiedBuffer = buffer;
+        execute(getRequestRunnable(buffer));
         buffer = new ArrayList<>();
-        execute(getRequestRunnable(copiedBuffer));
     }
 
     /**
