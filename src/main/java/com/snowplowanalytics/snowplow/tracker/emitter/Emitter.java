@@ -12,10 +12,9 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// This library
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-
 import java.util.List;
+
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
 /**
  * Emitter interface.
@@ -23,12 +22,12 @@ import java.util.List;
 public interface Emitter {
 
     /**
-     * Adds a payload to the buffer and checks whether
+     * Adds an event to the buffer and checks whether
      * we have reached the buffer limit yet.
      *
      * @param payload an event payload
      */
-    void emit(TrackerPayload payload);
+    void emit(TrackerEvent payload);
 
     /**
      * Customize the emitter buffer size to any valid integer
@@ -57,9 +56,9 @@ public interface Emitter {
     int getBufferSize();
 
     /**
-     * Returns the List of Payloads that are in the buffer.
+     * Returns the List of Events that are in the buffer.
      *
-     * @return the buffer payloads
+     * @return the buffer events
      */
-    List<TrackerPayload> getBuffer();
+    List<TrackerEvent> getBuffer();
 }

@@ -12,19 +12,14 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
-// Java
 import java.util.*;
 
-// Google
 import com.google.common.base.Preconditions;
-// This library
-import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
-import com.snowplowanalytics.snowplow.tracker.payload.LazyLoadedTrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public class Tracker {
@@ -230,83 +225,16 @@ public class Tracker {
     // --- Event Tracking Functions
 
     /**
-     * Used for either Tracking a custom TrackerPayload or
-     * for re-sending a failed event.
-     *
-     * @param payload the payload to track
-     */
-    public void track(TrackerPayload payload) {
-        this.emitter.emit(payload);
-    }
-
-    /**
      * Handles tracking the different types of events that
      * the Tracker can encounter.
      *
      * @param event the event to track
      */
     public void track(Event event) {
-      TrackerPayload trackerPayload = getTrackerPayload(event);
-      if(trackerPayload != null){
-        // Emit the event
-        this.emitter.emit(trackerPayload);
-      }
-    }
+      List<TrackerEvent> events = getTrackerEvents(event);
 
-    /**
-     * Converts a {@link Event} to a {@link TrackerPayload}. Adds fields to the {@link TrackerPayload} based on the type of the {@link Event}.
-     */
-    public TrackerPayload getTrackerPayload(Event event){
-      List<SelfDescribingJson> context = event.getContext();
-      Subject subject = event.getSubject();
-
-      TrackerPayload trackerPayload = null;
-
-      // Figure out what type of event it is
-      Class eClass = event.getClass();
-      if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
-          trackerPayload = (TrackerPayload) event.getPayload();
-          this.addTrackerPayload(trackerPayload, context, subject);
-      } else if (eClass.equals(EcommerceTransaction.class)) {
-          trackerPayload = (TrackerPayload) event.getPayload();
-          this.addTrackerPayload(trackerPayload, context, subject);
-
-          // Track each item individually
-          EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
-          for(EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
-              item.setTimestamp(ecommerceTransaction.getTimestamp());
-              this.addTrackerPayload(item.getPayload(), item.getContext(), item.getSubject());
-          }
-      } else if (eClass.equals(Unstructured.class)) {
-
-          // Need to set the Base64 rule for Unstructured events
-          Unstructured unstructured = (Unstructured) event;
-          unstructured.setBase64Encode(base64Encoded);
-          trackerPayload = unstructured.getPayload();
-          this.addTrackerPayload(trackerPayload, context, subject);
-      } else if (eClass.equals(Timing.class) || eClass.equals(ScreenView.class)) {
-
-          // These are wrapper classes for Unstructured events; need to create Unstructured
-          // events from them and resend.
-          trackerPayload = getTrackerPayload(Unstructured.builder()
-                  .eventData((SelfDescribingJson) event.getPayload())
-                  .customContext(context)
-                  .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
-                  .trueTimestamp(event.getTrueTimestamp())
-                  .eventId(event.getEventId())
-                  .subject(subject)
-                  .build());
-      }
-      return trackerPayload;
-    }
-
-    /**
-     * Tracks an {@link Event} and builds the {@link Payload} for the {@link Event} asynchronously.
-     * @param event The {@link Event} that should be tracked asynchronously.
-     */
-    public void trackAsync(Event event){
-      LazyLoadedTrackerPayload lazyLoadedTrackerPayload = new LazyLoadedTrackerPayload(this, event);
-      this.emitter.emit(lazyLoadedTrackerPayload);
+      // Emit the events
+      events.forEach(e -> this.emitter.emit(e));
     }
 
     // --- Helpers
@@ -318,40 +246,41 @@ public class Tracker {
      * @param contexts Custom context for the event
      * @param eventSubject An optional event specific Subject
      */
-    private void addTrackerPayload(TrackerPayload payload, List<SelfDescribingJson> contexts, Subject eventSubject) {
+    public void addTrackerParameters(TrackerPayload payload) {
 
         // Add default parameters to the payload
         payload.add(Parameter.PLATFORM, platform.toString());
         payload.add(Parameter.APP_ID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
-
-        // Build the final context and add it to the payload
-        if (contexts != null && contexts.size() > 0) {
-            SelfDescribingJson envelope = getFinalContext(contexts);
-            payload.addMap(envelope.getMap(), this.base64Encoded, Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
-        }
-
-        // Add subject if available
-        if (eventSubject != null) {
-            payload.addMap(new HashMap<>(eventSubject.getSubject()));
-        } else if (this.subject != null) {
-            payload.addMap(new HashMap<>(this.subject.getSubject()));
-        }
     }
 
     /**
-     * Builds the final event context.
+     * Builds the collection of TrackerEvents within the Event.
      *
-     * @param contexts the base event context
-     * @return the final event context json with
-     * many contexts inside
+     * @param event the initial event
+     * @return the collection of TrackerEvents that are contained within the Event
      */
-    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> contexts) {
-        List<Map> contextMaps = new LinkedList<>();
-        for (SelfDescribingJson selfDescribingJson : contexts) {
-            contextMaps.add(selfDescribingJson.getMap());
-        }
-        return new SelfDescribingJson(Constants.SCHEMA_CONTEXTS, contextMaps);
+    private List<TrackerEvent> getTrackerEvents(Event event) {
+        List<TrackerEvent> events = new ArrayList<>();
+
+        //Always add top level event
+        events.add(new TrackerEvent(this, event));
+
+        // Figure out what type of event it is
+        final Class<?> eventClass = event.getClass();
+
+        // Check for subevents on certain event types
+        if (eventClass.equals(EcommerceTransaction.class)) {
+            final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
+
+            // Track each item individually
+            for (final EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
+              item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
+              events.add(new TrackerEvent(this, item));
+            }
+          } 
+
+        return events;
     }
 }

@@ -12,17 +12,14 @@
  */
 package com.snowplowanalytics.snowplow.tracker.payload;
 
-// Java
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// This library
-import com.snowplowanalytics.snowplow.tracker.Utils;
-
-// Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.snowplowanalytics.snowplow.tracker.Utils;
 
 /**
  * Returns a standard Tracker Payload consisting of
@@ -31,18 +28,17 @@ import org.slf4j.LoggerFactory;
 public class TrackerPayload implements Payload {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
-    protected final LinkedHashMap<String, String> payload = new LinkedHashMap<>();
+    protected final Map<String, String> payload = new LinkedHashMap<>();
 
     /**
-     * Add a key-value pair to the payload:
-     * - Checks that the key is not null or empty
-     * - Checks that the value is not null or empty
+     * Add a key-value pair to the payload: - Checks that the key is not null or
+     * empty - Checks that the value is not null or empty
      *
-     * @param key The parameter key
+     * @param key   The parameter key
      * @param value The parameter value as a String
      */
     @Override
-    public void add(String key, String value) {
+    public void add(final String key, final String value) {
         if (key == null || key.isEmpty()) {
             LOGGER.error("Invalid key detected: {}", key);
             return;
@@ -56,40 +52,42 @@ public class TrackerPayload implements Payload {
     }
 
     /**
-     * Add all the mappings from the specified map. The effect is the equivalent to that of calling:
-     *  - add(String key, String value) for each key value pair.
+     * Add all the mappings from the specified map. The effect is the equivalent to
+     * that of calling: - add(String key, String value) for each key value pair.
      *
      * @param map Key-Value pairs to be stored in this payload
      */
     @Override
-    public void addMap(Map<String, String> map) {
+    public void addMap(final Map<String, String> map) {
         if (map == null) {
             LOGGER.debug("Map passed in is null, returning without adding map.");
             return;
         }
         LOGGER.debug("Adding new map: {}", map);
-        for (Map.Entry<String, String> entry : map.entrySet()) {
+        for (final Map.Entry<String, String> entry : map.entrySet()) {
             add(entry.getKey(), entry.getValue());
         }
     }
 
     /**
-     * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
-     * two keys provided.
+     * Add a map to the Payload with a key dependent on the base 64 encoding option
+     * you choose using the two keys provided.
      *
-     * @param map Map to be converted to a String and stored as a value
-     * @param base64Encoded The option you choose to encode the data
-     * @param typeEncoded The key that would be set if the encoding option was set to true
-     * @param typeNotEncoded They key that would be set if the encoding option was set to false
+     * @param map            Map to be converted to a String and stored as a value
+     * @param base64Encoded  The option you choose to encode the data
+     * @param typeEncoded    The key that would be set if the encoding option was
+     *                       set to true
+     * @param typeNotEncoded They key that would be set if the encoding option was
+     *                       set to false
      */
     @Override
-    public void addMap(Map map, boolean base64Encoded, String typeEncoded, String typeNotEncoded) {
+    public void addMap(final Map<String, ?> map, final boolean base64Encoded, final String typeEncoded, final String typeNotEncoded) {
         if (map == null) {
             LOGGER.debug("Map passed in is null, returning nothing.");
             return;
         }
 
-        String mapString = Utils.mapToJSONString(map);
+        final String mapString = Utils.mapToJSONString(map);
         LOGGER.debug("Adding new map: {}", map);
 
         if (base64Encoded) {
@@ -105,7 +103,7 @@ public class TrackerPayload implements Payload {
      * @return A Map of all the key-value entries
      */
     @Override
-    public Map getMap() {
+    public Map<String, String> getMap() {
         return payload;
     }
 
@@ -120,8 +118,8 @@ public class TrackerPayload implements Payload {
     }
 
     /**
-     * Returns the Payload as a string. This is essentially the toString from the ObjectNode used
-     * to store the Payload.
+     * Returns the Payload as a string. This is essentially the toString from the
+     * ObjectNode used to store the Payload.
      *
      * @return A string value of the Payload.
      */

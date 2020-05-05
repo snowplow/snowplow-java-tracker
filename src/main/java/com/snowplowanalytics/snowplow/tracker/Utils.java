@@ -12,21 +12,17 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
-// Java
 import java.nio.charset.Charset;
 import java.util.*;
 import java.net.URL;
 import java.net.URLEncoder;
 
-// Jackson
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-// Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// Apache
 import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 
 /**
@@ -121,7 +117,7 @@ public class Utils {
      * @param map the map to process into a JSON String
      * @return the final JSON String
      */
-    public static String mapToJSONString(Map map) {
+    public static String mapToJSONString(Map<String, ?> map) {
         String jString = "";
         try {
             jString = objectMapper.writeValueAsString(map);
@@ -137,7 +133,7 @@ public class Utils {
      * @param map The map to convert
      * @return the QueryString ready for sending
      */
-    public static String mapToQueryString(Map<String, Object> map) {
+    public static String mapToQueryString(Map<String, ?> map) {
         StringBuilder sb = new StringBuilder();
         for (String key : map.keySet()) {
             if (sb.length() > 0) {

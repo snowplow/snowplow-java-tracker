@@ -12,35 +12,33 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// Java
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-// Google
 import com.google.common.collect.Lists;
 
-// JUnit
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-// Mockito
 import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.*;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
+import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 
 public class BatchEmitterTest {
 
     private HttpClientAdapter httpClientAdapter;
+    private Tracker tracker;
     private BatchEmitter emitter;
 
     @Rule
@@ -49,6 +47,7 @@ public class BatchEmitterTest {
     @Before
     public void setUp() throws Exception {
         httpClientAdapter = mock(HttpClientAdapter.class);
+        tracker = mock(Tracker.class);
         emitter = spy(BatchEmitter.builder()
                 .httpClientAdapter(httpClientAdapter)
                 .bufferSize(10)
@@ -61,11 +60,11 @@ public class BatchEmitterTest {
         // Given
         ArgumentCaptor<TrackerPayload> argumentCaptor = ArgumentCaptor.forClass(TrackerPayload.class);
 
-        List<TrackerPayload> payloads = createPayloads(2);
+        List<TrackerEvent> events = createEvents(2);
 
         // When
-        for (TrackerPayload payload : payloads) {
-            emitter.emit(payload);
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
         }
 
         // Then
@@ -73,19 +72,18 @@ public class BatchEmitterTest {
         verify(httpClientAdapter, never()).get(argumentCaptor.capture());
 
         Assert.assertEquals(2, emitter.getBuffer().size());
-        Assert.assertEquals(payloads, emitter.getBuffer());
+        Assert.assertEquals(events, emitter.getBuffer());
     }
 
     @Test
-    @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
     public void addToBuffer_withMore10Payloads_shouldFlushBuffer() throws Exception {
         // Given
         ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
-        List<TrackerPayload> payloads = createPayloads(10);
+        List<TrackerEvent> events = createEvents(10);
 
         // When
-        for (TrackerPayload payload : payloads) {
-            emitter.emit(payload);
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
         }
 
         Thread.sleep(500);
@@ -94,9 +92,9 @@ public class BatchEmitterTest {
         verify(emitter).flushBuffer();
         verify(httpClientAdapter).post(argumentCaptor.capture());
 
-        List<Map> payloadMaps = new ArrayList<>();
-        for (TrackerPayload payload : payloads) {
-            payloadMaps.add(payload.getMap());
+        List<Map<String, String>> payloadMaps = new ArrayList<>();
+        for (TrackerEvent event : events) {
+            payloadMaps.add(event.getTrackerPayload().getMap());
         }
 
         Assert.assertEquals(payloadMaps, argumentCaptor.getValue().getMap().get("data"));
@@ -114,11 +112,11 @@ public class BatchEmitterTest {
     public void getFinalPost_shouldAddSTMParameter() throws Exception {
         // Given
         ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
-        List<TrackerPayload> payloads = createPayloads(10);
+        List<TrackerEvent> events = createEvents(10);
 
         // When
-        for (TrackerPayload payload : payloads) {
-            emitter.emit(payload);
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
         }
 
         Thread.sleep(500);
@@ -132,17 +130,21 @@ public class BatchEmitterTest {
         }
     }
 
-    private List<TrackerPayload> createPayloads(int nbPayload) {
-        final List<TrackerPayload> payloads = Lists.newArrayList();
-        for (int i = 0; i < nbPayload; i++) {
-            payloads.add(createPayload());
+    private List<TrackerEvent> createEvents(int numEvents) {
+        final List<TrackerEvent> payloads = Lists.newArrayList();
+        for (int i = 0; i < numEvents; i++) {
+            payloads.add(createEvent());
         }
         return payloads;
     }
 
-    private TrackerPayload createPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add("id", UUID.randomUUID().toString());
-        return payload;
+    private TrackerEvent createEvent() {
+        PageView pv = PageView.builder()
+        .pageUrl("https://www.snowplowanalytics.com/")
+        .pageTitle("Snowplow")
+        .referrer("https://www.google.com/")
+        .build();
+
+        return new TrackerEvent(tracker, pv);
     }
 }

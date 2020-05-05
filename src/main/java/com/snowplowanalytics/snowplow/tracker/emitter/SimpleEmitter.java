@@ -12,15 +12,13 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// Java
 import java.util.ArrayList;
 import java.util.List;
 
-// Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// This library
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 
@@ -54,13 +52,13 @@ public class SimpleEmitter extends AbstractEmitter {
     }
 
     /**
-     * Adds a payload to the buffer and instantly sends it
+     * Adds an event to the buffer and instantly sends it
      *
-     * @param payload an event payload
+     * @param event an event
      */
     @Override
-    public void emit(final TrackerPayload payload) {
-        execute(getRequestRunnable(payload));
+    public void emit(final TrackerEvent event) {
+        execute(getRequestRunnable(event));
     }
 
     /**
@@ -73,13 +71,14 @@ public class SimpleEmitter extends AbstractEmitter {
     /**
      * Returns a Runnable GET Request operation
      *
-     * @param payload the event to be sent
+     * @param event the event to be sent
      * @return the new Callable object
      */
-    private Runnable getRequestRunnable(final TrackerPayload payload) {
+    private Runnable getRequestRunnable(final TrackerEvent event) {
         return new Runnable() {
             @Override
             public void run() {
+                TrackerPayload payload = event.getTrackerPayload();
                 payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
                 final int code = httpClientAdapter.get(payload);
 
@@ -97,8 +96,8 @@ public class SimpleEmitter extends AbstractEmitter {
                 // Send the callback if available
                 if (requestCallback != null) {
                     if (failure != 0) {
-                        final List<TrackerPayload> buffer = new ArrayList<>();
-                        buffer.add(payload);
+                        final List<TrackerEvent> buffer = new ArrayList<>();
+                        buffer.add(event);
                         requestCallback.onFailure(success, buffer);
                     } else {
                         requestCallback.onSuccess(success);

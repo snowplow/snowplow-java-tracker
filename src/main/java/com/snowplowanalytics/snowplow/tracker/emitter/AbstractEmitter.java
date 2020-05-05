@@ -12,18 +12,15 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// Java
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// Google
 import com.google.common.base.Preconditions;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
 /**
  * AbstractEmitter class which contains common elements to
@@ -34,7 +31,7 @@ public abstract class AbstractEmitter implements Emitter {
     protected HttpClientAdapter httpClientAdapter;
     protected RequestCallback requestCallback;
     protected ExecutorService executor;
-    protected List<TrackerPayload> buffer = new ArrayList<>();
+    protected List<TrackerEvent> buffer = new ArrayList<>();
     protected int bufferSize = 1;
 
     public static abstract class Builder<T extends Builder<T>> {
@@ -108,7 +105,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @param payload an event payload
      */
     @Override
-    public abstract void emit(TrackerPayload payload);
+    public abstract void emit(TrackerEvent payload);
 
     /**
      * Customize the emitter buffer size to any valid integer greater than zero. -
@@ -144,7 +141,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @return the buffer payloads
      */
     @Override
-    public List<TrackerPayload> getBuffer() {
+    public List<TrackerEvent> getBuffer() {
         return this.buffer;
     }
 

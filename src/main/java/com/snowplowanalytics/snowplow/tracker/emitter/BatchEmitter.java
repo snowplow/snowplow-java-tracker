@@ -12,23 +12,20 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// Java
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-// Google
 import com.google.common.base.Preconditions;
-// This library
+
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
-import com.snowplowanalytics.snowplow.tracker.payload.LazyLoadedTrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-// Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,14 +78,13 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Adds a payload to the buffer and checks whether we have reached the buffer
-     * limit yet.
+     * Adds a TrackerEvent to the buffer and checks whether we have reached the buffer limit yet.
      *
-     * @param payload an event payload
+     * @param event an event
      */
     @Override
-    public synchronized void emit(final TrackerPayload payload) {
-        buffer.add(payload);
+    public synchronized void emit(final TrackerEvent event) {
+        buffer.add(event);
         if (buffer.size() >= bufferSize) {
             flushBuffer();
         }
@@ -110,7 +106,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @param buffer the event buffer to be sent
      * @return the new Callable object
      */
-    private Runnable getRequestRunnable(final List<TrackerPayload> buffer) {
+    private Runnable getRequestRunnable(final List<TrackerEvent> buffer) {
         return new Runnable() {
             @Override
             public void run() {
@@ -149,14 +145,10 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      *
      * @return the constructed POST payload
      */
-    private SelfDescribingJson getFinalPost(final List<TrackerPayload> buffer) {
-        final List<Map> toSendPayloads = new ArrayList<>();
-        for (TrackerPayload payload : buffer) {
-            if(payload instanceof LazyLoadedTrackerPayload){
-              LazyLoadedTrackerPayload lazyLoadedTrackerPayload = (LazyLoadedTrackerPayload) payload;
-              lazyLoadedTrackerPayload.fillPayload();
-              payload = lazyLoadedTrackerPayload.getTrackerPayload();
-            }
+    private SelfDescribingJson getFinalPost(final List<TrackerEvent> buffer) {
+        final List<Map<String, String>> toSendPayloads = new ArrayList<>();
+        for (TrackerEvent event : buffer) {
+            TrackerPayload payload = event.getTrackerPayload();
             payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
             toSendPayloads.add(payload.getMap());
         }
