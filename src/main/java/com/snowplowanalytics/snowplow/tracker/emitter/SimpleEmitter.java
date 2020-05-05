@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
+import com.snowplowanalytics.snowplow.tracker.events.Event;
 
 /**
  * An emitter which sends events as soon as they are received via
@@ -96,8 +97,8 @@ public class SimpleEmitter extends AbstractEmitter {
                 // Send the callback if available
                 if (requestCallback != null) {
                     if (failure != 0) {
-                        final List<TrackerEvent> buffer = new ArrayList<>();
-                        buffer.add(event);
+                        final List<Event> buffer = new ArrayList<>();
+                        buffer.add(event.getEvent());
                         requestCallback.onFailure(success, buffer);
                     } else {
                         requestCallback.onSuccess(success);

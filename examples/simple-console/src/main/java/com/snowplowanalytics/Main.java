@@ -18,13 +18,16 @@ import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
 import okhttp3.OkHttpClient;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -53,6 +56,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        Set<String> failedEventIds = new HashSet<String>();
         String collectorEndpoint = getUrlFromArgs(args);
 
         System.out.println("Sending " + PAGEVIEW_COUNT + " events to " + collectorEndpoint);
@@ -78,7 +82,7 @@ public class Main {
 
                     // let us know if something has gone wrong (may be called multiple times)
                     @Override
-                    public void onFailure(int successCount, List<TrackerPayload> failedEvents) {
+                    public void onFailure(int successCount, List<Event> failedEvents) {
                         System.err.println("Successfully sent " + successCount + " events; failed to send " + failedEvents.size() + " events");
                     }
                 })
@@ -86,10 +90,10 @@ public class Main {
                 .build();
 
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
-                .base64(true)
-                .platform(DevicePlatform.ServerSideApp)
-                .build();
+        final Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
+            .base64(true)
+            .platform(DevicePlatform.ServerSideApp)
+            .build();
 
         for (int i = 0; i < PAGEVIEW_COUNT; i++) {
             // This is a sample page view event, many other event types (such as self-describing events) are available

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 
@@ -131,7 +132,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 // Send the callback if available
                 if (requestCallback != null) {
                     if (failure != 0) {
-                        requestCallback.onFailure(success, buffer);
+                        requestCallback.onFailure(success, buffer.stream().map(te -> te.getEvent()).collect(Collectors.toList()));
                     } else {
                         requestCallback.onSuccess(success);
                     }

@@ -14,7 +14,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import java.util.List;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.events.Event;
 
 /**
  * Provides a callback interface for reporting counts of successfully sent
@@ -37,5 +37,5 @@ public interface RequestCallback {
      * @param successCount the successful count
      * @param failedEvents the list of failed payloads
      */
-    void onFailure(int successCount, List<TrackerEvent> failedEvents);
+    void onFailure(int successCount, List<Event> failedEvents);
 }

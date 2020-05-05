@@ -243,8 +243,6 @@ public class Tracker {
      * Builds and Adds a finalised payload which is ready for sending.
      *
      * @param payload The raw event Payload
-     * @param contexts Custom context for the event
-     * @param eventSubject An optional event specific Subject
      */
     public void addTrackerParameters(TrackerPayload payload) {
 
