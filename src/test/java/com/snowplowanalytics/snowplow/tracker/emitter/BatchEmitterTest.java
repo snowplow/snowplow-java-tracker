@@ -94,7 +94,7 @@ public class BatchEmitterTest {
 
         List<Map<String, String>> payloadMaps = new ArrayList<>();
         for (TrackerEvent event : events) {
-            payloadMaps.add(event.getTrackerPayload().getMap());
+            payloadMaps.add(event.getTrackerPayloads().get(0).getMap());
         }
 
         Assert.assertEquals(payloadMaps, argumentCaptor.getValue().getMap().get("data"));

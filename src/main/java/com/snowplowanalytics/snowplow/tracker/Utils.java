@@ -23,8 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.commons.codec.binary.Base64.encodeBase64String;
-
 /**
  * Provides basic Utilities for the Snowplow Tracker.
  */
@@ -107,7 +105,7 @@ public class Utils {
      * @return a Base64 encoded string
      */
     public static String base64Encode(String string, Charset charset) {
-        return encodeBase64String(string.getBytes(charset));
+        return Base64.getEncoder().encodeToString(string.getBytes(charset));
     }
 
     /**

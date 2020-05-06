@@ -148,10 +148,14 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     private SelfDescribingJson getFinalPost(final List<TrackerEvent> buffer) {
         final List<Map<String, String>> toSendPayloads = new ArrayList<>();
+        final String sentTimestamp = Long.toString(System.currentTimeMillis());
+
         for (TrackerEvent event : buffer) {
-            TrackerPayload payload = event.getTrackerPayload();
-            payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
-            toSendPayloads.add(payload.getMap());
+            List<TrackerPayload> payloads = event.getTrackerPayloads();
+            for (TrackerPayload payload : payloads) {
+                payload.add(Parameter.DEVICE_SENT_TIMESTAMP, sentTimestamp);
+                toSendPayloads.add(payload.getMap());
+            }
         }
 
         return new SelfDescribingJson(Constants.SCHEMA_PAYLOAD_DATA, toSendPayloads);

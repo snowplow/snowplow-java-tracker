@@ -79,19 +79,23 @@ public class SimpleEmitter extends AbstractEmitter {
         return new Runnable() {
             @Override
             public void run() {
-                TrackerPayload payload = event.getTrackerPayload();
-                payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
-                final int code = httpClientAdapter.get(payload);
-
-                // Process results
                 int success = 0;
                 int failure = 0;
-                if (!isSuccessfulSend(code)) {
-                    LOGGER.error("SimpleEmitter failed to send {} events: code: {}", 1, code);
-                    failure += 1;
-                } else {
-                    LOGGER.debug("SimpleEmitter successfully sent {} events: code: {}", 1, code);
-                    success += 1;
+                
+                List<TrackerPayload> payloads = event.getTrackerPayloads();
+
+                for (TrackerPayload payload : payloads) {
+                    payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
+                    final int code = httpClientAdapter.get(payload);
+
+                    // Process results
+                    if (!isSuccessfulSend(code)) {
+                        LOGGER.error("SimpleEmitter failed to send {} events: code: {}", 1, code);
+                        failure += 1;
+                    } else {
+                        LOGGER.debug("SimpleEmitter successfully sent {} events: code: {}", 1, code);
+                        success += 1;
+                    }
                 }
 
                 // Send the callback if available

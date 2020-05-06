@@ -25,9 +25,9 @@ public interface Emitter {
      * Adds an event to the buffer and checks whether
      * we have reached the buffer limit yet.
      *
-     * @param payload an event payload
+     * @param event an event to be emitted
      */
-    void emit(TrackerEvent payload);
+    void emit(TrackerEvent event);
 
     /**
      * Customize the emitter buffer size to any valid integer

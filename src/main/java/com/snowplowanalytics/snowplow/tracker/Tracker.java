@@ -231,10 +231,8 @@ public class Tracker {
      * @param event the event to track
      */
     public void track(Event event) {
-      List<TrackerEvent> events = getTrackerEvents(event);
-
-      // Emit the events
-      events.forEach(e -> this.emitter.emit(e));
+        // Emit the event
+        this.emitter.emit(new TrackerEvent(this, event));
     }
 
     // --- Helpers
@@ -251,34 +249,5 @@ public class Tracker {
         payload.add(Parameter.APP_ID, this.appId);
         payload.add(Parameter.NAMESPACE, this.namespace);
         payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
-    }
-
-    /**
-     * Builds the collection of TrackerEvents within the Event.
-     *
-     * @param event the initial event
-     * @return the collection of TrackerEvents that are contained within the Event
-     */
-    private List<TrackerEvent> getTrackerEvents(Event event) {
-        List<TrackerEvent> events = new ArrayList<>();
-
-        //Always add top level event
-        events.add(new TrackerEvent(this, event));
-
-        // Figure out what type of event it is
-        final Class<?> eventClass = event.getClass();
-
-        // Check for subevents on certain event types
-        if (eventClass.equals(EcommerceTransaction.class)) {
-            final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
-
-            // Track each item individually
-            for (final EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
-              item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
-              events.add(new TrackerEvent(this, item));
-            }
-          } 
-
-        return events;
     }
 }
