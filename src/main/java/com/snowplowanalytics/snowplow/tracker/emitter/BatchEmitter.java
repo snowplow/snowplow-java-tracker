@@ -16,11 +16,12 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
-
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -31,13 +32,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An emitter that emit a batch of events in a single call
- * It uses the post method of under-laying http adapter
+ * An emitter that emit a batch of events in a single call It uses the post
+ * method of under-laying http adapter
  */
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
 
+    private int bufferSize = 1;
+    private BlockingQueue<TrackerEvent> eventBuffer = new LinkedBlockingQueue<>();
     private final long closeTimeout = 5;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
@@ -76,36 +79,79 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize must be greater than 0");
 
         this.bufferSize = builder.bufferSize;
+
+        new Thread(getBufferConsumerRunnable()).start();
     }
 
     /**
-     * Adds a TrackerEvent to the buffer and checks whether we have reached the buffer limit yet.
+     * Adds a TrackerEvent to the concurrent queue buffer
      *
      * @param event an event
      */
     @Override
-    public synchronized void emit(final TrackerEvent event) {
-        buffer.add(event);
-        if (buffer.size() >= bufferSize) {
-            flushBuffer();
+    public void emit(final TrackerEvent event) {
+        try {
+            eventBuffer.put(event);
+        } catch (Exception e) {
+            LOGGER.error("Unable to add event to emitter", e);
         }
     }
 
-    /**
-     * When the buffer limit is reached sending of the buffer is initiated.
-     * The reference to the existing buffer is copied to a local variable which is passed to the request Runnable,
-     * after the buffer has been reset. Therefore, the emit method does not have to be synchronized.
+    /*
+     * Forces the events currently in the buffer to be sent
      */
     public void flushBuffer() {
+        /**
+         * The concurrent eventBuffer is always empty unless this is a sudden call to flushBuffer
+         * for instance on application shutdown, so we wait for the eventBuffer to drain into buffer.
+         */
+        while(eventBuffer.size() != 0) {} // Wait for eventBuffer to drain
+
+        // Once eventBuffer has drained then we can send the final pending requests.
+        sendRequests();
+    }
+
+    /**
+     * Create new Runnable to send requests and clears out buffer
+     * and executes it on the Executor ThreadPool
+     * Safe to do this un-atomically (i.e. no synchronized) as this is only called from
+     * bufferConsumerRunnable (of which there is only one consumer thread) 
+     * or flushBuffer when eventBuffer is empty so no new events should be being written
+     */
+    private void sendRequests() {
         execute(getRequestRunnable(buffer));
         buffer = new ArrayList<>();
+    }
+
+    /**
+     * Returns a Consumer for the concurrent queue buffer
+     * Writes to the AbstractEmitter buffer
+     *
+     * @return the new Runnable object
+     */
+    private Runnable getBufferConsumerRunnable() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        buffer.add(eventBuffer.take());
+                        if (buffer.size() >= bufferSize) {
+                            sendRequests();
+                        }
+                    } catch (InterruptedException e) {
+                        LOGGER.warn("Buffer consumer interrupted", e);
+                    }
+                }
+            }
+        };
     }
 
     /**
      * Returns a Runnable POST Request operation
      *
      * @param buffer the event buffer to be sent
-     * @return the new Callable object
+     * @return the new Runnable object
      */
     private Runnable getRequestRunnable(final List<TrackerEvent> buffer) {
         return new Runnable() {

@@ -73,22 +73,22 @@ public class Main {
         String namespace = "demo";
 
         // build an emitter, this is used by the tracker to batch and schedule transmission of events
-        Emitter emitter = BatchEmitter.builder()
+        BatchEmitter emitter = BatchEmitter.builder()
                 .httpClientAdapter(okHttpClientAdapter)
                 .requestCallback(new RequestCallback() {
                     // let us know on successes (may be called multiple times)
                     @Override
-                    public void onSuccess(int successCount) {
+                    public synchronized void onSuccess(int successCount) {
                         System.out.println("Successfully sent " + successCount + " events");
                     }
 
                     // let us know if something has gone wrong (may be called multiple times)
                     @Override
-                    public void onFailure(int successCount, List<Event> failedEvents) {
+                    public synchronized void onFailure(int successCount, List<Event> failedEvents) {
                         System.err.println("Successfully sent " + successCount + " events; failed to send " + failedEvents.size() + " events");
                     }
                 })
-                .bufferSize(5) // send an event every time one is given (no batching). In production this number should be higher, depending on the size/event volume
+                .bufferSize(3) // send an event every time one is given (no batching). In production this number should be higher, depending on the size/event volume
                 .build();
 
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
@@ -151,6 +151,7 @@ public class Main {
 
         tracker.track(unstructured);
 
+        // This is an example of a ScreenView event which will be translated into an Unstructured event
         ScreenView screenView = ScreenView.builder()
             .name("name")
             .id("id")
@@ -159,6 +160,7 @@ public class Main {
 
         tracker.track(screenView);
 
+        // This is an example of a Timing event which will be translated into an Unstructured event
         Timing timing = Timing.builder()
             .category("category")
             .label("label")
@@ -168,6 +170,8 @@ public class Main {
             .build();
 
         tracker.track(timing);
+
+        emitter.close();
     }
 
 }

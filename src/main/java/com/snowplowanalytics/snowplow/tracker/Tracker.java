@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
-import java.util.*;
-
 import com.google.common.base.Preconditions;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;

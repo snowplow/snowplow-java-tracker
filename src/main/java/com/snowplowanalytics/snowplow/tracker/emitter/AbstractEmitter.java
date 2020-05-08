@@ -136,9 +136,9 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * Returns the List of Payloads that are in the buffer.
+     * Returns the List of Events that are in the buffer.
      *
-     * @return the buffer payloads
+     * @return the buffer events
      */
     @Override
     public List<TrackerEvent> getBuffer() {
