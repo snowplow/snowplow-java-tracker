@@ -106,7 +106,7 @@ public class BatchEmitterTest {
         // Given
         ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
 
-        List<TrackerEvent> events = createEvents(2);
+        List<TrackerEvent> events = createEvents(1);
 
         // When
         for (TrackerEvent event : events) {
