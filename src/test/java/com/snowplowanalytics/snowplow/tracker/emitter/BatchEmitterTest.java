@@ -66,6 +66,8 @@ public class BatchEmitterTest {
             emitter.emit(event);
         }
 
+        Thread.sleep(500);
+
         // Then
         verify(httpClientAdapter, never()).get(argumentCaptor.capture());
 
