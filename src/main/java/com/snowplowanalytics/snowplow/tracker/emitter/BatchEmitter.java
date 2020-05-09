@@ -39,8 +39,15 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
 
-    private int bufferSize = 1;
-    private BlockingQueue<TrackerEvent> eventBuffer = new LinkedBlockingQueue<>();
+    private final Thread bufferConsumer;
+    private boolean isClosing = false;
+
+    // Queue for immediate buffering of events
+    private final BlockingQueue<TrackerEvent> eventBuffer = new LinkedBlockingQueue<>();
+
+    // Queue for storing events until bufferSize is reached
+    private final BlockingQueue<TrackerEvent> eventsToSend = new LinkedBlockingQueue<>();
+
     private final long closeTimeout = 5;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
@@ -80,7 +87,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         this.bufferSize = builder.bufferSize;
 
-        new Thread(getBufferConsumerRunnable()).start();
+        bufferConsumer = new Thread(getBufferConsumerRunnable());
+        bufferConsumer.start();
     }
 
     /**
@@ -91,7 +99,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     @Override
     public void emit(final TrackerEvent event) {
         try {
-            eventBuffer.put(event);
+            eventBuffer.put(event); //Add to buffer and quickly return back to application
         } catch (Exception e) {
             LOGGER.error("Unable to add event to emitter", e);
         }
@@ -100,32 +108,25 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     /*
      * Forces the events currently in the buffer to be sent
      */
+    @Override
     public void flushBuffer() {
         /**
-         * The concurrent eventBuffer is always empty unless this is a sudden call to flushBuffer
-         * for instance on application shutdown, so we wait for the eventBuffer to drain into buffer.
+         * Drain the two queues that may contain events and send them
          */
-        while(eventBuffer.size() != 0) {} // Wait for eventBuffer to drain
-
-        // Once eventBuffer has drained then we can send the final pending requests.
-        sendRequests();
+        List<TrackerEvent> events = new ArrayList<>();
+        eventBuffer.drainTo(events);
+        eventsToSend.drainTo(events);
+        execute(getRequestRunnable(events));
     }
 
-    /**
-     * Create new Runnable to send requests and clears out buffer
-     * and executes it on the Executor ThreadPool
-     * Safe to do this un-atomically (i.e. no synchronized) as this is only called from
-     * bufferConsumerRunnable (of which there is only one consumer thread) 
-     * or flushBuffer when eventBuffer is empty so no new events should be being written
-     */
-    private void sendRequests() {
-        execute(getRequestRunnable(buffer));
-        buffer = new ArrayList<>();
+    @Override
+    public List<TrackerEvent> getBuffer() {
+        return eventsToSend.stream().collect(Collectors.toList());
     }
 
     /**
      * Returns a Consumer for the concurrent queue buffer
-     * Writes to the AbstractEmitter buffer
+     * Consumes events onto another queue to be sent when bufferSize is reached
      *
      * @return the new Runnable object
      */
@@ -135,12 +136,16 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             public void run() {
                 while (true) {
                     try {
-                        buffer.add(eventBuffer.take());
-                        if (buffer.size() >= bufferSize) {
-                            sendRequests();
+                        eventsToSend.put(eventBuffer.take());
+                        if (eventsToSend.size() >= bufferSize) {
+                            List<TrackerEvent> events = new ArrayList<>();
+                            eventsToSend.drainTo(events);
+                            execute(getRequestRunnable(events));
                         }
-                    } catch (InterruptedException e) {
-                        LOGGER.warn("Buffer consumer interrupted", e);
+                    } catch (InterruptedException ex) {
+                        if (isClosing) {
+                            return;
+                        }
                     }
                 }
             }
@@ -178,7 +183,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 // Send the callback if available
                 if (requestCallback != null) {
                     if (failure != 0) {
-                        requestCallback.onFailure(success, buffer.stream().map(te -> te.getEvent()).collect(Collectors.toList()));
+                        requestCallback.onFailure(success,
+                                buffer.stream().map(te -> te.getEvent()).collect(Collectors.toList()));
                     } else {
                         requestCallback.onSuccess(success);
                     }
@@ -212,7 +218,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void close() {
-        flushBuffer();
+        isClosing = true;
+
+        bufferConsumer.interrupt(); // Kill buffer consumer
+        flushBuffer(); // Attempt to send all reminaing events
+
+        //Shutdown executor threadpool
         if (executor != null) {
             executor.shutdown();
             try {

@@ -55,8 +55,7 @@ public class BatchEmitterTest {
     }
 
     @Test
-    @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void addToBuffer_withLess10Payloads_shouldNotFlushBuffer() throws Exception {
+    public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws Exception {
         // Given
         ArgumentCaptor<TrackerPayload> argumentCaptor = ArgumentCaptor.forClass(TrackerPayload.class);
 
@@ -68,7 +67,6 @@ public class BatchEmitterTest {
         }
 
         // Then
-        verify(emitter, never()).flushBuffer();
         verify(httpClientAdapter, never()).get(argumentCaptor.capture());
 
         Assert.assertEquals(2, emitter.getBuffer().size());
@@ -76,7 +74,7 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void addToBuffer_withMore10Payloads_shouldFlushBuffer() throws Exception {
+    public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws Exception {
         // Given
         ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
         List<TrackerEvent> events = createEvents(10);
@@ -89,16 +87,45 @@ public class BatchEmitterTest {
         Thread.sleep(500);
 
         // Then
-        verify(emitter).flushBuffer();
         verify(httpClientAdapter).post(argumentCaptor.capture());
 
         List<Map<String, String>> payloadMaps = new ArrayList<>();
         for (TrackerEvent event : events) {
+            //All PageView events so we can get(0) from payloads
             payloadMaps.add(event.getTrackerPayloads().get(0).getMap());
         }
 
         Assert.assertEquals(payloadMaps, argumentCaptor.getValue().getMap().get("data"));
-        Assert.assertTrue(emitter.getBuffer().size() == 0);
+        Assert.assertEquals(0, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void flushBuffer_shouldEmptyBuffer() throws Exception {
+        // Given
+        ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
+
+        List<TrackerEvent> events = createEvents(2);
+
+        // When
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
+        }
+
+        emitter.flushBuffer();
+
+        Thread.sleep(500);
+
+        // Then
+        verify(httpClientAdapter).post(argumentCaptor.capture());
+
+        List<Map<String, String>> payloadMaps = new ArrayList<>();
+        for (TrackerEvent event : events) {
+            //All PageView events so we can get(0) from payloads
+            payloadMaps.add(event.getTrackerPayloads().get(0).getMap());
+        }
+
+        Assert.assertEquals(payloadMaps, argumentCaptor.getValue().getMap().get("data"));
+        Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
     @Test

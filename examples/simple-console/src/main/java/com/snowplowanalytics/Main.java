@@ -88,7 +88,7 @@ public class Main {
                         System.err.println("Successfully sent " + successCount + " events; failed to send " + failedEvents.size() + " events");
                     }
                 })
-                .bufferSize(3) // send an event every time one is given (no batching). In production this number should be higher, depending on the size/event volume
+                .bufferSize(4) // send an event every time one is given (no batching). In production this number should be higher, depending on the size/event volume
                 .build();
 
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
@@ -171,6 +171,8 @@ public class Main {
 
         tracker.track(timing);
 
+        // Will close all threads and force send remaining events
+        // should be 1 left to flush, as we send 5 events with a bufferSize of 4
         emitter.close();
     }
 

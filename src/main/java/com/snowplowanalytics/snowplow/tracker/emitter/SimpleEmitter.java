@@ -111,4 +111,9 @@ public class SimpleEmitter extends AbstractEmitter {
             }
         };
     }
+
+    @Override
+    public List<TrackerEvent> getBuffer() {
+        return new ArrayList<>();
+    }
 }

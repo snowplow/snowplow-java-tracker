@@ -31,7 +31,6 @@ public abstract class AbstractEmitter implements Emitter {
     protected HttpClientAdapter httpClientAdapter;
     protected RequestCallback requestCallback;
     protected ExecutorService executor;
-    protected List<TrackerEvent> buffer = new ArrayList<>();
     protected int bufferSize = 1;
 
     public static abstract class Builder<T extends Builder<T>> {
@@ -109,7 +108,7 @@ public abstract class AbstractEmitter implements Emitter {
 
     /**
      * Customize the emitter buffer size to any valid integer greater than zero. -
-     * Will only effect the BatchEmitter
+     * Has no effect on SimpleEmitter
      *
      * @param bufferSize number of events to collect before sending
      */
@@ -141,9 +140,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @return the buffer events
      */
     @Override
-    public List<TrackerEvent> getBuffer() {
-        return this.buffer;
-    }
+    public abstract List<TrackerEvent> getBuffer();
 
     /**
      * Sends a runnable to the executor service.
