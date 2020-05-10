@@ -32,8 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An emitter that emit a batch of events in a single call It uses the post
- * method of under-laying http adapter
+ * An emitter that emit a batch of events in a single call 
+ * It uses the post method of under-laying http adapter
  */
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
@@ -110,9 +110,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void flushBuffer() {
-        /**
-         * Drain the two queues that may contain events and send them
-         */
+        // Drain immediate event buffer
         while (true) {
             TrackerEvent event = eventBuffer.poll();
             if (event == null) {
@@ -122,11 +120,19 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             }
         }
 
+        // Drain unsent events
         List<TrackerEvent> events = new ArrayList<>();
         eventsToSend.drainTo(events);
+
+        // And send them
         execute(getRequestRunnable(events));
     }
 
+    /**
+     * Returns List of Events that are in the buffer.
+     *
+     * @return the buffered events
+     */
     @Override
     public List<TrackerEvent> getBuffer() {
         return eventsToSend.stream().collect(Collectors.toList());
@@ -204,6 +210,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     /**
      * Constructs the SelfDescribingJson to be sent to the endpoint
      *
+     * @param buffer the event buffer
      * @return the constructed POST payload
      */
     private SelfDescribingJson getFinalPost(final List<TrackerEvent> buffer) {

@@ -98,16 +98,15 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * Adds a payload to the buffer and checks whether we have reached the buffer
-     * limit yet.
+     * Adds an event to the buffer
      *
-     * @param payload an event payload
+     * @param event an event
      */
     @Override
-    public abstract void emit(TrackerEvent payload);
+    public abstract void emit(TrackerEvent event);
 
     /**
-     * Customize the emitter buffer size to any valid integer greater than zero. -
+     * Customize the emitter buffer size to any valid integer greater than zero.
      * Has no effect on SimpleEmitter
      *
      * @param bufferSize number of events to collect before sending
@@ -119,7 +118,7 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * When the buffer limit is reached sending of the buffer is initiated.
+     * Removes all events from the buffer and sends them
      */
     @Override
     public abstract void flushBuffer();
@@ -135,9 +134,9 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * Returns the List of Events that are in the buffer.
+     * Returns List of Events that are in the buffer.
      *
-     * @return the buffer events
+     * @return the buffered events
      */
     @Override
     public abstract List<TrackerEvent> getBuffer();

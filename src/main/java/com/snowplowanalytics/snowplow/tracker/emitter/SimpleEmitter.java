@@ -63,8 +63,10 @@ public class SimpleEmitter extends AbstractEmitter {
     }
 
     /**
-     * When the buffer limit is reached sending of the buffer is initiated.
+     * Sends buffered events, but SimpleEmitter does not buffer events
+     * So has no effect
      */
+    @Override
     public void flushBuffer() {
         // Do nothing!
     }
@@ -112,8 +114,25 @@ public class SimpleEmitter extends AbstractEmitter {
         };
     }
 
+    /**
+     * Returns List of Events that are in the buffer.
+     * Always empty for SimpleEmitter
+     *
+     * @return the empty buffer
+     */
     @Override
     public List<TrackerEvent> getBuffer() {
         return new ArrayList<>();
+    }
+
+    /**
+     * Customize the emitter buffer size to any valid integer greater than zero.
+     * Has no effect on SimpleEmitter
+     *
+     * @param bufferSize number of events to collect before sending
+     */
+    @Override
+    public void setBufferSize(final int bufferSize) {
+        this.bufferSize = 1;
     }
 }

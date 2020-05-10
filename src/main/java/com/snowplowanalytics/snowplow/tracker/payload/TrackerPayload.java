@@ -75,10 +75,8 @@ public class TrackerPayload implements Payload {
      *
      * @param map            Map to be converted to a String and stored as a value
      * @param base64Encoded  The option you choose to encode the data
-     * @param typeEncoded    The key that would be set if the encoding option was
-     *                       set to true
-     * @param typeNotEncoded They key that would be set if the encoding option was
-     *                       set to false
+     * @param typeEncoded    The key that would be set if the encoding option was set to true
+     * @param typeNotEncoded They key that would be set if the encoding option was set to false
      */
     @Override
     public void addMap(final Map<String, ?> map, final boolean base64Encoded, final String typeEncoded, final String typeNotEncoded) {

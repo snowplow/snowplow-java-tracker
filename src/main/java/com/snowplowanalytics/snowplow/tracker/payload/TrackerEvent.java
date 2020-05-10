@@ -40,14 +40,21 @@ public class TrackerEvent {
         this.payloads = new ArrayList<>();
     }
 
+    /**
+     * Returns the {@link Event} 
+     * 
+     * @return The {@link Event}
+     */
     public Event getEvent() {
         return this.event;
     }
 
     /**
-     * Converts a {@link Event} to a {@link TrackerPayload} and caches the value. 
+     * Converts a {@link Event} to a list of {@link TrackerPayload} and caches the values.
+     * Returns a list as some Events contain nested payloads (e.g. {@link EcommerceTransaction})
      * Adds fields to the {@link TrackerPayload} based on the type of the {@link Event}.
-     * @return The populated TrackerPayload
+     * 
+     * @return The populated TrackerPayloads
      */
     public List<TrackerPayload> getTrackerPayloads() {
         if (payloads.size() > 0) {
@@ -116,6 +123,13 @@ public class TrackerEvent {
         return payloads;
     }
 
+    /**
+     * Adds the context and subject to the event payload
+     *
+     * @param contexts the base event context - can be null or empty
+     * @param subject the event subject - can be null
+     * @param payload the payload to add the contexts and subjects to
+     */
     private void addContextsAndSubject(final List<SelfDescribingJson> contexts, final Subject subject, TrackerPayload payload) {
         // Build the final context and add it to the payload
         if (contexts != null && contexts.size() > 0) {
