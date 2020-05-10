@@ -15,11 +15,15 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Preconditions;
 
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
+import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+
+import okhttp3.OkHttpClient;
 
 /**
  * AbstractEmitter class which contains common elements to
@@ -33,9 +37,10 @@ public abstract class AbstractEmitter implements Emitter {
 
     public static abstract class Builder<T extends Builder<T>> {
 
-        private HttpClientAdapter httpClientAdapter; // Required
+        private HttpClientAdapter httpClientAdapter; // Optional
         private RequestCallback requestCallback = null; // Optional
         private int threadCount = 50; // Optional
+        private String collectorUrl = null; // Required if not specifying a httpClientAdapter
         protected abstract T self();
 
         /**
@@ -71,6 +76,18 @@ public abstract class AbstractEmitter implements Emitter {
             this.threadCount = threadCount;
             return self();
         }
+
+        /**
+         * Sets the emitter url for when a httpClientAdapter is not specified
+         * Will be used to create the default OkHttpClientAdapter.
+         *
+         * @param collectorUrl the url for the default httpClientAdapter
+         * @return itself
+         */
+        public T url(final String collectorUrl) {
+            this.collectorUrl = collectorUrl;
+            return self();
+        }
     }
 
     private static class Builder2 extends Builder<Builder2> {
@@ -87,10 +104,20 @@ public abstract class AbstractEmitter implements Emitter {
     protected AbstractEmitter(final Builder<?> builder) {
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.httpClientAdapter);
         Preconditions.checkArgument(builder.threadCount > 0, "threadCount must be greater than 0");
 
-        this.httpClientAdapter = builder.httpClientAdapter;
+        if (builder.httpClientAdapter != null) {
+            this.httpClientAdapter = builder.httpClientAdapter;
+        } else {
+            Preconditions.checkNotNull(builder.collectorUrl, "Collector url must be specified if not using a httpClientAdapter");
+
+            this.httpClientAdapter = OkHttpClientAdapter.builder()
+                    .url(builder.collectorUrl)
+                    .httpClient(
+                        new OkHttpClient()) // use okhttp as a default
+                    .build();
+        }
+
         this.requestCallback = builder.requestCallback;
         this.executor = Executors.newScheduledThreadPool(builder.threadCount);
     }
