@@ -113,8 +113,16 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         /**
          * Drain the two queues that may contain events and send them
          */
+        while (true) {
+            TrackerEvent event = eventBuffer.poll();
+            if (event == null) {
+                break;
+            } else {
+                eventsToSend.offer(event);
+            }
+        }
+
         List<TrackerEvent> events = new ArrayList<>();
-        eventBuffer.drainTo(events);
         eventsToSend.drainTo(events);
         execute(getRequestRunnable(events));
     }
