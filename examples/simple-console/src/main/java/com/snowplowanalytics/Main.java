@@ -19,12 +19,8 @@ import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.events.*;
-import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-
-import okhttp3.OkHttpClient;
 
 import java.util.List;
 import java.util.Set;
@@ -43,29 +39,11 @@ public class Main {
         return args[0];
     }
 
-    public static HttpClientAdapter getClient(String url) {
-        // use okhttp to send events
-        OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(5, TimeUnit.SECONDS)
-            .readTimeout(5, TimeUnit.SECONDS)
-            .writeTimeout(5, TimeUnit.SECONDS)
-            .build();
-
-        return OkHttpClientAdapter.builder()
-                .url(url)
-                .httpClient(client)
-                .build();
-    }
-
     public static void main(String[] args) {
         Set<String> failedEventIds = new HashSet<String>();
         String collectorEndpoint = getUrlFromArgs(args);
 
         System.out.println("Sending events to " + collectorEndpoint);
-
-        // get the client adapter
-        // this is used by the Java tracker to transmit events to the collector
-        HttpClientAdapter okHttpClientAdapter = getClient(collectorEndpoint);
 
         // the application id to attach to events
         String appId = "java-tracker-sample-console-app";
@@ -74,7 +52,7 @@ public class Main {
 
         // build an emitter, this is used by the tracker to batch and schedule transmission of events
         BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(okHttpClientAdapter)
+                .url(collectorEndpoint)
                 .requestCallback(new RequestCallback() {
                     // let us know on successes (may be called multiple times)
                     @Override
