@@ -128,7 +128,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
     public int doPost(String url, String payload) {
         int returnValue = -1;
 
-        RequestBody body = RequestBody.create(JSON, payload);
+        RequestBody body = RequestBody.create(payload, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader(HttpHeaders.CONTENT_TYPE, Constants.POST_CONTENT_TYPE)

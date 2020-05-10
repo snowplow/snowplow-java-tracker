@@ -121,7 +121,7 @@ public class HttpClientAdapterTest {
         assertEquals(1, mockWebServer.getRequestCount());
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals("/com.snowplowanalytics.snowplow/tp2", recordedRequest.getPath());
-        assertEquals("{\"schema\":\"schema\",\"data\":{\"foo\":\"bar\"}}", recordedRequest.getUtf8Body());
+        assertEquals("{\"schema\":\"schema\",\"data\":{\"foo\":\"bar\"}}", recordedRequest.getBody().readUtf8());
         assertEquals("POST", recordedRequest.getMethod());
         assertEquals("application/json; charset=utf-8", recordedRequest.getHeader("Content-Type"));
     }
