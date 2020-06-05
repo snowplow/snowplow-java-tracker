@@ -120,12 +120,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             }
         }
 
-        // Drain unsent events
-        List<TrackerEvent> events = new ArrayList<>();
-        eventsToSend.drainTo(events);
-
-        // And send them
-        execute(getRequestRunnable(events));
+        drainBufferAndSend();
     }
 
     /**
@@ -152,9 +147,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                     try {
                         eventsToSend.put(eventBuffer.take());
                         if (eventsToSend.size() >= bufferSize) {
-                            List<TrackerEvent> events = new ArrayList<>();
-                            eventsToSend.drainTo(events);
-                            execute(getRequestRunnable(events));
+                            drainBufferAndSend();
                         }
                     } catch (InterruptedException ex) {
                         if (isClosing) {
@@ -164,6 +157,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 }
             }
         };
+    }
+
+    private void drainBufferAndSend() {
+        List<TrackerEvent> events = new ArrayList<>();
+        eventsToSend.drainTo(events);
+        execute(getRequestRunnable(events));
     }
 
     /**
