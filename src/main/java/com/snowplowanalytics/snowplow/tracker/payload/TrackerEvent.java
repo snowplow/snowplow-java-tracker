@@ -32,12 +32,10 @@ public class TrackerEvent {
 
     private final Event event;
     private final Tracker tracker;
-    private final List<TrackerPayload> payloads;
 
     public TrackerEvent(final Tracker tracker, final Event event) {
         this.tracker = tracker;
         this.event = event;
-        this.payloads = new ArrayList<>();
     }
 
     /**
@@ -57,10 +55,7 @@ public class TrackerEvent {
      * @return The populated TrackerPayloads
      */
     public List<TrackerPayload> getTrackerPayloads() {
-        if (payloads.size() > 0) {
-            return payloads;
-        }
-
+        final List<TrackerPayload> payloads = new ArrayList<>();
         final List<SelfDescribingJson> contexts = event.getContext();
         final Subject subject = event.getSubject();
 
