@@ -42,6 +42,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     private final Thread bufferConsumer;
     private boolean isClosing = false;
 
+    private int bufferSize = 1;
+
     // Queue for immediate buffering of events
     private final BlockingQueue<TrackerEvent> eventBuffer = new LinkedBlockingQueue<>();
 
@@ -131,6 +133,27 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     @Override
     public List<TrackerEvent> getBuffer() {
         return eventsToSend.stream().collect(Collectors.toList());
+    }
+
+    /**
+     * Customize the emitter buffer size to any valid integer greater than zero.
+     *
+     * @param bufferSize number of events to collect before sending
+     */
+    @Override
+    public void setBufferSize(final int bufferSize) {
+        Preconditions.checkArgument(bufferSize > 0, "bufferSize must be greater than 0");
+        this.bufferSize = bufferSize;
+    }
+
+    /**
+     * Gets the Emitter Buffer Size
+     *
+     * @return the buffer size
+     */
+    @Override
+    public int getBufferSize() {
+        return this.bufferSize;
     }
 
     /**

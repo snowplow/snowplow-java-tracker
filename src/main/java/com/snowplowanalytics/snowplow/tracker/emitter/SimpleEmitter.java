@@ -133,6 +133,18 @@ public class SimpleEmitter extends AbstractEmitter {
      */
     @Override
     public void setBufferSize(final int bufferSize) {
-        this.bufferSize = 1;
+        if (bufferSize != 1) {
+            LOGGER.debug("Noop. SimpleEmitter buffer size must always be 1.");
+        }
+    }
+
+    /**
+     * Gets the Emitter Buffer Size - Will always be 1 for SimpleEmitter
+     *
+     * @return the buffer size
+     */
+    @Override
+    public int getBufferSize() {
+        return 1;
     }
 }

@@ -30,7 +30,6 @@ public abstract class AbstractEmitter implements Emitter {
     protected HttpClientAdapter httpClientAdapter;
     protected RequestCallback requestCallback;
     protected ExecutorService executor;
-    protected int bufferSize = 1;
 
     public static abstract class Builder<T extends Builder<T>> {
 
@@ -111,10 +110,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @param bufferSize number of events to collect before sending
      */
     @Override
-    public void setBufferSize(final int bufferSize) {
-        Preconditions.checkArgument(bufferSize > 0, "bufferSize must be greater than 0");
-        this.bufferSize = bufferSize;
-    }
+    public abstract void setBufferSize(final int bufferSize);
 
     /**
      * Removes all events from the buffer and sends them
@@ -128,9 +124,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @return the buffer size
      */
     @Override
-    public int getBufferSize() {
-        return this.bufferSize;
-    }
+    public abstract int getBufferSize();
 
     /**
      * Returns List of Events that are in the buffer.
