@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
@@ -31,11 +30,13 @@ import com.snowplowanalytics.snowplow.tracker.events.*;
 public class TrackerEvent {
 
     private final Event event;
-    private final Tracker tracker;
+    private final TrackerParameters parameters;
+    private final Subject subject;
 
-    public TrackerEvent(final Tracker tracker, final Event event) {
-        this.tracker = tracker;
+    public TrackerEvent(final Event event, final TrackerParameters parameters, final Subject subject) {
         this.event = event;
+        this.parameters = parameters;
+        this.subject = subject;
     }
 
     /**
@@ -66,9 +67,9 @@ public class TrackerEvent {
 
             // Need to set the Base64 rule for Unstructured events
             final Unstructured unstructured = (Unstructured) event;
-            unstructured.setBase64Encode(tracker.getBase64Encoded());
+            unstructured.setBase64Encode(this.parameters.getBase64Encoded());
             TrackerPayload payload = unstructured.getPayload();
-            tracker.addTrackerParameters(payload);
+            addTrackerParameters(payload);
             addContextsAndSubject(contexts, subject, payload);
             payloads.add(payload);
         } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
@@ -84,16 +85,16 @@ public class TrackerEvent {
               .subject(subject)
               .build();
 
-            unstructured.setBase64Encode(tracker.getBase64Encoded());
+            unstructured.setBase64Encode(this.parameters.getBase64Encoded());
             TrackerPayload payload = unstructured.getPayload();
-            tracker.addTrackerParameters(payload);
+            addTrackerParameters(payload);
             addContextsAndSubject(contexts, subject, payload);
             payloads.add(payload);
         } else if (eventClass.equals(EcommerceTransaction.class)) {
 
             final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
             TrackerPayload payload = ecommerceTransaction.getPayload();
-            tracker.addTrackerParameters(payload);
+            addTrackerParameters(payload);
             addContextsAndSubject(contexts, subject, payload);
             payloads.add(payload);
 
@@ -102,7 +103,7 @@ public class TrackerEvent {
 
                 item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
                 TrackerPayload itemPayload = item.getPayload();
-                tracker.addTrackerParameters(itemPayload);
+                addTrackerParameters(itemPayload);
                 addContextsAndSubject(item.getContext(), item.getSubject(), itemPayload);
                 payloads.add(itemPayload);
           }
@@ -110,7 +111,7 @@ public class TrackerEvent {
 
             // For all other events, simply get the payload
             TrackerPayload payload = (TrackerPayload) event.getPayload();
-            tracker.addTrackerParameters(payload);
+            addTrackerParameters(payload);
             addContextsAndSubject(contexts, subject, payload);
             payloads.add(payload);
         }
@@ -129,14 +130,14 @@ public class TrackerEvent {
         // Build the final context and add it to the payload
         if (contexts != null && contexts.size() > 0) {
             SelfDescribingJson envelope = getFinalContext(contexts);
-            payload.addMap(envelope.getMap(), this.tracker.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
+            payload.addMap(envelope.getMap(), this.parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
         }
 
         // Add subject if available
         if (subject != null) {
             payload.addMap(new HashMap<>(subject.getSubject()));
-        } else if (this.tracker.getSubject() != null) {
-            payload.addMap(new HashMap<>(this.tracker.getSubject().getSubject()));
+        } else if (this.subject != null) {
+            payload.addMap(new HashMap<>(this.subject.getSubject()));
         }
     }
 
@@ -152,5 +153,12 @@ public class TrackerEvent {
             contextMaps.add(selfDescribingJson.getMap());
         }
         return new SelfDescribingJson(Constants.SCHEMA_CONTEXTS, contextMaps);
+    }
+
+    private void addTrackerParameters(TrackerPayload payload) {
+        payload.add(Parameter.PLATFORM, this.parameters.getPlatform().toString());
+        payload.add(Parameter.APP_ID, this.parameters.getAppId());
+        payload.add(Parameter.NAMESPACE, this.parameters.getNamespace());
+        payload.add(Parameter.TRACKER_VERSION, this.parameters.getTrackerVersion());
     }
 }

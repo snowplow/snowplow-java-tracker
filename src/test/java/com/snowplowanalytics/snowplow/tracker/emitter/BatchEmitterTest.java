@@ -27,10 +27,14 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.*;
 
+import static org.hamcrest.MatcherAssert.assertThat; 
+import static org.hamcrest.Matchers.*;
+
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
@@ -38,7 +42,6 @@ import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 public class BatchEmitterTest {
 
     private HttpClientAdapter httpClientAdapter;
-    private Tracker tracker;
     private BatchEmitter emitter;
 
     @Rule
@@ -47,7 +50,6 @@ public class BatchEmitterTest {
     @Before
     public void setUp() throws Exception {
         httpClientAdapter = mock(HttpClientAdapter.class);
-        tracker = mock(Tracker.class);
         emitter = spy(BatchEmitter.builder()
                 .httpClientAdapter(httpClientAdapter)
                 .bufferSize(10)
@@ -91,13 +93,11 @@ public class BatchEmitterTest {
         // Then
         verify(httpClientAdapter).post(argumentCaptor.capture());
 
-        List<Map<String, String>> payloadMaps = new ArrayList<>();
-        for (TrackerEvent event : events) {
-            //All PageView events so we can get(0) from payloads
-            payloadMaps.add(event.getTrackerPayloads().get(0).getMap());
-        }
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get("data");
 
-        Assert.assertEquals(payloadMaps, argumentCaptor.getValue().getMap().get("data"));
+        assertPayload(events, capturedPayload);
+        
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
@@ -120,13 +120,11 @@ public class BatchEmitterTest {
         // Then
         verify(httpClientAdapter).post(argumentCaptor.capture());
 
-        List<Map<String, String>> payloadMaps = new ArrayList<>();
-        for (TrackerEvent event : events) {
-            //All PageView events so we can get(0) from payloads
-            payloadMaps.add(event.getTrackerPayloads().get(0).getMap());
-        }
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
 
-        Assert.assertEquals(payloadMaps, argumentCaptor.getValue().getMap().get("data"));
+        assertPayload(events, capturedPayload);
+
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
@@ -137,7 +135,6 @@ public class BatchEmitterTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void getFinalPost_shouldAddSTMParameter() throws Exception {
         // Given
         ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
@@ -153,8 +150,10 @@ public class BatchEmitterTest {
         // Then
         verify(httpClientAdapter).post(argumentCaptor.capture());
 
-        ArrayList<Map<String, String>> dataList = (ArrayList<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
-        for (Map<String, String> payloadMap : dataList) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
+        
+        for (Map<String, String> payloadMap : capturedPayload) {
             Assert.assertTrue(payloadMap.containsKey(Parameter.DEVICE_SENT_TIMESTAMP));
         }
     }
@@ -174,6 +173,31 @@ public class BatchEmitterTest {
         .referrer("https://www.google.com/")
         .build();
 
-        return new TrackerEvent(tracker, pv);
+        return new TrackerEvent(pv, new TrackerParameters("appId", DevicePlatform.ServerSideApp, "namespace", "0.0.0", false), null);
+    }
+
+    private void assertPayload(List<TrackerEvent> events, List<Map<String, String>> capturedPayload) {
+        List<Map<String, String>> eventPayloads = new ArrayList<>();
+        for (TrackerEvent event : events) {
+            //All PageView events so we can get(0) from payloads
+            eventPayloads.add(event.getTrackerPayloads().get(0).getMap());
+        }
+
+        //Iterate through all captured payloads
+        for (Map<String,String> capturedMap : capturedPayload) {
+            boolean matchFound = false;
+            for (Map<String,String> eventMap : eventPayloads) {
+                //Find the matching events
+                if (capturedMap.get("eid") == eventMap.get("eid")) {
+                    matchFound = true;
+
+                    //Assert that all the entries in the event are in the captured payload
+                    //There might be extra entries in capturedMap, such as the STM parameter
+                    //check for these addtional parameters in other tests
+                    assertThat(eventMap.entrySet(), everyItem(is(in(capturedMap.entrySet()))));
+                }
+            }
+            assertThat(matchFound, is(true)); //Ensure every event was found
+        }
     }
 }

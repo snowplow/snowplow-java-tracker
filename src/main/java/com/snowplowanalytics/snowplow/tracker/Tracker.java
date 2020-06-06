@@ -14,21 +14,16 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.base.Preconditions;
 
-import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 
 public class Tracker {
 
-    private final String trackerVersion = Version.TRACKER;
     private Emitter emitter;
     private Subject subject;
-    private String appId;
-    private String namespace;
-    private DevicePlatform platform;
-    private boolean base64Encoded;
+    private final TrackerParameters parameters;
 
     /**
      * Creates a new Snowplow Tracker.
@@ -44,12 +39,9 @@ public class Tracker {
         Preconditions.checkArgument(!builder.namespace.isEmpty(), "namespace cannot be empty");
         Preconditions.checkArgument(!builder.appId.isEmpty(), "appId cannot be empty");
 
+        this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
         this.emitter = builder.emitter;
-        this.namespace = builder.namespace;
-        this.appId = builder.appId;
         this.subject = builder.subject;
-        this.platform = builder.platform;
-        this.base64Encoded = builder.base64Encoded;
     }
 
     /**
@@ -131,44 +123,6 @@ public class Tracker {
         this.subject = subject;
     }
 
-    /**
-     * Sets the Trackers platform, defaults to a
-     * Server Side Application.
-     *
-     * @param platform the DevicePlatform
-     */
-    public void setPlatform(DevicePlatform platform) {
-        this.platform = platform;
-    }
-
-    /**
-     * Sets whether to base64 Encode custom contexts
-     * and unstructured events
-     *
-     * @param base64Encoded a boolean truth
-     */
-    public void setBase64Encoded(boolean base64Encoded) {
-        this.base64Encoded = base64Encoded;
-    }
-
-    /**
-     * Sets a new Application ID
-     *
-     * @param appId the new application id
-     */
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
-    /**
-     * Sets a new Tracker Namespace
-     *
-     * @param namespace the new tracker namespace
-     */
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
     // --- Getters
 
     /**
@@ -189,35 +143,42 @@ public class Tracker {
      * @return the tracker version that was set
      */
     public String getTrackerVersion() {
-        return this.trackerVersion;
+        return this.parameters.getTrackerVersion();
     }
 
     /**
      * @return the trackers namespace
      */
     public String getNamespace() {
-        return this.namespace;
+        return this.parameters.getNamespace();
     }
 
     /**
      * @return the trackers set Application ID
      */
     public String getAppId() {
-        return this.appId;
+        return this.parameters.getAppId();
     }
 
     /**
      * @return the base64 setting of the tracker
      */
     public boolean getBase64Encoded() {
-        return this.base64Encoded;
+        return this.parameters.getBase64Encoded();
     }
 
     /**
      * @return the Tracker platform
      */
     public DevicePlatform getPlatform() {
-        return this.platform;
+        return this.parameters.getPlatform();
+    }
+
+    /**
+     * @return the wrapper containing the Tracker parameters
+     */
+    public TrackerParameters getParameters() {
+        return this.parameters;
     }
 
     // --- Event Tracking Functions
@@ -230,22 +191,6 @@ public class Tracker {
      */
     public void track(Event event) {
         // Emit the event
-        this.emitter.emit(new TrackerEvent(this, event));
-    }
-
-    // --- Helpers
-
-    /**
-     * Builds and Adds a finalised payload which is ready for sending.
-     *
-     * @param payload The raw event Payload
-     */
-    public void addTrackerParameters(TrackerPayload payload) {
-
-        // Add default parameters to the payload
-        payload.add(Parameter.PLATFORM, platform.toString());
-        payload.add(Parameter.APP_ID, this.appId);
-        payload.add(Parameter.NAMESPACE, this.namespace);
-        payload.add(Parameter.TRACKER_VERSION, this.trackerVersion);
+        this.emitter.emit(new TrackerEvent(event, this.parameters, this.subject));
     }
 }

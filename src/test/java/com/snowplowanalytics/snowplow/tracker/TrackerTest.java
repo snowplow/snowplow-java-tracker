@@ -502,8 +502,6 @@ public class TrackerTest {
                 .platform(DevicePlatform.Desktop)
                 .build();
         assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
-        tracker.setPlatform(DevicePlatform.ConnectedTV);
-        assertEquals(DevicePlatform.ConnectedTV, tracker.getPlatform());
     }
 
     @Test
@@ -528,23 +526,17 @@ public class TrackerTest {
                 .base64(false)
                 .build();
         assertTrue(!tracker.getBase64Encoded());
-        tracker.setBase64Encoded(true);
-        assertTrue(tracker.getBase64Encoded());
     }
 
     @Test
     public void testSetAppId() throws Exception {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "an-app-id").build();
         assertEquals("an-app-id", tracker.getAppId());
-        tracker.setAppId("cloudfront");
-        assertEquals("cloudfront", tracker.getAppId());
     }
 
     @Test
     public void testSetNamespace() throws Exception {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "an-app-id").build();
         assertEquals("namespace", tracker.getNamespace());
-        tracker.setNamespace("cloudfront");
-        assertEquals("cloudfront", tracker.getNamespace());
     }
 }
