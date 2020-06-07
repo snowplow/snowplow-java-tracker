@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         # build and test against LTS releases and latest GA
-        java: [ 8, 11, 14 ]
+        java: [ 8, 11 ]
 
     steps:
     - uses: actions/checkout@v2
