@@ -243,9 +243,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             List<TrackerPayload> payloads = event.getTrackerPayloads();
             for (TrackerPayload payload : payloads) {
                 payload.add(Parameter.DEVICE_SENT_TIMESTAMP, sentTimestamp);
-                Map<String, String> map = payload.getMap();
-                map.remove(Parameter.APP_ID);
-                toSendPayloads.add(map);
+                toSendPayloads.add(payload.getMap());
             }
         }
 
