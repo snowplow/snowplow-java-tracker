@@ -162,6 +162,39 @@ publishing {
             groupId group
             artifactId 'snowplow-java-tracker'
             version version
+            pom {
+                name = 'snowplow-java-tracker'
+                description = 'Snowplow event tracker for Java. Add analytics to your Java desktop and server apps, servlets and games.'
+                url = 'https://github.com/snowplow/snowplow-java-tracker/'
+                inceptionYear = '2014'
+
+                packaging = 'jar'
+                groupId = 'com.snowplowanalytics'
+
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+                scm {
+                    connection = 'https://github.com/snowplow/snowplow-java-tracker.git'
+                    url = 'https://github.com/snowplow/snowplow-java-tracker'
+                }
+                developers {
+                    developer {
+                        name = 'Snowplow Analytics Ltd'
+                        email = 'support@snowplowanalytics.com'
+                        organization = 'Snowplow Analytics Ltd'
+                        organizationUrl = 'http://snowplowanalytics.com'
+                    }
+                }
+                organization {
+                    name = 'com.snowplowanalytics'
+                    url = 'http://snowplowanalytics.com'
+                }
+            }
         }
     }
 }
