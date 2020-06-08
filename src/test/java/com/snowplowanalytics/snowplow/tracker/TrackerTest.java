@@ -12,32 +12,28 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
-// Java
 import java.util.*;
 import static java.util.Collections.singletonList;
 
-// JUnit
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-// Google
 import com.google.common.collect.ImmutableMap;
 
-// Mockito
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import static org.mockito.Mockito.*;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {
@@ -49,7 +45,7 @@ public class TrackerTest {
     Emitter emitter;
 
     @Captor
-    ArgumentCaptor<TrackerPayload> captor;
+    ArgumentCaptor<TrackerEvent> captor;
 
     Tracker tracker;
     private List<SelfDescribingJson> contexts;
@@ -102,10 +98,12 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter, times(2)).emit(captor.capture());
-        List<TrackerPayload> allValues = captor.getAllValues();
+        verify(emitter, times(1)).emit(captor.capture());
+        List<TrackerEvent> allValues = captor.getAllValues();
 
-        Map result1 = allValues.get(0).getMap();
+        assertEquals(allValues.get(0).getTrackerPayloads().size(), 2);
+
+        Map<String, String> result1 = allValues.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("e", "tr")
                 .put("tr_cu", "currency")
@@ -128,7 +126,7 @@ public class TrackerTest {
                 .put("tr_st", "state")
                 .build(), result1);
 
-        Map result2 = allValues.get(1).getMap();
+        Map<String, String> result2 = allValues.get(0).getTrackerPayloads().get(1).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("ti_nm", "name")
                 .put("ti_id", "order_id")
@@ -167,7 +165,7 @@ public class TrackerTest {
         // Then
         verify(emitter).emit(captor.capture());
 
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -198,7 +196,7 @@ public class TrackerTest {
 
         // Then
         verify(emitter).emit(captor.capture());
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -227,7 +225,7 @@ public class TrackerTest {
 
         // Then
         verify(emitter).emit(captor.capture());
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -256,7 +254,7 @@ public class TrackerTest {
 
         // Then
         verify(emitter).emit(captor.capture());
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -275,6 +273,63 @@ public class TrackerTest {
     }
 
     @Test
+    public void testTrackTwoEvents() {
+        // When
+        tracker.track(PageView.builder()
+                .pageUrl("url")
+                .pageTitle("title")
+                .referrer("referer")
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
+                .eventId("9783090a-dace-4c85-a75c-933b4596a6c5")
+                .build());
+
+        tracker.track(PageView.builder()
+                .pageUrl("url")
+                .pageTitle("title")
+                .referrer("referer")
+                .deviceCreatedTimestamp(123456)
+                .trueTimestamp(456789L)
+                .eventId("39139d43-ea13-4163-8559-adea258bf9c4")
+                .build());
+
+        // Then
+        verify(emitter, times(2)).emit(captor.capture());
+
+        Map<String, String> result = captor.getAllValues().get(0).getTrackerPayloads().get(0).getMap();
+        assertEquals(ImmutableMap.<String, String>builder()
+                .put("dtm", "123456")
+                .put("ttm", "456789")
+                .put("tz", "Etc/UTC")
+                .put("e", "pv")
+                .put("page", "title")
+                .put("tv", Version.TRACKER)
+                .put("p", "srv")
+                .put("eid", "9783090a-dace-4c85-a75c-933b4596a6c5")
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("refr", "referer")
+                .put("url", "url")
+                .build(), result);
+
+        Map<String, String> result2 = captor.getAllValues().get(1).getTrackerPayloads().get(0).getMap();
+        assertEquals(ImmutableMap.<String, String>builder()
+                .put("dtm", "123456")
+                .put("ttm", "456789")
+                .put("tz", "Etc/UTC")
+                .put("e", "pv")
+                .put("page", "title")
+                .put("tv", Version.TRACKER)
+                .put("p", "srv")
+                .put("eid", "39139d43-ea13-4163-8559-adea258bf9c4")
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("refr", "referer")
+                .put("url", "url")
+                .build(), result2);
+    }
+
+    @Test
     public void testTrackScreenView() {
         // When
         tracker.track(ScreenView.builder()
@@ -288,7 +343,7 @@ public class TrackerTest {
 
         // Then
         verify(emitter).emit(captor.capture());
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -317,7 +372,7 @@ public class TrackerTest {
 
         // Then
         verify(emitter).emit(captor.capture());
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -346,7 +401,7 @@ public class TrackerTest {
 
         // Then
         verify(emitter).emit(captor.capture());
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -378,7 +433,7 @@ public class TrackerTest {
 
         // Then
         verify(emitter).emit(captor.capture());
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -416,7 +471,7 @@ public class TrackerTest {
 
         // Then
         verify(emitter).emit(captor.capture());
-        Map result = captor.getValue().getMap();
+        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}")
@@ -447,8 +502,6 @@ public class TrackerTest {
                 .platform(DevicePlatform.Desktop)
                 .build();
         assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
-        tracker.setPlatform(DevicePlatform.ConnectedTV);
-        assertEquals(DevicePlatform.ConnectedTV, tracker.getPlatform());
     }
 
     @Test
@@ -473,23 +526,17 @@ public class TrackerTest {
                 .base64(false)
                 .build();
         assertTrue(!tracker.getBase64Encoded());
-        tracker.setBase64Encoded(true);
-        assertTrue(tracker.getBase64Encoded());
     }
 
     @Test
     public void testSetAppId() throws Exception {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "an-app-id").build();
         assertEquals("an-app-id", tracker.getAppId());
-        tracker.setAppId("cloudfront");
-        assertEquals("cloudfront", tracker.getAppId());
     }
 
     @Test
     public void testSetNamespace() throws Exception {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "an-app-id").build();
         assertEquals("namespace", tracker.getNamespace());
-        tracker.setNamespace("cloudfront");
-        assertEquals("cloudfront", tracker.getNamespace());
     }
 }

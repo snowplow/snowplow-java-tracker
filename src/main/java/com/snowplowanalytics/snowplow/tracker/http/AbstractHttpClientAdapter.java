@@ -12,13 +12,8 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-// Java
-import java.util.Map;
-
-// Google
 import com.google.common.base.Preconditions;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -94,7 +89,6 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
      * @param payload the TrackerPayload to send
      */
     @Override
-    @SuppressWarnings("unchecked")
     public int get(TrackerPayload payload) {
         String url = this.url + "/i?" + Utils.mapToQueryString(payload.getMap());
         return doGet(url);

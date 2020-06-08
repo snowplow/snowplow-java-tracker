@@ -45,6 +45,14 @@ public class Subject {
     }
 
     /**
+     * Creates a new {@link Subject} object based on the map of another {@link Subject} object.
+     * @param subject The subject from which the map is copied.
+     */
+    public Subject(Subject subject){
+      this.standardPairs.putAll(subject.getSubject());
+    }
+
+    /**
      * Builder for the Subject
      */
     public static class SubjectBuilder {

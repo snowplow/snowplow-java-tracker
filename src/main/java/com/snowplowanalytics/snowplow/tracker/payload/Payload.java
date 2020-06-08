@@ -12,7 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker.payload;
 
-// Java
 import java.util.Map;
 
 /**
@@ -48,14 +47,14 @@ public interface Payload {
      * @param typeEncoded The key that would be set if the encoding option was set to true
      * @param typeNotEncoded They key that would be set if the encoding option was set to false
      */
-    void addMap(Map map, boolean base64Encoded, String typeEncoded, String typeNotEncoded);
+    void addMap(Map<String, ?> map, boolean base64Encoded, String typeEncoded, String typeNotEncoded);
 
     /**
      * Returns the Payload as a HashMap.
      *
      * @return A HashMap
      */
-    Map getMap();
+    Map<String, ?> getMap();
 
     /**
      * Returns the byte size of a payload.

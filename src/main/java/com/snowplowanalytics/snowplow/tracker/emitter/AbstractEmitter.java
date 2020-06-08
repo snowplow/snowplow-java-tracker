@@ -12,18 +12,14 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// Java
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// Google
 import com.google.common.base.Preconditions;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
 /**
  * AbstractEmitter class which contains common elements to
@@ -34,8 +30,6 @@ public abstract class AbstractEmitter implements Emitter {
     protected HttpClientAdapter httpClientAdapter;
     protected RequestCallback requestCallback;
     protected ExecutorService executor;
-    protected List<TrackerPayload> buffer = new ArrayList<>();
-    protected int bufferSize = 1;
 
     public static abstract class Builder<T extends Builder<T>> {
 
@@ -102,28 +96,24 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * Adds a payload to the buffer and checks whether we have reached the buffer
-     * limit yet.
+     * Adds an event to the buffer
      *
-     * @param payload an event payload
+     * @param event an event
      */
     @Override
-    public abstract void emit(TrackerPayload payload);
+    public abstract void emit(TrackerEvent event);
 
     /**
-     * Customize the emitter buffer size to any valid integer greater than zero. -
-     * Will only effect the BatchEmitter
+     * Customize the emitter buffer size to any valid integer greater than zero.
+     * Has no effect on SimpleEmitter
      *
      * @param bufferSize number of events to collect before sending
      */
     @Override
-    public void setBufferSize(final int bufferSize) {
-        Preconditions.checkArgument(bufferSize > 0, "bufferSize must be greater than 0");
-        this.bufferSize = bufferSize;
-    }
+    public abstract void setBufferSize(final int bufferSize);
 
     /**
-     * When the buffer limit is reached sending of the buffer is initiated.
+     * Removes all events from the buffer and sends them
      */
     @Override
     public abstract void flushBuffer();
@@ -134,19 +124,15 @@ public abstract class AbstractEmitter implements Emitter {
      * @return the buffer size
      */
     @Override
-    public int getBufferSize() {
-        return this.bufferSize;
-    }
+    public abstract int getBufferSize();
 
     /**
-     * Returns the List of Payloads that are in the buffer.
+     * Returns List of Events that are in the buffer.
      *
-     * @return the buffer payloads
+     * @return the buffered events
      */
     @Override
-    public List<TrackerPayload> getBuffer() {
-        return this.buffer;
-    }
+    public abstract List<TrackerEvent> getBuffer();
 
     /**
      * Sends a runnable to the executor service.
