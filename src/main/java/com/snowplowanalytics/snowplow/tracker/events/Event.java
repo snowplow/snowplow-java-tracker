@@ -12,10 +12,8 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-// Java
 import java.util.List;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;

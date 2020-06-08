@@ -12,18 +12,14 @@
  */
 package com.snowplowanalytics.snowplow.tracker.payload;
 
-// Java
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// Google
 import com.google.common.base.Preconditions;
 
-// Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 
@@ -157,7 +153,7 @@ public class SelfDescribingJson implements Payload {
 
     @Deprecated
     @Override
-    public void addMap(Map map, boolean base64Encoded, String typeEncoded, String typeNotEncoded) {
+    public void addMap(Map<String, ?> map, boolean base64Encoded, String typeEncoded, String typeNotEncoded) {
         LOGGER.info("Payload: addMap(Map, boolean, String, String) method called - Doing nothing.");
     }
 
@@ -167,7 +163,7 @@ public class SelfDescribingJson implements Payload {
      * @return A Map of all the key-value entries
      */
     @Override
-    public Map getMap() {
+    public Map<String, Object> getMap() {
         return payload;
     }
 
