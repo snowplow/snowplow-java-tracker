@@ -3,21 +3,24 @@ group = 'com.snowplowanalytics'
 version = '0.0.1'
 
 repositories {
+    mavenLocal()
+    maven {
+        url  "https://snowplow.bintray.com/snowplow-maven" 
+    }
     mavenCentral()
-    flatDir {
-       dirs '../../build/libs'
-   }
 }
 
 dependencies {
-    compile 'com.google.code.gson:gson:2.8+'
-    compile 'com.snowplowanalytics:snowplow-java-tracker:0.9.0'
-    compile 'com.squareup.okhttp3:okhttp:4.2.2'
-    compile 'org.slf4j:slf4j-api:1.7.7'
-    compile 'org.slf4j:slf4j-simple:1.7.7'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
-    compile 'com.google.guava:guava:18.0'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.snowplowanalytics:snowplow-java-tracker:0.9.0'
+
+    implementation ('com.snowplowanalytics:snowplow-java-tracker:0.9.0') {
+        capabilities {
+            requireCapability 'com.snowplowanalytics:snowplow-java-tracker-okhttp-support:0.9.0'
+        }
+    }
+
+    implementation 'org.slf4j:slf4j-simple:1.7.7'
+    testImplementation 'junit:junit:4.12'
 }
 
 task fatJar(type: Jar) {
@@ -27,7 +30,7 @@ task fatJar(type: Jar) {
                 'Main-Class': 'com.snowplowanalytics.Main'
     }
     baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
