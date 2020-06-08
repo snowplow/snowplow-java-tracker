@@ -11,27 +11,14 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-buildscript {
-    repositories {
-        maven { url 'https://repo.spring.io/plugins-release' }
-    }
-    dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
-    }
-}
-
 plugins {
-    id "com.jfrog.bintray" version "1.8.4"
+    id 'com.jfrog.bintray' version '1.8.5'
+    id 'java-library'
+    id 'maven-publish'
+    id 'idea'
 }
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'idea'
-apply plugin: 'propdeps'
-apply plugin: 'propdeps-maven'
-apply plugin: 'propdeps-idea'
-
-wrapper.gradleVersion = '5.0.0'
+wrapper.gradleVersion = '6.5.0'
 
 group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
@@ -54,44 +41,44 @@ configure([compileJava, compileTestJava]) {
     options.encoding = 'UTF-8'
 }
 
-configurations {
-    provided
-}
-
-sourceSets {
-    main {
-        compileClasspath += configurations.provided
+java {
+    registerFeature('okhttpSupport') {
+        usingSourceSet(sourceSets.main)
+    }
+    registerFeature('apachehttpSupport') {
+        usingSourceSet(sourceSets.main)
     }
 }
 
 dependencies {
     // Apache Commons
-    compile 'commons-net:commons-net:3.3'
+    api 'commons-codec:commons-codec:1.10'
+    api 'commons-net:commons-net:3.3'
 
     // Apache HTTP
-    optional 'org.apache.httpcomponents:httpclient:4.3.3'
-    optional 'org.apache.httpcomponents:httpasyncclient:4.0.1'
+    apachehttpSupportApi 'org.apache.httpcomponents:httpclient:4.3.3'
+    apachehttpSupportApi 'org.apache.httpcomponents:httpasyncclient:4.0.1'
 
     // Square OK HTTP
-    optional 'com.squareup.okhttp3:okhttp:4.2.2'
+    okhttpSupportApi 'com.squareup.okhttp3:okhttp:4.2.2'
 
     // SLF4J logging API
-    compile 'org.slf4j:slf4j-api:1.7.7'
-    testRuntime 'org.slf4j:slf4j-simple:1.7.7'
+    api 'org.slf4j:slf4j-api:1.7.7'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.7'
 
     // Jackson JSON processor
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
 
     // Preconditions
-    compile 'com.google.guava:guava:18.0'
+    api 'com.google.guava:guava:18.0'
 
     // Testing libraries
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.hamcrest:hamcrest:2.2'
-    testCompile 'com.github.tomakehurst:wiremock:1.53'
-    testCompile 'org.skyscreamer:jsonassert:1.2.3'
-    testCompile 'org.mockito:mockito-core:3.2.4'
-    testCompile 'com.squareup.okhttp3:mockwebserver:4.2.1'
+    testImplementation 'junit:junit:4.11'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'com.github.tomakehurst:wiremock:1.53'
+    testImplementation 'org.skyscreamer:jsonassert:1.2.3'
+    testImplementation 'org.mockito:mockito-core:3.2.4'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.2.1'
 }
 
 task sourceJar(type: Jar, dependsOn: 'generateSources') {
@@ -162,6 +149,10 @@ publishing {
             groupId group
             artifactId 'snowplow-java-tracker'
             version version
+            suppressPomMetadataWarningsFor('apachehttpSupportApiElements')
+            suppressPomMetadataWarningsFor('apachehttpSupportRuntimeElements')
+            suppressPomMetadataWarningsFor('okhttpSupportApiElements')
+            suppressPomMetadataWarningsFor('okhttpSupportRuntimeElements')
             pom {
                 name = 'snowplow-java-tracker'
                 description = 'Snowplow event tracker for Java. Add analytics to your Java desktop and server apps, servlets and games.'
@@ -194,46 +185,6 @@ publishing {
                     name = 'com.snowplowanalytics'
                     url = 'http://snowplowanalytics.com'
                 }
-            }
-        }
-    }
-}
-
-install {
-    repositories.mavenInstaller {
-        pom.artifactId = 'snowplow-java-tracker'
-        pom.version = "$project.version"
-        pom.project {
-            name = 'snowplow-java-tracker'
-            description = 'Snowplow event tracker for Java. Add analytics to your Java desktop and server apps, servlets and games.'
-            url = 'https://github.com/snowplow/snowplow-java-tracker/'
-            inceptionYear = '2014'
-
-            packaging = 'jar'
-            groupId = 'com.snowplowanalytics'
-
-            licenses {
-                license {
-                    name = 'The Apache Software License, Version 2.0'
-                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution = 'repo'
-                }
-            }
-            scm {
-                connection = 'https://github.com/snowplow/snowplow-java-tracker.git'
-                url = 'https://github.com/snowplow/snowplow-java-tracker'
-            }
-            developers {
-                developer {
-                    name = 'Snowplow Analytics Ltd'
-                    email = 'support@snowplowanalytics.com'
-                    organization = 'Snowplow Analytics Ltd'
-                    organizationUrl = 'http://snowplowanalytics.com'
-                }
-            }
-            organization {
-                name = 'com.snowplowanalytics'
-                url = 'http://snowplowanalytics.com'
             }
         }
     }
