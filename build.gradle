@@ -70,7 +70,7 @@ dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
 
     // Preconditions
-    api 'com.google.guava:guava:18.0'
+    api 'com.google.guava:guava:29.0-jre'
 
     // Testing libraries
     testImplementation 'junit:junit:4.11'
