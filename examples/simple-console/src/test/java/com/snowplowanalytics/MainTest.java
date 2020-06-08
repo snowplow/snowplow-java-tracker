@@ -37,12 +37,4 @@ public class MainTest {
         Main.getUrlFromArgs(new String[]{});
     }
 
-
-    @Test
-    public void testGetClientAdapter() {
-        HttpClientAdapter givenClient = Main.getClient("https://acme.com");
-        assertNotNull(givenClient);
-        assertEquals("https://acme.com", givenClient.getUrl());
-    }
-
 }
