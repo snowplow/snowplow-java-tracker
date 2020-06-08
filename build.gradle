@@ -77,7 +77,7 @@ dependencies {
     testImplementation 'org.hamcrest:hamcrest:2.2'
     testImplementation 'com.github.tomakehurst:wiremock:2.26.3'
     testImplementation 'org.skyscreamer:jsonassert:1.2.3'
-    testImplementation 'org.mockito:mockito-core:3.2.4'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.7.2'
 }
 
