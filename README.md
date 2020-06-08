@@ -19,6 +19,10 @@ Assuming git, **[Vagrant][vagrant-install]** and **[VirtualBox][virtualbox-insta
 guest$ cd /vagrant
 guest$ ./gradlew clean build
 guest$ ./gradlew test
+guest$ ./gradlew publishToMavenLocal
+guest$ cd /examples/simple-console
+guest$ ./gradlew jar
+guest$ java -jar ./build/libs/simple-console-all-0.0.1.jar "http://<your-collector-domain>"
 ```
 
 ## Find out more
