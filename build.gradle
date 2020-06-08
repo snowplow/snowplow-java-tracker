@@ -52,7 +52,7 @@ java {
 
 dependencies {
     // Apache Commons
-    api 'commons-codec:commons-codec:1.10'
+    api 'commons-codec:commons-codec:1.14'
     api 'commons-net:commons-net:3.3'
 
     // Apache HTTP
