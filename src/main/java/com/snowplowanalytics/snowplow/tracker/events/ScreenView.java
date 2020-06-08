@@ -12,10 +12,8 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-// Google
 import com.google.common.base.Preconditions;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;

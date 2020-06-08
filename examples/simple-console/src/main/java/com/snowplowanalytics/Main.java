@@ -18,18 +18,23 @@ import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.events.PageView;
+import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
 import okhttp3.OkHttpClient;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
+import static java.util.Collections.singletonList;
+
+import com.google.common.collect.ImmutableMap;
 
 public class Main {
-
-    private static final int PAGEVIEW_COUNT = 10;
 
     public static String getUrlFromArgs(String[] args) {
         if (args == null || args.length < 1) {
@@ -53,9 +58,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        Set<String> failedEventIds = new HashSet<String>();
         String collectorEndpoint = getUrlFromArgs(args);
 
-        System.out.println("Sending " + PAGEVIEW_COUNT + " events to " + collectorEndpoint);
+        System.out.println("Sending events to " + collectorEndpoint);
 
         // get the client adapter
         // this is used by the Java tracker to transmit events to the collector
@@ -67,41 +73,107 @@ public class Main {
         String namespace = "demo";
 
         // build an emitter, this is used by the tracker to batch and schedule transmission of events
-        Emitter emitter = BatchEmitter.builder()
+        BatchEmitter emitter = BatchEmitter.builder()
                 .httpClientAdapter(okHttpClientAdapter)
                 .requestCallback(new RequestCallback() {
                     // let us know on successes (may be called multiple times)
                     @Override
-                    public void onSuccess(int successCount) {
+                    public synchronized void onSuccess(int successCount) {
                         System.out.println("Successfully sent " + successCount + " events");
                     }
 
                     // let us know if something has gone wrong (may be called multiple times)
                     @Override
-                    public void onFailure(int successCount, List<TrackerPayload> failedEvents) {
+                    public synchronized void onFailure(int successCount, List<Event> failedEvents) {
                         System.err.println("Successfully sent " + successCount + " events; failed to send " + failedEvents.size() + " events");
                     }
                 })
-                .bufferSize(1) // send an event every time one is given (no batching). In production this number should be higher, depending on the size/event volume
+                .bufferSize(4) // send an event every time one is given (no batching). In production this number should be higher, depending on the size/event volume
                 .build();
 
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
-                .base64(true)
-                .platform(DevicePlatform.ServerSideApp)
-                .build();
+        final Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
+            .base64(true)
+            .platform(DevicePlatform.ServerSideApp)
+            .build();
 
-        for (int i = 0; i < PAGEVIEW_COUNT; i++) {
-            // This is a sample page view event, many other event types (such as self-describing events) are available
-            PageView pageViewEvent = PageView.builder()
-                .pageTitle("Hello world " + i)
-                .pageUrl("https://www.snowplowanalytics.com")
-                .referrer("https://www.google.com")
-                .build();
-            
-            tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
-        }
+        // This is an example of a custom context
+        List<SelfDescribingJson> contexts = singletonList(
+            new SelfDescribingJson(
+                "iglu:com.snowplowanalytics.iglu/anything-c/jsonschema/1-0-0",
+                ImmutableMap.of("foo", "bar")));
 
+        // This is a sample page view event, many other event types (such as self-describing events) are available
+        PageView pageViewEvent = PageView.builder()
+            .pageTitle("Snowplow Analytics")
+            .pageUrl("https://www.snowplowanalytics.com")
+            .referrer("https://www.google.com")
+            .customContext(contexts)
+            .build();
+        
+        tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
+
+        EcommerceTransactionItem item = EcommerceTransactionItem.builder()
+            .itemId("order_id")
+            .sku("sku")
+            .price(1.0)
+            .quantity(2)
+            .name("name")
+            .category("category")
+            .currency("currency")
+            .customContext(contexts)
+            .build();
+
+        EcommerceTransaction ecommerceTransaction = EcommerceTransaction.builder()
+            .orderId("order_id")
+            .totalValue(1.0)
+            .affiliation("affiliation")
+            .taxValue(2.0)
+            .shipping(3.0)
+            .city("city")
+            .state("state")
+            .country("country")
+            .currency("currency")
+            .items(item) // EcommerceTransactionItem events are added to a parent EcommerceTransaction
+            .customContext(contexts)
+            .build();
+
+        tracker.track(ecommerceTransaction); // This will track two events
+
+        // This is an example of a custom "Unsutrcutred" event based on a schema
+        Unstructured unstructured = Unstructured.builder()
+            .eventData(new SelfDescribingJson(
+                    "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
+                    ImmutableMap.of("foo", "bar")
+            ))
+            .customContext(contexts)
+            .build();
+
+        tracker.track(unstructured);
+
+        // This is an example of a ScreenView event which will be translated into an Unstructured event
+        ScreenView screenView = ScreenView.builder()
+            .name("name")
+            .id("id")
+            .customContext(contexts)
+            .build();
+
+        tracker.track(screenView);
+
+        // This is an example of a Timing event which will be translated into an Unstructured event
+        Timing timing = Timing.builder()
+            .category("category")
+            .label("label")
+            .variable("variable")
+            .timing(10)
+            .customContext(contexts)
+            .build();
+
+        tracker.track(timing);
+
+        // Will close all threads and force send remaining events
+        // should be 1 left to flush, as we send 5 events with a bufferSize of 4
+        emitter.close();
     }
 
 }

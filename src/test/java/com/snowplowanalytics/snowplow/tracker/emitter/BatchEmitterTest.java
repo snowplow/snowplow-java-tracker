@@ -12,30 +12,31 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-// Java
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-// Google
 import com.google.common.collect.Lists;
 
-// JUnit
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-// Mockito
 import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.*;
 
-// This library
+import static org.hamcrest.MatcherAssert.assertThat; 
+import static org.hamcrest.Matchers.*;
+
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
+import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 
 public class BatchEmitterTest {
@@ -56,51 +57,75 @@ public class BatchEmitterTest {
     }
 
     @Test
-    @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void addToBuffer_withLess10Payloads_shouldNotFlushBuffer() throws Exception {
+    public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws Exception {
         // Given
         ArgumentCaptor<TrackerPayload> argumentCaptor = ArgumentCaptor.forClass(TrackerPayload.class);
 
-        List<TrackerPayload> payloads = createPayloads(2);
+        List<TrackerEvent> events = createEvents(2);
 
         // When
-        for (TrackerPayload payload : payloads) {
-            emitter.emit(payload);
-        }
-
-        // Then
-        verify(emitter, never()).flushBuffer();
-        verify(httpClientAdapter, never()).get(argumentCaptor.capture());
-
-        Assert.assertEquals(2, emitter.getBuffer().size());
-        Assert.assertEquals(payloads, emitter.getBuffer());
-    }
-
-    @Test
-    @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void addToBuffer_withMore10Payloads_shouldFlushBuffer() throws Exception {
-        // Given
-        ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
-        List<TrackerPayload> payloads = createPayloads(10);
-
-        // When
-        for (TrackerPayload payload : payloads) {
-            emitter.emit(payload);
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
         }
 
         Thread.sleep(500);
 
         // Then
-        verify(emitter).flushBuffer();
-        verify(httpClientAdapter).post(argumentCaptor.capture());
+        verify(httpClientAdapter, never()).get(argumentCaptor.capture());
 
-        List<Map> payloadMaps = new ArrayList<>();
-        for (TrackerPayload payload : payloads) {
-            payloadMaps.add(payload.getMap());
+        Assert.assertEquals(2, emitter.getBuffer().size());
+        Assert.assertEquals(events, emitter.getBuffer());
+    }
+
+    @Test
+    public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws Exception {
+        // Given
+        ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
+        List<TrackerEvent> events = createEvents(10);
+
+        // When
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
         }
 
-        Assert.assertEquals(payloadMaps, argumentCaptor.getValue().getMap().get("data"));
-        Assert.assertTrue(emitter.getBuffer().size() == 0);
+        Thread.sleep(500);
+
+        // Then
+        verify(httpClientAdapter).post(argumentCaptor.capture());
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get("data");
+
+        assertPayload(events, capturedPayload);
+        
+        Assert.assertEquals(0, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void flushBuffer_shouldEmptyBuffer() throws Exception {
+        // Given
+        ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
+
+        List<TrackerEvent> events = createEvents(2);
+
+        // When
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
+        }
+
+        emitter.flushBuffer();
+
+        Thread.sleep(500);
+
+        // Then
+        verify(httpClientAdapter).post(argumentCaptor.capture());
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
+
+        assertPayload(events, capturedPayload);
+
+        Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
     @Test
@@ -110,15 +135,14 @@ public class BatchEmitterTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void getFinalPost_shouldAddSTMParameter() throws Exception {
         // Given
         ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
-        List<TrackerPayload> payloads = createPayloads(10);
+        List<TrackerEvent> events = createEvents(10);
 
         // When
-        for (TrackerPayload payload : payloads) {
-            emitter.emit(payload);
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
         }
 
         Thread.sleep(500);
@@ -126,23 +150,54 @@ public class BatchEmitterTest {
         // Then
         verify(httpClientAdapter).post(argumentCaptor.capture());
 
-        ArrayList<Map<String, String>> dataList = (ArrayList<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
-        for (Map<String, String> payloadMap : dataList) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
+        
+        for (Map<String, String> payloadMap : capturedPayload) {
             Assert.assertTrue(payloadMap.containsKey(Parameter.DEVICE_SENT_TIMESTAMP));
         }
     }
 
-    private List<TrackerPayload> createPayloads(int nbPayload) {
-        final List<TrackerPayload> payloads = Lists.newArrayList();
-        for (int i = 0; i < nbPayload; i++) {
-            payloads.add(createPayload());
+    private List<TrackerEvent> createEvents(int numEvents) {
+        final List<TrackerEvent> payloads = Lists.newArrayList();
+        for (int i = 0; i < numEvents; i++) {
+            payloads.add(createEvent());
         }
         return payloads;
     }
 
-    private TrackerPayload createPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add("id", UUID.randomUUID().toString());
-        return payload;
+    private TrackerEvent createEvent() {
+        PageView pv = PageView.builder()
+        .pageUrl("https://www.snowplowanalytics.com/")
+        .pageTitle("Snowplow")
+        .referrer("https://www.google.com/")
+        .build();
+
+        return new TrackerEvent(pv, new TrackerParameters("appId", DevicePlatform.ServerSideApp, "namespace", "0.0.0", false), null);
+    }
+
+    private void assertPayload(List<TrackerEvent> events, List<Map<String, String>> capturedPayload) {
+        List<Map<String, String>> eventPayloads = new ArrayList<>();
+        for (TrackerEvent event : events) {
+            //All PageView events so we can get(0) from payloads
+            eventPayloads.add(event.getTrackerPayloads().get(0).getMap());
+        }
+
+        //Iterate through all captured payloads
+        for (Map<String,String> capturedMap : capturedPayload) {
+            boolean matchFound = false;
+            for (Map<String,String> eventMap : eventPayloads) {
+                //Find the matching events
+                if (capturedMap.get("eid") == eventMap.get("eid")) {
+                    matchFound = true;
+
+                    //Assert that all the entries in the event are in the captured payload
+                    //There might be extra entries in capturedMap, such as the STM parameter
+                    //check for these addtional parameters in other tests
+                    assertThat(eventMap.entrySet(), everyItem(is(in(capturedMap.entrySet()))));
+                }
+            }
+            assertThat(matchFound, is(true)); //Ensure every event was found
+        }
     }
 }

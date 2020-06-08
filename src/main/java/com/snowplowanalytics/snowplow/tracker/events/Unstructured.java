@@ -34,13 +34,13 @@ public class Unstructured extends AbstractEvent {
         private SelfDescribingJson eventData;
 
         /**
-         * @param eventData The properties of the event. Has two field:
+         * @param selfDescribingJson The properties of the event. Has two field:
          *                  A "data" field containing the event properties and
          *                  A "schema" field identifying the schema against which the data is validated
          * @return itself
          */
-        public T eventData(SelfDescribingJson eventData) {
-            this.eventData = eventData;
+        public T eventData(SelfDescribingJson selfDescribingJson) {
+            this.eventData = selfDescribingJson;
             return self();
         }
 

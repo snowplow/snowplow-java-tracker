@@ -12,26 +12,18 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-// Java
-import java.util.Map;
-
-// Google
 import com.google.common.base.Preconditions;
 
-// Apache
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-// Slf4j
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// This library
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 
 /**
