@@ -57,7 +57,7 @@ dependencies {
 
     // Apache HTTP
     apachehttpSupportApi 'org.apache.httpcomponents:httpclient:4.5.12'
-    apachehttpSupportApi 'org.apache.httpcomponents:httpasyncclient:4.0.1'
+    apachehttpSupportApi 'org.apache.httpcomponents:httpasyncclient:4.1.4'
 
     // Square OK HTTP
     okhttpSupportApi 'com.squareup.okhttp3:okhttp:4.2.2'
