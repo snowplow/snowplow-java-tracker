@@ -1,6 +1,6 @@
 # Java Analytics for Snowplow
 
-[![Build Status][travis-image]][travis] [![Release][release-image]][releases] [![License][license-image]][license]
+[![Build][github-image]][github] [![Release][release-image]][releases] [![License][license-image]][license]
 
 ## Overview
 
@@ -34,7 +34,7 @@ guest$ java -jar ./build/libs/simple-console-all-0.0.1.jar "http://<your-collect
 
 ## Copyright and license
 
-The Snowplow Java Tracker is copyright 2014-2015 Snowplow Analytics Ltd.
+The Snowplow Java Tracker is copyright 2014-2020 Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0][license]** (the "License");
 you may not use this software except in compliance with the License.
@@ -45,14 +45,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[travis]: https://travis-ci.org/snowplow/snowplow-java-tracker
-[travis-image]: https://travis-ci.org/snowplow/snowplow-java-tracker.svg?branch=master
+[github]: https://github.com/snowplow/snowplow-java-tracker/actions
+[github-image]: https://github.com/snowplow/snowplow-java-tracker/workflows/Build/badge.svg
 
 [release-image]: https://img.shields.io/github/release/snowplow/snowplow-java-tracker.svg?style=flat
 [releases]: https://github.com/snowplow/snowplow-java-tracker/releases
 
-[license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
-[license]: http://www.apache.org/licenses/LICENSE-2.0
+[license-image]: https://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
+[license]: https://www.apache.org/licenses/LICENSE-2.0
 
 [java]: http://www.java.com/en/
 
@@ -68,6 +68,6 @@ limitations under the License.
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
 [techdocs]: https://github.com/snowplow/snowplow/wiki/Java-Tracker
-[setup]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Setup
+[setup]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/java-tracker/setup/
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Contributing
