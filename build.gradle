@@ -198,6 +198,18 @@ publishing {
     }
 }
 
+// Workaround for upload of module.json file, remove when issue fixed https://github.com/bintray/gradle-bintray-plugin/issues/229
+bintrayUpload.doFirst {
+    publishing.publications.all { publication ->
+        def moduleFile = file("$buildDir/publications/$publication.name/module.json")
+        if (moduleFile.exists()) {
+            artifact(moduleFile) {
+                extension = "module"
+            }
+        }
+    }
+}
+
 bintray {
     user = System.getenv('BINTRAY_SNOWPLOW_MAVEN_USER')
     key = System.getenv('BINTRAY_SNOWPLOW_MAVEN_API_KEY')
