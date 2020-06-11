@@ -1,3 +1,8 @@
+Java 0.10.1 (2020-06-11)
+-----------------------
+Publish Gradle module file with bintrayUpload (#255)
+Update snyk integration to include project name in GitHub action (#256)
+
 Java 0.10.0 (2020-06-10)
 -----------------------
 Add snyk monitor to Github Actions (#253)
