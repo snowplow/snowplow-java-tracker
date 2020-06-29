@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Preconditions;
 
@@ -40,8 +39,21 @@ public abstract class AbstractEmitter implements Emitter {
         private HttpClientAdapter httpClientAdapter; // Optional
         private RequestCallback requestCallback = null; // Optional
         private int threadCount = 50; // Optional
+        private ExecutorService requestExecutorService = null; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
         protected abstract T self();
+
+        /**
+         * Set a custom ExecutorService to send http request.
+         *
+         *  /!\ Be aware that calling `close()` on a BatchEmitter instance has a side-effect and will shutdown that ExecutorService.
+         * @param executorService the ExecutorService to use
+         * @return itself
+         */
+        public T requestExecutorService(final ExecutorService executorService) {
+            this.requestExecutorService = executorService;
+            return self();
+        }
 
         /**
          * Adds the HttpClientAdapter to the AbstractEmitter
@@ -119,7 +131,11 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         this.requestCallback = builder.requestCallback;
-        this.executor = Executors.newScheduledThreadPool(builder.threadCount);
+        if (builder.requestExecutorService != null) {
+            this.executor = builder.requestExecutorService;
+        } else {
+            this.executor = Executors.newScheduledThreadPool(builder.threadCount);
+        }
     }
 
     /**
