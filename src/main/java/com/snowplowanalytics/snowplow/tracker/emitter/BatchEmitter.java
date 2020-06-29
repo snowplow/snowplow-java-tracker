@@ -20,6 +20,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
@@ -38,6 +39,8 @@ import org.slf4j.LoggerFactory;
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
+    private static final AtomicInteger BUFFER_CONSUMER_THREAD_NUMBER = new AtomicInteger(1);
+    private static final String BUFFER_CONSUMER_THREAD_NAME_PREFIX = "snowplow-emitter-BufferConsumer-thread-";
 
     private final Thread bufferConsumer;
     private boolean isClosing = false;
@@ -89,7 +92,10 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         this.bufferSize = builder.bufferSize;
 
-        bufferConsumer = new Thread(getBufferConsumerRunnable());
+        bufferConsumer = new Thread(
+                getBufferConsumerRunnable(),
+                BUFFER_CONSUMER_THREAD_NAME_PREFIX + BUFFER_CONSUMER_THREAD_NUMBER.getAndIncrement()
+        );
         bufferConsumer.start();
     }
 
