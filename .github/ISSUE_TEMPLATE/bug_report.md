@@ -21,7 +21,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
  - OS: [e.g. Ubuntu 20.04]
- - Version [e.g. 3.8]
+ - Version [e.g. Java 12]
 
 **Additional context**
 Add any other context about the problem here.
