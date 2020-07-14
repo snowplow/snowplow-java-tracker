@@ -1,6 +1,6 @@
 # Java Analytics for Snowplow
 
-[![Build][github-image]][github] [![Release][release-image]][releases] [![License][license-image]][license]
+[![early-release]][tracker-classificiation] [![Build][github-image]][github] [![Release][release-image]][releases] [![License][license-image]][license]
 
 ## Overview
 
@@ -30,7 +30,7 @@ guest$ java -jar ./build/libs/simple-console-all-0.0.1.jar "http://<your-collect
 | Technical Docs                  | Setup Guide               | Roadmap                 | Contributing                      |
 |---------------------------------|---------------------------|-------------------------|-----------------------------------|
 | ![i1][techdocs-image]           | ![i2][setup-image]        | ![i3][roadmap-image]    | ![i4][contributing-image]         |
-| **[Technical Docs][techdocs]**  | **[Setup Guide][setup]**  | **[Roadmap][roadmap]**  | **[Contributing][contributing]**  |
+| **[Technical Docs][techdocs]**  | **[Setup Guide][setup]**  | **[Roadmap][roadmap]**  | **[Contributing](Contributing.md)**  |
 
 ## Copyright and license
 
@@ -70,4 +70,6 @@ limitations under the License.
 [techdocs]: https://github.com/snowplow/snowplow/wiki/Java-Tracker
 [setup]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/java-tracker/setup/
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Roadmap
-[contributing]: https://github.com/snowplow/snowplow/wiki/Java-Tracker-Contributing
+
+[tracker-classificiation]: https://github.com/snowplow/snowplow/wiki/Tracker-Maintenance-Classification
+[early-release]: https://img.shields.io/static/v1?style=flat&label=Snowplow&message=Early%20Release&color=014477&labelColor=9ba0aa&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAeFBMVEVMaXGXANeYANeXANZbAJmXANeUANSQAM+XANeMAMpaAJhZAJeZANiXANaXANaOAM2WANVnAKWXANZ9ALtmAKVaAJmXANZaAJlXAJZdAJxaAJlZAJdbAJlbAJmQAM+UANKZANhhAJ+EAL+BAL9oAKZnAKVjAKF1ALNBd8J1AAAAKHRSTlMAa1hWXyteBTQJIEwRgUh2JjJon21wcBgNfmc+JlOBQjwezWF2l5dXzkW3/wAAAHpJREFUeNokhQOCA1EAxTL85hi7dXv/E5YPCYBq5DeN4pcqV1XbtW/xTVMIMAZE0cBHEaZhBmIQwCFofeprPUHqjmD/+7peztd62dWQRkvrQayXkn01f/gWp2CrxfjY7rcZ5V7DEMDQgmEozFpZqLUYDsNwOqbnMLwPAJEwCopZxKttAAAAAElFTkSuQmCC 
