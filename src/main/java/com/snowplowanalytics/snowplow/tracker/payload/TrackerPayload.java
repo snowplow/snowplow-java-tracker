@@ -44,7 +44,7 @@ public class TrackerPayload implements Payload {
             return;
         }
         if (value == null || value.isEmpty()) {
-            LOGGER.info("null or empty value detected: {}", value);
+            LOGGER.info("null or empty value detected: {}->{}", key, value);
             return;
         }
         LOGGER.debug("Adding new kv pair: {}->{}", key, value);
