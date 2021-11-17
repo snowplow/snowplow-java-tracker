@@ -1,0 +1,9 @@
+.git
+.github
+.gitignore
+
+.idea
+.DS_Store
+
+build/
+examples/

@@ -1,6 +1,8 @@
 apply plugin: 'java'
 group = 'com.snowplowanalytics'
 version = '0.0.1'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 repositories {
     mavenLocal()
@@ -39,8 +41,13 @@ task fatJar(type: Jar) {
                 'Main-Class': 'com.snowplowanalytics.Main'
     }
     baseName = project.name + '-all'
-    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from {
+        configurations.compileClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
     with jar
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
 }
 
 tasks.jar.dependsOn(fatJar)
