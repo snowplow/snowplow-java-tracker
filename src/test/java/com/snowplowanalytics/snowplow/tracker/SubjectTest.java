@@ -93,6 +93,13 @@ public class SubjectTest {
     }
 
     @Test
+    public void testSetSid() throws Exception {
+        Subject subject = new Subject.SubjectBuilder().build();
+        subject.setDomainSessionId("sessionid");
+        assertEquals("sessionid", subject.getSubject().get("sid"));
+    }
+
+    @Test
     public void testGetSubject() throws Exception {
         Subject subject = new Subject.SubjectBuilder().build();
         Map<String, String> expected = new HashMap<>();
