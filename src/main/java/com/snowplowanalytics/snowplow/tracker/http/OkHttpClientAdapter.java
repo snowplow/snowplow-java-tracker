@@ -26,7 +26,6 @@ import okhttp3.Response;
 import okhttp3.RequestBody;
 
 // Slf4j
-import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +130,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         RequestBody body = RequestBody.create(payload, JSON);
         Request request = new Request.Builder()
                 .url(url)
-                .addHeader(HttpHeaders.CONTENT_TYPE, Constants.POST_CONTENT_TYPE)
+                .addHeader("Content-Type", Constants.POST_CONTENT_TYPE)
                 .post(body)
                 .build();
         try (Response response = httpClient.newCall(request).execute()) {
