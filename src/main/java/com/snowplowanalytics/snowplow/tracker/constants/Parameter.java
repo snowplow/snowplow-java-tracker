@@ -49,6 +49,7 @@ public class Parameter {
     public static final String USERAGENT = "ua";
     public static final String DOMAIN_UID = "duid";
     public static final String NETWORK_UID = "tnuid";
+    public static final String SESSION_UID = "sid";
 
     // Page View
     public static final String PAGE_URL = "url";

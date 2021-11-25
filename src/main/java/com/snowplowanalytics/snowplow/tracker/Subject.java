@@ -42,6 +42,7 @@ public class Subject {
         this.setUseragent(builder.useragent);
         this.setNetworkUserId(builder.networkUserId);
         this.setDomainUserId(builder.domainUserId);
+        this.setDomainSessionId(builder.domainSessionId);
     }
 
     /**
@@ -69,6 +70,7 @@ public class Subject {
         private String useragent; // Optional
         private String networkUserId; // Optional
         private String domainUserId; // Optional
+        private String domainSessionId; // Optional
 
         /**
          * @param userId a user id string
@@ -161,6 +163,15 @@ public class Subject {
          */
         public SubjectBuilder domainUserId(String domainUserId) {
             this.domainUserId = domainUserId;
+            return this;
+        }
+
+        /**
+         * @param domainSessionId a domainSessionId string
+         * @return itself
+         */
+        public SubjectBuilder domainSessionId(String domainSessionId) {
+            this.domainSessionId = domainSessionId;
             return this;
         }
 
@@ -277,6 +288,18 @@ public class Subject {
     public void setDomainUserId(String domainUserId) {
         if (domainUserId != null) {
             this.standardPairs.put(Parameter.DOMAIN_UID, domainUserId);
+        }
+    }
+
+    /**
+     * User inputted Domain Session ID for the
+     * subject.
+     *
+     * @param domainSessionId a domain session id
+     */
+    public void setDomainSessionId(String domainSessionId) {
+        if (domainSessionId != null) {
+            this.standardPairs.put(Parameter.SESSION_UID, domainSessionId);
         }
     }
 

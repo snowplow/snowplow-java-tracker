@@ -79,17 +79,24 @@ public class SubjectTest {
     }
 
     @Test
-    public void testSetDuid() throws Exception {
+    public void testSetDomainUserId() throws Exception {
         Subject subject = new Subject.SubjectBuilder().build();
         subject.setDomainUserId("duid");
         assertEquals("duid", subject.getSubject().get("duid"));
     }
 
     @Test
-    public void testSetNuid() throws Exception {
+    public void testSetNetworkUserId() throws Exception {
         Subject subject = new Subject.SubjectBuilder().build();
         subject.setNetworkUserId("nuid");
         assertEquals("nuid", subject.getSubject().get("tnuid"));
+    }
+
+    @Test
+    public void testSetDomainSessionId() throws Exception {
+        Subject subject = new Subject.SubjectBuilder().build();
+        subject.setDomainSessionId("sessionid");
+        assertEquals("sessionid", subject.getSubject().get("sid"));
     }
 
     @Test
