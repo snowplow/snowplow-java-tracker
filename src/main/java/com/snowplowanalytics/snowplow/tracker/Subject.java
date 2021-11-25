@@ -295,7 +295,7 @@ public class Subject {
      * User inputted Domain Session ID for the
      * subject.
      *
-     * @param domainSessionId a domain user id
+     * @param domainSessionId a domain session id
      */
     public void setDomainSessionId(String domainSessionId) {
         if (domainSessionId != null) {
