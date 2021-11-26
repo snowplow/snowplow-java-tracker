@@ -17,42 +17,54 @@ import static java.util.Collections.singletonList;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import com.google.common.collect.ImmutableMap;
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import static org.mockito.Mockito.*;
-
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
-@RunWith(MockitoJUnitRunner.class)
 public class TrackerTest {
 
     public static final String EXPECTED_CONTEXTS = "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-1\",\"data\":[{\"schema\":\"schema\",\"data\":{\"foo\":\"bar\"}}]}";
     public static final String EXPECTED_EVENT_ID = "15e9b149-6029-4f6e-8447-5b9797c9e6be";
 
-    @Mock
-    Emitter emitter;
+    public static class MockEmitter implements Emitter {
+        public ArrayList<TrackerEvent> eventList = new ArrayList<>();
 
-    @Captor
-    ArgumentCaptor<TrackerEvent> captor;
+        @Override
+        public void emit(TrackerEvent event) {
+            eventList.add(event);
+        }
 
+        @Override
+        public void setBufferSize(int bufferSize) {}
+
+        @Override
+        public void flushBuffer() {}
+
+        @Override
+        public int getBufferSize() {
+            return 0;
+        }
+
+        @Override
+        public List<TrackerEvent> getBuffer() {
+            return null;
+        }
+    }
+
+    MockEmitter mockEmitter;
     Tracker tracker;
     private List<SelfDescribingJson> contexts;
 
     @Before
     public void setUp() throws Exception {
-        tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+        mockEmitter = new MockEmitter();
+        tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
                 .subject(new Subject.SubjectBuilder().build())
                 .base64(false)
                 .build();
@@ -98,12 +110,10 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter, times(1)).emit(captor.capture());
-        List<TrackerEvent> allValues = captor.getAllValues();
+        List<TrackerPayload> results = mockEmitter.eventList.get(0).getTrackerPayloads();
+        assertEquals(2, results.size());
 
-        assertEquals(allValues.get(0).getTrackerPayloads().size(), 2);
-
-        Map<String, String> result1 = allValues.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result1 = results.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("e", "tr")
                 .put("tr_cu", "currency")
@@ -126,7 +136,7 @@ public class TrackerTest {
                 .put("tr_st", "state")
                 .build(), result1);
 
-        Map<String, String> result2 = allValues.get(0).getTrackerPayloads().get(1).getMap();
+        Map<String, String> result2 = results.get(1).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("ti_nm", "name")
                 .put("ti_id", "order_id")
@@ -163,9 +173,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -195,8 +203,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -224,8 +231,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+      Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -241,6 +247,12 @@ public class TrackerTest {
 
     @Test
     public void testTrackPageView() {
+        tracker = new Tracker.TrackerBuilder(this.mockEmitter, "AF003", "cloudfront")
+                .subject(new Subject.SubjectBuilder().build())
+                .base64(false)
+                .build();
+        tracker.getSubject().setTimezone("Etc/UTC");
+
         // When
         tracker.track(PageView.builder()
                 .pageUrl("url")
@@ -253,8 +265,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -294,9 +305,10 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter, times(2)).emit(captor.capture());
+        List<TrackerEvent> results = mockEmitter.eventList;
+        assertEquals(2, results.size());
 
-        Map<String, String> result = captor.getAllValues().get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result1 = results.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -310,9 +322,9 @@ public class TrackerTest {
                 .put("aid", "cloudfront")
                 .put("refr", "referer")
                 .put("url", "url")
-                .build(), result);
+                .build(), result1);
 
-        Map<String, String> result2 = captor.getAllValues().get(1).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result2 = results.get(1).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -342,8 +354,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -371,8 +382,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -400,8 +410,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -432,8 +441,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -470,8 +478,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        verify(emitter).emit(captor.capture());
-        Map<String, String> result = captor.getValue().getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}")
@@ -492,13 +499,13 @@ public class TrackerTest {
 
     @Test
     public void testGetTrackerVersion() throws Exception {
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "an-app-id").build();
+        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
         assertEquals("java-0.10.1", tracker.getTrackerVersion());
     }
 
     @Test
     public void testSetDefaultPlatform() throws Exception {
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
                 .platform(DevicePlatform.Desktop)
                 .build();
         assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
@@ -508,7 +515,7 @@ public class TrackerTest {
     public void testSetSubject() throws Exception {
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
         Subject s1 = new Subject.SubjectBuilder().build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
                 .subject(s1)
                 .build();
         Subject s2 = new Subject.SubjectBuilder().build();
@@ -522,7 +529,7 @@ public class TrackerTest {
 
     @Test
     public void testSetBase64Encoded() throws Exception {
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "cloudfront")
+        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
                 .base64(false)
                 .build();
         assertTrue(!tracker.getBase64Encoded());
@@ -530,13 +537,13 @@ public class TrackerTest {
 
     @Test
     public void testSetAppId() throws Exception {
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "AF003", "an-app-id").build();
+        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "an-app-id").build();
         assertEquals("an-app-id", tracker.getAppId());
     }
 
     @Test
     public void testSetNamespace() throws Exception {
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "an-app-id").build();
+        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
         assertEquals("namespace", tracker.getNamespace());
     }
 }
