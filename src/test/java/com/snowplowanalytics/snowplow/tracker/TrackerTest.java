@@ -62,7 +62,7 @@ public class TrackerTest {
     private List<SelfDescribingJson> contexts;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mockEmitter = new MockEmitter();
         tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
                 .subject(new Subject.SubjectBuilder().build())
@@ -498,13 +498,13 @@ public class TrackerTest {
     // --- Tracker Setter & Getter Tests
 
     @Test
-    public void testGetTrackerVersion() throws Exception {
+    public void testGetTrackerVersion() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
         assertEquals("java-0.10.1", tracker.getTrackerVersion());
     }
 
     @Test
-    public void testSetDefaultPlatform() throws Exception {
+    public void testSetDefaultPlatform() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
                 .platform(DevicePlatform.Desktop)
                 .build();
@@ -512,7 +512,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testSetSubject() throws Exception {
+    public void testSetSubject() {
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
         Subject s1 = new Subject.SubjectBuilder().build();
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
@@ -528,21 +528,21 @@ public class TrackerTest {
     }
 
     @Test
-    public void testSetBase64Encoded() throws Exception {
+    public void testSetBase64Encoded() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
                 .base64(false)
                 .build();
-        assertTrue(!tracker.getBase64Encoded());
+        assertFalse(tracker.getBase64Encoded());
     }
 
     @Test
-    public void testSetAppId() throws Exception {
+    public void testSetAppId() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "an-app-id").build();
         assertEquals("an-app-id", tracker.getAppId());
     }
 
     @Test
-    public void testSetNamespace() throws Exception {
+    public void testSetNamespace() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
         assertEquals("namespace", tracker.getNamespace());
     }

@@ -18,9 +18,8 @@ import java.util.Map;
 
 // JUnit
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.*;
 
 public class TrackerPayloadTest {
 
@@ -38,7 +37,7 @@ public class TrackerPayloadTest {
         TrackerPayload payload = new TrackerPayload();
         payload.add("key", null);
         assertNotNull(payload);
-        assertTrue(!payload.getMap().containsKey("key"));
+        assertFalse(payload.getMap().containsKey("key"));
     }
 
     @Test
@@ -46,7 +45,7 @@ public class TrackerPayloadTest {
         TrackerPayload payload = new TrackerPayload();
         payload.add("key", "");
         assertNotNull(payload);
-        assertTrue(!payload.getMap().containsKey("key"));
+        assertFalse(payload.getMap().containsKey("key"));
     }
 
     @Test
@@ -67,7 +66,7 @@ public class TrackerPayloadTest {
         TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
         assertNotNull(payload);
-        assertTrue(!payload.getMap().containsKey("key"));
+        assertFalse(payload.getMap().containsKey("key"));
     }
 
     @Test
@@ -77,7 +76,7 @@ public class TrackerPayloadTest {
         TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
         assertNotNull(payload);
-        assertTrue(!payload.getMap().containsKey("key"));
+        assertFalse(payload.getMap().containsKey("key"));
     }
 
     @Test

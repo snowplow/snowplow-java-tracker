@@ -20,9 +20,7 @@ import com.google.common.collect.Lists;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat; 
 import static org.hamcrest.Matchers.*;
@@ -68,13 +66,10 @@ public class BatchEmitterTest {
         public Object getHttpClient() {
             return null;
         }
-    };
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mockHttpClientAdapter = new MockHttpClientAdapter();
         emitter = BatchEmitter.builder()
                 .httpClientAdapter(mockHttpClientAdapter)
@@ -83,7 +78,7 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws Exception {
+    public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws InterruptedException {
         // Given
         List<TrackerEvent> events = createEvents(2);
 
@@ -102,7 +97,7 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws Exception {
+    public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws InterruptedException {
         // Given
         List<TrackerEvent> events = createEvents(10);
 
@@ -125,7 +120,7 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void flushBuffer_shouldEmptyBuffer() throws Exception {
+    public void flushBuffer_shouldEmptyBuffer() throws InterruptedException {
         // Given
         List<TrackerEvent> events = createEvents(2);
 
@@ -150,13 +145,13 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void setBufferSize_WithNegativeValue_ThrowInvalidArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        emitter.setBufferSize(-1);
+    public void setBufferSize_WithNegativeValue_ThrowInvalidArgumentException() {
+        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> emitter.setBufferSize(-1));
+        Assert.assertEquals("bufferSize must be greater than 0", exception.getMessage());
     }
 
     @Test
-    public void getFinalPost_shouldAddSTMParameter() throws Exception {
+    public void getFinalPost_shouldAddSTMParameter() throws InterruptedException {
         // Given
         List<TrackerEvent> events = createEvents(10);
 
@@ -213,7 +208,7 @@ public class BatchEmitterTest {
 
                     //Assert that all the entries in the event are in the captured payload
                     //There might be extra entries in capturedMap, such as the STM parameter
-                    //check for these addtional parameters in other tests
+                    //check for these additional parameters in other tests
                     assertThat(eventMap.entrySet(), everyItem(is(in(capturedMap.entrySet()))));
                 }
             }
