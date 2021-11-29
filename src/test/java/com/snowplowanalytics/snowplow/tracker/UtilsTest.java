@@ -14,14 +14,13 @@ package com.snowplowanalytics.snowplow.tracker;
 
 // JUnit
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 // Java
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 public class UtilsTest {
 
@@ -29,7 +28,7 @@ public class UtilsTest {
     public void testGetTimestamp() {
         String ts = Utils.getTimestamp();
         assertNotNull(ts);
-        assertTrue(ts.length() == 13);
+        assertEquals(13, ts.length());
     }
 
     @Test
@@ -55,9 +54,9 @@ public class UtilsTest {
         assertTrue(Utils.isValidUrl(goodUri3));
 
         String badUri1 = "www.acme.com";
-        assertTrue(!Utils.isValidUrl(badUri1));
+        assertFalse(Utils.isValidUrl(badUri1));
         String badUri2 = "http://";
-        assertTrue(!Utils.isValidUrl(badUri2));
+        assertFalse(Utils.isValidUrl(badUri2));
     }
 
     @Test

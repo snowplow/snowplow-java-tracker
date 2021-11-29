@@ -26,9 +26,8 @@ import okhttp3.mockwebserver.RecordedRequest;
 
 import org.apache.http.impl.client.HttpClients;
 
-import org.junit.Rule;
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import static org.junit.Assert.assertEquals;
@@ -38,9 +37,6 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 @RunWith(Parameterized.class)
 public class HttpClientAdapterTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
     
     private final MockWebServer mockWebServer;
     private HttpClientAdapter adapter;
@@ -121,14 +117,12 @@ public class HttpClientAdapterTest {
     }
 
     @Test
-    public void testPostWithNullArgument() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        adapter.post(null);
+    public void testPostWithNullArgument() {
+        Assert.assertThrows(NullPointerException.class, () -> adapter.post(null));
     }
 
     @Test
-    public void testGetWithNullArgument() throws Exception {
-        expectedException.expect(NullPointerException.class);
-        adapter.get(null);
+    public void testGetWithNullArgument() {
+        Assert.assertThrows(NullPointerException.class, () -> adapter.get(null));
     }
 }
