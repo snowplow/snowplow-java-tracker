@@ -12,36 +12,51 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import static org.mockito.Mockito.*;
-
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class BatchEmitterBuilderTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     @Test
-    public void setNeitherHttpClientAdapterOrCollectorUrl_shouldThrowException() throws Exception {
-        expectedException.expect(Exception.class);
-        BatchEmitter.builder().build();
+    public void setNeitherHttpClientAdapterOrCollectorUrl_shouldThrowException() {
+        Exception exception = Assert.assertThrows(Exception.class, () -> BatchEmitter.builder().build());
+        Assert.assertEquals("Collector url must be specified if not using a httpClientAdapter", exception.getMessage());
     }
 
     @Test
-    public void setCollectorUrlAndNoHttpClientAdapter_shouldInitialiseCorrectly() throws Exception {
+    public void setCollectorUrlAndNoHttpClientAdapter_shouldInitialiseCorrectly() {
         BatchEmitter emitter = BatchEmitter.builder().url("https://mycollector.com").build();
         Assert.assertNotNull(emitter);
     }
 
     @Test
-    public void setHttpClientAdapterAndNoCollectorUrl_shouldInitialiseCorrectly() throws Exception {
-        HttpClientAdapter httpClientAdapter = mock(HttpClientAdapter.class);
-        BatchEmitter emitter = BatchEmitter.builder().httpClientAdapter(httpClientAdapter).build();
+    public void setHttpClientAdapterAndNoCollectorUrl_shouldInitialiseCorrectly() {
+        HttpClientAdapter mockHttpClientAdapter = new HttpClientAdapter() {
+            @Override
+            public int post(SelfDescribingJson payload) {
+                return 0;
+            }
+
+            @Override
+            public int get(TrackerPayload payload) {
+                return 0;
+            }
+
+            @Override
+            public String getUrl() {
+                return null;
+            }
+
+            @Override
+            public Object getHttpClient() {
+                return null;
+            }
+        };
+
+        BatchEmitter emitter = BatchEmitter.builder().httpClientAdapter(mockHttpClientAdapter).build();
         Assert.assertNotNull(emitter);
     }
 }

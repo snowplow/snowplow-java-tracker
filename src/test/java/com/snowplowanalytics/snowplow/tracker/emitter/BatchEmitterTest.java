@@ -20,12 +20,7 @@ import com.google.common.collect.Lists;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import org.mockito.ArgumentCaptor;
-import static org.mockito.Mockito.*;
 
 import static org.hamcrest.MatcherAssert.assertThat; 
 import static org.hamcrest.Matchers.*;
@@ -41,26 +36,50 @@ import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 
 public class BatchEmitterTest {
 
-    private HttpClientAdapter httpClientAdapter;
+    private MockHttpClientAdapter mockHttpClientAdapter;
     private BatchEmitter emitter;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public static class MockHttpClientAdapter implements HttpClientAdapter {
+        public boolean isGetCalled = false;
+        public boolean isPostCalled = false;
+        public SelfDescribingJson capturedPayload;
+
+        @Override
+        public int post(SelfDescribingJson payload) {
+            isPostCalled = true;
+            capturedPayload = payload;
+            return 200;
+        }
+
+        @Override
+        public int get(TrackerPayload payload) {
+            isGetCalled = true;
+            return 0;
+        }
+
+        @Override
+        public String getUrl() {
+            return null;
+        }
+
+        @Override
+        public Object getHttpClient() {
+            return null;
+        }
+    }
 
     @Before
-    public void setUp() throws Exception {
-        httpClientAdapter = mock(HttpClientAdapter.class);
-        emitter = spy(BatchEmitter.builder()
-                .httpClientAdapter(httpClientAdapter)
+    public void setUp() {
+        mockHttpClientAdapter = new MockHttpClientAdapter();
+        emitter = BatchEmitter.builder()
+                .httpClientAdapter(mockHttpClientAdapter)
                 .bufferSize(10)
-                .build());
+                .build();
     }
 
     @Test
-    public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws Exception {
+    public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws InterruptedException {
         // Given
-        ArgumentCaptor<TrackerPayload> argumentCaptor = ArgumentCaptor.forClass(TrackerPayload.class);
-
         List<TrackerEvent> events = createEvents(2);
 
         // When
@@ -71,16 +90,15 @@ public class BatchEmitterTest {
         Thread.sleep(500);
 
         // Then
-        verify(httpClientAdapter, never()).get(argumentCaptor.capture());
+        Assert.assertFalse(mockHttpClientAdapter.isGetCalled);
 
         Assert.assertEquals(2, emitter.getBuffer().size());
         Assert.assertEquals(events, emitter.getBuffer());
     }
 
     @Test
-    public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws Exception {
+    public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws InterruptedException {
         // Given
-        ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
         List<TrackerEvent> events = createEvents(10);
 
         // When
@@ -91,10 +109,10 @@ public class BatchEmitterTest {
         Thread.sleep(500);
 
         // Then
-        verify(httpClientAdapter).post(argumentCaptor.capture());
+        Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
 
         @SuppressWarnings("unchecked")
-        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get("data");
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
 
         assertPayload(events, capturedPayload);
         
@@ -102,10 +120,8 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void flushBuffer_shouldEmptyBuffer() throws Exception {
+    public void flushBuffer_shouldEmptyBuffer() throws InterruptedException {
         // Given
-        ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
-
         List<TrackerEvent> events = createEvents(2);
 
         // When
@@ -118,10 +134,10 @@ public class BatchEmitterTest {
         Thread.sleep(500);
 
         // Then
-        verify(httpClientAdapter).post(argumentCaptor.capture());
+        Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
 
         @SuppressWarnings("unchecked")
-        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
 
         assertPayload(events, capturedPayload);
 
@@ -129,15 +145,14 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void setBufferSize_WithNegativeValue_ThrowInvalidArgumentException() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        emitter.setBufferSize(-1);
+    public void setBufferSize_WithNegativeValue_ThrowInvalidArgumentException() {
+        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> emitter.setBufferSize(-1));
+        Assert.assertEquals("bufferSize must be greater than 0", exception.getMessage());
     }
 
     @Test
-    public void getFinalPost_shouldAddSTMParameter() throws Exception {
+    public void getFinalPost_shouldAddSTMParameter() throws InterruptedException {
         // Given
-        ArgumentCaptor<SelfDescribingJson> argumentCaptor = ArgumentCaptor.forClass(SelfDescribingJson.class);
         List<TrackerEvent> events = createEvents(10);
 
         // When
@@ -148,10 +163,10 @@ public class BatchEmitterTest {
         Thread.sleep(500);
 
         // Then
-        verify(httpClientAdapter).post(argumentCaptor.capture());
+        Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
 
         @SuppressWarnings("unchecked")
-        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) argumentCaptor.getValue().getMap().get(Parameter.DATA);
+        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
         
         for (Map<String, String> payloadMap : capturedPayload) {
             Assert.assertTrue(payloadMap.containsKey(Parameter.DEVICE_SENT_TIMESTAMP));
@@ -193,7 +208,7 @@ public class BatchEmitterTest {
 
                     //Assert that all the entries in the event are in the captured payload
                     //There might be extra entries in capturedMap, such as the STM parameter
-                    //check for these addtional parameters in other tests
+                    //check for these additional parameters in other tests
                     assertThat(eventMap.entrySet(), everyItem(is(in(capturedMap.entrySet()))));
                 }
             }

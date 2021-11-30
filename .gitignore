@@ -8,6 +8,9 @@
 *.war
 *.ear
 
+# Don't ignore gradle wrapper
+!gradle-wrapper.jar
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
@@ -54,8 +57,9 @@ local.properties
 # Ignoring Version.java since its auto-generated
 Version.java
 
-# Vagrant
-.vagrant
-
 #macOS
 .DS_Store
+
+# Eclipse
+.project
+.settings/
