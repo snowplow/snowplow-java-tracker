@@ -29,7 +29,7 @@ import com.snowplowanalytics.snowplow.tracker.events.Event;
  */
 public class SimpleEmitter extends AbstractEmitter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleEmitter.class);
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
         public SimpleEmitter build() {

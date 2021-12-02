@@ -264,7 +264,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         isClosing = true;
 
         bufferConsumer.interrupt(); // Kill buffer consumer
-        flushBuffer(); // Attempt to send all reminaing events
+        flushBuffer(); // Attempt to send all remaining events
 
         //Shutdown executor threadpool
         if (executor != null) {

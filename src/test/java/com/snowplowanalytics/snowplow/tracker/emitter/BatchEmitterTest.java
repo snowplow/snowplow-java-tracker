@@ -173,6 +173,38 @@ public class BatchEmitterTest {
         }
     }
 
+    @Test
+    public void emitterThreadFactory_correctlyNamesThreads() {
+        class MyRunnable implements Runnable {
+            @Override
+            public void run() {}
+        }
+
+        BatchEmitter.EmitterThreadFactory threadFactory = new BatchEmitter.EmitterThreadFactory();
+        String threadName = threadFactory.newThread(new MyRunnable()).getName();
+
+        // It's pool-2 because pool-1 was created during emitter instantiation
+        Assert.assertEquals("snowplow-emitter-pool-2-request-thread-1", threadName);
+    }
+
+    @Test
+    public void threadsHaveExpectedNames() {
+        // A BufferConsumer thread is created on BatchEmitter instantiation.
+        // Calling flushBuffer() here to require another thread - causing
+        // creation of a request thread within the scheduledThreadPool.
+        emitter.flushBuffer();
+
+        // Create a list of all live thread names
+        List<Thread> threadList = new ArrayList<>(Thread.getAllStackTraces().keySet());
+        List<String> threadNames = new ArrayList<>();
+        for (Thread thread : threadList) {
+            threadNames.add(thread.getName());
+        }
+
+        Assert.assertTrue(threadNames.contains("snowplow-emitter-BufferConsumer-thread-1"));
+        Assert.assertTrue(threadNames.contains("snowplow-emitter-pool-1-request-thread-1"));
+    }
+
     private List<TrackerEvent> createEvents(int numEvents) {
         final List<TrackerEvent> payloads = Lists.newArrayList();
         for (int i = 0; i < numEvents; i++) {
