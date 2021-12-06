@@ -15,6 +15,8 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Preconditions;
 
@@ -131,10 +133,11 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         this.requestCallback = builder.requestCallback;
+      
         if (builder.requestExecutorService != null) {
             this.executor = builder.requestExecutorService;
         } else {
-            this.executor = Executors.newScheduledThreadPool(builder.threadCount);
+            this.executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
         }
     }
 
@@ -194,5 +197,35 @@ public abstract class AbstractEmitter implements Emitter {
      */
     protected boolean isSuccessfulSend(final int code) {
         return code >= 200 && code < 300;
+    }
+
+    /**
+     * Copied from `Executors.defaultThreadFactory()`.
+     * The only change is the generated name prefix.
+     */
+    static class EmitterThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        EmitterThreadFactory() {
+            SecurityManager securityManager = System.getSecurityManager();
+            this.group = securityManager != null ? securityManager.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            this.namePrefix = "snowplow-emitter-pool-" + poolNumber.getAndIncrement() + "-request-thread-";
+        }
+
+        public Thread newThread(Runnable runnable) {
+            Thread thread = new Thread(this.group, runnable, this.namePrefix + this.threadNumber.getAndIncrement(), 0L);
+            if (thread.isDaemon()) {
+                thread.setDaemon(false);
+            }
+
+            if (thread.getPriority() != 5) {
+                thread.setPriority(5);
+            }
+
+            return thread;
+        }
     }
 }
