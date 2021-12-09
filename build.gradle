@@ -14,7 +14,8 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'signing'
+    id('io.github.gradle-nexus.publish-plugin').version('1.1.0')
+    id('signing')
     id 'idea'
 }
 
@@ -22,7 +23,7 @@ wrapper.gradleVersion = '6.5.0'
 
 group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
-version = '0.11.0-alpha.4'
+version = '0.11.0-alpha.5'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -143,16 +144,6 @@ artifacts {
 }
 
 publishing {
-    repositories {
-        maven {
-            name = "OSSRH"
-            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = System.getenv("SONA_USER")
-                password = System.getenv("SONA_PASS")
-            }
-        }
-    }
     publications {
         mavenJava(MavenPublication) {
             from components.java
@@ -198,6 +189,15 @@ publishing {
                     url = 'http://snowplowanalytics.com'
                 }
             }
+        }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username = System.getenv("SONA_USER")
+            password = System.getenv("SONA_PASS")
         }
     }
 }
