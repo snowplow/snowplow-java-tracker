@@ -14,6 +14,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
     id 'idea'
 }
 
@@ -21,14 +22,13 @@ wrapper.gradleVersion = '6.5.0'
 
 group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
-version = '0.11.0-alpha.2'
+version = '0.11.0-alpha.3'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 def javaVersion = JavaVersion.VERSION_1_8
 
 repositories {
-    // Use 'maven central' for resolving our dependencies
     mavenCentral()
 }
 
@@ -143,6 +143,17 @@ artifacts {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("SONA_USER")
+                password = System.getenv("SONA_PASS")
+            }
+        }
+    }
+
     publications {
         mavenJava(MavenPublication) {
             from components.java
@@ -151,7 +162,7 @@ publishing {
             groupId group
             artifactId 'snowplow-java-tracker'
             version version
-            suppressPomMetadataWarningsFor("apachehttpSupportApiElements")
+            suppressPomMetadataWarningsFor('apachehttpSupportApiElements')
             suppressPomMetadataWarningsFor('apachehttpSupportRuntimeElements')
             suppressPomMetadataWarningsFor('okhttpSupportApiElements')
             suppressPomMetadataWarningsFor('okhttpSupportRuntimeElements')
@@ -192,3 +203,10 @@ publishing {
     }
 }
 
+signing {
+    if (project.hasProperty('SONA_PGP_SECRET') && project.hasProperty('SONA_PGP_PASSPHRASE')) {
+        println 'Found signing credentials. Signing...'
+        useInMemoryPgpKeys(project.getProperty('SONA_PGP_SECRET'), project.getProperty('SONA_PGP_PASSPHRASE'))
+        println 'Used useInMemoryPgpKeys()'
+    }
+}
