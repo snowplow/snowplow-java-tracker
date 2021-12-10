@@ -37,12 +37,15 @@ jobs:
           exit 1
 
       - name: Publish to Maven Central
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+        run: |
+          ./gradlew -P SONA_PGP_SECRET=${{ secrets.SONA_PGP_SECRET }} \
+          -P SONA_PGP_PASSPHRASE=${{ secrets.SONA_PGP_PASSPHRASE }} \
+          publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
-          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONA_USER }}
-          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONA_PASS }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SONA_PGP_PASSPHRASE }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SONA_PGP_SECRET }}
+          SONA_USER: ${{ secrets.SONA_USER }}
+          SONA_PASS: ${{ secrets.SONA_PASS }}
+          SONA_PGP_PASSPHRASE: ${{ secrets.SONA_PGP_PASSPHRASE }}
+          SONA_PGP_SECRET: ${{ secrets.SONA_PGP_SECRET }}
 
       - name: Release on GitHub
         uses: softprops/action-gh-release@v0.1.12

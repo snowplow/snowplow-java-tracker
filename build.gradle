@@ -23,7 +23,7 @@ wrapper.gradleVersion = '6.5.0'
 
 group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
-version = '0.11.0-alpha.9'
+version = '0.11.0-alpha.10'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -195,10 +195,17 @@ publishing {
 
 nexusPublishing {
     repositories {
-        sonatype()
+        sonatype {
+            username = System.getenv('SONA_USER')
+            password = System.getenv('SONA_PASS')
+        }
     }
 }
 
 signing {
-    sign publishing.publications.mavenJava
+    if (System.getenv('SONA_PGP_SECRET') && System.getenv('SONA_PGP_PASSPHRASE')) {
+        println 'Found signing credentials. Signing...'
+        useInMemoryPgpKeys(System.getenv('SONA_PGP_SECRET'), System.getenv('SONA_PGP_PASSPHRASE'))
+        println 'Used useInMemoryPgpKeys()'
+    }
 }
