@@ -205,7 +205,10 @@ nexusPublishing {
 signing {
     if (System.getenv('SONA_PGP_SECRET') && System.getenv('SONA_PGP_PASSPHRASE')) {
         println 'Found signing credentials. Signing...'
-        useInMemoryPgpKeys(System.getenv('SONA_PGP_SECRET'), System.getenv('SONA_PGP_PASSPHRASE'))
+        def signingKey = findProperty("signingKey")
+        def signingPassword = findProperty("signingPassword")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.mavenJava
         println 'Used useInMemoryPgpKeys()'
     }
 }
