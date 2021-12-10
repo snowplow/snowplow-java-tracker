@@ -38,8 +38,8 @@ jobs:
 
       - name: Publish to Maven Central
         run: |
-          ./gradlew -P SONA_PGP_SECRET=${{ secrets.SONA_PGP_SECRET }} \
-          -P SONA_PGP_PASSPHRASE=${{ secrets.SONA_PGP_PASSPHRASE }} \
+          ./gradlew -PSONA_PGP_SECRET=${{ secrets.SONA_PGP_SECRET }} \
+          -PSONA_PGP_PASSPHRASE=${{ secrets.SONA_PGP_PASSPHRASE }} \
           publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
           SONA_USER: ${{ secrets.SONA_USER }}
