@@ -23,7 +23,7 @@ wrapper.gradleVersion = '6.5.0'
 
 group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
-version = '0.11.0-alpha.14'
+version = '0.11.0-alpha.15'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -203,7 +203,6 @@ nexusPublishing {
 }
 
 signing {
-    println 'Looking for signing credentials'
     if (System.getenv('ORG_GRADLE_PROJECT_signingKey') && System.getenv('ORG_GRADLE_PROJECT_signingPassword')) {
         println 'Found signing credentials. Signing...'
         def signingKey = findProperty("signingKey")
