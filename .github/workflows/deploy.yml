@@ -45,7 +45,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SONA_PGP_SECRET }}
 
       - name: Release on GitHub
-        uses: softprops/action-gh-release@v0.1.12
+        uses: softprops/action-gh-release@v1
         with:
           name: Version ${{ steps.version.outputs.TRACKER_VERSION }}
           prerelease: ${{ contains(steps.version.outputs.TRACKER_VERSION, '-') }}
