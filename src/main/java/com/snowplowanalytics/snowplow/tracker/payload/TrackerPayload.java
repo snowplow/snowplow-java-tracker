@@ -40,11 +40,11 @@ public class TrackerPayload implements Payload {
     @Override
     public void add(final String key, final String value) {
         if (key == null || key.isEmpty()) {
-            LOGGER.error("Invalid key detected: {}", key);
+            LOGGER.error("Invalid key detected");
             return;
         }
         if (value == null || value.isEmpty()) {
-            LOGGER.info("null or empty value detected: {}->{}", key, value);
+            LOGGER.info("Null or empty value detected");
             return;
         }
         LOGGER.debug("Adding new kv pair: {}->{}", key, value);
