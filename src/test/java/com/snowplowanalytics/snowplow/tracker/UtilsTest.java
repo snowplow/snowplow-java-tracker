@@ -60,6 +60,17 @@ public class UtilsTest {
     }
 
     @Test
+    public void testMapToJSONString() {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("k1", "v1");
+        assertEquals("{\"k1\":\"v1\"}", Utils.mapToJSONString(payload));
+
+        Map<String, Object> payload2 = new LinkedHashMap<>();
+        payload2.put("k1", new Object());
+        assertEquals("", Utils.mapToJSONString(payload2));
+    }
+
+    @Test
     public void testMapToQueryString() {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("k1", "v1");
