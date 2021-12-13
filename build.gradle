@@ -11,10 +11,13 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
+import java.time.Duration
+
 plugins {
-    id 'com.jfrog.bintray' version '1.8.5'
     id 'java-library'
     id 'maven-publish'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+    id 'signing'
     id 'idea'
 }
 
@@ -22,14 +25,13 @@ wrapper.gradleVersion = '6.5.0'
 
 group = 'com.snowplowanalytics'
 archivesBaseName = 'snowplow-java-tracker'
-version = '0.10.1'
+version = '0.11.0-alpha.15'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 def javaVersion = JavaVersion.VERSION_1_8
 
 repositories {
-    // Use 'maven central' for resolving our dependencies
     mavenCentral()
 }
 
@@ -193,49 +195,26 @@ publishing {
     }
 }
 
-// Workaround for upload of module.json file, remove when issue fixed https://github.com/bintray/gradle-bintray-plugin/issues/229
-bintrayUpload.doFirst {
-    publishing.publications.all { publication ->
-        def moduleFile = file("$buildDir/publications/$publication.name/module.json")
-        if (moduleFile.exists()) {
-            artifact(moduleFile) {
-                extension = "module"
-            }
+nexusPublishing {
+    repositories {
+        sonatype {
+            username = System.getenv('SONA_USER')
+            password = System.getenv('SONA_PASS')
         }
+    }
+    transitionCheckOptions {
+        maxRetries.set(360)
+        delayBetween.set(Duration.ofSeconds(20))
     }
 }
 
-bintray {
-    user = System.getenv('BINTRAY_SNOWPLOW_MAVEN_USER')
-    key = System.getenv('BINTRAY_SNOWPLOW_MAVEN_API_KEY')
-
-    publish = true
-
-    pkg {
-        repo = 'snowplow-maven'
-        name = 'snowplow-java-tracker'
-
-        group = 'com.snowplowanalytics'
-        userOrg = 'snowplow'
-
-        websiteUrl = 'https://github.com/snowplow/snowplow-java-tracker'
-        vcsUrl = 'https://github.com/snowplow/snowplow-java-tracker'
-        issueTrackerUrl = 'https://github.com/snowplow/snowplow-java-tracker/issues'
-
-        licenses = ['Apache-2.0']
-        publications = ['mavenJava']
-
-        version {
-            name = "$project.version"
-            gpg {
-                sign = true
-            }
-            mavenCentralSync {
-                sync = true
-                user = System.getenv('SONA_USER')
-                password = System.getenv('SONA_PASS')
-                close = '1'
-            }
-        }
+signing {
+    if (System.getenv('ORG_GRADLE_PROJECT_signingKey') && System.getenv('ORG_GRADLE_PROJECT_signingPassword')) {
+        println 'Found signing credentials. Signing...'
+        def signingKey = findProperty("signingKey")
+        def signingPassword = findProperty("signingPassword")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.mavenJava
+        println 'Used useInMemoryPgpKeys()'
     }
 }

@@ -1,49 +1,53 @@
-
 name: Deploy
 
 on:
   push:
     tags:
-    - '*.*.*'
-    
+      - '*.*.*'
+
 jobs:
   deploy:
 
     runs-on: ubuntu-latest
-
-    env:
-      BINTRAY_SNOWPLOW_MAVEN_USER: ${{ secrets.BINTRAY_SNOWPLOW_MAVEN_USER }}
-      BINTRAY_SNOWPLOW_MAVEN_API_KEY: ${{ secrets.BINTRAY_SNOWPLOW_MAVEN_API_KEY }}
-      SONA_USER: 'snowplow'
-      SONA_PASS: ${{ secrets.SONA_PASS }}
-
     steps:
-    - uses: actions/checkout@v2
-    - uses: gradle/wrapper-validation-action@v1
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Set up JDK
-      uses: actions/setup-java@v1
-      with:
-        java-version: 8
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
 
-    - name: Cache Gradle packages
-      uses: actions/cache@v2
-      with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-        restore-keys: ${{ runner.os }}-gradle
-    
-    - name: Get tag and tracker version information
-      id: version
-      run: |
-        echo ::set-output name=TAG_VERSION::${GITHUB_REF#refs/*/}
-        echo "##[set-output name=TRACKER_VERSION;]$(./gradlew -q printVersion)"
-    
-    - name: Fail if version mismatch
-      if: ${{ steps.version.outputs.TAG_VERSION != steps.version.outputs.TRACKER_VERSION }}
-      run: |
-        echo "Tag version (${{ steps.version.outputs.TAG_VERSION }}) doesn't match version in project (${{ steps.version.outputs.TRACKER_VERSION }})"
-        exit 1
-      
-    - name: Publish
-      run: ./gradlew bintrayUpload
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Get tag and tracker version information
+        id: version
+        run: |
+          echo ::set-output name=TAG_VERSION::${GITHUB_REF#refs/*/}
+          echo "##[set-output name=TRACKER_VERSION;]$(./gradlew -q printVersion)"
+
+      - name: Fail if version mismatch
+        if: ${{ steps.version.outputs.TAG_VERSION != steps.version.outputs.TRACKER_VERSION }}
+        run: |
+          echo "Tag version (${{ steps.version.outputs.TAG_VERSION }}) doesn't match version in project (${{ steps.version.outputs.TRACKER_VERSION }})"
+          exit 1
+
+      - name: Publish to Maven Central
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+        env:
+          SONA_USER: ${{ secrets.SONA_USER }}
+          SONA_PASS: ${{ secrets.SONA_PASS }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SONA_PGP_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SONA_PGP_SECRET }}
+
+      - name: Release on GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Version ${{ steps.version.outputs.TRACKER_VERSION }}
+          prerelease: ${{ contains(steps.version.outputs.TRACKER_VERSION, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
