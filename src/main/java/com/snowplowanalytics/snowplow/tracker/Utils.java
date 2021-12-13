@@ -77,8 +77,8 @@ public class Utils {
             new URL(url).toURI();
             return true;
         } catch (Exception e) {
-            LOGGER.debug("URI {} is not valid: {}", url, e.getMessage());
             LOGGER.error("Invalid URI");
+            LOGGER.debug("URI {} is not valid: {}", url, e.getMessage());
             return false;
         }
     }
@@ -121,8 +121,8 @@ public class Utils {
         try {
             jString = objectMapper.writeValueAsString(map);
         } catch (JsonProcessingException e) {
-            LOGGER.debug("Could not process Map {} into JSON String: {}", map, e.getMessage());
             LOGGER.error("Could not process Map into JSON String");
+            LOGGER.debug("Could not process Map {} into JSON String: {}", map, e.getMessage());
         }
         return jString;
     }
@@ -165,8 +165,8 @@ public class Utils {
             String encoded = URLEncoder.encode(s, "UTF-8");
             return encoded.replaceAll("\\+", "%20");
         } catch (Exception e) {
-            LOGGER.debug("Object {} could not be encoded: {}", o, e.getMessage());
             LOGGER.error("Object could not be encoded");
+            LOGGER.debug("Object {} could not be encoded: {}", o, e.getMessage());
             return "";
         }
     }

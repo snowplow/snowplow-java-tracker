@@ -40,7 +40,7 @@ public class TrackerPayload implements Payload {
     @Override
     public void add(final String key, final String value) {
         if (key == null || key.isEmpty()) {
-            LOGGER.error("Invalid key detected");
+            LOGGER.error("Null or empty key detected");
             return;
         }
         if (value == null || value.isEmpty()) {
