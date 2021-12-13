@@ -1,3 +1,19 @@
+Java 0.11.0 (2021-12-14)
+-----------------------
+Remove logging of user supplied values (#286)
+Update Deploy action to remove Bintray (#283)
+Set Emitter's threads name for easier debugging (#280)
+Update all copyright notices (#279)
+Allow Emitter to use a custom ExecutorService (#278)
+Specify the key for 'null or empty value detected' payload log (#277)
+Remove Mockito and Wiremock dependencies (#275)
+Update dependencies guava, wiremock, and httpclient (#269)
+Manually set the session_id (#265)
+Update gradle GH Action to include Java 17 (#273)
+Remove HttpHeaders dependency in OkHttpClientAdapter (#266)
+Replace Vagrant with Docker (#267)
+
+
 Java 0.10.1 (2020-06-11)
 -----------------------
 Publish Gradle module file with bintrayUpload (#255)
