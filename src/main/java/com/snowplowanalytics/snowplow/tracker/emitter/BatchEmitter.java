@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,18 +45,14 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     private boolean isClosing = false;
 
     private int bufferSize = 1;
-
-    // Queue for immediate buffering of events
-    private final BlockingQueue<TrackerEvent> eventBuffer = new LinkedBlockingQueue<>();
-
-    // Queue for storing events until bufferSize is reached
-    private final BlockingQueue<TrackerEvent> eventsToSend = new LinkedBlockingQueue<>();
+    private InMemoryStorage storage;
 
     private final long closeTimeout = 5;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
         private int bufferSize = 50; // Optional
+        private InMemoryStorage storage = new InMemoryStorage();
 
         /**
          * @param bufferSize The count of events to buffer before sending
@@ -65,6 +60,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
          */
         public T bufferSize(final int bufferSize) {
             this.bufferSize = bufferSize;
+            return self();
+        }
+
+        public T storage(final InMemoryStorage storage) {
+            this.storage = storage;
             return self();
         }
 
@@ -91,6 +91,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize must be greater than 0");
 
         this.bufferSize = builder.bufferSize;
+        this.storage = builder.storage;
 
         bufferConsumer = new Thread(
                 getBufferConsumerRunnable(),
@@ -106,7 +107,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void emit(final TrackerEvent event) {
-        boolean result = eventBuffer.offer(event); // Add to buffer and quickly return back to application
+        boolean result = storage.add(event); // Add to buffer and quickly return back to application
         
         if (!result) {
             LOGGER.error("Unable to add event to emitter, emitter buffer is full");
@@ -120,15 +121,15 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     public void flushBuffer() {
         // Drain immediate event buffer
         while (true) {
-            TrackerEvent event = eventBuffer.poll();
+            TrackerEvent event = storage.getInitialEventBuffer().poll();
             if (event == null) {
                 break;
             } else {
-                eventsToSend.offer(event);
+                storage.getStagingEventBuffer().offer(event);
             }
         }
 
-        drainBufferAndSend();
+        drainEventsAndSend();
     }
 
     /**
@@ -138,7 +139,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public List<TrackerEvent> getBuffer() {
-        return eventsToSend.stream().collect(Collectors.toList());
+        return new ArrayList<>(storage.getStagingEventBuffer());
     }
 
     /**
@@ -174,11 +175,14 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             public void run() {
                 while (true) {
                     try {
-                        eventsToSend.put(eventBuffer.take());
-                        if (eventsToSend.size() >= bufferSize) {
-                            drainBufferAndSend();
+                        storage.getStagingEventBuffer().put(storage.getInitialEventBuffer().take());
+                        System.out.println("eventsToSend size now " + storage.getStagingEventBuffer().size());
+                        if (storage.getStagingEventBuffer().size() >= bufferSize) {
+                            System.out.println("events found");
+                            drainEventsAndSend();
                         }
                     } catch (InterruptedException ex) {
+                        System.out.println("no more events");
                         if (isClosing) {
                             return;
                         }
@@ -188,10 +192,10 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         };
     }
 
-    private void drainBufferAndSend() {
+    private void drainEventsAndSend() {
         List<TrackerEvent> events = new ArrayList<>();
-        eventsToSend.drainTo(events);
-        execute(getRequestRunnable(events));
+        storage.retrieveEvents(events);
+        execute(getPostRequestRunnable(events));
     }
 
     /**
@@ -200,7 +204,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @param buffer the event buffer to be sent
      * @return the new Runnable object
      */
-    private Runnable getRequestRunnable(final List<TrackerEvent> buffer) {
+    private Runnable getPostRequestRunnable(final List<TrackerEvent> buffer) {
         return new Runnable() {
             @Override
             public void run() {
@@ -226,7 +230,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 if (requestCallback != null) {
                     if (failure != 0) {
                         requestCallback.onFailure(success,
-                                buffer.stream().map(te -> te.getEvent()).collect(Collectors.toList()));
+                                buffer.stream().map(TrackerEvent::getEvent).collect(Collectors.toList()));
                     } else {
                         requestCallback.onSuccess(success);
                     }

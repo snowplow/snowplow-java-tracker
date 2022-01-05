@@ -59,7 +59,7 @@ public class SimpleEmitter extends AbstractEmitter {
      */
     @Override
     public void emit(final TrackerEvent event) {
-        execute(getRequestRunnable(event));
+        execute(getGetRequestRunnable(event));
     }
 
     /**
@@ -77,7 +77,7 @@ public class SimpleEmitter extends AbstractEmitter {
      * @param event the event to be sent
      * @return the new Callable object
      */
-    private Runnable getRequestRunnable(final TrackerEvent event) {
+    private Runnable getGetRequestRunnable(final TrackerEvent event) {
         return new Runnable() {
             @Override
             public void run() {
