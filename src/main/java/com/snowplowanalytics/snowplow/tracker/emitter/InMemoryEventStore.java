@@ -2,6 +2,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.List;
@@ -11,10 +12,10 @@ public class InMemoryEventStore implements EventStore {
     private static final AtomicInteger BUFFER_CONSUMER_THREAD_NUMBER = new AtomicInteger(1);
     private static final String BUFFER_CONSUMER_THREAD_NAME_PREFIX = "snowplow-eventStore-BufferConsumer-thread-";
 
+    // Thread for moving events from initial buffer into staging buffer
     private final Thread bufferConsumer;
     // Queue for immediate buffering of events
     public final BlockingQueue<TrackerEvent> eventInitialBuffer = new LinkedBlockingQueue<>();
-
     // Queue for storing events until bufferSize is reached
     public final BlockingQueue<TrackerEvent> eventStagingBuffer = new LinkedBlockingQueue<>();
 
@@ -26,15 +27,10 @@ public class InMemoryEventStore implements EventStore {
         bufferConsumer.start();
     }
 
-    public BlockingQueue<TrackerEvent> getInitialEventBuffer() {
-        return eventInitialBuffer;
+    @Override
+    public List<TrackerEvent> retrieveAllEvents() {
+        return new ArrayList<>(eventStagingBuffer);
     }
-
-    public BlockingQueue<TrackerEvent> getEventStagingBuffer() {
-        return eventStagingBuffer;
-    }
-
-
 
     @Override
     public boolean add(TrackerEvent trackerEvent) {
@@ -51,6 +47,19 @@ public class InMemoryEventStore implements EventStore {
         return eventStagingBuffer.size();
     }
 
+    @Override
+    public void prepareAllEventsForRemoval() {
+        // Drain initial event buffer into staging queue
+        while (true) {
+            TrackerEvent event = eventInitialBuffer.poll();
+            if (event == null) {
+                break;
+            } else {
+                eventStagingBuffer.offer(event);
+            }
+        }
+    }
+
     /**
      * Returns a Consumer for the concurrent queue buffer
      * Consumes events onto another queue to be sent when bufferSize is reached
@@ -61,7 +70,6 @@ public class InMemoryEventStore implements EventStore {
         return new Runnable() {
             @Override
             public void run() {
-                System.out.println("hello from " + Thread.currentThread().getName());
                 while (true) {
                     try {
                         eventStagingBuffer.put(eventInitialBuffer.take());
@@ -70,7 +78,6 @@ public class InMemoryEventStore implements EventStore {
 //                            return;
 //                        }
                         // right now it never stops! isClosing is part of BatchEmitter
-                        System.out.println("there was an exception in BufferConsumer");
                     }
                 }
             }

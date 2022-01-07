@@ -44,7 +44,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     private boolean isClosing = false;
 
     private int bufferSize = 1;
-    private InMemoryEventStore storage;
+    private EventStore storage;
 
     private final long closeTimeout = 5;
 
@@ -118,16 +118,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void flushBuffer() {
-        // Drain immediate event buffer
-        while (true) {
-            TrackerEvent event = storage.getInitialEventBuffer().poll();
-            if (event == null) {
-                break;
-            } else {
-                storage.getEventStagingBuffer().offer(event);
-            }
-        }
-
+        storage.prepareAllEventsForRemoval();
         drainEventsAndSend();
     }
 
@@ -138,7 +129,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public List<TrackerEvent> getBuffer() {
-        return new ArrayList<>(storage.getEventStagingBuffer());
+        return storage.retrieveAllEvents();
     }
 
     /**

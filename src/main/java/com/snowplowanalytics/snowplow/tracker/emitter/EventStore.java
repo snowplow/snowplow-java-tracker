@@ -11,7 +11,10 @@ public interface EventStore {
 
     void removeAllEvents(List<TrackerEvent> eventsList);
 
-//    TrackerEvent removeEvent();
+    // this can be removed if Emitter.getBuffer is changed to return just the size
+    List<TrackerEvent> retrieveAllEvents();
+
+    void prepareAllEventsForRemoval();
 
     long getSize();
 }
