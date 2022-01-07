@@ -16,7 +16,6 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,21 +37,21 @@ import org.slf4j.LoggerFactory;
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
-    private static final AtomicInteger BUFFER_CONSUMER_THREAD_NUMBER = new AtomicInteger(1);
-    private static final String BUFFER_CONSUMER_THREAD_NAME_PREFIX = "snowplow-emitter-BufferConsumer-thread-";
+    private static final AtomicInteger EVENTS_CHECK_THREAD_NUMBER = new AtomicInteger(1);
+    private static final String EVENTS_CHECK_THREAD_NAME_PREFIX = "snowplow-emitter-areThereEvents-thread-";
 
-    private final Thread bufferConsumer;
+    private final Thread areThereEventsToSend;
     private boolean isClosing = false;
 
     private int bufferSize = 1;
-    private InMemoryStorage storage;
+    private InMemoryEventStore storage;
 
     private final long closeTimeout = 5;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
         private int bufferSize = 50; // Optional
-        private InMemoryStorage storage = new InMemoryStorage();
+        private InMemoryEventStore storage = new InMemoryEventStore();
 
         /**
          * @param bufferSize The count of events to buffer before sending
@@ -63,7 +62,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             return self();
         }
 
-        public T storage(final InMemoryStorage storage) {
+        public T storage(final InMemoryEventStore storage) {
             this.storage = storage;
             return self();
         }
@@ -93,11 +92,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         this.bufferSize = builder.bufferSize;
         this.storage = builder.storage;
 
-        bufferConsumer = new Thread(
-                getBufferConsumerRunnable(),
-                BUFFER_CONSUMER_THREAD_NAME_PREFIX + BUFFER_CONSUMER_THREAD_NUMBER.getAndIncrement()
+        areThereEventsToSend = new Thread(
+                getAreThereEventsToSendRunnable(),
+                EVENTS_CHECK_THREAD_NAME_PREFIX + EVENTS_CHECK_THREAD_NUMBER.getAndIncrement()
         );
-        bufferConsumer.start();
+        areThereEventsToSend.start();
     }
 
     /**
@@ -125,7 +124,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             if (event == null) {
                 break;
             } else {
-                storage.getStagingEventBuffer().offer(event);
+                storage.getEventStagingBuffer().offer(event);
             }
         }
 
@@ -139,7 +138,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public List<TrackerEvent> getBuffer() {
-        return new ArrayList<>(storage.getStagingEventBuffer());
+        return new ArrayList<>(storage.getEventStagingBuffer());
     }
 
     /**
@@ -169,23 +168,13 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      *
      * @return the new Runnable object
      */
-    private Runnable getBufferConsumerRunnable() {
+    private Runnable getAreThereEventsToSendRunnable() {
         return new Runnable() {
             @Override
             public void run() {
-                while (true) {
-                    try {
-                        storage.getStagingEventBuffer().put(storage.getInitialEventBuffer().take());
-                        System.out.println("eventsToSend size now " + storage.getStagingEventBuffer().size());
-                        if (storage.getStagingEventBuffer().size() >= bufferSize) {
-                            System.out.println("events found");
-                            drainEventsAndSend();
-                        }
-                    } catch (InterruptedException ex) {
-                        System.out.println("no more events");
-                        if (isClosing) {
-                            return;
-                        }
+                while (!isClosing) {
+                    if (storage.getSize() >= bufferSize) {
+                        drainEventsAndSend();
                     }
                 }
             }
@@ -194,7 +183,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private void drainEventsAndSend() {
         List<TrackerEvent> events = new ArrayList<>();
-        storage.retrieveEvents(events);
+        storage.removeAllEvents(events);
         execute(getPostRequestRunnable(events));
     }
 
@@ -267,7 +256,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     public void close() {
         isClosing = true;
 
-        bufferConsumer.interrupt(); // Kill buffer consumer
+        areThereEventsToSend.interrupt(); // Kill buffer consumer
         flushBuffer(); // Attempt to send all remaining events
 
         //Shutdown executor threadpool

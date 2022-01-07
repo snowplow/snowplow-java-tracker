@@ -7,11 +7,11 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
 public interface EventStore {
 
-    Collection getInitialEventBuffer();
-    Collection getStagingEventBuffer();
-
     boolean add(TrackerEvent trackerEvent);
 
-    void retrieveEvents(List<TrackerEvent> eventsList);
+    void removeAllEvents(List<TrackerEvent> eventsList);
 
+//    TrackerEvent removeEvent();
+
+    long getSize();
 }
