@@ -82,7 +82,7 @@ public class BatchEmitterTest {
     public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws InterruptedException {
         List<TrackerEvent> events = createEvents(2);
         for (TrackerEvent event : events) {
-            emitter.emit(event);
+            emitter.add(event);
         }
 
         Thread.sleep(500);
@@ -96,7 +96,7 @@ public class BatchEmitterTest {
     public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws InterruptedException {
         List<TrackerEvent> events = createEvents(10);
         for (TrackerEvent event : events) {
-            emitter.emit(event);
+            emitter.add(event);
         }
 
         Thread.sleep(500);
@@ -113,7 +113,7 @@ public class BatchEmitterTest {
     public void flushBuffer_shouldEmptyBuffer() throws InterruptedException {
         List<TrackerEvent> events = createEvents(2);
         for (TrackerEvent event : events) {
-            emitter.emit(event);
+            emitter.add(event);
         }
         emitter.flushBuffer();
 
@@ -140,7 +140,7 @@ public class BatchEmitterTest {
 
         List<TrackerEvent> events = createEvents(2);
         for (TrackerEvent event : events) {
-            emitter.emit(event);
+            emitter.add(event);
         }
 
         Thread.sleep(500);
@@ -153,7 +153,7 @@ public class BatchEmitterTest {
     public void getFinalPost_shouldAddSTMParameter() throws InterruptedException {
         List<TrackerEvent> events = createEvents(10);
         for (TrackerEvent event : events) {
-            emitter.emit(event);
+            emitter.add(event);
         }
 
         Thread.sleep(500);
@@ -203,7 +203,7 @@ public class BatchEmitterTest {
     public void close_sendsEventsAndStopsThreads() throws InterruptedException {
         List<TrackerEvent> events = createEvents(2);
         for (TrackerEvent event : events) {
-            emitter.emit(event);
+            emitter.add(event);
         }
         emitter.close();
 
@@ -216,7 +216,7 @@ public class BatchEmitterTest {
         // these events can be added to storage but should not be sent
         List<TrackerEvent> moreEvents = createEvents(20);
         for (TrackerEvent event : moreEvents) {
-            emitter.emit(event);
+            emitter.add(event);
         }
         Assert.assertEquals(20, emitter.getBuffer().size());
     }

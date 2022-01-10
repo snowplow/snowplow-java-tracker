@@ -68,10 +68,7 @@ public class TrackerEvent {
             // Need to set the Base64 rule for Unstructured events
             final Unstructured unstructured = (Unstructured) event;
             unstructured.setBase64Encode(this.parameters.getBase64Encoded());
-            TrackerPayload payload = unstructured.getPayload();
-            addTrackerParameters(payload);
-            addContextsAndSubject(contexts, subject, payload);
-            payloads.add(payload);
+            completePayloadCreation(payloads, unstructured.getPayload(), subject, contexts);
         } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
 
             // These are wrapper classes for Unstructured events; need to create
@@ -86,37 +83,31 @@ public class TrackerEvent {
               .build();
 
             unstructured.setBase64Encode(this.parameters.getBase64Encoded());
-            TrackerPayload payload = unstructured.getPayload();
-            addTrackerParameters(payload);
-            addContextsAndSubject(contexts, subject, payload);
-            payloads.add(payload);
+            completePayloadCreation(payloads, unstructured.getPayload(), subject, contexts);
         } else if (eventClass.equals(EcommerceTransaction.class)) {
 
             final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
-            TrackerPayload payload = ecommerceTransaction.getPayload();
-            addTrackerParameters(payload);
-            addContextsAndSubject(contexts, subject, payload);
-            payloads.add(payload);
+            completePayloadCreation(payloads, ecommerceTransaction.getPayload(), subject, contexts);
 
             // Track each item individually
             for (final EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
 
                 item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
-                TrackerPayload itemPayload = item.getPayload();
-                addTrackerParameters(itemPayload);
-                addContextsAndSubject(item.getContext(), item.getSubject(), itemPayload);
-                payloads.add(itemPayload);
-          }
+                completePayloadCreation(payloads, item.getPayload(), item.getSubject(), item.getContext());
+            }
         } else {
 
             // For all other events, simply get the payload
             TrackerPayload payload = (TrackerPayload) event.getPayload();
-            addTrackerParameters(payload);
-            addContextsAndSubject(contexts, subject, payload);
-            payloads.add(payload);
+            completePayloadCreation(payloads, payload, subject, contexts);
         }
-
         return payloads;
+    }
+
+    private void completePayloadCreation(List<TrackerPayload> payloads, TrackerPayload payload, Subject subject, List<SelfDescribingJson> contexts) {
+        addTrackerParameters(payload);
+        addContextsAndSubject(contexts, subject, payload);
+        payloads.add(payload);
     }
 
     /**

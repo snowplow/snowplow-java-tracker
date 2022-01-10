@@ -105,13 +105,19 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @param event an event
      */
     @Override
-    public void emit(final TrackerEvent event) {
+    public void add(final TrackerEvent event) {
         boolean result = eventStore.add(event);
         
         if (!result) {
             LOGGER.error("Unable to add event to emitter, emitter buffer is full");
         }
     }
+
+    @Override
+    public void add(TrackerPayload payload) {
+        System.out.println("payload received");
+    }
+
 
     /*
      * Forces all the events currently in the buffer to be sent

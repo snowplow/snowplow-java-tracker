@@ -14,10 +14,19 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.base.Preconditions;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Tracker {
 
@@ -190,7 +199,61 @@ public class Tracker {
      * @param event the event to track
      */
     public void track(Event event) {
-        // Emit the event
-        this.emitter.emit(new TrackerEvent(event, this.parameters, this.subject));
+        final Class<?> eventClass = event.getClass();
+
+        if (eventClass.equals(PageView.class)) {
+            System.out.println("got a pageView!");
+
+            TrackerPayload payload = (TrackerPayload) event.getPayload();
+            Subject eventSubject = event.getSubject();
+            final List<SelfDescribingJson> entities = event.getContext();
+
+            addTrackerParameters(payload);
+            // Build the final context and add it to the payload
+            if (entities != null && entities.size() > 0) {
+                SelfDescribingJson envelope = getFinalContext(entities);
+                payload.addMap(envelope.getMap(), this.parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
+            }
+
+            // Add subject if available
+            if (eventSubject != null) {
+                payload.addMap(new HashMap<>(eventSubject.getSubject()));
+            } else if (this.subject != null) {
+                payload.addMap(new HashMap<>(this.subject.getSubject()));
+            }
+            this.emitter.add(payload);
+
+        }
+
+        TrackerEvent trackerEvent = new TrackerEvent(event, this.parameters, this.subject);
+        // convert trackerEvent into payload (hashmap-based)
+        // it's a list for now because of eCommerce event nesting
+
+
+
+        // Send the event to the Emitter
+        // change this to send the payload to Emitter instead
+        this.emitter.add(trackerEvent);
+    }
+
+    /**
+     * Builds the final event context.
+     *
+     * @param entities the base event context
+     * @return the final event context json with many entities inside
+     */
+    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> entities) {
+        List<Map<String, Object>> entityMaps = new LinkedList<>();
+        for (SelfDescribingJson selfDescribingJson : entities) {
+            entityMaps.add(selfDescribingJson.getMap());
+        }
+        return new SelfDescribingJson(Constants.SCHEMA_CONTEXTS, entityMaps);
+    }
+
+    private void addTrackerParameters(TrackerPayload payload) {
+        payload.add(Parameter.PLATFORM, this.parameters.getPlatform().toString());
+        payload.add(Parameter.APP_ID, this.parameters.getAppId());
+        payload.add(Parameter.NAMESPACE, this.parameters.getNamespace());
+        payload.add(Parameter.TRACKER_VERSION, this.parameters.getTrackerVersion());
     }
 }

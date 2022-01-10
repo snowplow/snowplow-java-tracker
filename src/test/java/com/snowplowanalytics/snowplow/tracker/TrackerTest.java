@@ -36,8 +36,13 @@ public class TrackerTest {
         public ArrayList<TrackerEvent> eventList = new ArrayList<>();
 
         @Override
-        public void emit(TrackerEvent event) {
+        public void add(TrackerEvent event) {
             eventList.add(event);
+        }
+
+        @Override
+        public void add(TrackerPayload payload) {
+            System.out.println("MockEmitter got a payload");
         }
 
         @Override
@@ -500,7 +505,7 @@ public class TrackerTest {
     @Test
     public void testGetTrackerVersion() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
-        assertEquals("java-0.10.1", tracker.getTrackerVersion());
+        assertEquals("java-0.11.0", tracker.getTrackerVersion());
     }
 
     @Test

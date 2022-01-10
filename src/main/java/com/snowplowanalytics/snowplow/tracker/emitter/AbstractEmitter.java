@@ -24,6 +24,7 @@ import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import okhttp3.OkHttpClient;
 
 /**
@@ -147,7 +148,10 @@ public abstract class AbstractEmitter implements Emitter {
      * @param event an event
      */
     @Override
-    public abstract void emit(TrackerEvent event);
+    public abstract void add(TrackerEvent event);
+
+    @Override
+    public abstract void add(TrackerPayload payload);
 
     /**
      * Customize the emitter buffer size to any valid integer greater than zero.

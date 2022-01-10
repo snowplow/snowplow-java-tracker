@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 import java.util.List;
 
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Emitter interface.
@@ -27,7 +28,9 @@ public interface Emitter {
      *
      * @param event an event to be emitted
      */
-    void emit(TrackerEvent event);
+    void add(TrackerEvent event);
+
+    void add(TrackerPayload payload);
 
     /**
      * Customize the emitter buffer size to any valid integer

@@ -58,8 +58,13 @@ public class SimpleEmitter extends AbstractEmitter {
      * @param event an event
      */
     @Override
-    public void emit(final TrackerEvent event) {
+    public void add(final TrackerEvent event) {
         execute(getGetRequestRunnable(event));
+    }
+
+    @Override
+    public void add(TrackerPayload payload) {
+        // nothing happens
     }
 
     /**
