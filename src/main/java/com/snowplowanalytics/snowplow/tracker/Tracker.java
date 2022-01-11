@@ -19,16 +19,7 @@ import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class Tracker {
-
-    private static final AtomicInteger EVENT_PROCESSOR_THREAD_NUMBER = new AtomicInteger(1);
-    private static final String EVENT_PROCESSOR_THREAD_NAME_PREFIX = "snowplow-tracker-EventProcessor-thread-";
-
-    private final Thread eventProcessor;
 
     private Emitter emitter;
     private Subject subject;
@@ -51,13 +42,6 @@ public class Tracker {
         this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
         this.emitter = builder.emitter;
         this.subject = builder.subject;
-
-        eventProcessor = new Thread(
-                getEventProcessorRunnable(),
-                EVENT_PROCESSOR_THREAD_NAME_PREFIX + EVENT_PROCESSOR_THREAD_NUMBER.getAndIncrement()
-        );
-        eventProcessor.start();
-
     }
 
     /**
@@ -140,16 +124,6 @@ public class Tracker {
     }
 
     // --- Getters
-
-    private Runnable getEventProcessorRunnable() {
-
-        return new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("hello I'm a runnable on thread: " + Thread.currentThread().getName());
-            }
-        };
-    }
 
     /**
      * @return the emitter associated with the tracker
