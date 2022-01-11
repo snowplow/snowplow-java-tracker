@@ -93,7 +93,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         this.storage = builder.eventStore;
 
         checkForEventsToSend = new Thread(
-                getAreThereEventsToSendRunnable(),
+                getCheckForEventsToSendRunnable(),
                 EVENTS_CHECK_THREAD_NAME_PREFIX + EVENTS_CHECK_THREAD_NUMBER.getAndIncrement()
         );
         checkForEventsToSend.start();
@@ -114,12 +114,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /*
-     * Forces the events currently in the buffer to be sent
+     * Forces all the events currently in the buffer to be sent
      */
     @Override
     public void flushBuffer() {
-        storage.prepareAllEventsForRemoval();
-        drainEventsAndSend();
+        drainEventsAndSend(storage.getSize());
     }
 
     /**
@@ -129,7 +128,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public List<TrackerEvent> getBuffer() {
-        return storage.retrieveAllEvents();
+        return storage.getAllEvents();
     }
 
     /**
@@ -154,27 +153,26 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Returns a Consumer for the concurrent queue buffer
-     * Consumes events onto another queue to be sent when bufferSize is reached
+     * Checks if bufferSize is reached
      *
      * @return the new Runnable object
      */
-    private Runnable getAreThereEventsToSendRunnable() {
+    private Runnable getCheckForEventsToSendRunnable() {
         return new Runnable() {
             @Override
             public void run() {
                 while (!isClosing) {
                     if (storage.getSize() >= bufferSize) {
-                        drainEventsAndSend();
+                        drainEventsAndSend(getBufferSize());
                     }
                 }
             }
         };
     }
 
-    private void drainEventsAndSend() {
+    private void drainEventsAndSend(int numberOfEvents) {
         List<TrackerEvent> events = new ArrayList<>();
-        storage.removeAllEvents(events);
+        storage.removeEvents(events, numberOfEvents);
         execute(getPostRequestRunnable(events));
     }
 
@@ -247,7 +245,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     public void close() {
         isClosing = true;
 
-        checkForEventsToSend.interrupt(); // Kill buffer consumer
+        checkForEventsToSend.interrupt(); // Kill checkForEventsToSend thread
         flushBuffer(); // Attempt to send all remaining events
 
         //Shutdown executor threadpool

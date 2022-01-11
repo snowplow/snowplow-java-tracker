@@ -9,12 +9,9 @@ public interface EventStore {
 
     boolean add(TrackerEvent trackerEvent);
 
-    void removeAllEvents(List<TrackerEvent> eventsList);
+    void removeEvents(List<TrackerEvent> eventsList, int numberToRemove);
 
-    // this can be removed if Emitter.getBuffer is changed to return just the size
-    List<TrackerEvent> retrieveAllEvents();
+    int getSize();
 
-    void prepareAllEventsForRemoval();
-
-    long getSize();
+    List<TrackerEvent> getAllEvents();
 }
