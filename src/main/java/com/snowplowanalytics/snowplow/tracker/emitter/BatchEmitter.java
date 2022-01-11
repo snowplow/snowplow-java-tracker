@@ -38,9 +38,9 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
     private static final AtomicInteger EVENTS_CHECK_THREAD_NUMBER = new AtomicInteger(1);
-    private static final String EVENTS_CHECK_THREAD_NAME_PREFIX = "snowplow-emitter-areThereEvents-thread-";
+    private static final String EVENTS_CHECK_THREAD_NAME_PREFIX = "snowplow-emitter-checkForEvents-thread-";
 
-    private final Thread areThereEventsToSend;
+    private final Thread checkForEventsToSend;
     private boolean isClosing = false;
 
     private int bufferSize = 1;
@@ -51,7 +51,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
         private int bufferSize = 50; // Optional
-        private InMemoryEventStore storage = new InMemoryEventStore();
+        private EventStore eventStore = new InMemoryEventStore();
 
         /**
          * @param bufferSize The count of events to buffer before sending
@@ -62,8 +62,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             return self();
         }
 
-        public T storage(final InMemoryEventStore storage) {
-            this.storage = storage;
+        public T eventStore(final EventStore eventStore) {
+            this.eventStore = eventStore;
             return self();
         }
 
@@ -90,13 +90,13 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize must be greater than 0");
 
         this.bufferSize = builder.bufferSize;
-        this.storage = builder.storage;
+        this.storage = builder.eventStore;
 
-        areThereEventsToSend = new Thread(
+        checkForEventsToSend = new Thread(
                 getAreThereEventsToSendRunnable(),
                 EVENTS_CHECK_THREAD_NAME_PREFIX + EVENTS_CHECK_THREAD_NUMBER.getAndIncrement()
         );
-        areThereEventsToSend.start();
+        checkForEventsToSend.start();
     }
 
     /**
@@ -106,7 +106,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void emit(final TrackerEvent event) {
-        boolean result = storage.add(event); // Add to buffer and quickly return back to application
+        boolean result = storage.add(event);
         
         if (!result) {
             LOGGER.error("Unable to add event to emitter, emitter buffer is full");
@@ -247,7 +247,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     public void close() {
         isClosing = true;
 
-        areThereEventsToSend.interrupt(); // Kill buffer consumer
+        checkForEventsToSend.interrupt(); // Kill buffer consumer
         flushBuffer(); // Attempt to send all remaining events
 
         //Shutdown executor threadpool

@@ -201,7 +201,7 @@ public class BatchEmitterTest {
             threadNames.add(thread.getName());
         }
 
-        Assert.assertTrue(threadNames.contains("snowplow-emitter-areThereEvents-thread-1"));
+        Assert.assertTrue(threadNames.contains("snowplow-emitter-checkForEvents-thread-1"));
         Assert.assertTrue(threadNames.contains("snowplow-emitter-pool-1-request-thread-1"));
     }
 
