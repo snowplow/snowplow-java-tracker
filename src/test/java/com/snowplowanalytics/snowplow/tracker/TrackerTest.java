@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

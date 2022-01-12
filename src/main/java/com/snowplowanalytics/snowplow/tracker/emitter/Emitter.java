@@ -45,7 +45,6 @@ public interface Emitter {
      *
      * This can be used to manually start sending.
      */
-    // might be better called just flush
     void flushBuffer();
 
     /**
@@ -61,7 +60,5 @@ public interface Emitter {
      *
      * @return the buffer events
      */
-    // when would it be useful to get a list of all the events?
-    // replace with getBufferedEventsCount() ?
     List<TrackerEvent> getBuffer();
 }

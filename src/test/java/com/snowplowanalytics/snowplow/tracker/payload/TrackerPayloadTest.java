@@ -17,22 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 // JUnit
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class TrackerPayloadTest {
 
-    private TrackerPayload payload;
-
-    @Before
-    public void setUp() {
-        payload = new TrackerPayload();
-    }
-
     @Test
     public void testAddKeyValue() {
+        TrackerPayload payload = new TrackerPayload();
         payload.add("key", "value");
         assertNotNull(payload);
         assertTrue(payload.getMap().containsKey("key"));
@@ -41,6 +34,7 @@ public class TrackerPayloadTest {
 
     @Test
     public void testAddKeyWithNullValue() {
+        TrackerPayload payload = new TrackerPayload();
         payload.add("key", null);
         assertNotNull(payload);
         assertFalse(payload.getMap().containsKey("key"));
@@ -48,6 +42,7 @@ public class TrackerPayloadTest {
 
     @Test
     public void testAddKeyWithEmptyValue() {
+        TrackerPayload payload = new TrackerPayload();
         payload.add("key", "");
         assertNotNull(payload);
         assertFalse(payload.getMap().containsKey("key"));
@@ -57,6 +52,7 @@ public class TrackerPayloadTest {
     public void testAddMap() {
         Map<String, String> data = new HashMap<>();
         data.put("key", "value");
+        TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
         assertNotNull(payload);
         assertTrue(payload.getMap().containsKey("key"));
@@ -67,6 +63,7 @@ public class TrackerPayloadTest {
     public void testAddMapWithNullValue() {
         Map<String, String> data = new HashMap<>();
         data.put("key", null);
+        TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
         assertNotNull(payload);
         assertFalse(payload.getMap().containsKey("key"));
@@ -76,6 +73,7 @@ public class TrackerPayloadTest {
     public void testAddMapWithEmptyValue() {
         Map<String, String> data = new HashMap<>();
         data.put("key", "");
+        TrackerPayload payload = new TrackerPayload();
         payload.addMap(data);
         assertNotNull(payload);
         assertFalse(payload.getMap().containsKey("key"));
@@ -85,6 +83,7 @@ public class TrackerPayloadTest {
     public void testAddMapEncoded() {
         Map<String, String> data = new HashMap<>();
         data.put("key", "value");
+        TrackerPayload payload = new TrackerPayload();
         payload.addMap(data, true, "encoded", "non_encoded");
         assertNotNull(payload);
         assertTrue(payload.getMap().containsKey("encoded"));
@@ -95,6 +94,7 @@ public class TrackerPayloadTest {
     public void testAddMapNonEncoded() {
         Map<String, String> data = new HashMap<>();
         data.put("key", "value");
+        TrackerPayload payload = new TrackerPayload();
         payload.addMap(data, false, "encoded", "non_encoded");
         assertNotNull(payload);
         assertTrue(payload.getMap().containsKey("non_encoded"));
