@@ -9,7 +9,7 @@ public interface EventStore {
 
     boolean add(TrackerEvent trackerEvent);
 
-    void removeEvents(List<TrackerEvent> eventsList, int numberToRemove);
+    List<TrackerEvent> removeEvents(int numberToRemove);
 
     int getSize();
 

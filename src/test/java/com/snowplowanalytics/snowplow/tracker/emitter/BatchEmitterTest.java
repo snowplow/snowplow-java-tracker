@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.google.common.collect.Lists;
 
@@ -189,7 +190,7 @@ public class BatchEmitterTest {
 
     @Test
     public void threadsHaveExpectedNames() {
-        // A BufferConsumer thread is created on BatchEmitter instantiation.
+        // A checkForEventsToSend thread is created on BatchEmitter instantiation.
         // Calling flushBuffer() here to require another thread - causing
         // creation of a request thread within the scheduledThreadPool.
         emitter.flushBuffer();
@@ -235,7 +236,7 @@ public class BatchEmitterTest {
             boolean matchFound = false;
             for (Map<String,String> eventMap : eventPayloads) {
                 //Find the matching events
-                if (capturedMap.get("eid") == eventMap.get("eid")) {
+                if (Objects.equals(capturedMap.get("eid"), eventMap.get("eid"))) {
                     matchFound = true;
 
                     //Assert that all the entries in the event are in the captured payload

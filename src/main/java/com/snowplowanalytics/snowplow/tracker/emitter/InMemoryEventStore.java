@@ -16,8 +16,10 @@ public class InMemoryEventStore implements EventStore {
     }
 
     @Override
-    public void removeEvents(List<TrackerEvent> eventsList, int numberToRemove) {
+    public List<TrackerEvent> removeEvents(int numberToRemove) {
+        List<TrackerEvent> eventsList = new ArrayList<>();
         eventBuffer.drainTo(eventsList, numberToRemove);
+        return eventsList;
     }
 
     @Override
