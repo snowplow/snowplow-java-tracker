@@ -80,68 +80,50 @@ public class BatchEmitterTest {
 
     @Test
     public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws InterruptedException {
-        // Given
         List<TrackerEvent> events = createEvents(2);
-
-        // When
         for (TrackerEvent event : events) {
             emitter.emit(event);
         }
 
         Thread.sleep(500);
 
-        // Then
-        Assert.assertFalse(mockHttpClientAdapter.isGetCalled);
-
+        Assert.assertFalse(mockHttpClientAdapter.isPostCalled);
         Assert.assertEquals(2, emitter.getBuffer().size());
         Assert.assertEquals(events, emitter.getBuffer());
     }
 
     @Test
     public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws InterruptedException {
-        // Given
         List<TrackerEvent> events = createEvents(10);
-
-        // When
         for (TrackerEvent event : events) {
             emitter.emit(event);
         }
 
         Thread.sleep(500);
 
-        // Then
         Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
-
         @SuppressWarnings("unchecked")
         List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
 
         assertPayload(events, capturedPayload);
-        
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
     @Test
     public void flushBuffer_shouldEmptyBuffer() throws InterruptedException {
-        // Given
         List<TrackerEvent> events = createEvents(2);
-
-        // When
         for (TrackerEvent event : events) {
             emitter.emit(event);
         }
-
         emitter.flushBuffer();
 
         Thread.sleep(500);
 
-        // Then
         Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
-
         @SuppressWarnings("unchecked")
         List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
 
         assertPayload(events, capturedPayload);
-
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
@@ -152,20 +134,31 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void getFinalPost_shouldAddSTMParameter() throws InterruptedException {
-        // Given
-        List<TrackerEvent> events = createEvents(10);
+    public void setAndGetBufferSizeWorksAsExpected() throws InterruptedException {
+        emitter.setBufferSize(2);
+        Assert.assertEquals(2, emitter.getBufferSize());
 
-        // When
+        List<TrackerEvent> events = createEvents(2);
         for (TrackerEvent event : events) {
             emitter.emit(event);
         }
 
         Thread.sleep(500);
 
-        // Then
         Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
+        Assert.assertEquals(0, emitter.getBuffer().size());
+    }
 
+    @Test
+    public void getFinalPost_shouldAddSTMParameter() throws InterruptedException {
+        List<TrackerEvent> events = createEvents(10);
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
+        }
+
+        Thread.sleep(500);
+
+        Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
         @SuppressWarnings("unchecked")
         List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
         
@@ -204,6 +197,28 @@ public class BatchEmitterTest {
 
         Assert.assertTrue(threadNames.contains("snowplow-emitter-checkForEvents-thread-1"));
         Assert.assertTrue(threadNames.contains("snowplow-emitter-pool-1-request-thread-1"));
+    }
+
+    @Test
+    public void close_sendsEventsAndStopsThreads() throws InterruptedException {
+        List<TrackerEvent> events = createEvents(2);
+        for (TrackerEvent event : events) {
+            emitter.emit(event);
+        }
+        emitter.close();
+
+        Thread.sleep(500);
+
+        // close() calls flushBuffer() to send all remaining stored events
+        Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
+        Assert.assertEquals(0, emitter.getBuffer().size());
+
+        // these events can be added to storage but should not be sent
+        List<TrackerEvent> moreEvents = createEvents(20);
+        for (TrackerEvent event : moreEvents) {
+            emitter.emit(event);
+        }
+        Assert.assertEquals(20, emitter.getBuffer().size());
     }
 
     private List<TrackerEvent> createEvents(int numEvents) {

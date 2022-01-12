@@ -17,6 +17,8 @@ public class InMemoryEventStore implements EventStore {
 
     @Override
     public List<TrackerEvent> removeEvents(int numberToRemove) {
+        // if numberToRemove is greater than the number of events present,
+        // it will return all the events (there's no error)
         List<TrackerEvent> eventsList = new ArrayList<>();
         eventBuffer.drainTo(eventsList, numberToRemove);
         return eventsList;
