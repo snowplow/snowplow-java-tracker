@@ -23,10 +23,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Tracker {
 
@@ -199,41 +196,81 @@ public class Tracker {
      * @param event the event to track
      */
     public void track(Event event) {
-        final Class<?> eventClass = event.getClass();
-
-        if (eventClass.equals(PageView.class)) {
-            System.out.println("got a pageView!");
-
-            TrackerPayload payload = (TrackerPayload) event.getPayload();
-            Subject eventSubject = event.getSubject();
-            final List<SelfDescribingJson> entities = event.getContext();
+        // a list because Ecommerce events become multiple payloads
+        List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
+        for (Event processedEvent : processedEvents) {
+            TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
 
             addTrackerParameters(payload);
-            // Build the final context and add it to the payload
-            if (entities != null && entities.size() > 0) {
-                SelfDescribingJson envelope = getFinalContext(entities);
-                payload.addMap(envelope.getMap(), this.parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
-            }
-
-            // Add subject if available
-            if (eventSubject != null) {
-                payload.addMap(new HashMap<>(eventSubject.getSubject()));
-            } else if (this.subject != null) {
-                payload.addMap(new HashMap<>(this.subject.getSubject()));
-            }
+            addContext(processedEvent, payload);
+            addSubject(processedEvent, payload);
             this.emitter.add(payload);
-
         }
 
         TrackerEvent trackerEvent = new TrackerEvent(event, this.parameters, this.subject);
-        // convert trackerEvent into payload (hashmap-based)
-        // it's a list for now because of eCommerce event nesting
-
-
 
         // Send the event to the Emitter
         // change this to send the payload to Emitter instead
         this.emitter.add(trackerEvent);
+    }
+
+    private List<Event> eventTypeSpecificPreProcessing(Event event) {
+        // a list because Ecommerce events become multiple payloads
+        List<Event> eventList = new ArrayList<>();
+
+        final Class<?> eventClass = event.getClass();
+        if (eventClass.equals(Unstructured.class)) {
+            // Need to set the Base64 rule for Unstructured events
+            final Unstructured unstructured = (Unstructured) event;
+            unstructured.setBase64Encode(this.parameters.getBase64Encoded());
+            eventList.add(unstructured);
+
+        } else if (eventClass.equals(EcommerceTransaction.class)) {
+
+            final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
+            eventList.add(ecommerceTransaction);
+
+            // Track each item individually
+            for (final EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
+
+                item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
+                eventList.add(item);
+            }
+        } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
+            // These are wrapper classes for Unstructured events; need to create
+            // Unstructured events from them and resend.
+            final Unstructured unstructured = Unstructured.builder()
+                    .eventData((SelfDescribingJson) event.getPayload())
+                    .customContext(event.getContext())
+                    .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
+                    .trueTimestamp(event.getTrueTimestamp())
+                    .eventId(event.getEventId())
+                    .subject(event.getSubject())
+                    .build();
+
+            unstructured.setBase64Encode(this.parameters.getBase64Encoded());
+            eventList.add(unstructured);
+        } else {
+            eventList.add(event);
+        }
+        return eventList;
+    }
+
+    private void addTrackerParameters(TrackerPayload payload) {
+        payload.add(Parameter.PLATFORM, this.parameters.getPlatform().toString());
+        payload.add(Parameter.APP_ID, this.parameters.getAppId());
+        payload.add(Parameter.NAMESPACE, this.parameters.getNamespace());
+        payload.add(Parameter.TRACKER_VERSION, this.parameters.getTrackerVersion());
+    }
+
+    private void addContext(Event event, TrackerPayload payload) {
+        List<SelfDescribingJson> entities = event.getContext();
+
+        // Build the final context and add it to the payload
+        if (entities != null && entities.size() > 0) {
+            SelfDescribingJson envelope = getFinalContext(entities);
+            payload.addMap(envelope.getMap(), this.parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
+        }
     }
 
     /**
@@ -250,10 +287,14 @@ public class Tracker {
         return new SelfDescribingJson(Constants.SCHEMA_CONTEXTS, entityMaps);
     }
 
-    private void addTrackerParameters(TrackerPayload payload) {
-        payload.add(Parameter.PLATFORM, this.parameters.getPlatform().toString());
-        payload.add(Parameter.APP_ID, this.parameters.getAppId());
-        payload.add(Parameter.NAMESPACE, this.parameters.getNamespace());
-        payload.add(Parameter.TRACKER_VERSION, this.parameters.getTrackerVersion());
+    private void addSubject(Event event, TrackerPayload payload) {
+        Subject eventSubject = event.getSubject();
+
+        // Add subject if available
+        if (eventSubject != null) {
+            payload.addMap(new HashMap<>(eventSubject.getSubject()));
+        } else if (this.subject != null) {
+            payload.addMap(new HashMap<>(this.subject.getSubject()));
+        }
     }
 }

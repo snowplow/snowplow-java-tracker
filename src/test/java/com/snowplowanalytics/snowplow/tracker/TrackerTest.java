@@ -43,6 +43,7 @@ public class TrackerTest {
         @Override
         public void add(TrackerPayload payload) {
             System.out.println("MockEmitter got a payload");
+            System.out.println(payload.toString());
         }
 
         @Override

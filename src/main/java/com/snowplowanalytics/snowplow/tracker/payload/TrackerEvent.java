@@ -69,6 +69,7 @@ public class TrackerEvent {
             final Unstructured unstructured = (Unstructured) event;
             unstructured.setBase64Encode(this.parameters.getBase64Encoded());
             completePayloadCreation(payloads, unstructured.getPayload(), subject, contexts);
+
         } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
 
             // These are wrapper classes for Unstructured events; need to create
@@ -84,6 +85,7 @@ public class TrackerEvent {
 
             unstructured.setBase64Encode(this.parameters.getBase64Encoded());
             completePayloadCreation(payloads, unstructured.getPayload(), subject, contexts);
+
         } else if (eventClass.equals(EcommerceTransaction.class)) {
 
             final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
