@@ -196,7 +196,7 @@ public class Tracker {
      * @param event the event to track
      */
     public void track(Event event) {
-        // a list because Ecommerce events become multiple payloads
+        // a list because Ecommerce events become multiple Payloads
         List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
         for (Event processedEvent : processedEvents) {
             TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
@@ -207,11 +207,11 @@ public class Tracker {
             this.emitter.add(payload);
         }
 
-        TrackerEvent trackerEvent = new TrackerEvent(event, this.parameters, this.subject);
-
-        // Send the event to the Emitter
-        // change this to send the payload to Emitter instead
-        this.emitter.add(trackerEvent);
+//        TrackerEvent trackerEvent = new TrackerEvent(event, this.parameters, this.subject);
+//
+//        // Send the event to the Emitter
+//        // change this to send the payload to Emitter instead
+//        this.emitter.add(trackerEvent);
     }
 
     private List<Event> eventTypeSpecificPreProcessing(Event event) {
@@ -232,7 +232,6 @@ public class Tracker {
 
             // Track each item individually
             for (final EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
-
                 item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
                 eventList.add(item);
             }

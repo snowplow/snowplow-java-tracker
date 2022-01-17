@@ -52,16 +52,16 @@ public class SimpleEmitter extends AbstractEmitter {
         super(builder);
     }
 
-    /**
-     * Adds an event to the buffer and instantly sends it
-     *
-     * @param event an event
-     */
-    @Override
-    public void add(final TrackerEvent event) {
-        execute(getGetRequestRunnable(event));
-    }
-
+//    /**
+//     * Adds an event to the buffer and instantly sends it
+//     *
+//     * @param event an event
+//     */
+//    @Override
+//    public void add(final TrackerEvent event) {
+//        execute(getGetRequestRunnable(event));
+//    }
+//
     @Override
     public void add(TrackerPayload payload) {
         // nothing happens
@@ -126,7 +126,7 @@ public class SimpleEmitter extends AbstractEmitter {
      * @return the empty buffer
      */
     @Override
-    public List<TrackerEvent> getBuffer() {
+    public List<TrackerPayload> getBuffer() {
         return new ArrayList<>();
     }
 

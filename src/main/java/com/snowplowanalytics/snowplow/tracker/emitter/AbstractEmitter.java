@@ -145,11 +145,8 @@ public abstract class AbstractEmitter implements Emitter {
     /**
      * Adds an event to the buffer
      *
-     * @param event an event
+     * @param payload an event
      */
-    @Override
-    public abstract void add(TrackerEvent event);
-
     @Override
     public abstract void add(TrackerPayload payload);
 
@@ -182,7 +179,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @return the buffered events
      */
     @Override
-    public abstract List<TrackerEvent> getBuffer();
+    public abstract List<TrackerPayload> getBuffer();
 
     /**
      * Sends a runnable to the executor service.

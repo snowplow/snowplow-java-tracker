@@ -102,22 +102,16 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     /**
      * Adds a TrackerEvent to the concurrent queue buffer
      *
-     * @param event an event
+     * @param payload an event
      */
     @Override
-    public void add(final TrackerEvent event) {
-        boolean result = eventStore.add(event);
+    public void add(final TrackerPayload payload) {
+        boolean result = eventStore.add(payload);
         
         if (!result) {
             LOGGER.error("Unable to add event to emitter, emitter buffer is full");
         }
     }
-
-    @Override
-    public void add(TrackerPayload payload) {
-        System.out.println("payload received");
-    }
-
 
     /*
      * Forces all the events currently in the buffer to be sent
@@ -133,7 +127,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @return the buffered events
      */
     @Override
-    public List<TrackerEvent> getBuffer() {
+    public List<TrackerPayload> getBuffer() {
         return eventStore.getAllEvents();
     }
 
@@ -174,8 +168,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     private void drainEventsAndSend(int numberOfEvents) {
-        List<TrackerEvent> events = eventStore.removeEvents(numberOfEvents);
-        execute(getPostRequestRunnable(events));
+        List<TrackerPayload> payloads = eventStore.removeEvents(numberOfEvents);
+        execute(getPostRequestRunnable(payloads));
     }
 
     /**
@@ -184,7 +178,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @param buffer the event buffer to be sent
      * @return the new Runnable object
      */
-    private Runnable getPostRequestRunnable(final List<TrackerEvent> buffer) {
+    private Runnable getPostRequestRunnable(final List<TrackerPayload> buffer) {
         return () -> {
             if (buffer.size() == 0) {
                 return;
@@ -204,15 +198,15 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 success += buffer.size();
             }
 
-            // Send the callback if available
-            if (requestCallback != null) {
-                if (failure != 0) {
-                    requestCallback.onFailure(success,
-                            buffer.stream().map(TrackerEvent::getEvent).collect(Collectors.toList()));
-                } else {
-                    requestCallback.onSuccess(success);
-                }
-            }
+//            // Send the callback if available
+//            if (requestCallback != null) {
+//                if (failure != 0) {
+//                    requestCallback.onFailure(success,
+//                            buffer.stream().map(TrackerEvent::getEvent).collect(Collectors.toList()));
+//                } else {
+//                    requestCallback.onSuccess(success);
+//                }
+//            }
         };
     }
 
@@ -222,16 +216,13 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @param buffer the event buffer
      * @return the constructed POST payload
      */
-    private SelfDescribingJson getFinalPost(final List<TrackerEvent> buffer) {
+    private SelfDescribingJson getFinalPost(final List<TrackerPayload> buffer) {
         final List<Map<String, String>> toSendPayloads = new ArrayList<>();
         final String sentTimestamp = Long.toString(System.currentTimeMillis());
 
-        for (TrackerEvent event : buffer) {
-            List<TrackerPayload> payloads = event.getTrackerPayloads();
-            for (TrackerPayload payload : payloads) {
-                payload.add(Parameter.DEVICE_SENT_TIMESTAMP, sentTimestamp);
-                toSendPayloads.add(payload.getMap());
-            }
+        for (TrackerPayload payload : buffer) {
+            payload.add(Parameter.DEVICE_SENT_TIMESTAMP, sentTimestamp);
+            toSendPayloads.add(payload.getMap());
         }
 
         return new SelfDescribingJson(Constants.SCHEMA_PAYLOAD_DATA, toSendPayloads);

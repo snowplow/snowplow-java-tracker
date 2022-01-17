@@ -26,10 +26,8 @@ public interface Emitter {
      * Adds an event to the buffer and checks whether
      * we have reached the buffer limit yet.
      *
-     * @param event an event to be emitted
+     * @param payload an event to be emitted
      */
-    void add(TrackerEvent event);
-
     void add(TrackerPayload payload);
 
     /**
@@ -63,5 +61,5 @@ public interface Emitter {
      *
      * @return the buffer events
      */
-    List<TrackerEvent> getBuffer();
+    List<TrackerPayload> getBuffer();
 }

@@ -33,17 +33,13 @@ public class TrackerTest {
     public static final String EXPECTED_EVENT_ID = "15e9b149-6029-4f6e-8447-5b9797c9e6be";
 
     public static class MockEmitter implements Emitter {
-        public ArrayList<TrackerEvent> eventList = new ArrayList<>();
-
-        @Override
-        public void add(TrackerEvent event) {
-            eventList.add(event);
-        }
+        public ArrayList<TrackerPayload> eventList = new ArrayList<>();
 
         @Override
         public void add(TrackerPayload payload) {
             System.out.println("MockEmitter got a payload");
             System.out.println(payload.toString());
+            eventList.add(payload);
         }
 
         @Override
@@ -58,7 +54,7 @@ public class TrackerTest {
         }
 
         @Override
-        public List<TrackerEvent> getBuffer() {
+        public List<TrackerPayload> getBuffer() {
             return null;
         }
     }
@@ -116,7 +112,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        List<TrackerPayload> results = mockEmitter.eventList.get(0).getTrackerPayloads();
+        List<TrackerPayload> results = mockEmitter.eventList;
         assertEquals(2, results.size());
 
         Map<String, String> result1 = results.get(0).getMap();
@@ -179,7 +175,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -209,7 +205,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -237,7 +233,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-      Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -271,7 +267,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -311,10 +307,10 @@ public class TrackerTest {
                 .build());
 
         // Then
-        List<TrackerEvent> results = mockEmitter.eventList;
+        List<TrackerPayload> results = mockEmitter.eventList;
         assertEquals(2, results.size());
 
-        Map<String, String> result1 = results.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result1 = results.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -330,7 +326,7 @@ public class TrackerTest {
                 .put("url", "url")
                 .build(), result1);
 
-        Map<String, String> result2 = results.get(1).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result2 = results.get(1).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -360,7 +356,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -388,7 +384,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
                 .put("ttm", "456789")
@@ -416,7 +412,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -447,7 +443,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("tv", Version.TRACKER)
@@ -484,7 +480,7 @@ public class TrackerTest {
                 .build());
 
         // Then
-        Map<String, String> result = mockEmitter.eventList.get(0).getTrackerPayloads().get(0).getMap();
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}")

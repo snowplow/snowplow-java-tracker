@@ -19,19 +19,16 @@ import java.util.Objects;
 
 import com.google.common.collect.Lists;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat; 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 
@@ -80,23 +77,23 @@ public class BatchEmitterTest {
 
     @Test
     public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws InterruptedException {
-        List<TrackerEvent> events = createEvents(2);
-        for (TrackerEvent event : events) {
-            emitter.add(event);
+        List<TrackerPayload> payloads = createPayloads(2);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
         }
 
         Thread.sleep(500);
 
         Assert.assertFalse(mockHttpClientAdapter.isPostCalled);
         Assert.assertEquals(2, emitter.getBuffer().size());
-        Assert.assertEquals(events, emitter.getBuffer());
+        Assert.assertEquals(payloads, emitter.getBuffer());
     }
 
     @Test
     public void addToBuffer_withMore10Payloads_shouldEmptyBuffer() throws InterruptedException {
-        List<TrackerEvent> events = createEvents(10);
-        for (TrackerEvent event : events) {
-            emitter.add(event);
+        List<TrackerPayload> payloads = createPayloads(10);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
         }
 
         Thread.sleep(500);
@@ -105,15 +102,15 @@ public class BatchEmitterTest {
         @SuppressWarnings("unchecked")
         List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
 
-        assertPayload(events, capturedPayload);
+        assertPayload(payloads, capturedPayload);
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
     @Test
     public void flushBuffer_shouldEmptyBuffer() throws InterruptedException {
-        List<TrackerEvent> events = createEvents(2);
-        for (TrackerEvent event : events) {
-            emitter.add(event);
+        List<TrackerPayload> payloads = createPayloads(2);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
         }
         emitter.flushBuffer();
 
@@ -123,7 +120,7 @@ public class BatchEmitterTest {
         @SuppressWarnings("unchecked")
         List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
 
-        assertPayload(events, capturedPayload);
+        assertPayload(payloads, capturedPayload);
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
@@ -138,9 +135,9 @@ public class BatchEmitterTest {
         emitter.setBufferSize(2);
         Assert.assertEquals(2, emitter.getBufferSize());
 
-        List<TrackerEvent> events = createEvents(2);
-        for (TrackerEvent event : events) {
-            emitter.add(event);
+        List<TrackerPayload> payloads = createPayloads(2);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
         }
 
         Thread.sleep(500);
@@ -151,9 +148,9 @@ public class BatchEmitterTest {
 
     @Test
     public void getFinalPost_shouldAddSTMParameter() throws InterruptedException {
-        List<TrackerEvent> events = createEvents(10);
-        for (TrackerEvent event : events) {
-            emitter.add(event);
+        List<TrackerPayload> payloads = createPayloads(10);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
         }
 
         Thread.sleep(500);
@@ -161,7 +158,7 @@ public class BatchEmitterTest {
         Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
         @SuppressWarnings("unchecked")
         List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
-        
+
         for (Map<String, String> payloadMap : capturedPayload) {
             Assert.assertTrue(payloadMap.containsKey(Parameter.DEVICE_SENT_TIMESTAMP));
         }
@@ -201,9 +198,9 @@ public class BatchEmitterTest {
 
     @Test
     public void close_sendsEventsAndStopsThreads() throws InterruptedException {
-        List<TrackerEvent> events = createEvents(2);
-        for (TrackerEvent event : events) {
-            emitter.add(event);
+        List<TrackerPayload> payloads = createPayloads(2);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
         }
         emitter.close();
 
@@ -214,36 +211,35 @@ public class BatchEmitterTest {
         Assert.assertEquals(0, emitter.getBuffer().size());
 
         // these events can be added to storage but should not be sent
-        List<TrackerEvent> moreEvents = createEvents(20);
-        for (TrackerEvent event : moreEvents) {
-            emitter.add(event);
+        List<TrackerPayload> morePayloads = createPayloads(20);
+        for (TrackerPayload payload : morePayloads) {
+            emitter.add(payload);
         }
         Assert.assertEquals(20, emitter.getBuffer().size());
     }
 
-    private List<TrackerEvent> createEvents(int numEvents) {
-        final List<TrackerEvent> payloads = Lists.newArrayList();
-        for (int i = 0; i < numEvents; i++) {
-            payloads.add(createEvent());
+    private TrackerPayload createPayload() {
+        PageView pv = PageView.builder()
+                .pageUrl("https://www.snowplowanalytics.com/")
+                .pageTitle("Snowplow")
+                .referrer("https://www.google.com/")
+                .build();
+
+        return pv.getPayload();
+    }
+
+    private List<TrackerPayload> createPayloads(int numPayloads) {
+        final List<TrackerPayload> payloads = Lists.newArrayList();
+        for (int i = 0; i < numPayloads; i++) {
+            payloads.add(createPayload());
         }
         return payloads;
     }
 
-    private TrackerEvent createEvent() {
-        PageView pv = PageView.builder()
-        .pageUrl("https://www.snowplowanalytics.com/")
-        .pageTitle("Snowplow")
-        .referrer("https://www.google.com/")
-        .build();
-
-        return new TrackerEvent(pv, new TrackerParameters("appId", DevicePlatform.ServerSideApp, "namespace", "0.0.0", false), null);
-    }
-
-    private void assertPayload(List<TrackerEvent> events, List<Map<String, String>> capturedPayload) {
+    private void assertPayload(List<TrackerPayload> payloads, List<Map<String, String>> capturedPayload) {
         List<Map<String, String>> eventPayloads = new ArrayList<>();
-        for (TrackerEvent event : events) {
-            //All PageView events so we can get(0) from payloads
-            eventPayloads.add(event.getTrackerPayloads().get(0).getMap());
+        for (TrackerPayload payload : payloads) {
+            eventPayloads.add(payload.getMap());
         }
 
         //Iterate through all captured payloads
@@ -264,3 +260,4 @@ public class BatchEmitterTest {
         }
     }
 }
+

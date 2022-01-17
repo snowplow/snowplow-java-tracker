@@ -4,14 +4,15 @@ import java.util.Collection;
 import java.util.List;
 
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public interface EventStore {
 
-    boolean add(TrackerEvent trackerEvent);
+    boolean add(TrackerPayload trackerPayload);
 
-    List<TrackerEvent> removeEvents(int numberToRemove);
+    List<TrackerPayload> removeEvents(int numberToRemove);
 
     int getSize();
 
-    List<TrackerEvent> getAllEvents();
+    List<TrackerPayload> getAllEvents();
 }
