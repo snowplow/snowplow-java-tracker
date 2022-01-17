@@ -1,6 +1,5 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.ArrayList;

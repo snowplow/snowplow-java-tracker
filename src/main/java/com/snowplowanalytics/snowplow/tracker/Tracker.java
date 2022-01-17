@@ -19,7 +19,6 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
@@ -206,12 +205,6 @@ public class Tracker {
             addSubject(processedEvent, payload);
             this.emitter.add(payload);
         }
-
-//        TrackerEvent trackerEvent = new TrackerEvent(event, this.parameters, this.subject);
-//
-//        // Send the event to the Emitter
-//        // change this to send the payload to Emitter instead
-//        this.emitter.add(trackerEvent);
     }
 
     private List<Event> eventTypeSpecificPreProcessing(Event event) {

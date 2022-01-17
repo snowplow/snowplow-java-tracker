@@ -24,7 +24,6 @@ import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An emitter that emit a batch of events in a single call 
- * It uses the post method of under-laying http adapter
+ * It uses the post method of underlying http adapter
  */
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
@@ -100,21 +99,21 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Adds a TrackerEvent to the concurrent queue buffer
+     * Adds a TrackerPayload to the concurrent queue buffer
      *
-     * @param payload an event
+     * @param payload a payload
      */
     @Override
     public void add(final TrackerPayload payload) {
         boolean result = eventStore.add(payload);
         
         if (!result) {
-            LOGGER.error("Unable to add event to emitter, emitter buffer is full");
+            LOGGER.error("Unable to add payload to emitter, emitter buffer is full");
         }
     }
 
     /*
-     * Forces all the events currently in the buffer to be sent
+     * Forces all the payloads currently in the buffer to be sent
      */
     @Override
     public void flushBuffer() {
@@ -122,7 +121,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Returns List of Events that are in the buffer.
+     * Returns List of Payloads that are in the buffer.
      *
      * @return the buffered events
      */
@@ -200,13 +199,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
 //            // Send the callback if available
 //            if (requestCallback != null) {
-//                if (failure != 0) {
-//                    requestCallback.onFailure(success,
-//                            buffer.stream().map(TrackerEvent::getEvent).collect(Collectors.toList()));
-//                } else {
-//                    requestCallback.onSuccess(success);
-//                }
-//            }
+
         };
     }
 

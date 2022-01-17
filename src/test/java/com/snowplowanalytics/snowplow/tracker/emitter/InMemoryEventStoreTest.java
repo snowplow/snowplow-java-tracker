@@ -12,11 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import com.google.common.collect.Lists;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import org.junit.Assert;
 import org.junit.Before;

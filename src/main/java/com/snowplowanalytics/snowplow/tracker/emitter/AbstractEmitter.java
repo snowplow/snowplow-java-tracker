@@ -22,7 +22,6 @@ import com.google.common.base.Preconditions;
 
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import okhttp3.OkHttpClient;
@@ -134,7 +133,7 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         this.requestCallback = builder.requestCallback;
-      
+
         if (builder.requestExecutorService != null) {
             this.executor = builder.requestExecutorService;
         } else {
@@ -143,9 +142,9 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * Adds an event to the buffer
+     * Adds a payload to the buffer
      *
-     * @param payload an event
+     * @param payload an payload
      */
     @Override
     public abstract void add(TrackerPayload payload);
@@ -160,7 +159,7 @@ public abstract class AbstractEmitter implements Emitter {
     public abstract void setBufferSize(final int bufferSize);
 
     /**
-     * Removes all events from the buffer and sends them
+     * Removes all payloads from the buffer and sends them
      */
     @Override
     public abstract void flushBuffer();
@@ -174,7 +173,7 @@ public abstract class AbstractEmitter implements Emitter {
     public abstract int getBufferSize();
 
     /**
-     * Returns List of Events that are in the buffer.
+     * Returns List of Payloads that are in the buffer.
      *
      * @return the buffered events
      */

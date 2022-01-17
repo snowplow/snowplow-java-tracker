@@ -1,9 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import java.util.Collection;
 import java.util.List;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public interface EventStore {
