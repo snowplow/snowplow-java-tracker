@@ -33,13 +33,11 @@ import okhttp3.OkHttpClient;
 public abstract class AbstractEmitter implements Emitter {
 
     protected HttpClientAdapter httpClientAdapter;
-    protected RequestCallback requestCallback;
     protected ExecutorService executor;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private HttpClientAdapter httpClientAdapter; // Optional
-        private RequestCallback requestCallback = null; // Optional
         private int threadCount = 50; // Optional
         private ExecutorService requestExecutorService = null; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
@@ -65,18 +63,6 @@ public abstract class AbstractEmitter implements Emitter {
          */
         public T httpClientAdapter(final HttpClientAdapter httpClientAdapter) {
             this.httpClientAdapter = httpClientAdapter;
-            return self();
-        }
-
-        /**
-         * An optional Request Callback for adding the ability to handle failure cases
-         * for sending.
-         *
-         * @param requestCallback the emitter request callback
-         * @return itself
-         */
-        public T requestCallback(final RequestCallback requestCallback) {
-            this.requestCallback = requestCallback;
             return self();
         }
 
@@ -131,8 +117,6 @@ public abstract class AbstractEmitter implements Emitter {
                         new OkHttpClient()) // use okhttp as a default
                     .build();
         }
-
-        this.requestCallback = builder.requestCallback;
 
         if (builder.requestExecutorService != null) {
             this.executor = builder.requestExecutorService;

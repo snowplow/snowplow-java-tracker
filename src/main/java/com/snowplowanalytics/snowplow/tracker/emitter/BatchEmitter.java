@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Preconditions;
@@ -187,19 +186,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             final int code = httpClientAdapter.post(post);
 
             // Process results
-            int success = 0;
-            int failure = 0;
             if (!isSuccessfulSend(code)) {
                 LOGGER.error("BatchEmitter failed to send {} events: code: {}", buffer.size(), code);
-                failure += buffer.size();
             } else {
                 LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", buffer.size(), code);
-                success += buffer.size();
             }
-
-//            // Send the callback if available
-//            if (requestCallback != null) {
-
         };
     }
 

@@ -17,7 +17,6 @@ import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
@@ -53,19 +52,6 @@ public class Main {
         // build an emitter, this is used by the tracker to batch and schedule transmission of events
         BatchEmitter emitter = BatchEmitter.builder()
                 .url(collectorEndpoint)
-                .requestCallback(new RequestCallback() {
-                    // let us know on successes (may be called multiple times)
-                    @Override
-                    public synchronized void onSuccess(int successCount) {
-                        System.out.println("Successfully sent " + successCount + " events");
-                    }
-
-                    // let us know if something has gone wrong (may be called multiple times)
-                    @Override
-                    public synchronized void onFailure(int successCount, List<Event> failedEvents) {
-                        System.err.println("Successfully sent " + successCount + " events; failed to send " + failedEvents.size() + " events");
-                    }
-                })
                 .bufferSize(4) // send an event every time one is given (no batching). In production this number should be higher, depending on the size/event volume
                 .build();
 

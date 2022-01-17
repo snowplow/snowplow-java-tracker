@@ -208,10 +208,13 @@ public class Tracker {
     }
 
     private List<Event> eventTypeSpecificPreProcessing(Event event) {
-        // a list because Ecommerce events become multiple payloads
+        // Different event types must be processed in slightly different ways.
+        // EcommerceTransaction events are an outlier, as they are processed into
+        // multiple payloads (a "tr" event plus one "ti" event per item).
+        // Because of this, this method returns a list of Events.
         List<Event> eventList = new ArrayList<>();
-
         final Class<?> eventClass = event.getClass();
+
         if (eventClass.equals(Unstructured.class)) {
             // Need to set the Base64 rule for Unstructured events
             final Unstructured unstructured = (Unstructured) event;
@@ -219,7 +222,6 @@ public class Tracker {
             eventList.add(unstructured);
 
         } else if (eventClass.equals(EcommerceTransaction.class)) {
-
             final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
             eventList.add(ecommerceTransaction);
 
@@ -229,8 +231,8 @@ public class Tracker {
                 eventList.add(item);
             }
         } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
-            // These are wrapper classes for Unstructured events; need to create
-            // Unstructured events from them and resend.
+            // Timing and ScreenView events are wrapper classes for Unstructured events
+            // Need to create Unstructured events from them to send.
             final Unstructured unstructured = Unstructured.builder()
                     .eventData((SelfDescribingJson) event.getPayload())
                     .customContext(event.getContext())
@@ -242,6 +244,7 @@ public class Tracker {
 
             unstructured.setBase64Encode(this.parameters.getBase64Encoded());
             eventList.add(unstructured);
+
         } else {
             eventList.add(event);
         }
