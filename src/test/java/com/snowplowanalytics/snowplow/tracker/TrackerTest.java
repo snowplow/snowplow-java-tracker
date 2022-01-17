@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -36,8 +37,6 @@ public class TrackerTest {
 
         @Override
         public void add(TrackerPayload payload) {
-            System.out.println("MockEmitter got a payload");
-            System.out.println(payload.toString());
             eventList.add(payload);
         }
 
@@ -76,7 +75,7 @@ public class TrackerTest {
     // --- Event Tests
 
     @Test
-    public void testEcommerceEvent() {
+    public void testEcommerceEvent() throws InterruptedException {
         // Given
         EcommerceTransactionItem item = EcommerceTransactionItem.builder()
                 .itemId("order_id")
@@ -111,6 +110,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         List<TrackerPayload> results = mockEmitter.eventList;
         assertEquals(2, results.size());
 
@@ -160,7 +161,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithContext() {
+    public void testUnstructuredEventWithContext() throws InterruptedException {
         // When
         tracker.track(Unstructured.builder()
                 .eventData(new SelfDescribingJson(
@@ -174,6 +175,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
@@ -191,7 +194,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithoutContext() {
+    public void testUnstructuredEventWithoutContext() throws InterruptedException {
         // When
         tracker.track(Unstructured.builder()
                 .eventData(new SelfDescribingJson(
@@ -204,6 +207,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
@@ -220,7 +225,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithoutTrueTimestamp() {
+    public void testUnstructuredEventWithoutTrueTimestamp() throws InterruptedException {
         // When
         tracker.track(Unstructured.builder()
                 .eventData(new SelfDescribingJson(
@@ -232,6 +237,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
@@ -247,7 +254,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackPageView() {
+    public void testTrackPageView() throws InterruptedException {
         tracker = new Tracker.TrackerBuilder(this.mockEmitter, "AF003", "cloudfront")
                 .subject(new Subject.SubjectBuilder().build())
                 .base64(false)
@@ -266,6 +273,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
@@ -285,7 +294,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackTwoEvents() {
+    public void testTrackTwoEvents() throws InterruptedException {
         // When
         tracker.track(PageView.builder()
                 .pageUrl("url")
@@ -295,6 +304,8 @@ public class TrackerTest {
                 .trueTimestamp(456789L)
                 .eventId("9783090a-dace-4c85-a75c-933b4596a6c5")
                 .build());
+
+        Thread.sleep(500);
 
         tracker.track(PageView.builder()
                 .pageUrl("url")
@@ -306,6 +317,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         List<TrackerPayload> results = mockEmitter.eventList;
         assertEquals(2, results.size());
 
@@ -343,7 +356,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackScreenView() {
+    public void testTrackScreenView() throws InterruptedException {
         // When
         tracker.track(ScreenView.builder()
                 .name("name")
@@ -355,6 +368,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
@@ -372,7 +387,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackScreenViewWithTimestamp() {
+    public void testTrackScreenViewWithTimestamp() throws InterruptedException {
         // When
         tracker.track(ScreenView.builder()
                 .name("name")
@@ -383,6 +398,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("dtm", "123456")
@@ -399,7 +416,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackScreenViewWithDefaultContextAndTimestamp() {
+    public void testTrackScreenViewWithDefaultContextAndTimestamp() throws InterruptedException {
         // When
         tracker.track(ScreenView.builder()
                 .name("name")
@@ -411,6 +428,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
@@ -428,7 +447,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackTiming() {
+    public void testTrackTiming() throws InterruptedException {
         // When
         tracker.track(Timing.builder()
                 .category("category")
@@ -442,6 +461,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
@@ -459,7 +480,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testTrackTimingWithSubject() {
+    public void testTrackTimingWithSubject() throws InterruptedException {
         // Make Subject
         Subject s1 = new Subject.SubjectBuilder().build();
         s1.setIpAddress("127.0.0.1");
@@ -479,6 +500,8 @@ public class TrackerTest {
                 .build());
 
         // Then
+        Thread.sleep(500);
+
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
         assertEquals(ImmutableMap.<String, String>builder()
                 .put("p", "srv")
@@ -546,5 +569,32 @@ public class TrackerTest {
     public void testSetNamespace() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
         assertEquals("namespace", tracker.getNamespace());
+    }
+
+    @Test
+    public void threadsHaveExpectedNames() {
+        // A new thread should be created for each event tracked,
+        // up to the configurable pool size limit
+        tracker.track(PageView.builder()
+                .pageUrl("url")
+                .pageTitle("title")
+                .referrer("referer")
+                .build());
+
+        tracker.track(PageView.builder()
+                .pageUrl("url")
+                .pageTitle("title")
+                .referrer("referer")
+                .build());
+
+        // Create a list of all live thread names
+        List<Thread> threadList = new ArrayList<>(Thread.getAllStackTraces().keySet());
+        List<String> threadNames = new ArrayList<>();
+        for (Thread thread : threadList) {
+            threadNames.add(thread.getName());
+        }
+
+        Assert.assertTrue(threadNames.contains("snowplow-tracker-pool-1-event-thread-1"));
+        Assert.assertTrue(threadNames.contains("snowplow-tracker-pool-1-event-thread-2"));
     }
 }
