@@ -279,6 +279,7 @@ public class Tracker {
             // a list because Ecommerce events become multiple Payloads
             List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
             for (Event processedEvent : processedEvents) {
+                // Event ID (eid) and device_created_timestamp (dtm) are added during getPayload()
                 TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
 
                 addTrackerParameters(payload);
