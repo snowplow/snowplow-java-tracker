@@ -14,11 +14,6 @@ package com.snowplowanalytics.snowplow.tracker.payload;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 
-/**
- * A TrackerEvent which allows the TrackerPayload to be filled later. The
- * payload will be filled by the Emitter in the Emitter thread, using the
- * getTrackerPayload() method.
- */
 public class TrackerParameters {
 
     private final String trackerVersion;

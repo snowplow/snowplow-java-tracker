@@ -14,7 +14,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import java.util.List;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Emitter interface.
@@ -22,17 +22,17 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 public interface Emitter {
 
     /**
-     * Adds an event to the buffer and checks whether
+     * Adds a payload to the buffer and checks whether
      * we have reached the buffer limit yet.
      *
-     * @param event an event to be emitted
+     * @param payload a payload to be emitted
      */
-    void emit(TrackerEvent event);
+    void add(TrackerPayload payload);
 
     /**
      * Customize the emitter buffer size to any valid integer
      * greater than zero.
-     * - Will only effect the BatchEmitter
+     * - Will only affect the BatchEmitter
      *
      * @param bufferSize number of events to collect before
      *                   sending
@@ -56,9 +56,9 @@ public interface Emitter {
     int getBufferSize();
 
     /**
-     * Returns the List of Events that are in the buffer.
+     * Returns the List of Payloads that are in the buffer.
      *
      * @return the buffer events
      */
-    List<TrackerEvent> getBuffer();
+    List<TrackerPayload> getBuffer();
 }

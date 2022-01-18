@@ -22,8 +22,8 @@ import com.google.common.base.Preconditions;
 
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import okhttp3.OkHttpClient;
 
 /**
@@ -33,13 +33,11 @@ import okhttp3.OkHttpClient;
 public abstract class AbstractEmitter implements Emitter {
 
     protected HttpClientAdapter httpClientAdapter;
-    protected RequestCallback requestCallback;
     protected ExecutorService executor;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private HttpClientAdapter httpClientAdapter; // Optional
-        private RequestCallback requestCallback = null; // Optional
         private int threadCount = 50; // Optional
         private ExecutorService requestExecutorService = null; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
@@ -65,18 +63,6 @@ public abstract class AbstractEmitter implements Emitter {
          */
         public T httpClientAdapter(final HttpClientAdapter httpClientAdapter) {
             this.httpClientAdapter = httpClientAdapter;
-            return self();
-        }
-
-        /**
-         * An optional Request Callback for adding the ability to handle failure cases
-         * for sending.
-         *
-         * @param requestCallback the emitter request callback
-         * @return itself
-         */
-        public T requestCallback(final RequestCallback requestCallback) {
-            this.requestCallback = requestCallback;
             return self();
         }
 
@@ -132,8 +118,6 @@ public abstract class AbstractEmitter implements Emitter {
                     .build();
         }
 
-        this.requestCallback = builder.requestCallback;
-      
         if (builder.requestExecutorService != null) {
             this.executor = builder.requestExecutorService;
         } else {
@@ -142,12 +126,12 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * Adds an event to the buffer
+     * Adds a payload to the buffer
      *
-     * @param event an event
+     * @param payload an payload
      */
     @Override
-    public abstract void emit(TrackerEvent event);
+    public abstract void add(TrackerPayload payload);
 
     /**
      * Customize the emitter buffer size to any valid integer greater than zero.
@@ -159,7 +143,7 @@ public abstract class AbstractEmitter implements Emitter {
     public abstract void setBufferSize(final int bufferSize);
 
     /**
-     * Removes all events from the buffer and sends them
+     * Removes all payloads from the buffer and sends them
      */
     @Override
     public abstract void flushBuffer();
@@ -173,12 +157,12 @@ public abstract class AbstractEmitter implements Emitter {
     public abstract int getBufferSize();
 
     /**
-     * Returns List of Events that are in the buffer.
+     * Returns List of Payloads that are in the buffer.
      *
      * @return the buffered events
      */
     @Override
-    public abstract List<TrackerEvent> getBuffer();
+    public abstract List<TrackerPayload> getBuffer();
 
     /**
      * Sends a runnable to the executor service.

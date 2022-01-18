@@ -18,10 +18,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
-import com.snowplowanalytics.snowplow.tracker.events.Event;
 
 /**
  * An emitter which sends events as soon as they are received via
@@ -52,14 +50,9 @@ public class SimpleEmitter extends AbstractEmitter {
         super(builder);
     }
 
-    /**
-     * Adds an event to the buffer and instantly sends it
-     *
-     * @param event an event
-     */
     @Override
-    public void emit(final TrackerEvent event) {
-        execute(getGetRequestRunnable(event));
+    public void add(TrackerPayload payload) {
+        // nothing happens
     }
 
     /**
@@ -74,42 +67,23 @@ public class SimpleEmitter extends AbstractEmitter {
     /**
      * Returns a Runnable GET Request operation
      *
-     * @param event the event to be sent
+     * @param payload the event to be sent
      * @return the new Callable object
      */
-    private Runnable getGetRequestRunnable(final TrackerEvent event) {
+    private Runnable getGetRequestRunnable(final TrackerPayload payload) {
         return new Runnable() {
             @Override
             public void run() {
-                int success = 0;
-                int failure = 0;
-                
-                List<TrackerPayload> payloads = event.getTrackerPayloads();
+                payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
+                final int code = httpClientAdapter.get(payload);
 
-                for (TrackerPayload payload : payloads) {
-                    payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
-                    final int code = httpClientAdapter.get(payload);
-
-                    // Process results
-                    if (!isSuccessfulSend(code)) {
-                        LOGGER.error("SimpleEmitter failed to send {} events: code: {}", 1, code);
-                        failure += 1;
-                    } else {
-                        LOGGER.debug("SimpleEmitter successfully sent {} events: code: {}", 1, code);
-                        success += 1;
-                    }
+                // Process results
+                if (!isSuccessfulSend(code)) {
+                    LOGGER.error("SimpleEmitter failed to send {} events: code: {}", 1, code);
+                } else {
+                    LOGGER.debug("SimpleEmitter successfully sent {} events: code: {}", 1, code);
                 }
 
-                // Send the callback if available
-                if (requestCallback != null) {
-                    if (failure != 0) {
-                        final List<Event> buffer = new ArrayList<>();
-                        buffer.add(event.getEvent());
-                        requestCallback.onFailure(success, buffer);
-                    } else {
-                        requestCallback.onSuccess(success);
-                    }
-                }
             }
         };
     }
@@ -121,7 +95,7 @@ public class SimpleEmitter extends AbstractEmitter {
      * @return the empty buffer
      */
     @Override
-    public List<TrackerEvent> getBuffer() {
+    public List<TrackerPayload> getBuffer() {
         return new ArrayList<>();
     }
 

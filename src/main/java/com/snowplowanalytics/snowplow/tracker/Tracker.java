@@ -14,16 +14,26 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.base.Preconditions;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Tracker {
 
     private Emitter emitter;
     private Subject subject;
     private final TrackerParameters parameters;
+    protected ExecutorService executor;
 
     /**
      * Creates a new Snowplow Tracker.
@@ -42,6 +52,12 @@ public class Tracker {
         this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
         this.emitter = builder.emitter;
         this.subject = builder.subject;
+
+        if (builder.requestExecutorService != null) {
+            this.executor = builder.requestExecutorService;
+        } else {
+            this.executor = Executors.newScheduledThreadPool(builder.threadCount, new TrackerThreadFactory());
+        }
     }
 
     /**
@@ -55,6 +71,8 @@ public class Tracker {
         private Subject subject = null; // Optional
         private DevicePlatform platform = DevicePlatform.ServerSideApp; // Optional
         private boolean base64Encoded = true; // Optional
+        private int threadCount = 50; // Optional
+        private ExecutorService requestExecutorService = null; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -93,6 +111,30 @@ public class Tracker {
             this.base64Encoded = base64;
             return this;
         }
+
+        /**
+         * Sets the Thread Count for the ExecutorService
+         *
+         * @param threadCount the size of the thread pool
+         * @return itself
+         */
+        public TrackerBuilder threadCount(final int threadCount) {
+            this.threadCount = threadCount;
+            return this;
+        }
+
+        /**
+         * Set a custom ExecutorService to send http request.
+         *
+         * @param executorService the ExecutorService to use
+         * @return itself
+         */
+        public TrackerBuilder requestExecutorService(final ExecutorService executorService) {
+            this.requestExecutorService = executorService;
+            return this;
+        }
+
+
 
         /**
          * Creates a new Tracker
@@ -184,13 +226,153 @@ public class Tracker {
     // --- Event Tracking Functions
 
     /**
+     * Sends a runnable to the executor service.
+     *
+     * @param runnable the runnable to be queued
+     */
+    protected void execute(final Runnable runnable) {
+        this.executor.execute(runnable);
+    }
+
+    /**
+     * Copied from `Executors.defaultThreadFactory()`.
+     * The only change is the generated name prefix.
+     */
+    static class TrackerThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        TrackerThreadFactory() {
+            SecurityManager securityManager = System.getSecurityManager();
+            this.group = securityManager != null ? securityManager.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            this.namePrefix = "snowplow-tracker-pool-" + poolNumber.getAndIncrement() + "-event-thread-";
+        }
+
+        public Thread newThread(Runnable runnable) {
+            Thread thread = new Thread(this.group, runnable, this.namePrefix + this.threadNumber.getAndIncrement(), 0L);
+            if (thread.isDaemon()) {
+                thread.setDaemon(false);
+            }
+
+            if (thread.getPriority() != 5) {
+                thread.setPriority(5);
+            }
+
+            return thread;
+        }
+    }
+
+    /**
      * Handles tracking the different types of events that
      * the Tracker can encounter.
      *
      * @param event the event to track
      */
     public void track(Event event) {
-        // Emit the event
-        this.emitter.emit(new TrackerEvent(event, this.parameters, this.subject));
+        execute(getProcessEventRunnable(event));
+    }
+
+    private Runnable getProcessEventRunnable(Event event) {
+        return () -> {
+            // a list because Ecommerce events become multiple Payloads
+            List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
+            for (Event processedEvent : processedEvents) {
+                // Event ID (eid) and device_created_timestamp (dtm) are added during getPayload()
+                TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
+
+                addTrackerParameters(payload);
+                addContext(processedEvent, payload);
+                addSubject(processedEvent, payload);
+                this.emitter.add(payload);
+            }
+        };
+    }
+
+    private List<Event> eventTypeSpecificPreProcessing(Event event) {
+        // Different event types must be processed in slightly different ways.
+        // EcommerceTransaction events are an outlier, as they are processed into
+        // multiple payloads (a "tr" event plus one "ti" event per item).
+        // Because of this, this method returns a list of Events.
+        List<Event> eventList = new ArrayList<>();
+        final Class<?> eventClass = event.getClass();
+
+        if (eventClass.equals(Unstructured.class)) {
+            // Need to set the Base64 rule for Unstructured events
+            final Unstructured unstructured = (Unstructured) event;
+            unstructured.setBase64Encode(this.parameters.getBase64Encoded());
+            eventList.add(unstructured);
+
+        } else if (eventClass.equals(EcommerceTransaction.class)) {
+            final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
+            eventList.add(ecommerceTransaction);
+
+            // Track each item individually
+            for (final EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
+                item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
+                eventList.add(item);
+            }
+        } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
+            // Timing and ScreenView events are wrapper classes for Unstructured events
+            // Need to create Unstructured events from them to send.
+            final Unstructured unstructured = Unstructured.builder()
+                    .eventData((SelfDescribingJson) event.getPayload())
+                    .customContext(event.getContext())
+                    .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
+                    .trueTimestamp(event.getTrueTimestamp())
+                    .eventId(event.getEventId())
+                    .subject(event.getSubject())
+                    .build();
+
+            unstructured.setBase64Encode(this.parameters.getBase64Encoded());
+            eventList.add(unstructured);
+
+        } else {
+            eventList.add(event);
+        }
+        return eventList;
+    }
+
+    private void addTrackerParameters(TrackerPayload payload) {
+        payload.add(Parameter.PLATFORM, this.parameters.getPlatform().toString());
+        payload.add(Parameter.APP_ID, this.parameters.getAppId());
+        payload.add(Parameter.NAMESPACE, this.parameters.getNamespace());
+        payload.add(Parameter.TRACKER_VERSION, this.parameters.getTrackerVersion());
+    }
+
+    private void addContext(Event event, TrackerPayload payload) {
+        List<SelfDescribingJson> entities = event.getContext();
+
+        // Build the final context and add it to the payload
+        if (entities != null && entities.size() > 0) {
+            SelfDescribingJson envelope = getFinalContext(entities);
+            payload.addMap(envelope.getMap(), this.parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
+        }
+    }
+
+    /**
+     * Builds the final event context.
+     *
+     * @param entities the base event context
+     * @return the final event context json with many entities inside
+     */
+    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> entities) {
+        List<Map<String, Object>> entityMaps = new LinkedList<>();
+        for (SelfDescribingJson selfDescribingJson : entities) {
+            entityMaps.add(selfDescribingJson.getMap());
+        }
+        return new SelfDescribingJson(Constants.SCHEMA_CONTEXTS, entityMaps);
+    }
+
+    private void addSubject(Event event, TrackerPayload payload) {
+        Subject eventSubject = event.getSubject();
+
+        // Add subject if available
+        if (eventSubject != null) {
+            payload.addMap(new HashMap<>(eventSubject.getSubject()));
+        } else if (this.subject != null) {
+            payload.addMap(new HashMap<>(this.subject.getSubject()));
+        }
     }
 }
