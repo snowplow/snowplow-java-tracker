@@ -6,9 +6,6 @@ targetCompatibility = '1.8'
 
 repositories {
     mavenLocal()
-    maven {
-        url  "https://snowplow.bintray.com/snowplow-maven" 
-    }
     mavenCentral()
 }
 
@@ -19,9 +16,9 @@ test {
 }
 
 dependencies {
-    implementation 'com.snowplowanalytics:snowplow-java-tracker:0.10.1'
+    implementation 'com.snowplowanalytics:snowplow-java-tracker:0.11.0'
 
-    implementation ('com.snowplowanalytics:snowplow-java-tracker:0.10.1') {
+    implementation ('com.snowplowanalytics:snowplow-java-tracker:0.11.0') {
         capabilities {
             requireCapability 'com.snowplowanalytics:snowplow-java-tracker-okhttp-support:0.10.1'
         }
