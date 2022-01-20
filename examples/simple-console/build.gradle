@@ -5,7 +5,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 repositories {
-    mavenLocal()
+//    mavenLocal()
     mavenCentral()
 }
 
@@ -20,7 +20,7 @@ dependencies {
 
     implementation ('com.snowplowanalytics:snowplow-java-tracker:0.11.0') {
         capabilities {
-            requireCapability 'com.snowplowanalytics:snowplow-java-tracker-okhttp-support:0.10.1'
+            requireCapability 'com.snowplowanalytics:snowplow-java-tracker-okhttp-support:0.11.0'
         }
     }
 
