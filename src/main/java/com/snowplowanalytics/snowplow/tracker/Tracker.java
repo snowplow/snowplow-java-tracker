@@ -16,16 +16,20 @@ import com.google.common.base.Preconditions;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
+import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Tracker {
@@ -34,6 +38,7 @@ public class Tracker {
     private Subject subject;
     private final TrackerParameters parameters;
     protected ExecutorService executor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Tracker.class);
 
     /**
      * Creates a new Snowplow Tracker.
@@ -375,4 +380,28 @@ public class Tracker {
             payload.addMap(new HashMap<>(this.subject.getSubject()));
         }
     }
+
+    public void close() {
+        // Shutdown executor thread pool for the tracker
+        if (executor != null) {
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                    if (!executor.awaitTermination(1, TimeUnit.SECONDS))
+                        LOGGER.warn("Tracker executor did not terminate");
+                }
+            } catch (InterruptedException ie) {
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        // Shutdown executor thread pool for the emitter
+        if (this.emitter.getClass().equals(BatchEmitter.class)) {
+            BatchEmitter emitter = (BatchEmitter) this.emitter;
+            emitter.close();
+        }
+    }
+
 }
