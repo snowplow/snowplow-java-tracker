@@ -14,6 +14,7 @@
 package com.snowplowanalytics;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
@@ -61,12 +62,19 @@ public class Main {
                 "iglu:com.snowplowanalytics.iglu/anything-c/jsonschema/1-0-0",
                 ImmutableMap.of("foo", "bar")));
 
+        // This is an example of a eventSubject for adding user data
+        Subject eventSubject = new Subject.SubjectBuilder().build();
+        eventSubject.setUserId("example@snowplowanalytics.com");
+        eventSubject.setLanguage("EN");
+
         // This is a sample page view event
+        // the eventSubject has been included in this event
         PageView pageViewEvent = PageView.builder()
             .pageTitle("Snowplow Analytics")
             .pageUrl("https://www.snowplowanalytics.com")
             .referrer("https://www.google.com")
             .customContext(entity)
+            .subject(eventSubject)
             .build();
         
         // EcommerceTransactionItems are tracked as part of an EcommerceTransaction event
@@ -127,7 +135,7 @@ public class Main {
             .customContext(entity)
             .build();
 
-        // This is an example of a Stuctured event
+        // This is an example of a Structured event
         Structured structured = Structured.builder()
                 .category("category")
                 .action("action")
