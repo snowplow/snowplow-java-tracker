@@ -229,7 +229,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 if (!executor.awaitTermination(closeTimeout, TimeUnit.SECONDS)) {
                     executor.shutdownNow();
                     if (!executor.awaitTermination(closeTimeout, TimeUnit.SECONDS))
-                        LOGGER.warn("Executor did not terminate");
+                        LOGGER.warn("Emitter executor did not terminate");
                 }
             } catch (final InterruptedException ie) {
                 executor.shutdownNow();

@@ -142,7 +142,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         } catch (IOException e) {
             LOGGER.error("OkHttpClient POST Request failed: {}", e.getMessage());
         }
-        
+
         return returnValue;
     }
 }
