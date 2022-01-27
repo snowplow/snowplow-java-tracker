@@ -58,7 +58,7 @@ public class Main {
         System.out.println("Using tracker version " + tracker.getTrackerVersion());
 
         // This is an example of a custom context entity
-        List<SelfDescribingJson> entity = singletonList(
+        List<SelfDescribingJson> context = singletonList(
             new SelfDescribingJson(
                 "iglu:com.snowplowanalytics.iglu/anything-c/jsonschema/1-0-0",
                 ImmutableMap.of("foo", "bar")));
@@ -74,7 +74,7 @@ public class Main {
             .pageTitle("Snowplow Analytics")
             .pageUrl("https://www.snowplowanalytics.com")
             .referrer("https://www.google.com")
-            .customContext(entity)
+            .customContext(context)
             .subject(eventSubject)
             .build();
         
@@ -88,7 +88,7 @@ public class Main {
             .name("name")
             .category("category")
             .currency("currency")
-            .customContext(entity)
+            .customContext(context)
             .build();
 
         // EcommerceTransaction event
@@ -103,7 +103,7 @@ public class Main {
             .country("country")
             .currency("currency")
             .items(item) // EcommerceTransactionItem events are added to a parent EcommerceTransaction here
-            .customContext(entity)
+            .customContext(context)
             .build();
 
 
@@ -115,7 +115,7 @@ public class Main {
                     "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
                     ImmutableMap.of("foo", "bar")
             ))
-            .customContext(entity)
+            .customContext(context)
             .build();
 
 
@@ -123,7 +123,7 @@ public class Main {
         ScreenView screenView = ScreenView.builder()
             .name("name")
             .id("id")
-            .customContext(entity)
+            .customContext(context)
             .build();
 
 
@@ -133,7 +133,7 @@ public class Main {
             .label("label")
             .variable("variable")
             .timing(10)
-            .customContext(entity)
+            .customContext(context)
             .build();
 
         // This is an example of a Structured event
@@ -143,7 +143,7 @@ public class Main {
                 .label("label")
                 .property("property")
                 .value(12.34)
-                .customContext(entity)
+                .customContext(context)
                 .build();
 
         tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow

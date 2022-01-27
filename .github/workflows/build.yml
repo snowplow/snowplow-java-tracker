@@ -44,12 +44,10 @@ jobs:
       run: ./gradlew test
 
     - name: Build simple-console example
-      working-directory: ./examples/simple-console
-      run: ./gradlew build -x test
-
-    - name: Test simple-console example
-      working-directory: ./examples/simple-console
-      run: ./gradlew test
+      run: |
+        ./gradlew publishToMavenLocal
+        cd examples/simple-console
+        ./gradlew build
 
     - name: Upload report if failed
       if: ${{ failure() }}
