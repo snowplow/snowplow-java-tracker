@@ -56,6 +56,11 @@ test {
     }
 }
 
+
+sourceSets {
+    jmh
+}
+
 dependencies {
     // Apache Commons
     api 'commons-codec:commons-codec:1.14'
@@ -84,6 +89,14 @@ dependencies {
 
     testImplementation 'org.hamcrest:hamcrest:2.2'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.2'
+
+    jmhImplementation project
+    jmhImplementation "com.squareup.okhttp3:okhttp:4.2.2"
+//        capabilities {
+//            requireCapability 'com.snowplowanalytics:snowplow-java-tracker-okhttp-support'
+//        }
+    jmhImplementation "org.openjdk.jmh:jmh-core:1.34"
+    jmhAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess:1.34"
 }
 
 task sourceJar(type: Jar, dependsOn: 'generateSources') {
@@ -138,6 +151,11 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
+}
+
+task jmh(type: JavaExec, description: 'Executing JMH benchmarks') {
+    classpath = sourceSets.jmh.runtimeClasspath
+    main = 'org.openjdk.jmh.Main'
 }
 
 // add javadoc/source jar tasks as artifacts
@@ -218,3 +236,4 @@ signing {
         println 'Used useInMemoryPgpKeys()'
     }
 }
+
