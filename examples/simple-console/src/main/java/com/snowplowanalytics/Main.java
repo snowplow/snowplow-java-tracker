@@ -34,7 +34,7 @@ public class Main {
         return args[0];
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         String collectorEndpoint = getUrlFromArgs(args);
 
         // the application id to attach to events
@@ -153,12 +153,7 @@ public class Main {
         tracker.track(timing);
         tracker.track(structured);
 
-        Thread.sleep(1000);
-
         // Will close all threads and force send remaining events
-        // We tracked 6 events; one of them an EcommerceTransaction containing one item
-        // Therefore 7 events should be sent in total.
-        // The bufferSize is 4 so there should be 3 left to flush
         tracker.close();
 
         System.out.println("Tracked 7 events");
