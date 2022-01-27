@@ -34,10 +34,8 @@ public class Main {
         return args[0];
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         String collectorEndpoint = getUrlFromArgs(args);
-
-        System.out.println("Sending events to " + collectorEndpoint);
 
         // the application id to attach to events
         String appId = "java-tracker-sample-console-app";
@@ -55,6 +53,9 @@ public class Main {
             .base64(true)
             .platform(DevicePlatform.ServerSideApp)
             .build();
+
+        System.out.println("Sending events to " + collectorEndpoint);
+        System.out.println("Using tracker version " + tracker.getTrackerVersion());
 
         // This is an example of a custom context entity
         List<SelfDescribingJson> entity = singletonList(
@@ -152,11 +153,15 @@ public class Main {
         tracker.track(timing);
         tracker.track(structured);
 
+        Thread.sleep(1000);
+
         // Will close all threads and force send remaining events
         // We tracked 6 events; one of them an EcommerceTransaction containing one item
         // Therefore 7 events should be sent in total.
         // The bufferSize is 4 so there should be 3 left to flush
-        emitter.close();
+        tracker.close();
+
+        System.out.println("Tracked 7 events");
     }
 
 }
