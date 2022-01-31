@@ -10,26 +10,27 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.jmh;
+package com.snowplowanalytics;
 
-import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.util.concurrent.TimeUnit;
 
+
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 30, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 30, time = 1, timeUnit = TimeUnit.SECONDS)
+@Fork(4)
 public class TrackerBenchmark {
-
     @State(Scope.Benchmark)
     public static class trackerComponents {
         public static class MockHttpClientAdapter implements HttpClientAdapter {
@@ -82,12 +83,8 @@ public class TrackerBenchmark {
 
         @TearDown(Level.Trial)
         public void doTearDown() {
-            if (!tracker.getTrackerVersion().equals("0.12.0-alpha.0")) {
-                emitter.close();
-            } else {
-            tracker.close();
+            emitter.close();
 
-            }
             System.out.println("Do TearDown");
             System.out.println("This many POST requests made: " + mockHttpClientAdapter.getPostCount());
         }
