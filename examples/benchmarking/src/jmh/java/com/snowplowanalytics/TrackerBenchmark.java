@@ -14,6 +14,7 @@ package com.snowplowanalytics;
 
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
+import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -27,48 +28,77 @@ import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-@Warmup(iterations = 30, time = 1, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 30, time = 1, timeUnit = TimeUnit.SECONDS)
-@Fork(4)
+@Warmup(iterations = 15, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 20, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+@Fork(5)
 public class TrackerBenchmark {
-    @State(Scope.Benchmark)
-    public static class TrackerComponents {
-        public static class MockHttpClientAdapter implements HttpClientAdapter {
-            public int getPostCount() {
-                return postCount;
-            }
-
-            private int postCount = 0;
-
-            @Override
-            public int post(SelfDescribingJson payload) {
-                postCount++;
-                return 200;
-            }
-
-            @Override
-            public int get(TrackerPayload payload) {
-                return 0;
-            }
-
-            @Override
-            public String getUrl() {
-                return null;
-            }
-
-            @Override
-            public Object getHttpClient() {
-                return null;
-            }
+    public static class MockHttpClientAdapter implements HttpClientAdapter {
+        public int getPostCount() {
+            return postCount;
         }
 
-        MockHttpClientAdapter mockHttpClientAdapter = new MockHttpClientAdapter();
+        private int postCount = 0;
 
-        BatchEmitter emitter = BatchEmitter.builder()
+        @Override
+        public int post(SelfDescribingJson payload) {
+            postCount++;
+            return 200;
+        }
+
+        @Override
+        public int get(TrackerPayload payload) {
+            return 0;
+        }
+
+        @Override
+        public String getUrl() {
+            return null;
+        }
+
+        @Override
+        public Object getHttpClient() {
+            return null;
+        }
+    }
+
+    public static BatchEmitter getEmitter() {
+        MockHttpClientAdapter mockHttpClientAdapter = new MockHttpClientAdapter();
+        return BatchEmitter.builder()
                 .httpClientAdapter(mockHttpClientAdapter)
                 .build();
+    }
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
+    public static Tracker getTracker(Emitter emitter) {
+        return new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
+    }
+
+    public static void closeThreads(Tracker tracker) {
+//        tracker.close();
+        BatchEmitter emitter = (BatchEmitter) tracker.getEmitter();
+        emitter.close();
+    }
+
+    @State(Scope.Benchmark)
+    public static class TrackerVersion {
+        BatchEmitter emitter = getEmitter();
+        Tracker tracker = getTracker(emitter);
+
+        @Setup(Level.Trial)
+        public void printTrackerVersion() {
+            System.out.println("Using tracker version: " + tracker.getTrackerVersion());
+        }
+
+        @TearDown(Level.Trial)
+        public void doTearDown() {
+            System.out.println("Do TearDown for trackerVersion state");
+            closeThreads(tracker);
+        }
+    }
+
+    @State(Scope.Benchmark)
+    public static class TrackerComponents {
+        Tracker tracker;
+        BatchEmitter emitter;
 
         PageView pageViewEvent = PageView.builder()
                 .pageUrl("url")
@@ -76,22 +106,20 @@ public class TrackerBenchmark {
                 .referrer("referrer")
                 .build();
 
-        @Setup
+        @Setup(Level.Iteration)
         public void doSetUp() {
-            System.out.println("Using tracker version: " + tracker.getTrackerVersion());
+            emitter = getEmitter();
+            tracker = getTracker(emitter);
         }
 
-        @TearDown(Level.Trial)
+        @TearDown(Level.Iteration)
         public void doTearDown() {
-            emitter.close();
-
-            System.out.println("Do TearDown");
-            System.out.println("This many POST requests made: " + mockHttpClientAdapter.getPostCount());
+            closeThreads(tracker);
         }
     }
 
     @Benchmark
-    public void testTrackEvent(Blackhole blackhole, TrackerComponents trackerComponents) {
+    public void testTrackEvent(Blackhole blackhole, TrackerComponents trackerComponents, TrackerVersion trackerVersion) {
         trackerComponents.tracker.track(trackerComponents.pageViewEvent);
         blackhole.consume(trackerComponents);
     }
