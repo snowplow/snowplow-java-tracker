@@ -56,11 +56,6 @@ test {
     }
 }
 
-// Java Microbenchmarking Harness
-sourceSets {
-    jmh
-}
-
 dependencies {
     // Apache Commons
     api 'commons-codec:commons-codec:1.14'
@@ -89,10 +84,6 @@ dependencies {
 
     testImplementation 'org.hamcrest:hamcrest:2.2'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.2'
-
-    jmhImplementation 'com.snowplowanalytics:snowplow-java-tracker:0.10.0'
-    jmhImplementation "org.openjdk.jmh:jmh-core:1.34"
-    jmhAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess:1.34"
 }
 
 task sourceJar(type: Jar, dependsOn: 'generateSources') {
@@ -147,19 +138,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
-}
-
-task jmh(type: JavaExec, description: 'Executing JMH benchmarks') {
-    classpath = sourceSets.jmh.runtimeClasspath
-    main = 'org.openjdk.jmh.Main'
-
-    // Save the results to build/reports/jmh/result.json
-    def resultFile = new File((File) project.reportsDir, 'jmh/result.json')
-    args '-rff', resultFile
-    doFirst {
-        // make sure build/reports/jmh directory exists
-        resultFile.parentFile.mkdirs()
-    }
 }
 
 // add javadoc/source jar tasks as artifacts

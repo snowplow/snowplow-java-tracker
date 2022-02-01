@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Fork(4)
 public class TrackerBenchmark {
     @State(Scope.Benchmark)
-    public static class trackerComponents {
+    public static class TrackerComponents {
         public static class MockHttpClientAdapter implements HttpClientAdapter {
             public int getPostCount() {
                 return postCount;
@@ -91,7 +91,7 @@ public class TrackerBenchmark {
     }
 
     @Benchmark
-    public void testTrackEvent(Blackhole blackhole, trackerComponents trackerComponents) {
+    public void testTrackEvent(Blackhole blackhole, TrackerComponents trackerComponents) {
         trackerComponents.tracker.track(trackerComponents.pageViewEvent);
         blackhole.consume(trackerComponents);
     }
