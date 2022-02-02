@@ -33,15 +33,8 @@ import java.util.concurrent.TimeUnit;
 @Fork(5)
 public class TrackerBenchmark {
     public static class MockHttpClientAdapter implements HttpClientAdapter {
-        public int getPostCount() {
-            return postCount;
-        }
-
-        private int postCount = 0;
-
         @Override
         public int post(SelfDescribingJson payload) {
-            postCount++;
             return 200;
         }
 
@@ -73,11 +66,14 @@ public class TrackerBenchmark {
     }
 
     public static void closeThreads(Tracker tracker) {
+        // Use this line for versions 0.12.0 onwards
 //        tracker.close();
+        // Use these lines for previous versions
         BatchEmitter emitter = (BatchEmitter) tracker.getEmitter();
         emitter.close();
     }
 
+    // This State class exists only to print out the tracker version
     @State(Scope.Benchmark)
     public static class TrackerVersion {
         BatchEmitter emitter = getEmitter();
@@ -95,6 +91,8 @@ public class TrackerBenchmark {
         }
     }
 
+    // This class creates the tracker components.
+    // They are recreated for every iteration of the benchmark test.
     @State(Scope.Benchmark)
     public static class TrackerComponents {
         Tracker tracker;
@@ -118,6 +116,7 @@ public class TrackerBenchmark {
         }
     }
 
+    // The Blackhole forces JMH to measure the method.
     @Benchmark
     public void testTrackEvent(Blackhole blackhole, TrackerComponents trackerComponents, TrackerVersion trackerVersion) {
         trackerComponents.tracker.track(trackerComponents.pageViewEvent);
