@@ -349,7 +349,7 @@ public class Tracker {
     private void addContext(Event event, TrackerPayload payload) {
         List<SelfDescribingJson> entities = event.getContext();
 
-        // Build the final context and add it to the payload
+        // Build the final context and addEvent it to the payload
         if (entities != null && entities.size() > 0) {
             SelfDescribingJson envelope = getFinalContext(entities);
             payload.addMap(envelope.getMap(), this.parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);

@@ -6,11 +6,11 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public interface EventStore {
 
-    boolean add(TrackerPayload trackerPayload);
+    boolean addEvent(TrackerPayload trackerPayload);
 
-    List<TrackerPayload> removeEvents(int numberToRemove);
+    List<EmitterPayload> getEvents(int numberToRemove);
+
+    void removeEvents(List<String> eventIds);
 
     int getSize();
-
-    List<TrackerPayload> getAllEvents();
 }

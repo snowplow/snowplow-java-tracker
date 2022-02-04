@@ -95,7 +95,7 @@ public class SimpleEmitter extends AbstractEmitter {
      * @return the empty buffer
      */
     @Override
-    public List<TrackerPayload> getBuffer() {
+    public List<EmitterPayload> getBuffer() {
         return new ArrayList<>();
     }
 

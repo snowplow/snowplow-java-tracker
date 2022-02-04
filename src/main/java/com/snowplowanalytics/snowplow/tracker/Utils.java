@@ -143,7 +143,7 @@ public class Utils {
             String encodedKey = urlEncodeUTF8(key);
             String encodedVal = urlEncodeUTF8(map.get(key));
 
-            // Do not add empty Keys
+            // Do not addEvent empty Keys
             if (!encodedKey.isEmpty()) {
                 sb.append(String.format("%s=%s", encodedKey, encodedVal));
             }

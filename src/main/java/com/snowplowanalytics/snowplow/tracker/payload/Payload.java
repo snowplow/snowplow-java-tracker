@@ -32,7 +32,7 @@ public interface Payload {
 
     /**
      * Add all the mappings from the specified map. The effect is the equivalent to that of calling:
-     *  - add(String key, String value) for each key value pair.
+     *  - addEvent(String key, String value) for each key value pair.
      *
      * @param map Key-Value pairs to be stored in this payload
      */

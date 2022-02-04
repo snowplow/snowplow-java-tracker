@@ -104,10 +104,10 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void add(final TrackerPayload payload) {
-        boolean result = eventStore.add(payload);
+        boolean result = eventStore.addEvent(payload);
         
         if (!result) {
-            LOGGER.error("Unable to add payload to emitter, emitter buffer is full");
+            LOGGER.error("Unable to addEvent payload to emitter, emitter buffer is full");
         }
     }
 
@@ -125,8 +125,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @return the buffered events
      */
     @Override
-    public List<TrackerPayload> getBuffer() {
-        return eventStore.getAllEvents();
+    public List<EmitterPayload> getBuffer() {
+        return eventStore.getEvents(eventStore.getSize());
     }
 
     /**
@@ -166,30 +166,37 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     private void drainEventsAndSend(int numberOfEvents) {
-        List<TrackerPayload> payloads = eventStore.removeEvents(numberOfEvents);
-        execute(getPostRequestRunnable(payloads));
+        List<EmitterPayload> emitterPayloads = eventStore.getEvents(numberOfEvents);
+
+        // for now, just extract the TP out
+        List<TrackerPayload> trackerPayloads = new ArrayList<>();
+        for (EmitterPayload payload : emitterPayloads) {
+            trackerPayloads.add((TrackerPayload) payload.getPayload());
+        }
+
+        execute(getPostRequestRunnable(trackerPayloads));
     }
 
     /**
      * Returns a Runnable POST Request operation
      *
-     * @param buffer the event buffer to be sent
+     * @param events the event buffer to be sent
      * @return the new Runnable object
      */
-    private Runnable getPostRequestRunnable(final List<TrackerPayload> buffer) {
+    private Runnable getPostRequestRunnable(final List<TrackerPayload> events) {
         return () -> {
-            if (buffer.size() == 0) {
+            if (events.size() == 0) {
                 return;
             }
 
-            final SelfDescribingJson post = getFinalPost(buffer);
+            final SelfDescribingJson post = getFinalPost(events);
             final int code = httpClientAdapter.post(post);
 
             // Process results
             if (!isSuccessfulSend(code)) {
-                LOGGER.error("BatchEmitter failed to send {} events: code: {}", buffer.size(), code);
+                LOGGER.error("BatchEmitter failed to send {} events: code: {}", events.size(), code);
             } else {
-                LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", buffer.size(), code);
+                LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", events.size(), code);
             }
         };
     }

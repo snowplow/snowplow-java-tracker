@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
+import com.snowplowanalytics.snowplow.tracker.emitter.EmitterPayload;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class TrackerTest {
         }
 
         @Override
-        public List<TrackerPayload> getBuffer() {
+        public List<EmitterPayload> getBuffer() {
             return null;
         }
     }

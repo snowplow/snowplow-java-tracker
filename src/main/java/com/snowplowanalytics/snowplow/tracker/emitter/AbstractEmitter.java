@@ -162,7 +162,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @return the buffered events
      */
     @Override
-    public abstract List<TrackerPayload> getBuffer();
+    public abstract List<EmitterPayload> getBuffer();
 
     /**
      * Sends a runnable to the executor service.
