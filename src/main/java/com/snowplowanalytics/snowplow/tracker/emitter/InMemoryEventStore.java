@@ -1,14 +1,19 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import com.snowplowanalytics.snowplow.tracker.Utils;
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryEventStore implements EventStore {
 
-    // this is not thread safe!
-    public final LinkedHashMap<String, TrackerPayload> eventBuffer = new LinkedHashMap<>();
+    private final AtomicLong batchId = new AtomicLong(1);
+
+    public final ConcurrentLinkedDeque<TrackerPayload> eventBuffer = new ConcurrentLinkedDeque<>();
+    public final ConcurrentHashMap<Long, List<TrackerPayload>> eventsBeingSent = new ConcurrentHashMap<>();
 
 
     @Override
@@ -16,44 +21,55 @@ public class InMemoryEventStore implements EventStore {
         // Using a new UUID instead of the event UUID for the key
         // in case of problems with non-unique event IDs.
         // Event IDs can be set by the user.
-        eventBuffer.put(Utils.getEventId(), trackerPayload);
+        eventBuffer.add(trackerPayload);
 
-        // returning true just because this was doing a queue offer before
-        // LinkedHashMap will get full when out of memory
-        // could artificially set the size
-        // probably better to just stop this returning a boolean
+        // returning true just because this was doing an offer to LinkedBlockingQueue before
+        // but ConcurrentLinkedDeque is unbounded
+        // will always return true!
         return true;
     }
 
     @Override
-    public List<EmitterPayload> getEvents(int numberToGet) {
-        List<EmitterPayload> eventsToSend = new ArrayList<>();
+    public BatchPayload getEventBatch(int numberToGet) {
+        List<TrackerPayload> eventsToSend = new ArrayList<>();
 
-        // Hopefully this makes a copy?
-        // Shouldn't modify the Map while iterating over entrySet
-        LinkedHashMap<String, TrackerPayload> bufferSnapshot = new LinkedHashMap<>(eventBuffer);
-
-        for (Map.Entry<String, TrackerPayload> event : bufferSnapshot.entrySet()) {
-            eventsToSend.add(new EmitterPayload(event.getKey(), event.getValue()));
-            if (eventsToSend.size() == numberToGet) {
+        for (int i = 0; i < numberToGet; i++) {
+            TrackerPayload payload = eventBuffer.poll();
+            if (payload == null) {
                 break;
             }
+            eventsToSend.add(payload);
         }
-        return eventsToSend;
+
+        // the batch of events is removed from the main buffer and added to the pending buffer
+        BatchPayload batchedEvents = new BatchPayload(batchId.getAndIncrement(), eventsToSend);
+        eventsBeingSent.put(batchedEvents.getBatchId(), batchedEvents.getPayload());
+
+        return batchedEvents;
     }
 
     @Override
-    public void removeEvents(List<String> eventIds) {
+    public void cleanupAfterSendingAttempt(Boolean successfullySent, Long batchId) {
+        List<TrackerPayload> events = eventsBeingSent.remove(batchId);
 
-        // should it log something if the eventId is invalid?
-        // is it possible for eventId to be invalid?
-        for (String eventId : eventIds) {
-            eventBuffer.remove(eventId);
+        // Events that didn't send are inserted at the head of the eventBuffer
+        // for immediate resending.
+        if (!successfullySent) {
+            for (TrackerPayload event : events) {
+                eventBuffer.addFirst(event);
+            }
         }
+    }
+
+    @Override
+    public List<TrackerPayload> getAllEvents() {
+        TrackerPayload[] events = eventBuffer.toArray(new TrackerPayload[0]);
+        return Arrays.asList(events);
     }
 
     @Override
     public int getSize() {
-        return eventBuffer.size();
+        // this might be slow?
+        return getAllEvents().size();
     }
 }

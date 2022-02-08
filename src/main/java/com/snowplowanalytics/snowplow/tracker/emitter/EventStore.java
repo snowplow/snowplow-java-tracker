@@ -8,9 +8,11 @@ public interface EventStore {
 
     boolean addEvent(TrackerPayload trackerPayload);
 
-    List<EmitterPayload> getEvents(int numberToRemove);
+    BatchPayload getEventBatch(int numberToRemove);
 
-    void removeEvents(List<String> eventIds);
+    List<TrackerPayload> getAllEvents();
+
+    void cleanupAfterSendingAttempt(Boolean successfullySent, Long batchId);
 
     int getSize();
 }

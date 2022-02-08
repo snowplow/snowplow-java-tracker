@@ -60,5 +60,5 @@ public interface Emitter {
      *
      * @return the buffer events
      */
-    List<EmitterPayload> getBuffer();
+    List<TrackerPayload> getBuffer();
 }

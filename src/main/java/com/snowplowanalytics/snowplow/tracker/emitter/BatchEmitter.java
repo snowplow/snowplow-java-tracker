@@ -104,7 +104,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void add(final TrackerPayload payload) {
-        boolean result = eventStore.addEvent(payload);
+        boolean result = this.eventStore.addEvent(payload);
         
         if (!result) {
             LOGGER.error("Unable to addEvent payload to emitter, emitter buffer is full");
@@ -116,7 +116,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void flushBuffer() {
-        drainEventsAndSend(eventStore.getSize());
+        drainEventsAndSend(this.eventStore.getSize());
     }
 
     /**
@@ -125,8 +125,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @return the buffered events
      */
     @Override
-    public List<EmitterPayload> getBuffer() {
-        return eventStore.getEvents(eventStore.getSize());
+    public List<TrackerPayload> getBuffer() {
+        return this.eventStore.getAllEvents();
     }
 
     /**
@@ -158,7 +158,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     private Runnable getCheckForEventsToSendRunnable() {
         return () -> {
             while (!isClosing) {
-                if (eventStore.getSize() >= bufferSize) {
+                if (eventStore.getSize() >= getBufferSize()) {
                     drainEventsAndSend(getBufferSize());
                 }
             }
@@ -166,37 +166,34 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     private void drainEventsAndSend(int numberOfEvents) {
-        List<EmitterPayload> emitterPayloads = eventStore.getEvents(numberOfEvents);
-
-        // for now, just extract the TP out
-        List<TrackerPayload> trackerPayloads = new ArrayList<>();
-        for (EmitterPayload payload : emitterPayloads) {
-            trackerPayloads.add((TrackerPayload) payload.getPayload());
-        }
-
-        execute(getPostRequestRunnable(trackerPayloads));
+        System.out.println("draining events and sending!");
+        BatchPayload emitterPayloads = eventStore.getEventBatch(numberOfEvents);
+        execute(getPostRequestRunnable(emitterPayloads));
     }
 
     /**
      * Returns a Runnable POST Request operation
      *
-     * @param events the event buffer to be sent
+     * @param batchedEvents the event buffer to be sent
      * @return the new Runnable object
      */
-    private Runnable getPostRequestRunnable(final List<TrackerPayload> events) {
+    private Runnable getPostRequestRunnable(final BatchPayload batchedEvents) {
         return () -> {
-            if (events.size() == 0) {
+            List<TrackerPayload> eventsInRequest = batchedEvents.getPayload();
+
+            if (eventsInRequest.size() == 0) {
                 return;
             }
 
-            final SelfDescribingJson post = getFinalPost(events);
+            final SelfDescribingJson post = getFinalPost(eventsInRequest);
             final int code = httpClientAdapter.post(post);
 
             // Process results
-            if (!isSuccessfulSend(code)) {
-                LOGGER.error("BatchEmitter failed to send {} events: code: {}", events.size(), code);
+            if (isSuccessfulSend(code)) {
+                LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
+                eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
             } else {
-                LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", events.size(), code);
+                LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
             }
         };
     }
@@ -204,14 +201,14 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     /**
      * Constructs the SelfDescribingJson to be sent to the endpoint
      *
-     * @param buffer the event buffer
+     * @param events the event buffer
      * @return the constructed POST payload
      */
-    private SelfDescribingJson getFinalPost(final List<TrackerPayload> buffer) {
+    private SelfDescribingJson getFinalPost(final List<TrackerPayload> events) {
         final List<Map<String, String>> toSendPayloads = new ArrayList<>();
         final String sentTimestamp = Long.toString(System.currentTimeMillis());
 
-        for (TrackerPayload payload : buffer) {
+        for (TrackerPayload payload : events) {
             payload.add(Parameter.DEVICE_SENT_TIMESTAMP, sentTimestamp);
             toSendPayloads.add(payload.getMap());
         }

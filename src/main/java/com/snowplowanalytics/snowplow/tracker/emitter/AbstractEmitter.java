@@ -23,6 +23,7 @@ import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import okhttp3.OkHttpClient;
 
@@ -162,7 +163,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @return the buffered events
      */
     @Override
-    public abstract List<EmitterPayload> getBuffer();
+    public abstract List<TrackerPayload> getBuffer();
 
     /**
      * Sends a runnable to the executor service.

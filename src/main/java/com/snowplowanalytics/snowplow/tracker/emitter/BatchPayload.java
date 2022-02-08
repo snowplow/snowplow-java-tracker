@@ -12,24 +12,26 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+import java.util.List;
 
 
-public class EmitterPayload {
+public class BatchPayload {
 
-    private final String eventId;
-    private final Payload payload;
+    private final Long batchId;
+    private final List<TrackerPayload> payloads;
 
-    public EmitterPayload(String eventId, Payload payload) {
-        this.eventId = eventId;
-        this.payload = payload;
+    public BatchPayload(Long payloadId, List<TrackerPayload> payloads) {
+        this.batchId = payloadId;
+        this.payloads = payloads;
     }
 
-    public String getEventId() {
-        return eventId;
+    public Long getBatchId() {
+        return batchId;
     }
 
-    public Payload getPayload() {
-        return payload;
+    public List<TrackerPayload> getPayload() {
+        return payloads;
     }
 }

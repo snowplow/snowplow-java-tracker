@@ -18,7 +18,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryEventStoreTest {
@@ -54,11 +53,8 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
-        System.out.println("EventStore has this many events right now: " + eventStore.getSize());
-
-        List<EmitterPayload> retrievedEventList = eventStore.getEvents(2);
-        Assert.assertEquals(2, retrievedEventList.size());
-        Assert.assertEquals(4, eventStore.getSize());
+        Assert.assertEquals(2, eventStore.getEventBatch(2).getPayload().size());
+        Assert.assertEquals(2, eventStore.getSize());
     }
 
     @Test
@@ -66,19 +62,34 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
-        List<EmitterPayload> retrievedEventList = eventStore.getEvents(10);
-        Assert.assertEquals(2, retrievedEventList.size());
+        List<TrackerPayload> events = eventStore.getEventBatch(3).getPayload();
+        System.out.println(events);
+
+        Assert.assertEquals(2, events.size());
     }
 
     @Test
-    public void removeEventsFromStorage() {
+    public void putEventsBackInBufferIfFailedToSend() {
         eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+        eventStore.getEventBatch(2);
 
-        List<EmitterPayload> retrievedEventList = eventStore.getEvents(1);
-        List<String> eventIds = new ArrayList<>();
-        eventIds.add(retrievedEventList.get(0).getEventId());
+        Assert.assertEquals(0, eventStore.getSize());
 
-        eventStore.removeEvents(eventIds);
+        eventStore.cleanupAfterSendingAttempt(false, 1L);
+
+        Assert.assertEquals(2, eventStore.getSize());
+    }
+
+    @Test
+    public void doNotPutEventsBackInBufferIfSent() {
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+        eventStore.getEventBatch(2);
+
+        Assert.assertEquals(0, eventStore.getSize());
+
+        eventStore.cleanupAfterSendingAttempt(true, 1L);
 
         Assert.assertEquals(0, eventStore.getSize());
     }
