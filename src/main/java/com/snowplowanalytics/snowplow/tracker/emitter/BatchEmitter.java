@@ -166,7 +166,6 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     private void drainEventsAndSend(int numberOfEvents) {
-        System.out.println("draining events and sending!");
         BatchPayload emitterPayloads = eventStore.getEventBatch(numberOfEvents);
         execute(getPostRequestRunnable(emitterPayloads));
     }
@@ -179,21 +178,34 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     private Runnable getPostRequestRunnable(final BatchPayload batchedEvents) {
         return () -> {
-            List<TrackerPayload> eventsInRequest = batchedEvents.getPayload();
+            // BatchPayloads are allowed to retry 3 times before being considered failed
+            while (batchedEvents.getRemainingRetries() > 0) {
+                List<TrackerPayload> eventsInRequest = batchedEvents.getPayload();
 
-            if (eventsInRequest.size() == 0) {
-                return;
+                if (eventsInRequest.size() == 0) {
+                    return;
+                }
+                final SelfDescribingJson post = getFinalPost(eventsInRequest);
+                final int code = httpClientAdapter.post(post);
+
+                // Process results
+                if (isSuccessfulSend(code)) {
+                    LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
+                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
+                    break;
+                } else {
+                    LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
+                    batchedEvents.subtractRetry();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        LOGGER.debug(e.getMessage());
+                    }
+                }
             }
 
-            final SelfDescribingJson post = getFinalPost(eventsInRequest);
-            final int code = httpClientAdapter.post(post);
-
-            // Process results
-            if (isSuccessfulSend(code)) {
-                LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
-                eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
-            } else {
-                LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
+            if (batchedEvents.getRemainingRetries() == 0) {
+                eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
             }
         };
     }

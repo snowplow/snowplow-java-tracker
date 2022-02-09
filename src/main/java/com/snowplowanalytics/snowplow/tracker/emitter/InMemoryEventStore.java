@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryEventStore implements EventStore {
-
     private final AtomicLong batchId = new AtomicLong(1);
 
     public final ConcurrentLinkedDeque<TrackerPayload> eventBuffer = new ConcurrentLinkedDeque<>();
@@ -18,9 +17,6 @@ public class InMemoryEventStore implements EventStore {
 
     @Override
     public boolean addEvent(TrackerPayload trackerPayload) {
-        // Using a new UUID instead of the event UUID for the key
-        // in case of problems with non-unique event IDs.
-        // Event IDs can be set by the user.
         eventBuffer.add(trackerPayload);
 
         // returning true just because this was doing an offer to LinkedBlockingQueue before
@@ -33,6 +29,7 @@ public class InMemoryEventStore implements EventStore {
     public BatchPayload getEventBatch(int numberToGet) {
         List<TrackerPayload> eventsToSend = new ArrayList<>();
 
+        // remove events one by one from the head of the queue, put into the List
         for (int i = 0; i < numberToGet; i++) {
             TrackerPayload payload = eventBuffer.poll();
             if (payload == null) {
@@ -41,15 +38,16 @@ public class InMemoryEventStore implements EventStore {
             eventsToSend.add(payload);
         }
 
-        // the batch of events is removed from the main buffer and added to the pending buffer
+        // The batch of events is wrapped as a BatchPayload
+        // They're also added to the "pending" event buffer, the eventsBeingSent HashMap
         BatchPayload batchedEvents = new BatchPayload(batchId.getAndIncrement(), eventsToSend);
         eventsBeingSent.put(batchedEvents.getBatchId(), batchedEvents.getPayload());
-
         return batchedEvents;
     }
 
     @Override
     public void cleanupAfterSendingAttempt(Boolean successfullySent, Long batchId) {
+        // Events that successfully sent are deleted from the pending buffer
         List<TrackerPayload> events = eventsBeingSent.remove(batchId);
 
         // Events that didn't send are inserted at the head of the eventBuffer
@@ -69,7 +67,6 @@ public class InMemoryEventStore implements EventStore {
 
     @Override
     public int getSize() {
-        // this might be slow?
         return getAllEvents().size();
     }
 }

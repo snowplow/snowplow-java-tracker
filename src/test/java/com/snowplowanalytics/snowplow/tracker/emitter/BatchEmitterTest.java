@@ -45,7 +45,6 @@ public class BatchEmitterTest {
 
         @Override
         public int post(SelfDescribingJson payload) {
-            System.out.println("post called");
             isPostCalled = true;
             postCounter++;
             capturedPayload = payload;
@@ -55,6 +54,30 @@ public class BatchEmitterTest {
         @Override
         public int get(TrackerPayload payload) {
             isGetCalled = true;
+            return 0;
+        }
+
+        @Override
+        public String getUrl() {
+            return null;
+        }
+
+        @Override
+        public Object getHttpClient() {
+            return null;
+        }
+    }
+
+    public static class FailingHttpClientAdapter implements HttpClientAdapter {
+        public int postCounter = 0;
+        @Override
+        public int post(SelfDescribingJson payload) {
+            postCounter++;
+            return 500;
+        }
+
+        @Override
+        public int get(TrackerPayload payload) {
             return 0;
         }
 
@@ -222,6 +245,50 @@ public class BatchEmitterTest {
             emitter.add(payload);
         }
         Assert.assertEquals(20, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void eventsThatFailToSendAreReturnedToEventBuffer() throws InterruptedException {
+        emitter = BatchEmitter.builder()
+                .httpClientAdapter(new FailingHttpClientAdapter())
+                .bufferSize(10)
+                .build();
+
+        List<TrackerPayload> payloads = createPayloads(2);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
+        }
+
+        Thread.sleep(500);
+
+        Assert.assertEquals(payloads, emitter.getBuffer());
+        emitter.flushBuffer();
+        Thread.sleep(500);
+
+        List<TrackerPayload> storedEvents = emitter.getBuffer();
+
+        Assert.assertEquals(2, storedEvents.size());
+        Assert.assertTrue(storedEvents.contains(payloads.get(0)));
+        Assert.assertTrue(storedEvents.contains(payloads.get(1)));
+    }
+
+    @Test
+    public void eventsThatFailToSendAreRetried() throws InterruptedException {
+        FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
+        emitter = BatchEmitter.builder()
+                .httpClientAdapter(failingHttpClientAdapter)
+                .bufferSize(10)
+                .build();
+
+        List<TrackerPayload> payloads = createPayloads(2);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
+        }
+        emitter.flushBuffer();
+        Thread.sleep(500);
+
+        Assert.assertEquals(3, failingHttpClientAdapter.postCounter);
+
     }
 
     private TrackerPayload createPayload() {

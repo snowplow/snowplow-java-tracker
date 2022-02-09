@@ -21,6 +21,17 @@ public class BatchPayload {
 
     private final Long batchId;
     private final List<TrackerPayload> payloads;
+    private int remainingRetries = 3;
+
+    public int getRemainingRetries() {
+        return remainingRetries;
+    }
+
+    public void subtractRetry() {
+        this.remainingRetries--;
+    }
+
+
 
     public BatchPayload(Long payloadId, List<TrackerPayload> payloads) {
         this.batchId = payloadId;
