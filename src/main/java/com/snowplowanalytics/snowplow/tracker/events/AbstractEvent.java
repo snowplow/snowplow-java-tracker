@@ -173,11 +173,11 @@ public abstract class AbstractEvent implements Event {
      * @return the TrackerPayload with appended values.
      */
     protected TrackerPayload putDefaultParams(TrackerPayload payload) {
-        payload.add(Parameter.EID, getEventId());
+        payload.add(Parameter.EID, Utils.getEventId());
         if (getTrueTimestamp()!=null) {
             payload.add(Parameter.TRUE_TIMESTAMP, Long.toString(getTrueTimestamp()));
         }
-        payload.add(Parameter.DEVICE_CREATED_TIMESTAMP, Long.toString(getDeviceCreatedTimestamp()));
+        payload.add(Parameter.DEVICE_CREATED_TIMESTAMP, Long.toString(System.currentTimeMillis()));
         return payload;
     }
 }

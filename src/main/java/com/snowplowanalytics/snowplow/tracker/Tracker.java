@@ -256,6 +256,15 @@ public class Tracker {
         return eventList;
     }
 
+//    private void addDefaultPayloadParameters(Event event, TrackerPayload payload) {
+//        payload.add(Parameter.EID, Utils.getEventId());
+//        if (event.getTrueTimestamp() != null) {
+//            payload.add(Parameter.TRUE_TIMESTAMP, Long.toString(event.getTrueTimestamp()));
+//        }
+//        payload.add(Parameter.DEVICE_CREATED_TIMESTAMP, Long.toString(System.currentTimeMillis()));
+//
+//    }
+
     private void addTrackerParameters(TrackerPayload payload) {
         payload.add(Parameter.PLATFORM, this.parameters.getPlatform().toString());
         payload.add(Parameter.APP_ID, this.parameters.getAppId());
