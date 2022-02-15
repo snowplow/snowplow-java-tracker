@@ -72,31 +72,6 @@ public abstract class AbstractEvent implements Event {
         }
 
         /**
-         * A custom event timestamp.
-         *
-         * @param timestamp the event timestamp as
-         *                  unix epoch
-         * @return itself
-         * Use {@link #trueTimestamp} or {@link #deviceCreatedTimestamp}
-         */
-        @Deprecated
-        public T timestamp(long timestamp) {
-            return deviceCreatedTimestamp(timestamp);
-        }
-
-        /**
-         * Adjust the device-created timestamp. This is usually not what you want, check {@link #trueTimestamp}.
-         *
-         * @param timestamp the event timestamp as
-         *                  unix epoch
-         * @return itself
-         */
-        public T deviceCreatedTimestamp(long timestamp) {
-            this.deviceCreatedTimestamp = timestamp;
-            return self();
-        }
-
-        /**
          * The true timestamp of that event (as determined by the user).
          *
          * @param timestamp the event timestamp as
@@ -105,17 +80,6 @@ public abstract class AbstractEvent implements Event {
          */
         public T trueTimestamp(Long timestamp) {
             this.trueTimestamp = timestamp;
-            return self();
-        }
-
-        /**
-         * A custom eventId for the event.
-         *
-         * @param eventId the eventId
-         * @return itself
-         */
-        public T eventId(String eventId) {
-            this.eventId = eventId;
             return self();
         }
 
@@ -162,15 +126,6 @@ public abstract class AbstractEvent implements Event {
     @Override
     public List<SelfDescribingJson> getContext() {
         return new ArrayList<>(this.context);
-    }
-
-    /**
-     * @return the event's timestamp
-     * @deprecated Use {@link #getTrueTimestamp()} or {@link #getDeviceCreatedTimestamp()}
-     */
-    @Override
-    public long getTimestamp() {
-        return this.deviceCreatedTimestamp;
     }
 
     /**
