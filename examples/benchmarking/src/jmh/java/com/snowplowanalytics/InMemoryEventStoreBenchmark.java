@@ -29,11 +29,7 @@ import java.util.concurrent.*;
 @Fork(3)
 public class InMemoryEventStoreBenchmark {
 
-    static TrackerPayload payload = PageView.builder()
-            .pageUrl("https://www.snowplowanalytics.com/")
-            .pageTitle("Snowplow")
-            .build()
-            .getPayload();
+    static TrackerPayload payload = BenchmarkHelpers.event.getPayload();
 
     static List<TrackerPayload> payloads = getTenPayloads();
 

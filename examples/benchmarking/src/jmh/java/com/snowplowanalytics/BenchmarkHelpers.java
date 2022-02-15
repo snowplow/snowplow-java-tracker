@@ -2,19 +2,18 @@ package com.snowplowanalytics;
 
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
-import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public class BenchmarkHelpers {
-    static Event event = PageView.builder()
+    static PageView event = PageView.builder()
             .pageUrl("https://www.snowplowanalytics.com/")
             .pageTitle("Snowplow")
             .build();
 
-    static TrackerPayload payload = (TrackerPayload) event.getPayload();
+    static TrackerPayload payload = event.getPayload();
 
     public static class MockHttpClientAdapter implements HttpClientAdapter {
         @Override

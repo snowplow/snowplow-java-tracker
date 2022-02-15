@@ -6,12 +6,13 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryEventStore implements EventStore {
     private final AtomicLong batchId = new AtomicLong(1);
 
-    public final ConcurrentLinkedDeque<TrackerPayload> eventBuffer = new ConcurrentLinkedDeque<>();
+    public final LinkedBlockingDeque<TrackerPayload> eventBuffer = new LinkedBlockingDeque<>();
     public final ConcurrentHashMap<Long, List<TrackerPayload>> eventsBeingSent = new ConcurrentHashMap<>();
 
 
