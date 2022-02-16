@@ -34,7 +34,7 @@ public class Main {
         return args[0];
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         String collectorEndpoint = getUrlFromArgs(args);
 
         // the application id to attach to events
@@ -146,15 +146,23 @@ public class Main {
                 .customContext(context)
                 .build();
 
-        tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
-        tracker.track(ecommerceTransaction); // This will track two events
-        tracker.track(unstructured);
-        tracker.track(screenView);
-        tracker.track(timing);
-        tracker.track(structured);
+        for (int i = 0; i < 150; i++) {
+            tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
+            tracker.track(ecommerceTransaction); // This will track two events
+            tracker.track(unstructured);
+            tracker.track(screenView);
+            tracker.track(timing);
+            tracker.track(structured);
+        }
+
+        Thread.sleep(5000);
+
 
         // Will close all threads and force send remaining events
         tracker.close();
+//        emitter.close();
+
+        Thread.sleep(5000);
 
         System.out.println("Tracked 7 events");
     }
