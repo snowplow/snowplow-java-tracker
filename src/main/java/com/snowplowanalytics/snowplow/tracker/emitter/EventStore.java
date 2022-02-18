@@ -12,7 +12,7 @@ public interface EventStore {
 
     List<TrackerPayload> getAllEvents();
 
-    void cleanupAfterSendingAttempt(Boolean successfullySent, Long batchId);
+    void cleanupAfterSendingAttempt(boolean successfullySent, long batchId);
 
     int getSize();
 }

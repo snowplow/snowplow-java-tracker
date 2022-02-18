@@ -34,6 +34,14 @@ public class Main {
         return args[0];
     }
 
+    public static PageView getPageView() {
+        return PageView.builder()
+                .pageTitle("Snowplow Analytics")
+                .pageUrl("https://www.snowplowanalytics.com")
+                .referrer("https://www.google.com")
+                .build();
+    }
+
     public static void main(String[] args) throws InterruptedException {
         String collectorEndpoint = getUrlFromArgs(args);
 
@@ -146,21 +154,35 @@ public class Main {
                 .customContext(context)
                 .build();
 
+        Thread.sleep(30000);
+
+        System.out.println("About to track events");
+
+
+
         for (int i = 0; i < 150; i++) {
-            tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
-            tracker.track(ecommerceTransaction); // This will track two events
-            tracker.track(unstructured);
-            tracker.track(screenView);
-            tracker.track(timing);
-            tracker.track(structured);
+//            tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
+//            tracker.track(ecommerceTransaction); // This will track two events
+//            tracker.track(unstructured);
+//            tracker.track(screenView);
+//            tracker.track(timing);
+//            tracker.track(structured);
+
+            tracker.track(getPageView());
+            tracker.track(getPageView());
+            tracker.track(getPageView());
+            tracker.track(getPageView());
+            tracker.track(getPageView());
+            tracker.track(getPageView());
+            tracker.track(getPageView());
+//            Thread.sleep(10);
         }
 
-        Thread.sleep(5000);
+//        Thread.sleep(5000);
 
 
         // Will close all threads and force send remaining events
-        tracker.close();
-//        emitter.close();
+        emitter.close();
 
         Thread.sleep(5000);
 

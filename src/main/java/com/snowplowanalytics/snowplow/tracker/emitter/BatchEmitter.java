@@ -35,10 +35,8 @@ import org.slf4j.LoggerFactory;
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
-    private static final AtomicInteger EVENTS_CHECK_THREAD_NUMBER = new AtomicInteger(1);
-    private static final String EVENTS_CHECK_THREAD_NAME_PREFIX = "snowplow-emitter-checkForEvents-thread-";
 
-    private final Thread checkForEventsToSend;
+//    private final Thread checkForEventsToSend;
     private boolean isClosing = false;
 
     private int bufferSize = 1;
@@ -90,11 +88,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         this.bufferSize = builder.bufferSize;
         this.eventStore = builder.eventStore;
 
-        checkForEventsToSend = new Thread(
-                getCheckForEventsToSendRunnable(),
-                EVENTS_CHECK_THREAD_NAME_PREFIX + EVENTS_CHECK_THREAD_NUMBER.getAndIncrement()
-        );
-        checkForEventsToSend.start();
+//        checkForEventsToSend = new Thread(
+//                getCheckForEventsToSendRunnable(),
+//                EVENTS_CHECK_THREAD_NAME_PREFIX + EVENTS_CHECK_THREAD_NUMBER.getAndIncrement()
+//        );
+//        checkForEventsToSend.start();
     }
 
     /**
@@ -105,6 +103,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     @Override
     public void add(final TrackerPayload payload) {
         boolean result = this.eventStore.addEvent(payload);
+
+        if (!isClosing) {
+            if (this.eventStore.getSize() >= getBufferSize()) {
+                execute(getPostRequestRunnable(getBufferSize()));
+            }
+        }
         
         if (!result) {
             LOGGER.error("Unable to addEvent payload to emitter, emitter buffer is full");
@@ -116,7 +120,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void flushBuffer() {
-        drainEventsAndSend(this.eventStore.getSize());
+        execute(getPostRequestRunnable(this.eventStore.getSize()));
     }
 
     /**
@@ -151,33 +155,14 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Checks if bufferSize is reached
-     *
-     * @return the new Runnable object
-     */
-    private Runnable getCheckForEventsToSendRunnable() {
-        return () -> {
-            while (!isClosing) {
-                if (eventStore.getSize() >= getBufferSize()) {
-                    drainEventsAndSend(getBufferSize());
-                }
-            }
-        };
-    }
-
-    private void drainEventsAndSend(int numberOfEvents) {
-        BatchPayload emitterPayloads = eventStore.getEventBatch(numberOfEvents);
-        execute(getPostRequestRunnable(emitterPayloads));
-    }
-
-    /**
      * Returns a Runnable POST Request operation
      *
-     * @param batchedEvents the event buffer to be sent
+     * @param numberOfEvents the event buffer to be sent
      * @return the new Runnable object
      */
-    private Runnable getPostRequestRunnable(final BatchPayload batchedEvents) {
+    private Runnable getPostRequestRunnable(int numberOfEvents) {
         return () -> {
+            BatchPayload batchedEvents = eventStore.getEventBatch(numberOfEvents);
             // BatchPayloads are allowed to retry 3 times before being considered failed
             while (batchedEvents.getRemainingRetries() > 0) {
                 List<TrackerPayload> eventsInRequest = batchedEvents.getPayload();
@@ -235,7 +220,6 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     public void close() {
         isClosing = true;
 
-        checkForEventsToSend.interrupt(); // Kill checkForEventsToSend thread
         flushBuffer(); // Attempt to send all remaining events
 
         //Shutdown executor threadpool

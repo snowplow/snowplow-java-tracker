@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
@@ -31,6 +32,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
+import org.junit.jupiter.api.BeforeEach;
 
 public class BatchEmitterTest {
 
@@ -194,24 +196,8 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void emitterThreadFactory_correctlyNamesThreads() {
-        class MyRunnable implements Runnable {
-            @Override
-            public void run() {}
-        }
-
-        BatchEmitter.EmitterThreadFactory threadFactory = new BatchEmitter.EmitterThreadFactory();
-        String threadName = threadFactory.newThread(new MyRunnable()).getName();
-
-        // It's pool-2 because pool-1 was created during emitter instantiation
-        Assert.assertEquals("snowplow-emitter-pool-2-request-thread-1", threadName);
-    }
-
-    @Test
     public void threadsHaveExpectedNames() {
-        // A checkForEventsToSend thread is created on BatchEmitter instantiation.
-        // Calling flushBuffer() here to require another thread - causing
-        // creation of a request thread within the scheduledThreadPool.
+        // Calling flushBuffer() here to create a request thread for event sending
         emitter.flushBuffer();
 
         // Create a list of all live thread names
@@ -220,9 +206,18 @@ public class BatchEmitterTest {
         for (Thread thread : threadList) {
             threadNames.add(thread.getName());
         }
+        System.out.println(threadNames);
 
-        Assert.assertTrue(threadNames.contains("snowplow-emitter-checkForEvents-thread-1"));
-        Assert.assertTrue(threadNames.contains("snowplow-emitter-pool-1-request-thread-1"));
+        // Because the threadpools are named by a static ThreadFactory,
+        // the pool number varies if this test is run in isolation or not
+        boolean matchResult = false;
+        for (String name : threadNames) {
+            if (Pattern.matches("snowplow-emitter-pool-\\d+-request-thread-1", name)) {
+                matchResult = true;
+            }
+        }
+
+        Assert.assertTrue(matchResult);
     }
 
     @Test
@@ -231,6 +226,9 @@ public class BatchEmitterTest {
         for (TrackerPayload payload : payloads) {
             emitter.add(payload);
         }
+        System.out.println(emitter.getBuffer().size());
+        Thread.sleep(500);
+
         emitter.close();
 
         Thread.sleep(500);
