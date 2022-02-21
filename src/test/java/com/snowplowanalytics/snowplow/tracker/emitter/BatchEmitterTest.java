@@ -32,11 +32,11 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import org.junit.jupiter.api.BeforeEach;
 
 public class BatchEmitterTest {
 
     private MockHttpClientAdapter mockHttpClientAdapter;
+    private FailingHttpClientAdapter failingHttpClientAdapter;
     private BatchEmitter emitter;
 
     public static class MockHttpClientAdapter implements HttpClientAdapter {
@@ -71,10 +71,16 @@ public class BatchEmitterTest {
     }
 
     public static class FailingHttpClientAdapter implements HttpClientAdapter {
-        public int postCounter = 0;
+        public int failedPostCounter = 0;
+        public int successfulPostCounter = 0;
         @Override
         public int post(SelfDescribingJson payload) {
-            postCounter++;
+            if (failedPostCounter >= 4) {
+                successfulPostCounter++;
+                return 200;
+            }
+
+            failedPostCounter++;
             return 500;
         }
 
@@ -97,6 +103,7 @@ public class BatchEmitterTest {
     @Before
     public void setUp() {
         mockHttpClientAdapter = new MockHttpClientAdapter();
+        failingHttpClientAdapter = new FailingHttpClientAdapter();
         emitter = BatchEmitter.builder()
                 .httpClientAdapter(mockHttpClientAdapter)
                 .bufferSize(10)
@@ -206,7 +213,6 @@ public class BatchEmitterTest {
         for (Thread thread : threadList) {
             threadNames.add(thread.getName());
         }
-        System.out.println(threadNames);
 
         // Because the threadpools are named by a static ThreadFactory,
         // the pool number varies if this test is run in isolation or not
@@ -271,22 +277,47 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void eventsThatFailToSendAreRetried() throws InterruptedException {
-        FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
+    public void eventSendingFailureIncreasesBackoffTime() throws InterruptedException {
         emitter = BatchEmitter.builder()
                 .httpClientAdapter(failingHttpClientAdapter)
-                .bufferSize(10)
+                .bufferSize(1)
                 .build();
 
         List<TrackerPayload> payloads = createPayloads(2);
         for (TrackerPayload payload : payloads) {
             emitter.add(payload);
         }
-        emitter.flushBuffer();
         Thread.sleep(500);
 
-        Assert.assertEquals(3, failingHttpClientAdapter.postCounter);
+        Assert.assertEquals(100, emitter.getRetryDelay());
+    }
 
+    @Test
+    public void successfulSendAfterFailureResetsBackoffTime() throws InterruptedException {
+        // the FailingHttpClientAdapter returns 500 for the first 4 requests
+        // then subsequently returns 200
+        FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
+        emitter = BatchEmitter.builder()
+                .httpClientAdapter(failingHttpClientAdapter)
+                .bufferSize(1)
+                .build();
+
+        // these requests will pass the failingHttpClientAdapter threshold for failing
+        // because they are being processed asynchronously, the retryDelay might
+        // not be reset as expected
+        List<TrackerPayload> payloads = createPayloads(6);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
+        }
+
+        Thread.sleep(500);
+
+        // this request will definitely succeed
+        emitter.add(createPayload());
+        Thread.sleep(500);
+
+        Assert.assertEquals(3, failingHttpClientAdapter.successfulPostCounter);
+        Assert.assertEquals(0, emitter.getRetryDelay());
     }
 
     private TrackerPayload createPayload() {

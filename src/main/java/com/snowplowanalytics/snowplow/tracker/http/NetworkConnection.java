@@ -10,28 +10,11 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.tracker.emitter;
+package com.snowplowanalytics.snowplow.tracker.http;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 
-import java.util.List;
+public interface NetworkConnection {
 
-
-public class BatchPayload {
-
-    private final Long batchId;
-    private final List<TrackerPayload> payloads;
-
-    public BatchPayload(Long payloadId, List<TrackerPayload> payloads) {
-        this.batchId = payloadId;
-        this.payloads = payloads;
-    }
-
-    public Long getBatchId() {
-        return batchId;
-    }
-
-    public List<TrackerPayload> getPayload() {
-        return payloads;
-    }
+    int sendRequest(Payload payload);
 }

@@ -16,8 +16,9 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
@@ -36,11 +37,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
 
-//    private final Thread checkForEventsToSend;
     private boolean isClosing = false;
 
-    private int bufferSize = 1;
+    private int bufferSize;
     private final EventStore eventStore;
+    private final AtomicLong retryDelay;
 
     private final long closeTimeout = 5;
 
@@ -87,12 +88,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         this.bufferSize = builder.bufferSize;
         this.eventStore = builder.eventStore;
-
-//        checkForEventsToSend = new Thread(
-//                getCheckForEventsToSendRunnable(),
-//                EVENTS_CHECK_THREAD_NAME_PREFIX + EVENTS_CHECK_THREAD_NUMBER.getAndIncrement()
-//        );
-//        checkForEventsToSend.start();
+        this.retryDelay = new AtomicLong(0);
     }
 
     /**
@@ -106,7 +102,9 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         if (!isClosing) {
             if (this.eventStore.getSize() >= getBufferSize()) {
-                execute(getPostRequestRunnable(getBufferSize()));
+                ScheduledExecutorService executor = (ScheduledExecutorService) this.executor;
+                executor.schedule(getPostRequestRunnable(getBufferSize()), this.retryDelay.get(), TimeUnit.MILLISECONDS);
+//                execute(getPostRequestRunnable(getBufferSize()));
             }
         }
         
@@ -154,6 +152,10 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         return this.bufferSize;
     }
 
+    public long getRetryDelay() {
+        return this.retryDelay.get();
+    }
+
     /**
      * Returns a Runnable POST Request operation
      *
@@ -162,36 +164,36 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     private Runnable getPostRequestRunnable(int numberOfEvents) {
         return () -> {
-            BatchPayload batchedEvents = eventStore.getEventBatch(numberOfEvents);
-            // BatchPayloads are allowed to retry 3 times before being considered failed
-            while (batchedEvents.getRemainingRetries() > 0) {
-                List<TrackerPayload> eventsInRequest = batchedEvents.getPayload();
+            BatchPayload batchedEvents = this.eventStore.getEventBatch(numberOfEvents);
+            List<TrackerPayload> eventsInRequest = batchedEvents.getPayload();
 
-                if (eventsInRequest.size() == 0) {
-                    return;
-                }
-                final SelfDescribingJson post = getFinalPost(eventsInRequest);
-                final int code = httpClientAdapter.post(post);
-
-                // Process results
-                if (isSuccessfulSend(code)) {
-                    LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
-                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
-                    break;
-                } else {
-                    LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
-                    batchedEvents.subtractRetry();
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        LOGGER.debug(e.getMessage());
-                    }
-                }
+            if (eventsInRequest.size() == 0) {
+                return;
             }
 
-            if (batchedEvents.getRemainingRetries() == 0) {
+            final SelfDescribingJson post = getFinalPost(eventsInRequest);
+
+            final int code = httpClientAdapter.post(post);
+
+            // Process results
+            if (isSuccessfulSend(code)) {
+                LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
+                eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
+                System.out.println("success and delay is: " + getRetryDelay());
+                this.retryDelay.set(0L);
+            } else {
+                LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
+                System.out.println("failed and delay is: " + getRetryDelay());
                 eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+
+                long currentDelay = this.retryDelay.get();
+                if (currentDelay == 0) {
+                    this.retryDelay.compareAndSet(0, 50);
+                } else {
+                    this.retryDelay.set(currentDelay * 2);
+                }
             }
+
         };
     }
 

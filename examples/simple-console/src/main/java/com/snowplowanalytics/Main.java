@@ -18,12 +18,14 @@ import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
+import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 import java.util.List;
 import static java.util.Collections.singletonList;
 
 import com.google.common.collect.ImmutableMap;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public class Main {
 
@@ -154,10 +156,9 @@ public class Main {
                 .customContext(context)
                 .build();
 
-        Thread.sleep(30000);
+//        Thread.sleep(30000);
 
         System.out.println("About to track events");
-
 
 
         for (int i = 0; i < 150; i++) {
@@ -175,7 +176,7 @@ public class Main {
             tracker.track(getPageView());
             tracker.track(getPageView());
             tracker.track(getPageView());
-//            Thread.sleep(10);
+            Thread.sleep(10);
         }
 
 //        Thread.sleep(5000);
