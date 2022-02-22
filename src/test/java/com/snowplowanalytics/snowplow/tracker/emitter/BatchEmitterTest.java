@@ -145,6 +145,21 @@ public class BatchEmitterTest {
     }
 
     @Test
+    public void addToBuffer_doesNotAddEventIfBufferFull() {
+        emitter = BatchEmitter.builder()
+                .httpClientAdapter(mockHttpClientAdapter)
+                .bufferCapacity(1)
+                .build();
+
+        emitter.add(createPayload());
+
+        TrackerPayload differentPayload = createPayload();
+        emitter.add(differentPayload);
+
+        Assert.assertFalse(emitter.getBuffer().contains(differentPayload));
+    }
+
+    @Test
     public void flushBuffer_shouldEmptyBuffer() throws InterruptedException {
         List<TrackerPayload> payloads = createPayloads(2);
         for (TrackerPayload payload : payloads) {

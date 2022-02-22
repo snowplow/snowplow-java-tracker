@@ -16,6 +16,7 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,6 +40,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     private boolean isClosing = false;
 
     private int bufferSize;
+    private int bufferCapacity;
     private final EventStore eventStore;
     private final AtomicLong retryDelay;
 
@@ -47,7 +49,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
         private int bufferSize = 50; // Optional
-        private EventStore eventStore = new InMemoryEventStore();
+        private int bufferCapacity = Integer.MAX_VALUE;
+        private EventStore eventStore;
 
         /**
          * @param bufferSize The count of events to buffer before sending
@@ -60,6 +63,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         public T eventStore(final EventStore eventStore) {
             this.eventStore = eventStore;
+            return self();
+        }
+
+        public T bufferCapacity(final int bufferCapacity) {
+            this.bufferCapacity = bufferCapacity;
             return self();
         }
 
@@ -86,7 +94,15 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize must be greater than 0");
 
         this.bufferSize = builder.bufferSize;
-        this.eventStore = builder.eventStore;
+        this.bufferCapacity = builder.bufferCapacity;
+//        this.eventStore = builder.eventStore;
+
+        if (builder.eventStore == null) {
+            this.eventStore = new InMemoryEventStore(this.bufferCapacity);
+        } else {
+            this.eventStore = builder.eventStore;
+        }
+
         this.retryDelay = new AtomicLong(0);
     }
 
@@ -106,7 +122,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         }
         
         if (!result) {
-            LOGGER.error("Unable to addEvent payload to emitter, emitter buffer is full");
+            LOGGER.error("Unable to add payload to emitter, emitter buffer is full");
         }
     }
 
@@ -182,6 +198,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                     LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
 
+                    // exponentially increase retry backoff time after the first failure
                     long currentDelay = this.retryDelay.get();
                     if (currentDelay == 0) {
                         this.retryDelay.compareAndSet(0, 50L);
