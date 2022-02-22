@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,7 +24,6 @@ import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import okhttp3.OkHttpClient;
 
@@ -34,24 +34,24 @@ import okhttp3.OkHttpClient;
 public abstract class AbstractEmitter implements Emitter {
 
     protected HttpClientAdapter httpClientAdapter;
-    protected ExecutorService executor;
+    protected ScheduledExecutorService executor;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private HttpClientAdapter httpClientAdapter; // Optional
         private int threadCount = 50; // Optional
-        private ExecutorService requestExecutorService = null; // Optional
+        private ScheduledExecutorService requestExecutorService = null; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
         protected abstract T self();
 
         /**
-         * Set a custom ExecutorService to send http request.
+         * Set a custom ScheduledExecutorService to send http request.
          *
          *  /!\ Be aware that calling `close()` on a BatchEmitter instance has a side-effect and will shutdown that ExecutorService.
-         * @param executorService the ExecutorService to use
+         * @param executorService the ScheduledExecutorService to use
          * @return itself
          */
-        public T requestExecutorService(final ExecutorService executorService) {
+        public T requestExecutorService(final ScheduledExecutorService executorService) {
             this.requestExecutorService = executorService;
             return self();
         }
@@ -164,15 +164,6 @@ public abstract class AbstractEmitter implements Emitter {
      */
     @Override
     public abstract List<TrackerPayload> getBuffer();
-
-    /**
-     * Sends a runnable to the executor service.
-     *
-     * @param runnable the runnable to be queued
-     */
-    protected void execute(final Runnable runnable) {
-        this.executor.execute(runnable);
-    }
 
     /**
      * Checks whether the response code was a success or not.

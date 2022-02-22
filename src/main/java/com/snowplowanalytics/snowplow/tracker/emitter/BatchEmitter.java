@@ -16,7 +16,6 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -101,10 +100,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         boolean result = this.eventStore.addEvent(payload);
 
         if (!isClosing) {
-            if (this.eventStore.getSize() >= getBufferSize()) {
-                ScheduledExecutorService executor = (ScheduledExecutorService) this.executor;
-                executor.schedule(getPostRequestRunnable(getBufferSize()), this.retryDelay.get(), TimeUnit.MILLISECONDS);
-//                execute(getPostRequestRunnable(getBufferSize()));
+            if (this.eventStore.getSize() >= this.bufferSize) {
+                executor.schedule(getPostRequestRunnable(this.bufferSize), this.retryDelay.get(), TimeUnit.MILLISECONDS);
             }
         }
         
@@ -118,7 +115,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void flushBuffer() {
-        execute(getPostRequestRunnable(this.eventStore.getSize()));
+        executor.schedule(getPostRequestRunnable(this.eventStore.getSize()), 0, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -164,36 +161,40 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     private Runnable getPostRequestRunnable(int numberOfEvents) {
         return () -> {
-            BatchPayload batchedEvents = this.eventStore.getEventBatch(numberOfEvents);
-            List<TrackerPayload> eventsInRequest = batchedEvents.getPayload();
+            BatchPayload batchedEvents = null;
+            try {
+                batchedEvents = this.eventStore.getEventBatch(numberOfEvents);
+                List<TrackerPayload> eventsInRequest = batchedEvents.getPayloads();
 
-            if (eventsInRequest.size() == 0) {
-                return;
-            }
+                if (eventsInRequest.size() == 0) {
+                    return;
+                }
 
-            final SelfDescribingJson post = getFinalPost(eventsInRequest);
+                final SelfDescribingJson post = getFinalPost(eventsInRequest);
+                final int code = httpClientAdapter.post(post);
 
-            final int code = httpClientAdapter.post(post);
-
-            // Process results
-            if (isSuccessfulSend(code)) {
-                LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
-                eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
-                System.out.println("success and delay is: " + getRetryDelay());
-                this.retryDelay.set(0L);
-            } else {
-                LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
-                System.out.println("failed and delay is: " + getRetryDelay());
-                eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
-
-                long currentDelay = this.retryDelay.get();
-                if (currentDelay == 0) {
-                    this.retryDelay.compareAndSet(0, 50);
+                // Process results
+                if (isSuccessfulSend(code)) {
+                    LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
+                    this.retryDelay.set(0L);
+                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
                 } else {
-                    this.retryDelay.set(currentDelay * 2);
+                    LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
+                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+
+                    long currentDelay = this.retryDelay.get();
+                    if (currentDelay == 0) {
+                        this.retryDelay.compareAndSet(0, 50L);
+                    } else {
+                        this.retryDelay.set(currentDelay * 2);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("BatchEmitter event sending error: {}", e.getMessage());
+                if (batchedEvents != null) {
+                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
                 }
             }
-
         };
     }
 

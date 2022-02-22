@@ -303,8 +303,8 @@ public class BatchEmitterTest {
                 .build();
 
         // these requests will pass the failingHttpClientAdapter threshold for failing
-        // because they are being processed asynchronously, the retryDelay might
-        // not be reset as expected
+        // but because they are being processed asynchronously, the successful requests
+        // may be processed by the Emitter before the failed ones
         List<TrackerPayload> payloads = createPayloads(6);
         for (TrackerPayload payload : payloads) {
             emitter.add(payload);

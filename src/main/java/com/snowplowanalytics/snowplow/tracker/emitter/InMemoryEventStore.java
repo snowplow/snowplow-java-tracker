@@ -28,7 +28,7 @@ public class InMemoryEventStore implements EventStore {
         // The batch of events is wrapped as a BatchPayload
         // They're also added to the "pending" event buffer, the eventsBeingSent HashMap
         BatchPayload batchedEvents = new BatchPayload(batchId.getAndIncrement(), eventsToSend);
-        eventsBeingSent.put(batchedEvents.getBatchId(), batchedEvents.getPayload());
+        eventsBeingSent.put(batchedEvents.getBatchId(), batchedEvents.getPayloads());
         return batchedEvents;
     }
 

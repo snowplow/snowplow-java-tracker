@@ -53,7 +53,7 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
-        Assert.assertEquals(2, eventStore.getEventBatch(2).getPayload().size());
+        Assert.assertEquals(2, eventStore.getEventBatch(2).getPayloads().size());
         Assert.assertEquals(2, eventStore.getSize());
     }
 
@@ -62,7 +62,7 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
-        List<TrackerPayload> events = eventStore.getEventBatch(3).getPayload();
+        List<TrackerPayload> events = eventStore.getEventBatch(3).getPayloads();
         System.out.println(events);
 
         Assert.assertEquals(2, events.size());

@@ -31,7 +31,7 @@ public class BatchPayload {
         return batchId;
     }
 
-    public List<TrackerPayload> getPayload() {
+    public List<TrackerPayload> getPayloads() {
         return payloads;
     }
 }
