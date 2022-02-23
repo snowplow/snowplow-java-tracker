@@ -45,8 +45,14 @@ public class Main {
         // build an emitter, this is used by the tracker to batch and schedule transmission of events
         BatchEmitter emitter = BatchEmitter.builder()
                 .url(collectorEndpoint)
-                .bufferSize(4) // send batches of 4 events. In production this number should be higher, depending on the size/event volume
+                .batchSize(4) // send batches of 4 events. In production this number should be higher, depending on the size/event volume
                 .build();
+
+        // For versions below 0.12.0, the batchSize property was called bufferSize
+//        BatchEmitter emitter = BatchEmitter.builder()
+//                .url(collectorEndpoint)
+//                .bufferSize(4) // send batches of 4 events. In production this number should be higher, depending on the size/event volume
+//                .build();
 
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
         final Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
@@ -154,7 +160,7 @@ public class Main {
         tracker.track(structured);
 
         // Will close all threads and force send remaining events
-        tracker.close();
+        emitter.close();
 
         System.out.println("Tracked 7 events");
     }

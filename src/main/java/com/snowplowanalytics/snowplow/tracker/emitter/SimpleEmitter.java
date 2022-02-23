@@ -100,25 +100,25 @@ public class SimpleEmitter extends AbstractEmitter {
     }
 
     /**
-     * Customize the emitter buffer size to any valid integer greater than zero.
+     * Customize the emitter batch size to any valid integer greater than zero.
      * Has no effect on SimpleEmitter
      *
-     * @param bufferSize number of events to collect before sending
+     * @param batchSize number of events to collect before sending
      */
     @Override
-    public void setBufferSize(final int bufferSize) {
-        if (bufferSize != 1) {
-            LOGGER.debug("Noop. SimpleEmitter buffer size must always be 1.");
+    public void setBatchSize(final int batchSize) {
+        if (batchSize != 1) {
+            LOGGER.debug("Noop. SimpleEmitter batch size must always be 1.");
         }
     }
 
     /**
-     * Gets the Emitter Buffer Size - Will always be 1 for SimpleEmitter
+     * Gets the Emitter batch Size - Will always be 1 for SimpleEmitter
      *
-     * @return the buffer size
+     * @return the batch size
      */
     @Override
-    public int getBufferSize() {
+    public int getBatchSize() {
         return 1;
     }
 }

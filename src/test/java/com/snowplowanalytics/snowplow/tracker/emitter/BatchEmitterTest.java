@@ -71,7 +71,7 @@ public class BatchEmitterTest {
         mockHttpClientAdapter = new MockHttpClientAdapter();
         emitter = BatchEmitter.builder()
                 .httpClientAdapter(mockHttpClientAdapter)
-                .bufferSize(10)
+                .batchSize(10)
                 .build();
     }
 
@@ -125,15 +125,15 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void setBufferSize_WithNegativeValue_ThrowInvalidArgumentException() {
-        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> emitter.setBufferSize(-1));
-        Assert.assertEquals("bufferSize must be greater than 0", exception.getMessage());
+    public void setBatchSize_WithNegativeValue_ThrowInvalidArgumentException() {
+        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> emitter.setBatchSize(-1));
+        Assert.assertEquals("batchSize must be greater than 0", exception.getMessage());
     }
 
     @Test
-    public void setAndGetBufferSizeWorksAsExpected() throws InterruptedException {
-        emitter.setBufferSize(2);
-        Assert.assertEquals(2, emitter.getBufferSize());
+    public void setAndGetBatchSizeWorksAsExpected() throws InterruptedException {
+        emitter.setBatchSize(2);
+        Assert.assertEquals(2, emitter.getBatchSize());
 
         List<TrackerPayload> payloads = createPayloads(2);
         for (TrackerPayload payload : payloads) {
