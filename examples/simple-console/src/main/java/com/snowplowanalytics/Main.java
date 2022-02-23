@@ -58,6 +58,12 @@ public class Main {
                 .bufferSize(4) // send batches of 4 events. In production this number should be higher, depending on the size/event volume
                 .build();
 
+        // for versions before 0.12.0, the property batchSize was called bufferSize
+//        BatchEmitter emitter = BatchEmitter.builder()
+//                .url(collectorEndpoint)
+//                .bufferSize(4)
+//                .build();
+
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
         final Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
             .base64(true)
@@ -156,31 +162,12 @@ public class Main {
                 .customContext(context)
                 .build();
 
-//        Thread.sleep(30000);
-
-        System.out.println("About to track events");
-
-
-        for (int i = 0; i < 150; i++) {
-//            tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
-//            tracker.track(ecommerceTransaction); // This will track two events
-//            tracker.track(unstructured);
-//            tracker.track(screenView);
-//            tracker.track(timing);
-//            tracker.track(structured);
-
-            tracker.track(getPageView());
-            tracker.track(getPageView());
-            tracker.track(getPageView());
-            tracker.track(getPageView());
-            tracker.track(getPageView());
-            tracker.track(getPageView());
-            tracker.track(getPageView());
-            Thread.sleep(10);
-        }
-
-//        Thread.sleep(5000);
-
+        tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
+        tracker.track(ecommerceTransaction); // This will track two events
+        tracker.track(unstructured);
+        tracker.track(screenView);
+        tracker.track(timing);
+        tracker.track(structured);
 
         // Will close all threads and force send remaining events
         emitter.close();
