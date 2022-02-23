@@ -34,7 +34,3 @@ repositories {
 dependencies {
     jmh 'com.snowplowanalytics:snowplow-java-tracker:0.10.1'
 }
-
-jmh {
-    includes = ['InMemoryEventStore*']
-}

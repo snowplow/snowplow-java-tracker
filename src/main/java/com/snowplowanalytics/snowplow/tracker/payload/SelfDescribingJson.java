@@ -125,10 +125,10 @@ public class SelfDescribingJson implements Payload {
     }
 
     /**
-     * Allows us to addEvent data from one SelfDescribingJson into another
+     * Allows us to add data from one SelfDescribingJson into another
      * without copying over the Schema.
      *
-     * @param data the payload to addEvent to the SelfDescribingJson
+     * @param data the payload to add to the SelfDescribingJson
      * @return this SelfDescribingJson
      */
     public SelfDescribingJson setData(SelfDescribingJson data) {
@@ -142,7 +142,7 @@ public class SelfDescribingJson implements Payload {
     @Deprecated
     @Override
     public void add(String key, String value) {
-        LOGGER.info("Payload: addEvent(String, String) method called - Doing nothing.");
+        LOGGER.info("Payload: add(String, String) method called - Doing nothing.");
     }
 
     @Deprecated

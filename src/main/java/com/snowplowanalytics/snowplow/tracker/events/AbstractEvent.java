@@ -214,7 +214,7 @@ public abstract class AbstractEvent implements Event {
     /**
      * Adds the default parameters to a TrackerPayload object.
      *
-     * @param payload the payload to addEvent too.
+     * @param payload the payload to add to.
      * @return the TrackerPayload with appended values.
      */
     protected TrackerPayload putDefaultParams(TrackerPayload payload) {

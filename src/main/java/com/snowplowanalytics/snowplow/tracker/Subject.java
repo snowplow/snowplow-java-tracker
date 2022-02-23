@@ -27,7 +27,7 @@ public class Subject {
     private HashMap<String, String> standardPairs = new HashMap<>();
 
     /**
-     * Creates a Subject which will addEvent extra data to each event.
+     * Creates a Subject which will add extra data to each event.
      *
      * @param builder The builder that constructs a subject
      */

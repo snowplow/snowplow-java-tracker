@@ -66,9 +66,6 @@ public class TrackerBenchmark {
     }
 
     public static void closeThreads(Tracker tracker) {
-        // Use this line for versions 0.12.0 onwards
-//        tracker.close();
-        // Use these lines for previous versions
         BatchEmitter emitter = (BatchEmitter) tracker.getEmitter();
         emitter.close();
     }

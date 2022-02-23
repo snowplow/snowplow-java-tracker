@@ -172,7 +172,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     /**
      * Returns a Runnable POST Request operation
      *
-     * @param numberOfEvents the event buffer to be sent
+     * @param numberOfEvents the number of events to be sent in the request
      * @return the new Runnable object
      */
     private Runnable getPostRequestRunnable(int numberOfEvents) {
