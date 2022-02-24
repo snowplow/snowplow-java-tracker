@@ -14,5 +14,5 @@ public interface EventStore {
 
     void cleanupAfterSendingAttempt(boolean successfullySent, long batchId);
 
-    int getSize();
+    int size();
 }

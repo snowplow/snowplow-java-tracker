@@ -16,7 +16,6 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -95,7 +94,6 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         this.bufferSize = builder.bufferSize;
         this.bufferCapacity = builder.bufferCapacity;
-//        this.eventStore = builder.eventStore;
 
         if (builder.eventStore == null) {
             this.eventStore = new InMemoryEventStore(this.bufferCapacity);
@@ -116,7 +114,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         boolean result = this.eventStore.addEvent(payload);
 
         if (!isClosing) {
-            if (this.eventStore.getSize() >= this.bufferSize) {
+            if (this.eventStore.size() >= this.bufferSize) {
                 executor.schedule(getPostRequestRunnable(this.bufferSize), this.retryDelay.get(), TimeUnit.MILLISECONDS);
             }
         }
@@ -131,7 +129,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void flushBuffer() {
-        executor.schedule(getPostRequestRunnable(this.eventStore.getSize()), 0, TimeUnit.MILLISECONDS);
+        executor.schedule(getPostRequestRunnable(this.eventStore.size()), 0, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -199,11 +197,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
 
                     // exponentially increase retry backoff time after the first failure
-                    long currentDelay = this.retryDelay.get();
-                    if (currentDelay == 0) {
-                        this.retryDelay.compareAndSet(0, 50L);
-                    } else {
-                        this.retryDelay.set(currentDelay * 2);
+                    if (!this.retryDelay.compareAndSet(0, 50L)) {
+                        this.retryDelay.updateAndGet(currentDelay -> currentDelay * 2);
                     }
                 }
             } catch (Exception e) {

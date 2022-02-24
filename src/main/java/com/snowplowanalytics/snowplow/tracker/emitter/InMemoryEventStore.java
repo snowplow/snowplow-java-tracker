@@ -69,7 +69,7 @@ public class InMemoryEventStore implements EventStore {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return eventBuffer.size();
     }
 }

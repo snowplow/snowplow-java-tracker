@@ -43,7 +43,7 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
-        Assert.assertEquals(2, eventStore.getSize());
+        Assert.assertEquals(2, eventStore.size());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
 
         Assert.assertEquals(2, eventStore.getEventBatch(2).getPayloads().size());
-        Assert.assertEquals(2, eventStore.getSize());
+        Assert.assertEquals(2, eventStore.size());
     }
 
     @Test
@@ -73,11 +73,11 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.getEventBatch(2);
 
-        Assert.assertEquals(0, eventStore.getSize());
+        Assert.assertEquals(0, eventStore.size());
 
         eventStore.cleanupAfterSendingAttempt(false, 1L);
 
-        Assert.assertEquals(2, eventStore.getSize());
+        Assert.assertEquals(2, eventStore.size());
     }
 
     @Test
@@ -86,11 +86,11 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.getEventBatch(2);
 
-        Assert.assertEquals(0, eventStore.getSize());
+        Assert.assertEquals(0, eventStore.size());
 
         eventStore.cleanupAfterSendingAttempt(true, 1L);
 
-        Assert.assertEquals(0, eventStore.getSize());
+        Assert.assertEquals(0, eventStore.size());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
 
         eventStore.cleanupAfterSendingAttempt(false, 1L);
-        Assert.assertEquals(3, eventStore.getSize());
+        Assert.assertEquals(3, eventStore.size());
         Assert.assertTrue(eventStore.getAllEvents().contains(differentPayload));
 
     }

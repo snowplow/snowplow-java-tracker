@@ -247,7 +247,6 @@ public class BatchEmitterTest {
         for (TrackerPayload payload : payloads) {
             emitter.add(payload);
         }
-        System.out.println(emitter.getBuffer().size());
         Thread.sleep(500);
 
         emitter.close();
