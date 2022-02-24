@@ -36,14 +36,6 @@ public class Main {
         return args[0];
     }
 
-    public static PageView getPageView() {
-        return PageView.builder()
-                .pageTitle("Snowplow Analytics")
-                .pageUrl("https://www.snowplowanalytics.com")
-                .referrer("https://www.google.com")
-                .build();
-    }
-
     public static void main(String[] args) throws InterruptedException {
         String collectorEndpoint = getUrlFromArgs(args);
 
@@ -57,12 +49,6 @@ public class Main {
                 .url(collectorEndpoint)
                 .bufferSize(4) // send batches of 4 events. In production this number should be higher, depending on the size/event volume
                 .build();
-
-        // for versions before 0.12.0, the property batchSize was called bufferSize
-//        BatchEmitter emitter = BatchEmitter.builder()
-//                .url(collectorEndpoint)
-//                .bufferSize(4)
-//                .build();
 
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
         final Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)

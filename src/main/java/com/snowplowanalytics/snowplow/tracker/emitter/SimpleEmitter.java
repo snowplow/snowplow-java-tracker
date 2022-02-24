@@ -50,9 +50,14 @@ public class SimpleEmitter extends AbstractEmitter {
         super(builder);
     }
 
+    /**
+     * Adds an event to the buffer and instantly sends it
+     *
+     * @param payload a payload
+     */
     @Override
     public void add(TrackerPayload payload) {
-        // nothing happens
+        executor.execute(getGetRequestRunnable(payload));
     }
 
     /**
