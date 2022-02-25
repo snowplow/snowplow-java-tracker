@@ -35,15 +35,10 @@ import org.slf4j.LoggerFactory;
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
-
     private boolean isClosing = false;
-
     private int bufferSize;
-    private int bufferCapacity;
     private final EventStore eventStore;
     private final AtomicLong retryDelay;
-
-    private final long closeTimeout = 5;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
@@ -91,17 +86,14 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         // Precondition checks
         Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize must be greater than 0");
-
-        this.bufferSize = builder.bufferSize;
-        this.bufferCapacity = builder.bufferCapacity;
+        bufferSize = builder.bufferSize;
 
         if (builder.eventStore == null) {
-            this.eventStore = new InMemoryEventStore(this.bufferCapacity);
+            eventStore = new InMemoryEventStore(builder.bufferCapacity);
         } else {
-            this.eventStore = builder.eventStore;
+            eventStore = builder.eventStore;
         }
-
-        this.retryDelay = new AtomicLong(0);
+        retryDelay = new AtomicLong(0L);
     }
 
     /**
@@ -111,11 +103,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void add(final TrackerPayload payload) {
-        boolean result = this.eventStore.addEvent(payload);
+        boolean result = eventStore.addEvent(payload);
 
         if (!isClosing) {
-            if (this.eventStore.size() >= this.bufferSize) {
-                executor.schedule(getPostRequestRunnable(this.bufferSize), this.retryDelay.get(), TimeUnit.MILLISECONDS);
+            if (eventStore.size() >= bufferSize) {
+                executor.schedule(getPostRequestRunnable(bufferSize), retryDelay.get(), TimeUnit.MILLISECONDS);
             }
         }
         
@@ -129,7 +121,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void flushBuffer() {
-        executor.schedule(getPostRequestRunnable(this.eventStore.size()), 0, TimeUnit.MILLISECONDS);
+        executor.schedule(getPostRequestRunnable(eventStore.size()), 0, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -139,7 +131,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public List<TrackerPayload> getBuffer() {
-        return this.eventStore.getAllEvents();
+        return eventStore.getAllEvents();
     }
 
     /**
@@ -160,11 +152,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public int getBufferSize() {
-        return this.bufferSize;
+        return bufferSize;
     }
 
     public long getRetryDelay() {
-        return this.retryDelay.get();
+        return retryDelay.get();
     }
 
     /**
@@ -177,7 +169,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         return () -> {
             BatchPayload batchedEvents = null;
             try {
-                batchedEvents = this.eventStore.getEventBatch(numberOfEvents);
+                batchedEvents = eventStore.getEventBatch(numberOfEvents);
                 List<TrackerPayload> eventsInRequest = batchedEvents.getPayloads();
 
                 if (eventsInRequest.size() == 0) {
@@ -190,15 +182,15 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 // Process results
                 if (isSuccessfulSend(code)) {
                     LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
-                    this.retryDelay.set(0L);
+                    retryDelay.set(0L);
                     eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
                 } else {
                     LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
 
                     // exponentially increase retry backoff time after the first failure
-                    if (!this.retryDelay.compareAndSet(0, 50L)) {
-                        this.retryDelay.updateAndGet(currentDelay -> currentDelay * 2);
+                    if (!retryDelay.compareAndSet(0, 50L)) {
+                        retryDelay.updateAndGet(currentDelay -> currentDelay * 2);
                     }
                 }
             } catch (Exception e) {
@@ -233,6 +225,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      */
     @Override
     public void close() {
+        final long closeTimeout = 5;
         isClosing = true;
 
         flushBuffer(); // Attempt to send all remaining events
