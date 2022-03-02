@@ -180,7 +180,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         return () -> {
             BatchPayload batchedEvents = null;
             try {
-                batchedEvents = eventStore.getEventBatch(numberOfEvents);
+                batchedEvents = eventStore.getEventsBatch(numberOfEvents);
                 List<TrackerPayload> eventsInRequest = batchedEvents.getPayloads();
 
                 if (eventsInRequest.size() == 0) {

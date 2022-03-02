@@ -8,7 +8,7 @@ public interface EventStore {
 
     boolean addEvent(TrackerPayload trackerPayload);
 
-    BatchPayload getEventBatch(int numberToRemove);
+    BatchPayload getEventsBatch(int numberToRemove);
 
     List<TrackerPayload> getAllEvents();
 

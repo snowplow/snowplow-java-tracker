@@ -30,7 +30,7 @@ public class InMemoryEventStore implements EventStore {
     }
 
     @Override
-    public BatchPayload getEventBatch(int numberToGet) {
+    public BatchPayload getEventsBatch(int numberToGet) {
         List<TrackerPayload> eventsToSend = new ArrayList<>();
 
         eventBuffer.drainTo(eventsToSend, numberToGet);

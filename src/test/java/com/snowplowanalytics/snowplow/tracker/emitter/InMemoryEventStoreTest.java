@@ -53,7 +53,7 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
-        Assert.assertEquals(2, eventStore.getEventBatch(2).getPayloads().size());
+        Assert.assertEquals(2, eventStore.getEventsBatch(2).getPayloads().size());
         Assert.assertEquals(2, eventStore.size());
     }
 
@@ -62,7 +62,7 @@ public class InMemoryEventStoreTest {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
-        List<TrackerPayload> events = eventStore.getEventBatch(3).getPayloads();
+        List<TrackerPayload> events = eventStore.getEventsBatch(3).getPayloads();
 
         Assert.assertEquals(2, events.size());
     }
@@ -71,7 +71,7 @@ public class InMemoryEventStoreTest {
     public void putEventsBackInBufferIfFailedToSend() {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
-        eventStore.getEventBatch(2);
+        eventStore.getEventsBatch(2);
 
         Assert.assertEquals(0, eventStore.size());
 
@@ -84,7 +84,7 @@ public class InMemoryEventStoreTest {
     public void doNotPutEventsBackInBufferIfSent() {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
-        eventStore.getEventBatch(2);
+        eventStore.getEventsBatch(2);
 
         Assert.assertEquals(0, eventStore.size());
 
@@ -100,7 +100,7 @@ public class InMemoryEventStoreTest {
         TrackerPayload differentPayload = createTrackerPayload();
 
         eventStore.addEvent(differentPayload);
-        eventStore.getEventBatch(1);
+        eventStore.getEventsBatch(1);
 
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
