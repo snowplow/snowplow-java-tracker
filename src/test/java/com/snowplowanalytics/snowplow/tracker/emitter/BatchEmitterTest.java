@@ -70,9 +70,11 @@ public class BatchEmitterTest {
         }
     }
 
-    public static class FailingHttpClientAdapter implements HttpClientAdapter {
-        public int failedPostCounter = 0;
-        public int successfulPostCounter = 0;
+    // this class fails to "send" the first 4 requests
+    // but returns a successful result (200) subsequently
+    static class FailingHttpClientAdapter implements HttpClientAdapter {
+        int failedPostCounter = 0;
+        int successfulPostCounter = 0;
         @Override
         public int post(SelfDescribingJson payload) {
             if (failedPostCounter >= 4) {
@@ -119,11 +121,9 @@ public class BatchEmitterTest {
 
         Thread.sleep(500);
 
-        List<TrackerPayload> storedPayloads = emitter.getBuffer();
-
         Assert.assertFalse(mockHttpClientAdapter.isPostCalled);
         Assert.assertEquals(2, emitter.getBuffer().size());
-        Assert.assertEquals(payloads, storedPayloads);
+        Assert.assertEquals(payloads, emitter.getBuffer());
     }
 
     @Test
@@ -139,7 +139,6 @@ public class BatchEmitterTest {
         @SuppressWarnings("unchecked")
         List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
 
-//        assertPayload(payloads, capturedPayload);
         Assert.assertEquals(0, emitter.getBuffer().size());
         Assert.assertEquals(1, mockHttpClientAdapter.postCounter);
     }
@@ -276,10 +275,6 @@ public class BatchEmitterTest {
         for (TrackerPayload payload : payloads) {
             emitter.add(payload);
         }
-
-        Thread.sleep(500);
-
-        Assert.assertEquals(payloads, emitter.getBuffer());
         emitter.flushBuffer();
         Thread.sleep(500);
 
@@ -314,11 +309,9 @@ public class BatchEmitterTest {
         emitter = BatchEmitter.builder()
                 .httpClientAdapter(failingHttpClientAdapter)
                 .bufferSize(1)
+                .threadCount(1)
                 .build();
 
-        // these requests will pass the failingHttpClientAdapter threshold for failing
-        // but because they are being processed asynchronously, the successful requests
-        // may be processed by the Emitter before the failed ones
         List<TrackerPayload> payloads = createPayloads(6);
         for (TrackerPayload payload : payloads) {
             emitter.add(payload);
@@ -326,11 +319,7 @@ public class BatchEmitterTest {
 
         Thread.sleep(500);
 
-        // this request will definitely succeed
-        emitter.add(createPayload());
-        Thread.sleep(500);
-
-        Assert.assertEquals(3, failingHttpClientAdapter.successfulPostCounter);
+        Assert.assertEquals(2, failingHttpClientAdapter.successfulPostCounter);
         Assert.assertEquals(0, emitter.getRetryDelay());
     }
 

@@ -94,7 +94,7 @@ public class InMemoryEventStoreTest {
     }
 
     @Test
-    public void dropEventsOnFailureWhenBufferFull() {
+    public void dropNewerEventsOnFailureWhenBufferFull() {
         eventStore = new InMemoryEventStore(3);
 
         TrackerPayload differentPayload = createTrackerPayload();
