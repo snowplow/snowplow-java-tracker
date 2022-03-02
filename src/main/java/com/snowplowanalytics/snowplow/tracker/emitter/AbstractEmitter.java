@@ -13,7 +13,6 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -47,7 +46,7 @@ public abstract class AbstractEmitter implements Emitter {
         /**
          * Set a custom ScheduledExecutorService to send http request.
          *
-         *  /!\ Be aware that calling `close()` on a BatchEmitter instance has a side-effect and will shutdown that ExecutorService.
+         * @implNote Be aware that calling `close()` on a BatchEmitter instance has a side-effect and will shutdown that ExecutorService.
          * @param executorService the ScheduledExecutorService to use
          * @return itself
          */

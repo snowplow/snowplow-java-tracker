@@ -100,6 +100,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * Adds a TrackerPayload to the concurrent queue buffer
      *
      * @param payload a payload
+     * @implNote As a side effect it triggers an Emitter thread to emit a batch of events.
      */
     @Override
     public void add(final TrackerPayload payload) {
@@ -155,7 +156,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         return bufferSize;
     }
 
-    public long getRetryDelay() {
+    long getRetryDelay() {
         return retryDelay.get();
     }
 
