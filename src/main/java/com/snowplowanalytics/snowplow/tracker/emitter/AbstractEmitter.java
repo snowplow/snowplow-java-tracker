@@ -45,8 +45,10 @@ public abstract class AbstractEmitter implements Emitter {
 
         /**
          * Set a custom ScheduledExecutorService to send http request.
+         * <p>
+         * <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
+         * has a side-effect and will shutdown that ExecutorService.</em>
          *
-         * @implNote Be aware that calling `close()` on a BatchEmitter instance has a side-effect and will shutdown that ExecutorService.
          * @param executorService the ScheduledExecutorService to use
          * @return itself
          */

@@ -106,9 +106,11 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     /**
      * Adds a TrackerPayload to the concurrent queue buffer
+     * <p>
+     * <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
+     * has a side-effect and will shutdown that ExecutorService.</em>
      *
      * @param payload a payload
-     * @implNote As a side effect it triggers an Emitter thread to emit a batch of events.
      */
     @Override
     public void add(final TrackerPayload payload) {
@@ -231,7 +233,9 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     /**
      * On close, attempt to send all remaining events.
-     * @implNote Be aware that calling `close()` has a side-effect of shutting down the Emitter ScheduledExecutorService.
+     * <p>
+     *  <b>Implementation note: </b><em>Be aware that calling `close()`
+     *  has a side-effect of shutting down the Emitter ScheduledExecutorService.</em>
      */
     @Override
     public void close() {
