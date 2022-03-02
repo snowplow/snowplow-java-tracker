@@ -55,11 +55,19 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             return self();
         }
 
+        /**
+         * @param eventStore The EventStore to use
+         * @return itself
+         */
         public T eventStore(final EventStore eventStore) {
             this.eventStore = eventStore;
             return self();
         }
 
+        /**
+         * @param bufferCapacity The maximum capacity of the default InMemoryEventStore event buffer
+         * @return itself
+         */
         public T bufferCapacity(final int bufferCapacity) {
             this.bufferCapacity = bufferCapacity;
             return self();
@@ -117,8 +125,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         }
     }
 
-    /*
-     * Forces all the payloads currently in the buffer to be sent
+    /**
+     * Forces all the payloads currently in the buffer to be sent immediately
      */
     @Override
     public void flushBuffer() {
@@ -222,7 +230,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * On close attempt to send all remaining events.
+     * On close, attempt to send all remaining events.
+     * @implNote Be aware that calling `close()` has a side-effect of shutting down the Emitter ScheduledExecutorService.
      */
     @Override
     public void close() {
