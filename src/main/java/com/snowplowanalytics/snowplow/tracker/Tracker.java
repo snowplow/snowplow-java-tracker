@@ -16,7 +16,6 @@ import com.google.common.base.Preconditions;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
-import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -26,18 +25,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Tracker {
 
     private Emitter emitter;
     private Subject subject;
     private final TrackerParameters parameters;
-    protected ExecutorService executor;
     private static final Logger LOGGER = LoggerFactory.getLogger(Tracker.class);
 
     /**
@@ -58,11 +51,6 @@ public class Tracker {
         this.emitter = builder.emitter;
         this.subject = builder.subject;
 
-        if (builder.requestExecutorService != null) {
-            this.executor = builder.requestExecutorService;
-        } else {
-            this.executor = Executors.newScheduledThreadPool(builder.threadCount, new TrackerThreadFactory());
-        }
     }
 
     /**
@@ -76,8 +64,6 @@ public class Tracker {
         private Subject subject = null; // Optional
         private DevicePlatform platform = DevicePlatform.ServerSideApp; // Optional
         private boolean base64Encoded = true; // Optional
-        private int threadCount = 50; // Optional
-        private ExecutorService requestExecutorService = null; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -116,30 +102,6 @@ public class Tracker {
             this.base64Encoded = base64;
             return this;
         }
-
-        /**
-         * Sets the Thread Count for the ExecutorService
-         *
-         * @param threadCount the size of the thread pool
-         * @return itself
-         */
-        public TrackerBuilder threadCount(final int threadCount) {
-            this.threadCount = threadCount;
-            return this;
-        }
-
-        /**
-         * Set a custom ExecutorService to send http request.
-         *
-         * @param executorService the ExecutorService to use
-         * @return itself
-         */
-        public TrackerBuilder requestExecutorService(final ExecutorService executorService) {
-            this.requestExecutorService = executorService;
-            return this;
-        }
-
-
 
         /**
          * Creates a new Tracker
@@ -231,68 +193,23 @@ public class Tracker {
     // --- Event Tracking Functions
 
     /**
-     * Sends a runnable to the executor service.
-     *
-     * @param runnable the runnable to be queued
-     */
-    protected void execute(final Runnable runnable) {
-        this.executor.execute(runnable);
-    }
-
-    /**
-     * Copied from `Executors.defaultThreadFactory()`.
-     * The only change is the generated name prefix.
-     */
-    static class TrackerThreadFactory implements ThreadFactory {
-        private static final AtomicInteger poolNumber = new AtomicInteger(1);
-        private final ThreadGroup group;
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix;
-
-        TrackerThreadFactory() {
-            SecurityManager securityManager = System.getSecurityManager();
-            this.group = securityManager != null ? securityManager.getThreadGroup() : Thread.currentThread().getThreadGroup();
-            this.namePrefix = "snowplow-tracker-pool-" + poolNumber.getAndIncrement() + "-event-thread-";
-        }
-
-        public Thread newThread(Runnable runnable) {
-            Thread thread = new Thread(this.group, runnable, this.namePrefix + this.threadNumber.getAndIncrement(), 0L);
-            if (thread.isDaemon()) {
-                thread.setDaemon(false);
-            }
-
-            if (thread.getPriority() != 5) {
-                thread.setPriority(5);
-            }
-
-            return thread;
-        }
-    }
-
-    /**
      * Handles tracking the different types of events that
      * the Tracker can encounter.
      *
      * @param event the event to track
      */
     public void track(Event event) {
-        execute(getProcessEventRunnable(event));
-    }
+        // a list because Ecommerce events become multiple Payloads
+        List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
+        for (Event processedEvent : processedEvents) {
+            // Event ID (eid) and device_created_timestamp (dtm) are generated when the Event is initialised
+            TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
 
-    private Runnable getProcessEventRunnable(Event event) {
-        return () -> {
-            // a list because Ecommerce events become multiple Payloads
-            List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
-            for (Event processedEvent : processedEvents) {
-                // Event ID (eid) and device_created_timestamp (dtm) are added during getPayload()
-                TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
-
-                addTrackerParameters(payload);
-                addContext(processedEvent, payload);
-                addSubject(processedEvent, payload);
-                this.emitter.add(payload);
-            }
-        };
+            addTrackerParameters(payload);
+            addContext(processedEvent, payload);
+            addSubject(processedEvent, payload);
+            this.emitter.add(payload);
+        }
     }
 
     private List<Event> eventTypeSpecificPreProcessing(Event event) {
@@ -378,29 +295,6 @@ public class Tracker {
             payload.addMap(new HashMap<>(eventSubject.getSubject()));
         } else if (this.subject != null) {
             payload.addMap(new HashMap<>(this.subject.getSubject()));
-        }
-    }
-
-    public void close() {
-        // Shutdown executor thread pool for the tracker
-        if (executor != null) {
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                    if (!executor.awaitTermination(1, TimeUnit.SECONDS))
-                        LOGGER.warn("Tracker executor did not terminate");
-                }
-            } catch (InterruptedException ie) {
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        // Shutdown executor thread pool for the emitter
-        if (this.emitter.getClass().equals(BatchEmitter.class)) {
-            BatchEmitter emitter = (BatchEmitter) this.emitter;
-            emitter.close();
         }
     }
 

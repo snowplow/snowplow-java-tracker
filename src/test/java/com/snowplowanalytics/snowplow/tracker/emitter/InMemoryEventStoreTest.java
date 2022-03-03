@@ -18,71 +18,101 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryEventStoreTest {
 
     private TrackerPayload trackerPayload;
     private InMemoryEventStore eventStore;
-    private List<TrackerPayload> singleEventList;
-    private List<TrackerPayload> twoEventsList;
-
 
     @Before
     public void setUp() {
-        trackerPayload = createPayload();
+        trackerPayload = createTrackerPayload();
         eventStore = new InMemoryEventStore();
-        singleEventList = new ArrayList<>();
-        twoEventsList = new ArrayList<>();
-
-        singleEventList.add(trackerPayload);
-        twoEventsList.add(trackerPayload);
-        twoEventsList.add(trackerPayload);
     }
 
     @Test
     public void correctlyAddAnEventToStore() {
-        boolean result = eventStore.add(trackerPayload);
+        boolean result = eventStore.addEvent(trackerPayload);
 
         Assert.assertTrue(result);
     }
 
     @Test
     public void getSize_returnsCorrectNumberOfStoredEvents() {
-        storeTwoPayloads();
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
 
-        Assert.assertEquals(2, eventStore.getSize());
+        Assert.assertEquals(2, eventStore.size());
     }
 
     @Test
-    public void removeAddedEvent() {
-        storeTwoPayloads();
+    public void getEventsFromStorage() {
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
 
-        List<TrackerPayload> removedEventList = eventStore.removeEvents(1);
-        Assert.assertEquals(singleEventList, removedEventList);
-        Assert.assertEquals(1, eventStore.getSize());
+        Assert.assertEquals(2, eventStore.getEventsBatch(2).getPayloads().size());
+        Assert.assertEquals(2, eventStore.size());
     }
 
     @Test
-    public void removeAllEventsIfAskedForMoreEventsThanAreStored() {
-        storeTwoPayloads();
+    public void getAllEventsIfAskedForMoreEventsThanAreStored() {
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
 
-        List<TrackerPayload> removedEventList = eventStore.removeEvents(100);
-        Assert.assertEquals(twoEventsList, removedEventList);
-        Assert.assertEquals(0, eventStore.getSize());
+        List<TrackerPayload> events = eventStore.getEventsBatch(3).getPayloads();
+
+        Assert.assertEquals(2, events.size());
     }
 
     @Test
-    public void getAllEvents_doesNotRemoveEventsFromStore() {
-        storeTwoPayloads();
+    public void putEventsBackInBufferIfFailedToSend() {
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+        eventStore.getEventsBatch(2);
 
-        List<TrackerPayload> retrievedEventsList = eventStore.getAllEvents();
-        Assert.assertEquals(twoEventsList, retrievedEventsList);
-        Assert.assertEquals(2, eventStore.getSize());
+        Assert.assertEquals(0, eventStore.size());
+
+        eventStore.cleanupAfterSendingAttempt(false, 1L);
+
+        Assert.assertEquals(2, eventStore.size());
     }
 
-    private TrackerPayload createPayload() {
+    @Test
+    public void doNotPutEventsBackInBufferIfSent() {
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+        eventStore.getEventsBatch(2);
+
+        Assert.assertEquals(0, eventStore.size());
+
+        eventStore.cleanupAfterSendingAttempt(true, 1L);
+
+        Assert.assertEquals(0, eventStore.size());
+    }
+
+    @Test
+    public void dropNewerEventsOnFailureWhenBufferFull() {
+        eventStore = new InMemoryEventStore(3);
+
+        TrackerPayload differentPayload = createTrackerPayload();
+
+        eventStore.addEvent(differentPayload);
+        eventStore.getEventsBatch(1);
+
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+
+        eventStore.cleanupAfterSendingAttempt(false, 1L);
+        Assert.assertEquals(3, eventStore.size());
+        Assert.assertTrue(eventStore.getAllEvents().contains(differentPayload));
+
+    }
+
+    private TrackerPayload createTrackerPayload() {
         PageView pv = PageView.builder()
                 .pageUrl("https://www.snowplowanalytics.com/")
                 .pageTitle("Snowplow")
@@ -90,11 +120,5 @@ public class InMemoryEventStoreTest {
                 .build();
 
         return pv.getPayload();
-    }
-
-    private void storeTwoPayloads() {
-        for (TrackerPayload payload : twoEventsList) {
-            eventStore.add(payload);
-        }
     }
 }

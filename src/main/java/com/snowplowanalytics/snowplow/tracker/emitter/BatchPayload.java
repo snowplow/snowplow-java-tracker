@@ -10,27 +10,28 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import org.gradle.api.tasks.JavaExec
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-plugins {
-    id 'java'
-    id "me.champeau.jmh" version "0.6.6"
-}
+import java.util.List;
 
-group 'com.snowplowanalytics'
-version '1.0'
 
-repositories {
-    mavenLocal {
-        content {
-            includeGroup "com.snowplowanalytics"
-        }
+public class BatchPayload {
+
+    private final Long batchId;
+    private final List<TrackerPayload> payloads;
+
+    public BatchPayload(Long payloadId, List<TrackerPayload> payloads) {
+        this.batchId = payloadId;
+        this.payloads = payloads;
     }
-    mavenCentral()
-}
 
+    public Long getBatchId() {
+        return batchId;
+    }
 
-dependencies {
-    jmh 'com.snowplowanalytics:snowplow-java-tracker:0.10.1'
+    public List<TrackerPayload> getPayloads() {
+        return payloads;
+    }
 }

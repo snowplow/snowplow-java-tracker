@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
+import com.snowplowanalytics.snowplow.tracker.emitter.BatchPayload;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -524,7 +525,7 @@ public class TrackerTest {
     @Test
     public void testGetTrackerVersion() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
-        assertEquals("java-0.11.0", tracker.getTrackerVersion());
+        assertEquals("java-0.12.0-alpha.1", tracker.getTrackerVersion());
     }
 
     @Test
@@ -569,32 +570,5 @@ public class TrackerTest {
     public void testSetNamespace() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
         assertEquals("namespace", tracker.getNamespace());
-    }
-
-    @Test
-    public void threadsHaveExpectedNames() {
-        // A new thread should be created for each event tracked,
-        // up to the configurable pool size limit
-        tracker.track(PageView.builder()
-                .pageUrl("url")
-                .pageTitle("title")
-                .referrer("referer")
-                .build());
-
-        tracker.track(PageView.builder()
-                .pageUrl("url")
-                .pageTitle("title")
-                .referrer("referer")
-                .build());
-
-        // Create a list of all live thread names
-        List<Thread> threadList = new ArrayList<>(Thread.getAllStackTraces().keySet());
-        List<String> threadNames = new ArrayList<>();
-        for (Thread thread : threadList) {
-            threadNames.add(thread.getName());
-        }
-
-        Assert.assertTrue(threadNames.contains("snowplow-tracker-pool-1-event-thread-1"));
-        Assert.assertTrue(threadNames.contains("snowplow-tracker-pool-1-event-thread-2"));
     }
 }

@@ -1,36 +1,75 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryEventStore implements EventStore {
-    public final BlockingQueue<TrackerPayload> eventBuffer = new LinkedBlockingQueue<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryEventStore.class);
+    private final AtomicLong batchId = new AtomicLong(1);
+
+    public final LinkedBlockingDeque<TrackerPayload> eventBuffer;
+    public final ConcurrentHashMap<Long, List<TrackerPayload>> eventsBeingSent = new ConcurrentHashMap<>();
+
+    public InMemoryEventStore() {
+        eventBuffer = new LinkedBlockingDeque<>();
+    }
+
+    public InMemoryEventStore(int bufferCapacity) {
+        eventBuffer = new LinkedBlockingDeque<>(bufferCapacity);
+    }
 
     @Override
-    public boolean add(TrackerPayload trackerPayload) {
+    public boolean addEvent(TrackerPayload trackerPayload) {
         return eventBuffer.offer(trackerPayload);
     }
 
     @Override
-    public List<TrackerPayload> removeEvents(int numberToRemove) {
-        // if numberToRemove is greater than the number of events present,
-        // it will return all the events (there's no error)
-        List<TrackerPayload> eventsList = new ArrayList<>();
-        eventBuffer.drainTo(eventsList, numberToRemove);
-        return eventsList;
+    public BatchPayload getEventsBatch(int numberToGet) {
+        List<TrackerPayload> eventsToSend = new ArrayList<>();
+
+        eventBuffer.drainTo(eventsToSend, numberToGet);
+
+        // The batch of events is wrapped as a BatchPayload
+        // They're also added to the "pending" event buffer, the eventsBeingSent HashMap
+        BatchPayload batchedEvents = new BatchPayload(batchId.getAndIncrement(), eventsToSend);
+        eventsBeingSent.put(batchedEvents.getBatchId(), batchedEvents.getPayloads());
+        return batchedEvents;
     }
 
     @Override
-    public int getSize() {
-        return eventBuffer.size();
+    public void cleanupAfterSendingAttempt(boolean successfullySent, long batchId) {
+        // Events that successfully sent are deleted from the pending buffer
+        List<TrackerPayload> events = eventsBeingSent.remove(batchId);
+
+        // Events that didn't send are inserted at the head of the eventBuffer
+        // for immediate resending.
+        if (!successfullySent) {
+            while (events.size() > 0) {
+                TrackerPayload payloadToReinsert = events.remove(0);
+                boolean result = eventBuffer.offerFirst(payloadToReinsert);
+                if (!result) {
+                    LOGGER.error("Event buffer is full. Dropping newer payload to reinsert older payload");
+                    eventBuffer.removeLast();
+                    eventBuffer.offerFirst(payloadToReinsert);
+                }
+            }
+        }
     }
 
     @Override
     public List<TrackerPayload> getAllEvents() {
-        return new ArrayList<>(eventBuffer);
+        TrackerPayload[] events = eventBuffer.toArray(new TrackerPayload[0]);
+        return Arrays.asList(events);
+    }
+
+    @Override
+    public int size() {
+        return eventBuffer.size();
     }
 }

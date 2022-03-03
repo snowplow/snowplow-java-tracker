@@ -18,12 +18,14 @@ import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
+import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 import java.util.List;
 import static java.util.Collections.singletonList;
 
 import com.google.common.collect.ImmutableMap;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public class Main {
 
@@ -34,7 +36,7 @@ public class Main {
         return args[0];
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         String collectorEndpoint = getUrlFromArgs(args);
 
         // the application id to attach to events
@@ -155,6 +157,7 @@ public class Main {
 
         // Will close all threads and force send remaining events
         emitter.close();
+        Thread.sleep(5000);
 
         System.out.println("Tracked 7 events");
     }

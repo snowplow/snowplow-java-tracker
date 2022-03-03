@@ -6,11 +6,13 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public interface EventStore {
 
-    boolean add(TrackerPayload trackerPayload);
+    boolean addEvent(TrackerPayload trackerPayload);
 
-    List<TrackerPayload> removeEvents(int numberToRemove);
-
-    int getSize();
+    BatchPayload getEventsBatch(int numberToRemove);
 
     List<TrackerPayload> getAllEvents();
+
+    void cleanupAfterSendingAttempt(boolean successfullySent, long batchId);
+
+    int size();
 }
