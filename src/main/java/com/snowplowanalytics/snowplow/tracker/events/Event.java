@@ -34,16 +34,6 @@ public interface Event {
     Long getTrueTimestamp();
 
     /**
-     * @return the event's device created timestamp
-     */
-    long getDeviceCreatedTimestamp();
-
-    /**
-     * @return the event id
-     */
-    String getEventId();
-
-    /**
      * @return the event subject
      */
     Subject getSubject();

@@ -40,22 +40,16 @@ public abstract class AbstractEvent implements Event {
 
     protected final List<SelfDescribingJson> context;
 
-    protected long deviceCreatedTimestamp;
-
     /**
      * The true timestamp may be null if none is set.
      */
     protected Long trueTimestamp;
-
-    protected final String eventId;
     protected final Subject subject;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private List<SelfDescribingJson> context = new LinkedList<>();
-        private long deviceCreatedTimestamp = System.currentTimeMillis();
         protected Long trueTimestamp = null;
-        private String eventId = Utils.getEventId();
         private Subject subject = null;
 
         protected abstract T self();
@@ -110,13 +104,9 @@ public abstract class AbstractEvent implements Event {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.context);
-        Preconditions.checkNotNull(builder.eventId);
-        Preconditions.checkArgument(!builder.eventId.isEmpty(), "eventId cannot be empty");
 
         this.context = builder.context;
-        this.deviceCreatedTimestamp = builder.deviceCreatedTimestamp;
         this.trueTimestamp = builder.trueTimestamp;
-        this.eventId = builder.eventId;
         this.subject = builder.subject;
     }
 
@@ -129,27 +119,11 @@ public abstract class AbstractEvent implements Event {
     }
 
     /**
-     * @return the event's device created timestamp.
-     */
-    @Override
-    public long getDeviceCreatedTimestamp() {
-        return deviceCreatedTimestamp;
-    }
-
-    /**
      * @return the event's true timestamp.
      */
     @Override
     public Long getTrueTimestamp() {
         return trueTimestamp;
-    }
-
-    /**
-     * @return the event id
-     */
-    @Override
-    public String getEventId() {
-        return this.eventId;
     }
 
     /**
