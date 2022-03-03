@@ -30,30 +30,27 @@ public interface Emitter {
     void add(TrackerPayload payload);
 
     /**
-     * Customize the emitter buffer size to any valid integer
+     * Customize the emitter batch size to any valid integer
      * greater than zero.
      * - Will only affect the BatchEmitter
      *
-     * @param bufferSize number of events to collect before
+     * @param batchSize number of events to collect before
      *                   sending
      */
-    void setBufferSize(int bufferSize);
+    void setBatchSize(int batchSize);
 
     /**
-     * When the buffer limit is reached sending of the buffer is
-     * initiated.
-     *
-     * This can be used to manually start sending.
+     * This can be used to manually send all buffered events.
      */
     void flushBuffer();
 
     /**
-     * Gets the Emitter Buffer Size
+     * Gets the Emitter Batch Size
      * - Will always be 1 for SimpleEmitter
      *
-     * @return the buffer size
+     * @return the batch size
      */
-    int getBufferSize();
+    int getBatchSize();
 
     /**
      * Returns the List of Payloads that are in the buffer.

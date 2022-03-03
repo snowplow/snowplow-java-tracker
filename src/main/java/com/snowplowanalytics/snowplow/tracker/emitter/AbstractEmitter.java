@@ -136,13 +136,13 @@ public abstract class AbstractEmitter implements Emitter {
     public abstract void add(TrackerPayload payload);
 
     /**
-     * Customize the emitter buffer size to any valid integer greater than zero.
+     * Customize the emitter batch size to any valid integer greater than zero.
      * Has no effect on SimpleEmitter
      *
-     * @param bufferSize number of events to collect before sending
+     * @param batchSize number of events to collect before sending
      */
     @Override
-    public abstract void setBufferSize(final int bufferSize);
+    public abstract void setBatchSize(final int batchSize);
 
     /**
      * Removes all payloads from the buffer and sends them
@@ -151,12 +151,12 @@ public abstract class AbstractEmitter implements Emitter {
     public abstract void flushBuffer();
 
     /**
-     * Gets the Emitter Buffer Size - Will always be 1 for SimpleEmitter
+     * Gets the Emitter Batch Size - Will always be 1 for SimpleEmitter
      *
-     * @return the buffer size
+     * @return the batch size
      */
     @Override
-    public abstract int getBufferSize();
+    public abstract int getBatchSize();
 
     /**
      * Returns List of Payloads that are in the buffer.

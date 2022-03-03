@@ -42,13 +42,13 @@ public class TrackerTest {
         }
 
         @Override
-        public void setBufferSize(int bufferSize) {}
+        public void setBatchSize(int batchSize) {}
 
         @Override
         public void flushBuffer() {}
 
         @Override
-        public int getBufferSize() {
+        public int getBatchSize() {
             return 0;
         }
 

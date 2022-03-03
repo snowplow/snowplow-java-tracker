@@ -36,22 +36,23 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
     private boolean isClosing = false;
-    private int bufferSize;
+  
+    private int batchSize;
     private final EventStore eventStore;
     private final AtomicLong retryDelay;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
-        private int bufferSize = 50; // Optional
+        private int batchSize = 50; // Optional
         private int bufferCapacity = Integer.MAX_VALUE;
         private EventStore eventStore;
 
         /**
-         * @param bufferSize The count of events to buffer before sending
+         * @param batchSize The count of events to buffer before sending
          * @return itself
          */
-        public T bufferSize(final int bufferSize) {
-            this.bufferSize = bufferSize;
+        public T batchSize(final int batchSize) {
+            this.batchSize = batchSize;
             return self();
         }
 
@@ -93,8 +94,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkArgument(builder.bufferSize > 0, "bufferSize must be greater than 0");
-        bufferSize = builder.bufferSize;
+        Preconditions.checkArgument(builder.batchSize > 0, "batchSize must be greater than 0");
+        batchSize = builder.batchSize;
 
         if (builder.eventStore == null) {
             eventStore = new InMemoryEventStore(builder.bufferCapacity);
@@ -146,24 +147,24 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Customize the emitter buffer size to any valid integer greater than zero.
+     * Customize the emitter batch size to any valid integer greater than zero.
      *
-     * @param bufferSize number of events to collect before sending
+     * @param batchSize number of events to collect before sending
      */
     @Override
-    public void setBufferSize(final int bufferSize) {
-        Preconditions.checkArgument(bufferSize > 0, "bufferSize must be greater than 0");
-        this.bufferSize = bufferSize;
+    public void setBatchSize(final int batchSize) {
+        Preconditions.checkArgument(batchSize > 0, "batchSize must be greater than 0");
+        this.batchSize = batchSize;
     }
 
     /**
-     * Gets the Emitter Buffer Size
+     * Gets the Emitter batch Size
      *
-     * @return the buffer size
+     * @return the batch size
      */
     @Override
-    public int getBufferSize() {
-        return bufferSize;
+    public int getBatchSize() {
+        return batchSize;
     }
 
     long getRetryDelay() {
