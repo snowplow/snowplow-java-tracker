@@ -25,9 +25,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
@@ -136,8 +133,6 @@ public class BatchEmitterTest {
         Thread.sleep(500);
 
         Assert.assertTrue(mockHttpClientAdapter.isPostCalled);
-        @SuppressWarnings("unchecked")
-        List<Map<String, String>> capturedPayload = (List<Map<String, String>>) mockHttpClientAdapter.capturedPayload.getMap().get("data");
 
         Assert.assertEquals(0, emitter.getBuffer().size());
         Assert.assertEquals(1, mockHttpClientAdapter.postCounter);
@@ -358,10 +353,10 @@ public class BatchEmitterTest {
                     //Assert that all the entries in the event are in the captured payload
                     //There might be extra entries in capturedMap, such as the STM parameter
                     //check for these additional parameters in other tests
-                    assertThat(eventMap.entrySet(), everyItem(is(in(capturedMap.entrySet()))));
+                    Assert.assertTrue(capturedMap.entrySet().containsAll(eventMap.entrySet()));
                 }
             }
-            assertThat(matchFound, is(true)); //Ensure every event was found
+            Assert.assertTrue(matchFound); //Ensure every event was found
         }
     }
 }

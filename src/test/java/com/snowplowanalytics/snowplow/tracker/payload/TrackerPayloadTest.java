@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.payload;
 // Java
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 // JUnit
 import org.junit.Test;
@@ -22,6 +23,21 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TrackerPayloadTest {
+
+    @Test
+    public void testGetEventId() {
+        TrackerPayload payload = new TrackerPayload();
+        // this throws an exception if it's not a valid UUID string
+        UUID.fromString(payload.getEventId());
+    }
+
+    @Test
+    public void testGetDeviceCreatedTimestamp() {
+        long currentTime = System.currentTimeMillis();
+        TrackerPayload payload = new TrackerPayload();
+        long timeDifference = payload.getDeviceCreatedTimestamp() - currentTime;
+        assertTrue(timeDifference < 1000);
+    }
 
     @Test
     public void testAddKeyValue() {

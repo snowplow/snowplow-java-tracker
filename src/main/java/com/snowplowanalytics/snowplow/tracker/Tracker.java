@@ -187,7 +187,7 @@ public class Tracker {
      * @return the wrapper containing the Tracker parameters
      */
     public TrackerParameters getParameters() {
-        return this.parameters;
+        return parameters;
     }
 
     // --- Event Tracking Functions

@@ -29,6 +29,22 @@ public class TrackerPayload implements Payload {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
     protected final Map<String, String> payload = new LinkedHashMap<>();
+    private final String eventId;
+    private final Long deviceCreatedTimestamp;
+
+
+    public TrackerPayload() {
+        eventId = Utils.getEventId();
+        deviceCreatedTimestamp = System.currentTimeMillis();
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public Long getDeviceCreatedTimestamp() {
+        return deviceCreatedTimestamp;
+    }
 
     /**
      * Add a key-value pair to the payload: - Checks that the key is not null or

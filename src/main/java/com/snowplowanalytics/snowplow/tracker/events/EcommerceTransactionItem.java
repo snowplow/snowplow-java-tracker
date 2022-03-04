@@ -142,25 +142,9 @@ public class EcommerceTransactionItem extends AbstractEvent {
 
     /**
      * @param timestamp the new timestamp
-     * Use {@link #setTrueTimestamp(long)} or {@link #setTrueTimestamp(long)}
-     */
-    @Deprecated
-    public void setTimestamp(long timestamp) {
-        setDeviceCreatedTimestamp(timestamp);
-    }
-
-    /**
-     * @param timestamp the new timestamp
      */
     public void setTrueTimestamp(long timestamp) {
         this.trueTimestamp = timestamp;
-    }
-
-    /**
-     * @param timestamp the new timestamp
-     */
-    public void setDeviceCreatedTimestamp(Long timestamp) {
-        this.deviceCreatedTimestamp = timestamp;
     }
 
     /**
