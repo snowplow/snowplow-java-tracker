@@ -57,14 +57,10 @@ public class BatchEmitterTest {
         }
 
         @Override
-        public String getUrl() {
-            return null;
-        }
+        public String getUrl() { return null; }
 
         @Override
-        public Object getHttpClient() {
-            return null;
-        }
+        public Object getHttpClient() { return null; }
     }
 
     // this class fails to "send" the first 4 requests
@@ -84,19 +80,13 @@ public class BatchEmitterTest {
         }
 
         @Override
-        public int get(TrackerPayload payload) {
-            return 0;
-        }
+        public int get(TrackerPayload payload) { return 0; }
 
         @Override
-        public String getUrl() {
-            return null;
-        }
+        public String getUrl() { return null; }
 
         @Override
-        public Object getHttpClient() {
-            return null;
-        }
+        public Object getHttpClient() { return null; }
     }
 
     @Before
@@ -111,16 +101,15 @@ public class BatchEmitterTest {
 
     @Test
     public void addToBuffer_withLess10Payloads_shouldNotEmptyBuffer() throws InterruptedException {
-        List<TrackerPayload> payloads = createPayloads(2);
-        for (TrackerPayload payload : payloads) {
-            emitter.add(payload);
-        }
+        TrackerPayload payload = createPayload();
+        boolean result = emitter.add(payload);
 
         Thread.sleep(500);
 
+        Assert.assertTrue(result);
         Assert.assertFalse(mockHttpClientAdapter.isPostCalled);
-        Assert.assertEquals(2, emitter.getBuffer().size());
-        Assert.assertEquals(payloads, emitter.getBuffer());
+        Assert.assertEquals(1, emitter.getBuffer().size());
+        Assert.assertEquals(payload, emitter.getBuffer().get(0));
     }
 
     @Test
@@ -148,9 +137,10 @@ public class BatchEmitterTest {
         emitter.add(createPayload());
 
         TrackerPayload differentPayload = createPayload();
-        emitter.add(differentPayload);
+        boolean result = emitter.add(differentPayload);
 
         Assert.assertFalse(emitter.getBuffer().contains(differentPayload));
+        Assert.assertFalse(result);
     }
 
     @Test

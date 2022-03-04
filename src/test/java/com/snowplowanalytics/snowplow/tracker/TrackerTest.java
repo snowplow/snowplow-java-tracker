@@ -34,25 +34,18 @@ public class TrackerTest {
         public ArrayList<TrackerPayload> eventList = new ArrayList<>();
 
         @Override
-        public void add(TrackerPayload payload) {
+        public boolean add(TrackerPayload payload) {
             eventList.add(payload);
+            return true;
         }
-
         @Override
         public void setBatchSize(int batchSize) {}
-
         @Override
         public void flushBuffer() {}
-
         @Override
-        public int getBatchSize() {
-            return 0;
-        }
-
+        public int getBatchSize() { return 0; }
         @Override
-        public List<TrackerPayload> getBuffer() {
-            return null;
-        }
+        public List<TrackerPayload> getBuffer() { return null; }
     }
 
     MockEmitter mockEmitter;
@@ -91,6 +84,52 @@ public class TrackerTest {
         long currentTime = System.currentTimeMillis();
         long timeDifference = Long.parseLong(result.get("dtm")) - currentTime;
         assertTrue(timeDifference < 1000);
+    }
+
+    @Test
+    public void testTrackReturnsEventID() throws InterruptedException {
+        // a list to allow for eCommerceTransaction
+        List<String> result = tracker.track(Unstructured.builder()
+                .eventData(new SelfDescribingJson(
+                        "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
+                        ImmutableMap.of("foo", "bar")
+                ))
+                .build());
+
+        Thread.sleep(500);
+
+        // this throws an exception if it's not a valid UUID string
+        UUID.fromString(result.get(0));
+    }
+
+    @Test
+    public void testTrackReturnsNullIfEventWasDropped() throws InterruptedException {
+        class FailingMockEmitter implements Emitter {
+            @Override
+            public boolean add(TrackerPayload payload) { return false; }
+            @Override
+            public void setBatchSize(int batchSize) {}
+            @Override
+            public void flushBuffer() {}
+            @Override
+            public int getBatchSize() { return 0; }
+            @Override
+            public List<TrackerPayload> getBuffer() { return null; }
+        }
+        FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
+        tracker = new Tracker.TrackerBuilder(failingMockEmitter, "AF003", "cloudfront").build();
+
+        List<String> result = tracker.track(Unstructured.builder()
+                .eventData(new SelfDescribingJson(
+                        "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
+                        ImmutableMap.of("foo", "bar")
+                ))
+                .build());
+
+        Thread.sleep(500);
+
+        // this throws an exception if it's not a valid UUID string
+        assertNull(result.get(0));
     }
 
     @Test

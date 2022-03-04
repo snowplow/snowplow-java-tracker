@@ -195,14 +195,22 @@ public class Tracker {
     /**
      * Handles tracking the different types of events that
      * the Tracker can encounter.
-     * A TrackerPayload object will be created from the Event. This is passed to the configured Emitter.
+     * A TrackerPayload object - or more than one, in the case of eCommerceTransaction events -
+     * will be created from the Event. This is passed to the configured Emitter.
+     * If the event was successfully added to the Emitter buffer for sending,
+     * a list containing the payload's eventId string (a UUID) is returned.
+     * ECommerceTransactions will return all the relevant eventIds in the list.
+     * If the Emitter event buffer is full, the payload will be lost. In this case, this method
+     * returns a list containing null.
      * <p>
      * <b>Implementation note: </b><em>As a side effect of adding a payload to the Emitter,
      * it triggers an Emitter thread to emit a batch of events.</em>
      *
      * @param event the event to track
+     * @return a list of eventIDs (UUIDs)
      */
-    public void track(Event event) {
+    public List<String> track(Event event) {
+        List<String> results = new ArrayList<>();
         // a list because Ecommerce events become multiple Payloads
         List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
         for (Event processedEvent : processedEvents) {
@@ -212,8 +220,15 @@ public class Tracker {
             addTrackerParameters(payload);
             addContext(processedEvent, payload);
             addSubject(processedEvent, payload);
-            emitter.add(payload);
+
+            boolean addedToBuffer = emitter.add(payload);
+            if (addedToBuffer) {
+                results.add(payload.getEventId());
+            } else {
+                results.add(null);
+            }
         }
+        return results;
     }
 
     private List<Event> eventTypeSpecificPreProcessing(Event event) {

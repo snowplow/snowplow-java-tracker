@@ -113,7 +113,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
      * @param payload a payload
      */
     @Override
-    public void add(final TrackerPayload payload) {
+    public boolean add(final TrackerPayload payload) {
         boolean result = eventStore.addEvent(payload);
 
         if (!isClosing) {
@@ -125,6 +125,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         if (!result) {
             LOGGER.error("Unable to add payload to emitter, emitter buffer is full");
         }
+
+        return result;
     }
 
     /**

@@ -133,7 +133,7 @@ public abstract class AbstractEmitter implements Emitter {
      * @param payload an payload
      */
     @Override
-    public abstract void add(TrackerPayload payload);
+    public abstract boolean add(TrackerPayload payload);
 
     /**
      * Customize the emitter batch size to any valid integer greater than zero.

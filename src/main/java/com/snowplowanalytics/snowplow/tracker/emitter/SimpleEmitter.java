@@ -56,8 +56,12 @@ public class SimpleEmitter extends AbstractEmitter {
      * @param payload a payload
      */
     @Override
-    public void add(TrackerPayload payload) {
+    public boolean add(TrackerPayload payload) {
         executor.execute(getGetRequestRunnable(payload));
+
+        // This result doesn't mean anything
+        // The return type is for BatchEmitter's benefit
+        return true;
     }
 
     /**
