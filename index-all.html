@@ -1079,7 +1079,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/Subject.html#setTimezone-java.lang.String-">setTimezone(String)</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.<a href="com/snowplowanalytics/snowplow/tracker/Subject.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject</a></dt>
 <dd>
-<div class="block">Sets the timezone parameter</div>
+<div class="block">Sets the timezone parameter.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html#setTrueTimestamp-long-">setTrueTimestamp(long)</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html" title="class in com.snowplowanalytics.snowplow.tracker.events">EcommerceTransactionItem</a></dt>
 <dd>&nbsp;</dd>
@@ -1186,7 +1186,10 @@
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/constants/Parameter.html#TIMEZONE">TIMEZONE</a></span> - Static variable in class com.snowplowanalytics.snowplow.tracker.constants.<a href="com/snowplowanalytics/snowplow/tracker/constants/Parameter.html" title="class in com.snowplowanalytics.snowplow.tracker.constants">Parameter</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html#timezone-java.lang.String-">timezone(String)</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.<a href="com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject.SubjectBuilder</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Note that timezone is set by default to the server's timezone
+ (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`)</div>
+</dd>
 <dt><a href="com/snowplowanalytics/snowplow/tracker/events/Timing.html" title="class in com.snowplowanalytics.snowplow.tracker.events"><span class="typeNameLink">Timing</span></a> - Class in <a href="com/snowplowanalytics/snowplow/tracker/events/package-summary.html">com.snowplowanalytics.snowplow.tracker.events</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/Timing.html#Timing-com.snowplowanalytics.snowplow.tracker.events.Timing.Builder-">Timing(Timing.Builder&lt;?&gt;)</a></span> - Constructor for class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/Timing.html" title="class in com.snowplowanalytics.snowplow.tracker.events">Timing</a></dt>
@@ -1233,7 +1236,9 @@
  the Tracker can encounter.</div>
 </dd>
 <dt><a href="com/snowplowanalytics/snowplow/tracker/Tracker.html" title="class in com.snowplowanalytics.snowplow.tracker"><span class="typeNameLink">Tracker</span></a> - Class in <a href="com/snowplowanalytics/snowplow/tracker/package-summary.html">com.snowplowanalytics.snowplow.tracker</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Allows tracking of Events.</div>
+</dd>
 <dt><a href="com/snowplowanalytics/snowplow/tracker/Tracker.TrackerBuilder.html" title="class in com.snowplowanalytics.snowplow.tracker"><span class="typeNameLink">Tracker.TrackerBuilder</span></a> - Class in <a href="com/snowplowanalytics/snowplow/tracker/package-summary.html">com.snowplowanalytics.snowplow.tracker</a></dt>
 <dd>
 <div class="block">Builder for the Tracker</div>

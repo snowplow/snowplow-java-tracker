@@ -224,7 +224,7 @@ extends java.lang.Object</pre>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Subject.html#setTimezone-java.lang.String-">setTimezone</a></span>(java.lang.String&nbsp;timezone)</code>
-<div class="block">Sets the timezone parameter</div>
+<div class="block">Sets the timezone parameter.</div>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
@@ -358,7 +358,8 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>setTimezone</h4>
 <pre>public&nbsp;void&nbsp;setTimezone(java.lang.String&nbsp;timezone)</pre>
-<div class="block">Sets the timezone parameter</div>
+<div class="block">Sets the timezone parameter. Note that timezone is set by default to the server's timezone
+ (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`);</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>timezone</code> - a timezone string</dd>

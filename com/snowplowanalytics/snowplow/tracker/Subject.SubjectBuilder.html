@@ -186,7 +186,10 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject.SubjectBuilder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html#timezone-java.lang.String-">timezone</a></span>(java.lang.String&nbsp;timezone)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html#timezone-java.lang.String-">timezone</a></span>(java.lang.String&nbsp;timezone)</code>
+<div class="block">Note that timezone is set by default to the server's timezone
+ (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`)</div>
+</td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject.SubjectBuilder</a></code></td>
@@ -311,6 +314,8 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>timezone</h4>
 <pre>public&nbsp;<a href="../../../../com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject.SubjectBuilder</a>&nbsp;timezone(java.lang.String&nbsp;timezone)</pre>
+<div class="block">Note that timezone is set by default to the server's timezone
+ (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>timezone</code> - a timezone string</dd>
