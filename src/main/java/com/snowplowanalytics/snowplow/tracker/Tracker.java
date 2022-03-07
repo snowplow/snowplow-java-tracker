@@ -21,8 +21,6 @@ import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -34,7 +32,6 @@ public class Tracker {
     private Emitter emitter;
     private Subject subject;
     private final TrackerParameters parameters;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Tracker.class);
 
     /**
      * Creates a new Snowplow Tracker.
@@ -89,6 +86,9 @@ public class Tracker {
         }
 
         /**
+         * The devicePlatform the tracker is running on ({@link DevicePlatform}).
+         * The default is "srv", ServerSideApp.
+         *
          * @param platform The device platform the tracker is running on
          * @return itself
          */
@@ -119,6 +119,8 @@ public class Tracker {
     // --- Setters
 
     /**
+     * Change the Emitter used to send events.
+     *
      * @param emitter a new emitter
      */
     public void setEmitter(Emitter emitter) {
@@ -145,14 +147,16 @@ public class Tracker {
     }
 
     /**
-     * @return the Tracker Subject
+     * @return the Tracker-associated Subject
      */
     public Subject getSubject() {
         return this.subject;
     }
 
     /**
-     * @return the tracker version that was set
+     * The Java tracker release version, e.g. 0.12.0.
+     *
+     * @return the tracker version
      */
     public String getTrackerVersion() {
         return this.parameters.getTrackerVersion();
@@ -166,7 +170,7 @@ public class Tracker {
     }
 
     /**
-     * @return the trackers set Application ID
+     * @return the tracker Application ID
      */
     public String getAppId() {
         return this.parameters.getAppId();
@@ -180,7 +184,7 @@ public class Tracker {
     }
 
     /**
-     * @return the Tracker platform
+     * @return the Tracker platform, e.g. "srv"
      */
     public DevicePlatform getPlatform() {
         return this.parameters.getPlatform();
@@ -196,8 +200,7 @@ public class Tracker {
     // --- Event Tracking Functions
 
     /**
-     * Handles tracking the different types of events that
-     * the Tracker can encounter.
+     * Handles tracking the different types of events.
      * A TrackerPayload object - or more than one, in the case of eCommerceTransaction events -
      * will be created from the Event. This is passed to the configured Emitter.
      * If the event was successfully added to the Emitter buffer for sending,
@@ -217,7 +220,7 @@ public class Tracker {
         // a list because Ecommerce events become multiple Payloads
         List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
         for (Event processedEvent : processedEvents) {
-            // Event ID (eid) and device_created_timestamp (dtm) are generated when
+            // Event ID (eid) and device_created_timestamp (dtm) are generated now when
             // the TrackerPayload is created
             TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
 
