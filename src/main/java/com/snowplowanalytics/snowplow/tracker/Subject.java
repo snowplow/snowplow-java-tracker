@@ -115,6 +115,8 @@ public class Subject {
         }
 
         /**
+         * Note that timezone is set by default to the server's timezone
+         * (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`)
          * @param timezone a timezone string
          * @return itself
          */
@@ -236,7 +238,8 @@ public class Subject {
     }
 
     /**
-     * Sets the timezone parameter
+     * Sets the timezone parameter. Note that timezone is set by default to the server's timezone
+     * (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`);
      *
      * @param timezone a timezone string
      */

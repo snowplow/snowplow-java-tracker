@@ -26,6 +26,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * Allows tracking of Events.
+ */
 public class Tracker {
 
     private Emitter emitter;
