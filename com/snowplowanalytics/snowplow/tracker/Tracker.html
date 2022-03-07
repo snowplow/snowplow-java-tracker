@@ -179,11 +179,15 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Tracker.html#getTrackerVersion--">getTrackerVersion</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Tracker.html#getTrackerVersion--">getTrackerVersion</a></span>()</code>
+<div class="block">The Java tracker release version, e.g.</div>
+</td>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Tracker.html#setEmitter-com.snowplowanalytics.snowplow.tracker.emitter.Emitter-">setEmitter</a></span>(<a href="../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">Emitter</a>&nbsp;emitter)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Tracker.html#setEmitter-com.snowplowanalytics.snowplow.tracker.emitter.Emitter-">setEmitter</a></span>(<a href="../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">Emitter</a>&nbsp;emitter)</code>
+<div class="block">Change the Emitter used to send events.</div>
+</td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
@@ -195,8 +199,7 @@ extends java.lang.Object</pre>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Tracker.html#track-com.snowplowanalytics.snowplow.tracker.events.Event-">track</a></span>(<a href="../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a>&nbsp;event)</code>
-<div class="block">Handles tracking the different types of events that
- the Tracker can encounter.</div>
+<div class="block">Handles tracking different types of events.</div>
 </td>
 </tr>
 </table>
@@ -228,6 +231,7 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>setEmitter</h4>
 <pre>public&nbsp;void&nbsp;setEmitter(<a href="../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">Emitter</a>&nbsp;emitter)</pre>
+<div class="block">Change the Emitter used to send events.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>emitter</code> - a new emitter</dd>
@@ -271,7 +275,7 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;<a href="../../../../com/snowplowanalytics/snowplow/tracker/Subject.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject</a>&nbsp;getSubject()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>the Tracker Subject</dd>
+<dd>the Tracker-associated Subject</dd>
 </dl>
 </li>
 </ul>
@@ -282,9 +286,10 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>getTrackerVersion</h4>
 <pre>public&nbsp;java.lang.String&nbsp;getTrackerVersion()</pre>
+<div class="block">The Java tracker release version, e.g. 0.12.0.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>the tracker version that was set</dd>
+<dd>the tracker version</dd>
 </dl>
 </li>
 </ul>
@@ -310,7 +315,7 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;java.lang.String&nbsp;getAppId()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>the trackers set Application ID</dd>
+<dd>the tracker Application ID</dd>
 </dl>
 </li>
 </ul>
@@ -336,7 +341,7 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;<a href="../../../../com/snowplowanalytics/snowplow/tracker/DevicePlatform.html" title="enum in com.snowplowanalytics.snowplow.tracker">DevicePlatform</a>&nbsp;getPlatform()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>the Tracker platform</dd>
+<dd>the Tracker platform, e.g. "srv"</dd>
 </dl>
 </li>
 </ul>
@@ -360,8 +365,7 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>track</h4>
 <pre>public&nbsp;void&nbsp;track(<a href="../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a>&nbsp;event)</pre>
-<div class="block">Handles tracking the different types of events that
- the Tracker can encounter.</div>
+<div class="block">Handles tracking different types of events.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>event</code> - the event to track</dd>
