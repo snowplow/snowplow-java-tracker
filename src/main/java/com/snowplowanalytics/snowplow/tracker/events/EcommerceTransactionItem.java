@@ -163,6 +163,6 @@ public class EcommerceTransactionItem extends AbstractEvent {
         payload.add(Parameter.TI_ITEM_PRICE, Double.toString(this.price));
         payload.add(Parameter.TI_ITEM_QUANTITY, Integer.toString(this.quantity));
         payload.add(Parameter.TI_ITEM_CURRENCY, this.currency);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

@@ -89,6 +89,6 @@ public class Unstructured extends AbstractEvent {
         payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
         payload.addMap(envelope.getMap(), this.base64Encode,
                 Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

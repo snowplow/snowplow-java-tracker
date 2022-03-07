@@ -66,28 +66,7 @@ public class TrackerTest {
     // --- Event Tests
 
     @Test
-    public void testEventHasEventIdAndDeviceTimestamp() throws InterruptedException {
-        tracker.track(Unstructured.builder()
-                .eventData(new SelfDescribingJson(
-                        "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                        ImmutableMap.of("foo", "bar")
-                ))
-                .build());
-
-        Thread.sleep(500);
-
-        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-
-        // this throws an exception if it's not a valid UUID string
-        UUID.fromString(result.get("eid"));
-
-        long currentTime = System.currentTimeMillis();
-        long timeDifference = Long.parseLong(result.get("dtm")) - currentTime;
-        assertTrue(timeDifference < 1000);
-    }
-
-    @Test
-    public void testTrackReturnsEventID() throws InterruptedException {
+    public void testTrackReturnsEventIdIfSuccessful() throws InterruptedException {
         // a list to allow for eCommerceTransaction
         List<String> result = tracker.track(Unstructured.builder()
                 .eventData(new SelfDescribingJson(
@@ -128,7 +107,6 @@ public class TrackerTest {
 
         Thread.sleep(500);
 
-        // this throws an exception if it's not a valid UUID string
         assertNull(result.get(0));
     }
 
@@ -423,6 +401,8 @@ public class TrackerTest {
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
                 .build();
 
+        System.out.println(expected);
+        System.out.println(result);
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
 

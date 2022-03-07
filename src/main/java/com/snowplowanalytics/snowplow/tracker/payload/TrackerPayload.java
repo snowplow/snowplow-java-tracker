@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,9 @@ public class TrackerPayload implements Payload {
     public TrackerPayload() {
         eventId = Utils.getEventId();
         deviceCreatedTimestamp = System.currentTimeMillis();
+
+        add(Parameter.EID, eventId);
+        add(Parameter.DEVICE_CREATED_TIMESTAMP, Long.toString(deviceCreatedTimestamp));
     }
 
     public String getEventId() {

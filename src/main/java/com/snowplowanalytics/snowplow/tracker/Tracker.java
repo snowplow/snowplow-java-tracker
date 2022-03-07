@@ -199,7 +199,7 @@ public class Tracker {
      * will be created from the Event. This is passed to the configured Emitter.
      * If the event was successfully added to the Emitter buffer for sending,
      * a list containing the payload's eventId string (a UUID) is returned.
-     * ECommerceTransactions will return all the relevant eventIds in the list.
+     * EcommerceTransactions will return all the relevant eventIds in the list.
      * If the Emitter event buffer is full, the payload will be lost. In this case, this method
      * returns a list containing null.
      * <p>
@@ -214,7 +214,8 @@ public class Tracker {
         // a list because Ecommerce events become multiple Payloads
         List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
         for (Event processedEvent : processedEvents) {
-            // Event ID (eid) and device_created_timestamp (dtm) are generated when the TrackerPayload is created
+            // Event ID (eid) and device_created_timestamp (dtm) are generated when
+            // the TrackerPayload is created
             TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
 
             addTrackerParameters(payload);

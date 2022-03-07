@@ -209,7 +209,7 @@ public class EcommerceTransaction extends AbstractEvent {
         payload.add(Parameter.TR_STATE, this.state);
         payload.add(Parameter.TR_COUNTRY, this.country);
         payload.add(Parameter.TR_CURRENCY, this.currency);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 
     /**

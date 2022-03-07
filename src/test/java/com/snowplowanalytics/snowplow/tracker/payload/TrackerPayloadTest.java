@@ -29,6 +29,9 @@ public class TrackerPayloadTest {
         TrackerPayload payload = new TrackerPayload();
         // this throws an exception if it's not a valid UUID string
         UUID.fromString(payload.getEventId());
+
+        assertTrue(payload.getMap().containsKey("eid"));
+        assertEquals(payload.getEventId(), payload.getMap().get("eid"));
     }
 
     @Test
@@ -37,6 +40,9 @@ public class TrackerPayloadTest {
         TrackerPayload payload = new TrackerPayload();
         long timeDifference = payload.getDeviceCreatedTimestamp() - currentTime;
         assertTrue(timeDifference < 1000);
+
+        assertTrue(payload.getMap().containsKey("dtm"));
+        assertEquals(Long.toString(payload.getDeviceCreatedTimestamp()), payload.getMap().get("dtm"));
     }
 
     @Test
