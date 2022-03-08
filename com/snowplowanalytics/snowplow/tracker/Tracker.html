@@ -197,9 +197,9 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i10" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/snowplowanalytics/snowplow/tracker/Tracker.html#track-com.snowplowanalytics.snowplow.tracker.events.Event-">track</a></span>(<a href="../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a>&nbsp;event)</code>
-<div class="block">Handles tracking different types of events.</div>
+<div class="block">Handles tracking the different types of events.</div>
 </td>
 </tr>
 </table>
@@ -364,11 +364,24 @@ extends java.lang.Object</pre>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>track</h4>
-<pre>public&nbsp;void&nbsp;track(<a href="../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a>&nbsp;event)</pre>
-<div class="block">Handles tracking different types of events.</div>
+<pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;track(<a href="../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a>&nbsp;event)</pre>
+<div class="block">Handles tracking the different types of events.
+
+ A TrackerPayload object - or more than one, in the case of eCommerceTransaction events -
+ will be created from the Event. This is passed to the configured Emitter.
+ If the event was successfully added to the Emitter buffer for sending,
+ a list containing the payload's eventId string (a UUID) is returned.
+ EcommerceTransactions will return all the relevant eventIds in the list.
+ If the Emitter event buffer is full, the payload will be lost. In this case, this method
+ returns a list containing null.
+ <p>
+ <b>Implementation note: </b><em>As a side effect of adding a payload to the Emitter,
+ it triggers an Emitter thread to emit a batch of events.</em></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>event</code> - the event to track</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a list of eventIDs (UUIDs)</dd>
 </dl>
 </li>
 </ul>

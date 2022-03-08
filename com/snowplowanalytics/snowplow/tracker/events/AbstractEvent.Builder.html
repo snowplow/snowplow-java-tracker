@@ -17,8 +17,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":6,"i4":10,"i5":42,"i6":10};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
+var methods = {"i0":10,"i1":6,"i2":10,"i3":10};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -166,7 +166,7 @@ extends java.lang.Object</pre>
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t6" class="tableTab"><span><a href="javascript:show(32);">Deprecated Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
@@ -178,34 +178,16 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#deviceCreatedTimestamp-long-">deviceCreatedTimestamp</a></span>(long&nbsp;timestamp)</code>
-<div class="block">Adjust the device-created timestamp.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#eventId-java.lang.String-">eventId</a></span>(java.lang.String&nbsp;eventId)</code>
-<div class="block">A custom eventId for the event.</div>
-</td>
-</tr>
-<tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected abstract <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#self--">self</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#subject-com.snowplowanalytics.snowplow.tracker.Subject-">subject</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/Subject.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject</a>&nbsp;subject)</code>
 <div class="block">A custom subject for the event.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#timestamp-long-">timestamp</a></span>(long&nbsp;timestamp)</code>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
-</td>
-</tr>
-<tr id="i6" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#trueTimestamp-java.lang.Long-">trueTimestamp</a></span>(java.lang.Long&nbsp;timestamp)</code>
 <div class="block">The true timestamp of that event (as determined by the user).</div>
@@ -292,43 +274,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="timestamp-long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>timestamp</h4>
-<pre>@Deprecated
-public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a>&nbsp;timestamp(long&nbsp;timestamp)</pre>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
-<div class="block">A custom event timestamp.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>timestamp</code> - the event timestamp as
-                  unix epoch</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>itself
- Use <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#trueTimestamp"><code>trueTimestamp</code></a> or <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#deviceCreatedTimestamp"><code>deviceCreatedTimestamp</code></a></dd>
-</dl>
-</li>
-</ul>
-<a name="deviceCreatedTimestamp-long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>deviceCreatedTimestamp</h4>
-<pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a>&nbsp;deviceCreatedTimestamp(long&nbsp;timestamp)</pre>
-<div class="block">Adjust the device-created timestamp. This is usually not what you want, check <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#trueTimestamp"><code>trueTimestamp</code></a>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>timestamp</code> - the event timestamp as
-                  unix epoch</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>itself</dd>
-</dl>
-</li>
-</ul>
 <a name="trueTimestamp-java.lang.Long-">
 <!--   -->
 </a>
@@ -341,22 +286,6 @@ public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/event
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>timestamp</code> - the event timestamp as
                   unix epoch</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>itself</dd>
-</dl>
-</li>
-</ul>
-<a name="eventId-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>eventId</h4>
-<pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a>&nbsp;eventId(java.lang.String&nbsp;eventId)</pre>
-<div class="block">A custom eventId for the event.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>eventId</code> - the eventId</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>itself</dd>
 </dl>

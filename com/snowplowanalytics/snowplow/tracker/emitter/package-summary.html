@@ -117,8 +117,7 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">BatchEmitter</a></td>
 <td class="colLast">
-<div class="block">An emitter that emit a batch of events in a single call 
- It uses the post method of underlying http adapter</div>
+<div class="block">An emitter that emits a batch of events in a single HTTP request.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -127,7 +126,9 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">BatchPayload</a></td>
-<td class="colLast">&nbsp;</td>
+<td class="colLast">
+<div class="block">A wrapper for a number of TrackerPayloads.</div>
+</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/InMemoryEventStore.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">InMemoryEventStore</a></td>
@@ -138,7 +139,7 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/SimpleEmitter.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">SimpleEmitter</a></td>
 <td class="colLast">
-<div class="block">An emitter which sends events as soon as they are received via
+<div class="block">An emitter which sends events one-by-one as soon as they are received, via
  GET requests.</div>
 </td>
 </tr>

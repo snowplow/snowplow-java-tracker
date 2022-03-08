@@ -118,8 +118,8 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">SimpleEmitter</span>
 extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">AbstractEmitter</a></pre>
-<div class="block">An emitter which sends events as soon as they are received via
- GET requests.</div>
+<div class="block">An emitter which sends events one-by-one as soon as they are received, via
+ GET requests. The events are sent asynchronously.</div>
 </li>
 </ul>
 </div>
@@ -192,9 +192,9 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/SimpleEmitter.html#add-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">add</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</code>
-<div class="block">Adds an event to the buffer and instantly sends it</div>
+<div class="block">Adds an event and instantly tries to send it.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -204,8 +204,7 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/SimpleEmitter.html#flushBuffer--">flushBuffer</a></span>()</code>
-<div class="block">Sends buffered events, but SimpleEmitter does not buffer events
- So has no effect</div>
+<div class="block">Sends all the buffered events, but SimpleEmitter does not buffer events.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
@@ -287,8 +286,8 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 <ul class="blockList">
 <li class="blockList">
 <h4>add</h4>
-<pre>public&nbsp;void&nbsp;add(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</pre>
-<div class="block">Adds an event to the buffer and instantly sends it</div>
+<pre>public&nbsp;boolean&nbsp;add(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</pre>
+<div class="block">Adds an event and instantly tries to send it.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html#add-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">add</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">Emitter</a></code></dd>
@@ -296,6 +295,8 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.html#add-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">add</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">AbstractEmitter</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>payload</code> - a payload</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true</dd>
 </dl>
 </li>
 </ul>
@@ -306,7 +307,7 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 <li class="blockList">
 <h4>flushBuffer</h4>
 <pre>public&nbsp;void&nbsp;flushBuffer()</pre>
-<div class="block">Sends buffered events, but SimpleEmitter does not buffer events
+<div class="block">Sends all the buffered events, but SimpleEmitter does not buffer events.
  So has no effect</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>

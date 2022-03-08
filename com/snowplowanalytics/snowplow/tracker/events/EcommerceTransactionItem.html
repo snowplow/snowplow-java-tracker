@@ -17,8 +17,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":10,"i2":10,"i3":42,"i4":10};
-var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
+var methods = {"i0":9,"i1":10,"i2":10};
+var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -154,7 +154,7 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;com.snowplowanalytics.snowplow.tracker.events.<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html" title="class in com.snowplowanalytics.snowplow.tracker.events">AbstractEvent</a></h3>
-<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#context">context</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#deviceCreatedTimestamp">deviceCreatedTimestamp</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#eventId">eventId</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#subject">subject</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#trueTimestamp">trueTimestamp</a></code></li>
+<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#context">context</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#subject">subject</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#trueTimestamp">trueTimestamp</a></code></li>
 </ul>
 </li>
 </ul>
@@ -184,7 +184,7 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t6" class="tableTab"><span><a href="javascript:show(32);">Deprecated Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
@@ -202,16 +202,6 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html#setDeviceCreatedTimestamp-java.lang.Long-">setDeviceCreatedTimestamp</a></span>(java.lang.Long&nbsp;timestamp)</code>&nbsp;</td>
-</tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html#setTimestamp-long-">setTimestamp</a></span>(long&nbsp;timestamp)</code>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
-</td>
-</tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html#setTrueTimestamp-long-">setTrueTimestamp</a></span>(long&nbsp;timestamp)</code>&nbsp;</td>
 </tr>
 </table>
@@ -220,7 +210,7 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.snowplowanalytics.snowplow.tracker.events.<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html" title="class in com.snowplowanalytics.snowplow.tracker.events">AbstractEvent</a></h3>
-<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getContext--">getContext</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getDeviceCreatedTimestamp--">getDeviceCreatedTimestamp</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getEventId--">getEventId</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getSubject--">getSubject</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getTimestamp--">getTimestamp</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getTrueTimestamp--">getTrueTimestamp</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#putDefaultParams-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">putDefaultParams</a></code></li>
+<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getContext--">getContext</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getSubject--">getSubject</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getTrueTimestamp--">getTrueTimestamp</a>, <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#putTrueTimestamp-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">putTrueTimestamp</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -269,22 +259,6 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
 <pre>public static&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.Builder.html" title="class in com.snowplowanalytics.snowplow.tracker.events">EcommerceTransactionItem.Builder</a>&lt;?&gt;&nbsp;builder()</pre>
 </li>
 </ul>
-<a name="setTimestamp-long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setTimestamp</h4>
-<pre>@Deprecated
-public&nbsp;void&nbsp;setTimestamp(long&nbsp;timestamp)</pre>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>timestamp</code> - the new timestamp
- Use <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html#setTrueTimestamp-long-"><code>setTrueTimestamp(long)</code></a> or <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html#setTrueTimestamp-long-"><code>setTrueTimestamp(long)</code></a></dd>
-</dl>
-</li>
-</ul>
 <a name="setTrueTimestamp-long-">
 <!--   -->
 </a>
@@ -292,19 +266,6 @@ public&nbsp;void&nbsp;setTimestamp(long&nbsp;timestamp)</pre>
 <li class="blockList">
 <h4>setTrueTimestamp</h4>
 <pre>public&nbsp;void&nbsp;setTrueTimestamp(long&nbsp;timestamp)</pre>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>timestamp</code> - the new timestamp</dd>
-</dl>
-</li>
-</ul>
-<a name="setDeviceCreatedTimestamp-java.lang.Long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setDeviceCreatedTimestamp</h4>
-<pre>public&nbsp;void&nbsp;setDeviceCreatedTimestamp(java.lang.Long&nbsp;timestamp)</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>timestamp</code> - the new timestamp</dd>

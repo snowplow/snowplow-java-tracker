@@ -114,9 +114,9 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">SelfDescribingJson</span>
 extends java.lang.Object
 implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html" title="interface in com.snowplowanalytics.snowplow.tracker.payload">Payload</a></pre>
-<div class="block">Builds a SelfDescribingJson object which can contain two fields:
- - Schema: the JsonSchema path for this Json
- - Data: the data for this Json</div>
+<div class="block">Builds a SelfDescribingJson object. SelfDescribingJson must contain only two fields, schema and data.
+
+ Schema is the JsonSchema path for this Json. Data is the data.</div>
 </li>
 </ul>
 </div>
@@ -226,8 +226,7 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/SelfDescribingJson.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">SelfDescribingJson</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/SelfDescribingJson.html#setData-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">setData</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;data)</code>
-<div class="block">Adds data to the SelfDescribingJson
- - Accepts a TrackerPayload object</div>
+<div class="block">Adds data to the SelfDescribingJson from a TrackerPayload object.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
@@ -272,7 +271,7 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 <h4>SelfDescribingJson</h4>
 <pre>public&nbsp;SelfDescribingJson(java.lang.String&nbsp;schema)</pre>
 <div class="block">Creates a SelfDescribingJson with only a Schema
- String and an empty data map.</div>
+ String and an empty data map. Data can be added later using <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/SelfDescribingJson.html#setData-java.lang.Object-"><code>setData(Object)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>schema</code> - the schema string</dd>
@@ -288,7 +287,12 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 <pre>public&nbsp;SelfDescribingJson(java.lang.String&nbsp;schema,
                           <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;data)</pre>
 <div class="block">Creates a SelfDescribingJson with a Schema and a
- TrackerPayload object.</div>
+ TrackerPayload object.
+
+ Note that TrackerPayload objects are initialised with an eventId UUID and
+ timestamp (deviceCreatedTimestamp), as they are the basis for sending events.
+ Therefore, your SelfDescribingJson data will contain the keys "eid" and "dtm".
+ This is unlikely to be what you want.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>schema</code> - the schema string</dd>
@@ -307,7 +311,7 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
                           <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/SelfDescribingJson.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">SelfDescribingJson</a>&nbsp;data)</pre>
 <div class="block">Creates a SelfDescribingJson with a Schema and a
  SelfDescribingJson object.  This can be used to
- nest SDJs inside of each other.</div>
+ nest SDJs inside each other.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>schema</code> - the schema string</dd>
@@ -364,8 +368,12 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 <li class="blockList">
 <h4>setData</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/SelfDescribingJson.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">SelfDescribingJson</a>&nbsp;setData(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;data)</pre>
-<div class="block">Adds data to the SelfDescribingJson
- - Accepts a TrackerPayload object</div>
+<div class="block">Adds data to the SelfDescribingJson from a TrackerPayload object.
+
+ Note that TrackerPayload objects are initialised with an eventId UUID and
+ timestamp (deviceCreatedTimestamp), as they are the basis for sending events.
+ Therefore, your SelfDescribingJson data will contain the keys "eid" and "dtm".
+ This is unlikely to be what you want.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>data</code> - the data to be added to the SelfDescribingJson</dd>
@@ -418,9 +426,9 @@ public&nbsp;void&nbsp;add(java.lang.String&nbsp;key,
                             java.lang.String&nbsp;value)</pre>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#add-java.lang.String-java.lang.String-">Payload</a></code></span></div>
-<div class="block">Add a key-value pair to the payload:
- - Checks that the key is not null or empty
- - Checks that the value is not null or empty</div>
+<div class="block">Add a key-value pair to the payload.
+
+ It checks that neither the key nor value is null or empty.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#add-java.lang.String-java.lang.String-">add</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html" title="interface in com.snowplowanalytics.snowplow.tracker.payload">Payload</a></code></dd>
@@ -440,8 +448,8 @@ public&nbsp;void&nbsp;add(java.lang.String&nbsp;key,
 public&nbsp;void&nbsp;addMap(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;map)</pre>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#addMap-java.util.Map-">Payload</a></code></span></div>
-<div class="block">Add all the mappings from the specified map. The effect is the equivalent to that of calling:
-  - add(String key, String value) for each key value pair.</div>
+<div class="block">Add all the mappings from the specified map. The effect is the equivalent to that of calling
+  <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#add-java.lang.String-java.lang.String-"><code>Payload.add(String, String)</code></a> for each key value pair.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#addMap-java.util.Map-">addMap</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html" title="interface in com.snowplowanalytics.snowplow.tracker.payload">Payload</a></code></dd>

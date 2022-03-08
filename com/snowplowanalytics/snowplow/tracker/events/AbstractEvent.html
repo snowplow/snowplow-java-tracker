@@ -17,8 +17,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":6,"i5":10,"i6":42,"i7":10,"i8":10};
-var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
+var methods = {"i0":9,"i1":10,"i2":6,"i3":10,"i4":10,"i5":10};
+var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -166,14 +166,6 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#context">context</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>protected long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#deviceCreatedTimestamp">deviceCreatedTimestamp</a></span></code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>protected java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#eventId">eventId</a></span></code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../../com/snowplowanalytics/snowplow/tracker/Subject.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#subject">subject</a></span></code>&nbsp;</td>
 </tr>
@@ -212,7 +204,7 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t6" class="tableTab"><span><a href="javascript:show(32);">Deprecated Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
@@ -226,36 +218,20 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getContext--">getContext</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getDeviceCreatedTimestamp--">getDeviceCreatedTimestamp</a></span>()</code>&nbsp;</td>
-</tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getEventId--">getEventId</a></span>()</code>&nbsp;</td>
-</tr>
-<tr id="i4" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html" title="interface in com.snowplowanalytics.snowplow.tracker.payload">Payload</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getPayload--">getPayload</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/Subject.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getSubject--">getSubject</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i6" class="altColor">
-<td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getTimestamp--">getTimestamp</a></span>()</code>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
-<div class="block"><span class="deprecationComment">Use <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getTrueTimestamp--"><code>getTrueTimestamp()</code></a> or <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getDeviceCreatedTimestamp--"><code>getDeviceCreatedTimestamp()</code></a></span></div>
-</div>
-</td>
-</tr>
-<tr id="i7" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getTrueTimestamp--">getTrueTimestamp</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#putDefaultParams-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">putDefaultParams</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#putTrueTimestamp-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">putTrueTimestamp</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</code>
 <div class="block">Adds the default parameters to a TrackerPayload object.</div>
 </td>
 </tr>
@@ -290,15 +266,6 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 <pre>protected final&nbsp;java.util.List&lt;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/SelfDescribingJson.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">SelfDescribingJson</a>&gt; context</pre>
 </li>
 </ul>
-<a name="deviceCreatedTimestamp">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>deviceCreatedTimestamp</h4>
-<pre>protected&nbsp;long deviceCreatedTimestamp</pre>
-</li>
-</ul>
 <a name="trueTimestamp">
 <!--   -->
 </a>
@@ -307,15 +274,6 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 <h4>trueTimestamp</h4>
 <pre>protected&nbsp;java.lang.Long trueTimestamp</pre>
 <div class="block">The true timestamp may be null if none is set.</div>
-</li>
-</ul>
-<a name="eventId">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>eventId</h4>
-<pre>protected final&nbsp;java.lang.String eventId</pre>
 </li>
 </ul>
 <a name="subject">
@@ -376,37 +334,6 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 </dl>
 </li>
 </ul>
-<a name="getTimestamp--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getTimestamp</h4>
-<pre>public&nbsp;long&nbsp;getTimestamp()</pre>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">Use <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getTrueTimestamp--"><code>getTrueTimestamp()</code></a> or <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#getDeviceCreatedTimestamp--"><code>getDeviceCreatedTimestamp()</code></a></span></div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html#getTimestamp--">getTimestamp</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>the event's timestamp</dd>
-</dl>
-</li>
-</ul>
-<a name="getDeviceCreatedTimestamp--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getDeviceCreatedTimestamp</h4>
-<pre>public&nbsp;long&nbsp;getDeviceCreatedTimestamp()</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html#getDeviceCreatedTimestamp--">getDeviceCreatedTimestamp</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>the event's device created timestamp.</dd>
-</dl>
-</li>
-</ul>
 <a name="getTrueTimestamp--">
 <!--   -->
 </a>
@@ -419,21 +346,6 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html#getTrueTimestamp--">getTrueTimestamp</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the event's true timestamp.</dd>
-</dl>
-</li>
-</ul>
-<a name="getEventId--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getEventId</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getEventId()</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html#getEventId--">getEventId</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>the event id</dd>
 </dl>
 </li>
 </ul>
@@ -467,13 +379,13 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 </dl>
 </li>
 </ul>
-<a name="putDefaultParams-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">
+<a name="putTrueTimestamp-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>putDefaultParams</h4>
-<pre>protected&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;putDefaultParams(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</pre>
+<h4>putTrueTimestamp</h4>
+<pre>protected&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;putTrueTimestamp(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</pre>
 <div class="block">Adds the default parameters to a TrackerPayload object.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

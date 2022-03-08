@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -114,8 +114,14 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">TrackerPayload</span>
 extends java.lang.Object
 implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html" title="interface in com.snowplowanalytics.snowplow.tracker.payload">Payload</a></pre>
-<div class="block">Returns a standard Tracker Payload consisting of
- many key - pair values.</div>
+<div class="block">A TrackerPayload stores a map of key - pair values.
+
+ When the Emitter attempts to send a TrackerPayload, these pairs are extracted
+ and added to the HTTP request (via a SelfDescribingJson).
+ The deviceSentTimestamp ("stm") is added at that point.
+
+ EventId and deviceCreatedTimestamp are added to the internal map at
+ TrackerPayload initialization.</div>
 </li>
 </ul>
 </div>
@@ -174,8 +180,7 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html#add-java.lang.String-java.lang.String-">add</a></span>(java.lang.String&nbsp;key,
    java.lang.String&nbsp;value)</code>
-<div class="block">Add a key-value pair to the payload: - Checks that the key is not null or
- empty - Checks that the value is not null or empty</div>
+<div class="block">Add a key-value pair to the payload.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -201,12 +206,20 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 </td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code>java.lang.Long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html#getDeviceCreatedTimestamp--">getDeviceCreatedTimestamp</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html#getEventId--">getEventId</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html#getMap--">getMap</a></span>()</code>
 <div class="block">Returns the Payload as a Map.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html#toString--">toString</a></span>()</code>
 <div class="block">Returns the Payload as a string.</div>
@@ -268,6 +281,24 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="getEventId--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getEventId</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getEventId()</pre>
+</li>
+</ul>
+<a name="getDeviceCreatedTimestamp--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDeviceCreatedTimestamp</h4>
+<pre>public&nbsp;java.lang.Long&nbsp;getDeviceCreatedTimestamp()</pre>
+</li>
+</ul>
 <a name="add-java.lang.String-java.lang.String-">
 <!--   -->
 </a>
@@ -276,8 +307,8 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 <h4>add</h4>
 <pre>public&nbsp;void&nbsp;add(java.lang.String&nbsp;key,
                 java.lang.String&nbsp;value)</pre>
-<div class="block">Add a key-value pair to the payload: - Checks that the key is not null or
- empty - Checks that the value is not null or empty</div>
+<div class="block">Add a key-value pair to the payload.
+ Checks that neither the key nor the value are null or empty.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#add-java.lang.String-java.lang.String-">add</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html" title="interface in com.snowplowanalytics.snowplow.tracker.payload">Payload</a></code></dd>
@@ -295,7 +326,7 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payloa
 <h4>addMap</h4>
 <pre>public&nbsp;void&nbsp;addMap(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;map)</pre>
 <div class="block">Add all the mappings from the specified map. The effect is the equivalent to
- that of calling: - add(String key, String value) for each key value pair.</div>
+ that of calling <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html#add-java.lang.String-java.lang.String-"><code>add(String, String)</code></a> for each key value pair.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#addMap-java.util.Map-">addMap</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html" title="interface in com.snowplowanalytics.snowplow.tracker.payload">Payload</a></code></dd>

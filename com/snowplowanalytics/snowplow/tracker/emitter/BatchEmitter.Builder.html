@@ -155,11 +155,15 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html" title="type parameter in BatchEmitter.Builder">T</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html#batchSize-int-">batchSize</a></span>(int&nbsp;batchSize)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html#batchSize-int-">batchSize</a></span>(int&nbsp;batchSize)</code>
+<div class="block">The default batch size is 50.</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html" title="type parameter in BatchEmitter.Builder">T</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html#bufferCapacity-int-">bufferCapacity</a></span>(int&nbsp;bufferCapacity)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html#bufferCapacity-int-">bufferCapacity</a></span>(int&nbsp;bufferCapacity)</code>
+<div class="block">The default buffer capacity is Integer.MAX_VALUE.</div>
+</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">BatchEmitter</a></code></td>
@@ -167,7 +171,9 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html" title="type parameter in BatchEmitter.Builder">T</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html#eventStore-com.snowplowanalytics.snowplow.tracker.emitter.EventStore-">eventStore</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/EventStore.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">EventStore</a>&nbsp;eventStore)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html#eventStore-com.snowplowanalytics.snowplow.tracker.emitter.EventStore-">eventStore</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/EventStore.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">EventStore</a>&nbsp;eventStore)</code>
+<div class="block">The default EventStore is InMemoryEventStore.</div>
+</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -222,9 +228,10 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 <li class="blockList">
 <h4>batchSize</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html" title="type parameter in BatchEmitter.Builder">T</a>&nbsp;batchSize(int&nbsp;batchSize)</pre>
+<div class="block">The default batch size is 50.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>batchSize</code> - The count of events to buffer before sending</dd>
+<dd><code>batchSize</code> - The count of events to send in one HTTP request</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>itself</dd>
 </dl>
@@ -237,6 +244,7 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 <li class="blockList">
 <h4>eventStore</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html" title="type parameter in BatchEmitter.Builder">T</a>&nbsp;eventStore(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/EventStore.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">EventStore</a>&nbsp;eventStore)</pre>
+<div class="block">The default EventStore is InMemoryEventStore.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>eventStore</code> - The EventStore to use</dd>
@@ -252,6 +260,8 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/A
 <li class="blockList">
 <h4>bufferCapacity</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.Builder.html" title="type parameter in BatchEmitter.Builder">T</a>&nbsp;bufferCapacity(int&nbsp;bufferCapacity)</pre>
+<div class="block">The default buffer capacity is Integer.MAX_VALUE. Your application would likely run out
+ of memory before buffering this many events. When the buffer is full, new events are lost.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>bufferCapacity</code> - The maximum capacity of the default InMemoryEventStore event buffer</dd>

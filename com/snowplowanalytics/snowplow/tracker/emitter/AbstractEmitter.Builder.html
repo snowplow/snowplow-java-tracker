@@ -155,7 +155,7 @@ extends java.lang.Object</pre>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html" title="type parameter in AbstractEmitter.Builder">T</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html#httpClientAdapter-com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter-">httpClientAdapter</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/http/HttpClientAdapter.html" title="interface in com.snowplowanalytics.snowplow.tracker.http">HttpClientAdapter</a>&nbsp;httpClientAdapter)</code>
-<div class="block">Adds the HttpClientAdapter to the AbstractEmitter</div>
+<div class="block">Adds a custom HttpClientAdapter to the AbstractEmitter.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -171,14 +171,13 @@ extends java.lang.Object</pre>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html" title="type parameter in AbstractEmitter.Builder">T</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html#threadCount-int-">threadCount</a></span>(int&nbsp;threadCount)</code>
-<div class="block">Sets the Thread Count for the ExecutorService</div>
+<div class="block">Sets the Thread Count for the ScheduledExecutorService.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html" title="type parameter in AbstractEmitter.Builder">T</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html#url-java.lang.String-">url</a></span>(java.lang.String&nbsp;collectorUrl)</code>
-<div class="block">Sets the emitter url for when a httpClientAdapter is not specified
- Will be used to create the default OkHttpClientAdapter.</div>
+<div class="block">Sets the emitter url for when a httpClientAdapter is not specified.</div>
 </td>
 </tr>
 </table>
@@ -255,7 +254,7 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>httpClientAdapter</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html" title="type parameter in AbstractEmitter.Builder">T</a>&nbsp;httpClientAdapter(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/http/HttpClientAdapter.html" title="interface in com.snowplowanalytics.snowplow.tracker.http">HttpClientAdapter</a>&nbsp;httpClientAdapter)</pre>
-<div class="block">Adds the HttpClientAdapter to the AbstractEmitter</div>
+<div class="block">Adds a custom HttpClientAdapter to the AbstractEmitter. The default is OkHttpClientAdapter.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>httpClientAdapter</code> - the adapter to use</dd>
@@ -271,7 +270,7 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>threadCount</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html" title="type parameter in AbstractEmitter.Builder">T</a>&nbsp;threadCount(int&nbsp;threadCount)</pre>
-<div class="block">Sets the Thread Count for the ExecutorService</div>
+<div class="block">Sets the Thread Count for the ScheduledExecutorService. The default is 50.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>threadCount</code> - the size of the thread pool</dd>
@@ -287,8 +286,8 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>url</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.Builder.html" title="type parameter in AbstractEmitter.Builder">T</a>&nbsp;url(java.lang.String&nbsp;collectorUrl)</pre>
-<div class="block">Sets the emitter url for when a httpClientAdapter is not specified
- Will be used to create the default OkHttpClientAdapter.</div>
+<div class="block">Sets the emitter url for when a httpClientAdapter is not specified.
+ It will be used to create the default OkHttpClientAdapter.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>collectorUrl</code> - the url for the default httpClientAdapter</dd>

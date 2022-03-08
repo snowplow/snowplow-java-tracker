@@ -128,9 +128,7 @@ var activeTableTab = "activeTableTab";
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#add-java.lang.String-java.lang.String-">add</a></span>(java.lang.String&nbsp;key,
    java.lang.String&nbsp;value)</code>
-<div class="block">Add a key-value pair to the payload:
- - Checks that the key is not null or empty
- - Checks that the value is not null or empty</div>
+<div class="block">Add a key-value pair to the payload.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -190,9 +188,9 @@ var activeTableTab = "activeTableTab";
 <h4>add</h4>
 <pre>void&nbsp;add(java.lang.String&nbsp;key,
          java.lang.String&nbsp;value)</pre>
-<div class="block">Add a key-value pair to the payload:
- - Checks that the key is not null or empty
- - Checks that the value is not null or empty</div>
+<div class="block">Add a key-value pair to the payload.
+
+ It checks that neither the key nor value is null or empty.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>key</code> - The parameter key</dd>
@@ -207,8 +205,8 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <h4>addMap</h4>
 <pre>void&nbsp;addMap(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;map)</pre>
-<div class="block">Add all the mappings from the specified map. The effect is the equivalent to that of calling:
-  - add(String key, String value) for each key value pair.</div>
+<div class="block">Add all the mappings from the specified map. The effect is the equivalent to that of calling
+  <a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/Payload.html#add-java.lang.String-java.lang.String-"><code>add(String, String)</code></a> for each key value pair.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>map</code> - Key-Value pairs to be stored in this payload</dd>

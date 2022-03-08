@@ -119,8 +119,18 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">BatchEmitter</span>
 extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">AbstractEmitter</a>
 implements java.io.Closeable</pre>
-<div class="block">An emitter that emit a batch of events in a single call 
- It uses the post method of underlying http adapter</div>
+<div class="block">An emitter that emits a batch of events in a single HTTP request.
+ It uses the POST method of the underlying HTTP adapter.
+
+ When a new event (TrackerPayload) is received and added to the buffer, the BatchEmitter checks the
+ number of buffered events. If it is equal to or greater than the `batchSize`, an attempt is made to send
+ a batch of events as one request. Events are sent asynchronously.
+
+ If the request is unsuccessful, the events are returned to the buffer. A delay is introduced for all
+ event sending attempts. This increases exponentially until a request succeeds, when it is reset to 0.
+ Retry will continue indefinitely.
+
+ If the buffer becomes full due to network problems, newer events will be lost.</div>
 </li>
 </ul>
 </div>
@@ -193,9 +203,9 @@ implements java.io.Closeable</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.html#add-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">add</a></span>(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</code>
-<div class="block">Adds a TrackerPayload to the concurrent queue buffer</div>
+<div class="block">Adds a TrackerPayload to the EventStore buffer.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -205,25 +215,25 @@ implements java.io.Closeable</pre>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.html#close--">close</a></span>()</code>
-<div class="block">On close, attempt to send all remaining events.</div>
+<div class="block">Attempt to send all remaining events, then shut down the ExecutorService.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.html#flushBuffer--">flushBuffer</a></span>()</code>
-<div class="block">Forces all the payloads currently in the buffer to be sent immediately</div>
+<div class="block">Forces all the payloads currently in the buffer to be sent immediately, as a single request.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.html#getBatchSize--">getBatchSize</a></span>()</code>
-<div class="block">Gets the Emitter batch Size</div>
+<div class="block">Gets the Emitter `batchSize`</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/BatchEmitter.html#getBuffer--">getBuffer</a></span>()</code>
-<div class="block">Returns List of Payloads that are in the buffer.</div>
+<div class="block">Returns a List of Payloads that are in the buffer.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
@@ -293,18 +303,21 @@ implements java.io.Closeable</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>add</h4>
-<pre>public&nbsp;void&nbsp;add(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</pre>
-<div class="block">Adds a TrackerPayload to the concurrent queue buffer
+<pre>public&nbsp;boolean&nbsp;add(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;payload)</pre>
+<div class="block">Adds a TrackerPayload to the EventStore buffer.
+ If the buffer is full, the payload will be lost.
+
  <p>
- <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
- has a side-effect and will shutdown that ExecutorService.</em></div>
+ <b>Implementation note: </b><em>As a side effect it triggers an Emitter thread to emit a batch of events.</em></div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html#add-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">add</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">Emitter</a></code></dd>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.html#add-com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload-">add</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">AbstractEmitter</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>payload</code> - a payload</dd>
+<dd><code>payload</code> - a TrackerPayload</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>whether the payload has been successfully added to the buffer.</dd>
 </dl>
 </li>
 </ul>
@@ -315,7 +328,7 @@ implements java.io.Closeable</pre>
 <li class="blockList">
 <h4>flushBuffer</h4>
 <pre>public&nbsp;void&nbsp;flushBuffer()</pre>
-<div class="block">Forces all the payloads currently in the buffer to be sent immediately</div>
+<div class="block">Forces all the payloads currently in the buffer to be sent immediately, as a single request.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html#flushBuffer--">flushBuffer</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">Emitter</a></code></dd>
@@ -331,7 +344,7 @@ implements java.io.Closeable</pre>
 <li class="blockList">
 <h4>getBuffer</h4>
 <pre>public&nbsp;java.util.List&lt;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&gt;&nbsp;getBuffer()</pre>
-<div class="block">Returns List of Payloads that are in the buffer.</div>
+<div class="block">Returns a List of Payloads that are in the buffer.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html#getBuffer--">getBuffer</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">Emitter</a></code></dd>
@@ -356,7 +369,7 @@ implements java.io.Closeable</pre>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.html#setBatchSize-int-">setBatchSize</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/AbstractEmitter.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">AbstractEmitter</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>batchSize</code> - number of events to collect before sending</dd>
+<dd><code>batchSize</code> - number of events to send in one request</dd>
 </dl>
 </li>
 </ul>
@@ -367,7 +380,7 @@ implements java.io.Closeable</pre>
 <li class="blockList">
 <h4>getBatchSize</h4>
 <pre>public&nbsp;int&nbsp;getBatchSize()</pre>
-<div class="block">Gets the Emitter batch Size</div>
+<div class="block">Gets the Emitter `batchSize`</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html#getBatchSize--">getBatchSize</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/emitter/Emitter.html" title="interface in com.snowplowanalytics.snowplow.tracker.emitter">Emitter</a></code></dd>
@@ -385,7 +398,8 @@ implements java.io.Closeable</pre>
 <li class="blockList">
 <h4>close</h4>
 <pre>public&nbsp;void&nbsp;close()</pre>
-<div class="block">On close, attempt to send all remaining events.
+<div class="block">Attempt to send all remaining events, then shut down the ExecutorService.
+
  <p>
   <b>Implementation note: </b><em>Be aware that calling `close()`
   has a side-effect of shutting down the Emitter ScheduledExecutorService.</em></div>
