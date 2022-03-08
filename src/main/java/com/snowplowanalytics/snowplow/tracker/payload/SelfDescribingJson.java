@@ -24,9 +24,9 @@ import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 
 /**
- * Builds a SelfDescribingJson object which can contain two fields:
- * - Schema: the JsonSchema path for this Json
- * - Data: the data for this Json
+ * Builds a SelfDescribingJson object. SelfDescribingJson must contain only two fields, schema and data.
+ *
+ * Schema is the JsonSchema path for this Json. Data is the data.
  */
 public class SelfDescribingJson implements Payload {
 
@@ -35,7 +35,7 @@ public class SelfDescribingJson implements Payload {
 
     /**
      * Creates a SelfDescribingJson with only a Schema
-     * String and an empty data map.
+     * String and an empty data map. Data can be added later using {@link #setData(Object)}.
      *
      * @param schema the schema string
      */
@@ -46,6 +46,11 @@ public class SelfDescribingJson implements Payload {
     /**
      * Creates a SelfDescribingJson with a Schema and a
      * TrackerPayload object.
+     *
+     * Note that TrackerPayload objects are initialised with an eventId UUID and
+     * timestamp (deviceCreatedTimestamp), as they are the basis for sending events.
+     * Therefore, your SelfDescribingJson data will contain the keys "eid" and "dtm".
+     * This is unlikely to be what you want.
      *
      * @param schema the schema string
      * @param data a TrackerPayload object to be embedded as
@@ -59,7 +64,7 @@ public class SelfDescribingJson implements Payload {
     /**
      * Creates a SelfDescribingJson with a Schema and a
      * SelfDescribingJson object.  This can be used to
-     * nest SDJs inside of each other.
+     * nest SDJs inside each other.
      *
      * @param schema the schema string
      * @param data a SelfDescribingJson object to be embedded as
@@ -96,8 +101,12 @@ public class SelfDescribingJson implements Payload {
     }
 
     /**
-     * Adds data to the SelfDescribingJson
-     * - Accepts a TrackerPayload object
+     * Adds data to the SelfDescribingJson from a TrackerPayload object.
+     *
+     * Note that TrackerPayload objects are initialised with an eventId UUID and
+     * timestamp (deviceCreatedTimestamp), as they are the basis for sending events.
+     * Therefore, your SelfDescribingJson data will contain the keys "eid" and "dtm".
+     * This is unlikely to be what you want.
      *
      * @param data the data to be added to the SelfDescribingJson
      * @return this SelfDescribingJson

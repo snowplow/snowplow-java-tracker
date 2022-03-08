@@ -201,6 +201,7 @@ public class Tracker {
 
     /**
      * Handles tracking the different types of events.
+     *
      * A TrackerPayload object - or more than one, in the case of eCommerceTransaction events -
      * will be created from the Event. This is passed to the configured Emitter.
      * If the event was successfully added to the Emitter buffer for sending,

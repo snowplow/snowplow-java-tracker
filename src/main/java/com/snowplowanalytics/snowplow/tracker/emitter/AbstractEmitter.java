@@ -58,7 +58,7 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         /**
-         * Adds the HttpClientAdapter to the AbstractEmitter
+         * Adds a custom HttpClientAdapter to the AbstractEmitter. The default is OkHttpClientAdapter.
          *
          * @param httpClientAdapter the adapter to use
          * @return itself
@@ -69,7 +69,7 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         /**
-         * Sets the Thread Count for the ExecutorService
+         * Sets the Thread Count for the ScheduledExecutorService. The default is 50.
          *
          * @param threadCount the size of the thread pool
          * @return itself
@@ -80,8 +80,8 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         /**
-         * Sets the emitter url for when a httpClientAdapter is not specified
-         * Will be used to create the default OkHttpClientAdapter.
+         * Sets the emitter url for when a httpClientAdapter is not specified.
+         * It will be used to create the default OkHttpClientAdapter.
          *
          * @param collectorUrl the url for the default httpClientAdapter
          * @return itself

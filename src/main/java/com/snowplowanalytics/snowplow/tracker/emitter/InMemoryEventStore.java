@@ -28,7 +28,7 @@ public class InMemoryEventStore implements EventStore {
     private final ConcurrentHashMap<Long, List<TrackerPayload>> eventsBeingSent = new ConcurrentHashMap<>();
 
     /**
-     * Make a new InMemoryEventStore with default queue capacity (`Integer.MAX_VALUE`).
+     * Make a new InMemoryEventStore with default queue capacity (Integer.MAX_VALUE).
      */
     public InMemoryEventStore() {
         eventBuffer = new LinkedBlockingDeque<>();

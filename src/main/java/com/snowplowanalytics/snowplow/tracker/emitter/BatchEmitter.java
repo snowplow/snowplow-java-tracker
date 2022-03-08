@@ -29,8 +29,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An emitter that emit a batch of events in a single call 
- * It uses the post method of underlying http adapter
+ * An emitter that emits a batch of events in a single HTTP request.
+ * It uses the POST method of the underlying HTTP adapter.
+ *
+ * When a new event (TrackerPayload) is received and added to the buffer, the BatchEmitter checks the
+ * number of buffered events. If it is equal to or greater than the `batchSize`, an attempt is made to send
+ * a batch of events as one request. Events are sent asynchronously.
+ *
+ * If the request is unsuccessful, the events are returned to the buffer. A delay is introduced for all
+ * event sending attempts. This increases exponentially until a request succeeds, when it is reset to 0.
+ * Retry will continue indefinitely.
+ *
+ * If the buffer becomes full due to network problems, newer events will be lost.
  */
 public class BatchEmitter extends AbstractEmitter implements Closeable {
 
@@ -48,7 +58,9 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         private EventStore eventStore;
 
         /**
-         * @param batchSize The count of events to buffer before sending
+         * The default batch size is 50.
+         *
+         * @param batchSize The count of events to send in one HTTP request
          * @return itself
          */
         public T batchSize(final int batchSize) {
@@ -57,6 +69,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         }
 
         /**
+         * The default EventStore is InMemoryEventStore.
+         *
          * @param eventStore The EventStore to use
          * @return itself
          */
@@ -66,6 +80,9 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         }
 
         /**
+         * The default buffer capacity is Integer.MAX_VALUE. Your application would likely run out
+         * of memory before buffering this many events. When the buffer is full, new events are lost.
+         *
          * @param bufferCapacity The maximum capacity of the default InMemoryEventStore event buffer
          * @return itself
          */
@@ -106,11 +123,14 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Adds a TrackerPayload to the concurrent queue buffer
+     * Adds a TrackerPayload to the EventStore buffer.
+     * If the buffer is full, the payload will be lost.
+     *
      * <p>
      * <b>Implementation note: </b><em>As a side effect it triggers an Emitter thread to emit a batch of events.</em>
      *
-     * @param payload a payload
+     * @param payload a TrackerPayload
+     * @return whether the payload has been successfully added to the buffer.
      */
     @Override
     public boolean add(final TrackerPayload payload) {
@@ -130,7 +150,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Forces all the payloads currently in the buffer to be sent immediately
+     * Forces all the payloads currently in the buffer to be sent immediately, as a single request.
      */
     @Override
     public void flushBuffer() {
@@ -138,7 +158,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Returns List of Payloads that are in the buffer.
+     * Returns a List of Payloads that are in the buffer.
      *
      * @return the buffered events
      */
@@ -150,7 +170,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     /**
      * Customize the emitter batch size to any valid integer greater than zero.
      *
-     * @param batchSize number of events to collect before sending
+     * @param batchSize number of events to send in one request
      */
     @Override
     public void setBatchSize(final int batchSize) {
@@ -159,7 +179,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Gets the Emitter batch Size
+     * Gets the Emitter `batchSize`
      *
      * @return the batch size
      */
@@ -234,7 +254,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * On close, attempt to send all remaining events.
+     * Attempt to send all remaining events, then shut down the ExecutorService.
+     *
      * <p>
      *  <b>Implementation note: </b><em>Be aware that calling `close()`
      *  has a side-effect of shutting down the Emitter ScheduledExecutorService.</em>

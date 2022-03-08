@@ -23,8 +23,14 @@ import org.slf4j.LoggerFactory;
 import com.snowplowanalytics.snowplow.tracker.Utils;
 
 /**
- * Returns a standard Tracker Payload consisting of
- * many key - pair values.
+ * A TrackerPayload stores a map of key - pair values.
+ *
+ * When the Emitter attempts to send a TrackerPayload, these pairs are extracted
+ * and added to the HTTP request (via a SelfDescribingJson).
+ * The deviceSentTimestamp ("stm") is added at that point.
+ *
+ * EventId and deviceCreatedTimestamp are added to the internal map at
+ * TrackerPayload initialization.
  */
 public class TrackerPayload implements Payload {
 
@@ -51,8 +57,8 @@ public class TrackerPayload implements Payload {
     }
 
     /**
-     * Add a key-value pair to the payload: - Checks that the key is not null or
-     * empty - Checks that the value is not null or empty
+     * Add a key-value pair to the payload.
+     * Checks that neither the key nor the value are null or empty.
      *
      * @param key   The parameter key
      * @param value The parameter value as a String
@@ -73,7 +79,7 @@ public class TrackerPayload implements Payload {
 
     /**
      * Add all the mappings from the specified map. The effect is the equivalent to
-     * that of calling: - add(String key, String value) for each key value pair.
+     * that of calling {@link #add(String, String)} for each key value pair.
      *
      * @param map Key-Value pairs to be stored in this payload
      */
