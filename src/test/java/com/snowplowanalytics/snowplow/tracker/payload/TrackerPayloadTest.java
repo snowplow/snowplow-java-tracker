@@ -27,9 +27,15 @@ public class TrackerPayloadTest {
     @Test
     public void testGetEventId() {
         TrackerPayload payload = new TrackerPayload();
-        // this throws an exception if it's not a valid UUID string
-        UUID.fromString(payload.getEventId());
 
+        boolean isValidEventId = true;
+        try {
+            UUID.fromString(payload.getEventId());
+        } catch (Exception e) {
+            isValidEventId = false;
+        }
+
+        assertTrue(isValidEventId);
         assertTrue(payload.getMap().containsKey("eid"));
         assertEquals(payload.getEventId(), payload.getMap().get("eid"));
     }

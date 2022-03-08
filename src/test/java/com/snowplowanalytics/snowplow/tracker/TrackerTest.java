@@ -77,8 +77,14 @@ public class TrackerTest {
 
         Thread.sleep(500);
 
-        // this throws an exception if it's not a valid UUID string
-        UUID.fromString(result.get(0));
+        boolean isValidEventId = true;
+        try {
+            UUID.fromString(result.get(0));
+        } catch (Exception e) {
+            isValidEventId = false;
+        }
+
+        assertTrue(isValidEventId);
     }
 
     @Test
@@ -258,7 +264,7 @@ public class TrackerTest {
         tracker.track(Unstructured.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                        ImmutableMap.of("foo", "baær")
+                        ImmutableMap.of("foo", "bar")
                 ))
                 .build());
 
@@ -324,15 +330,14 @@ public class TrackerTest {
                 .pageUrl("url")
                 .pageTitle("title")
                 .referrer("referer")
-                .trueTimestamp(456789L)
+                .trueTimestamp(123456L)
                 .build());
 
-        Thread.sleep(500);
-
-        tracker.track(PageView.builder()
-                .pageUrl("url")
-                .pageTitle("title")
-                .referrer("referer")
+        tracker.track(Unstructured.builder()
+                .eventData(new SelfDescribingJson(
+                        "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
+                        ImmutableMap.of("foo", "bar")
+                ))
                 .trueTimestamp(456789L)
                 .build());
 
@@ -344,7 +349,7 @@ public class TrackerTest {
 
         Map<String, String> result1 = results.get(0).getMap();
         Map<String, String> expected1 = ImmutableMap.<String, String>builder()
-                .put("ttm", "456789")
+                .put("ttm", "123456")
                 .put("tz", "Etc/UTC")
                 .put("e", "pv")
                 .put("page", "title")
@@ -361,15 +366,13 @@ public class TrackerTest {
         Map<String, String> result2 = results.get(1).getMap();
         Map<String, String> expected2 = ImmutableMap.<String, String>builder()
                 .put("ttm", "456789")
-                .put("tz", "Etc/UTC")
-                .put("e", "pv")
-                .put("page", "title")
-                .put("tv", Version.TRACKER)
                 .put("p", "srv")
+                .put("tv", Version.TRACKER)
+                .put("e", "ue")
                 .put("tna", "AF003")
+                .put("tz", "Etc/UTC")
+                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"bar\"}}}")
                 .put("aid", "cloudfront")
-                .put("refr", "referer")
-                .put("url", "url")
                 .build();
 
         assertTrue(result2.entrySet().containsAll(expected2.entrySet()));
@@ -401,8 +404,6 @@ public class TrackerTest {
                 .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
                 .build();
 
-        System.out.println(expected);
-        System.out.println(result);
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
 
