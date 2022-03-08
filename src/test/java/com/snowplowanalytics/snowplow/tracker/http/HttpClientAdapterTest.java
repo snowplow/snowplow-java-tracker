@@ -92,10 +92,15 @@ public class HttpClientAdapterTest {
         data.add("space", "b a r");
         adapter.get(data);
 
+        String eventId = data.getEventId();
+        String dtm = Long.toString(data.getDeviceCreatedTimestamp());
+
         // Then
         assertEquals(1, mockWebServer.getRequestCount());
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertEquals("/i?foo=bar&space=b%20a%20r", recordedRequest.getPath());
+
+        String expectedString = "/i?eid=" + eventId + "&dtm=" + dtm + "&foo=bar&space=b%20a%20r";
+        assertEquals(expectedString, recordedRequest.getPath());
         assertEquals("GET", recordedRequest.getMethod());
     }
 

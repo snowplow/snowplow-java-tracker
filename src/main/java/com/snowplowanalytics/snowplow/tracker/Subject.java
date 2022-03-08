@@ -21,6 +21,8 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 
 /**
  * An object for managing extra event decoration.
+ * All the properties are optional. However, the timezone is set by default,
+ * to that of the server.
  */
 public class Subject {
 

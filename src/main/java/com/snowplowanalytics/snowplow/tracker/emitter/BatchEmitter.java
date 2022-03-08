@@ -108,13 +108,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     /**
      * Adds a TrackerPayload to the concurrent queue buffer
      * <p>
-     * <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
-     * has a side-effect and will shutdown that ExecutorService.</em>
+     * <b>Implementation note: </b><em>As a side effect it triggers an Emitter thread to emit a batch of events.</em>
      *
      * @param payload a payload
      */
     @Override
-    public void add(final TrackerPayload payload) {
+    public boolean add(final TrackerPayload payload) {
         boolean result = eventStore.addEvent(payload);
 
         if (!isClosing) {
@@ -126,6 +125,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         if (!result) {
             LOGGER.error("Unable to add payload to emitter, emitter buffer is full");
         }
+
+        return result;
     }
 
     /**

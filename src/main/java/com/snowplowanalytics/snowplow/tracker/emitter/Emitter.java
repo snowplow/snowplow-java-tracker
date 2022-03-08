@@ -27,7 +27,7 @@ public interface Emitter {
      *
      * @param payload a payload to be emitted
      */
-    void add(TrackerPayload payload);
+    boolean add(TrackerPayload payload);
 
     /**
      * Customize the emitter batch size to any valid integer

@@ -102,6 +102,6 @@ public class PageView extends AbstractEvent {
         payload.add(Parameter.PAGE_URL, this.pageUrl);
         payload.add(Parameter.PAGE_TITLE, this.pageTitle);
         payload.add(Parameter.PAGE_REFR, this.referrer);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

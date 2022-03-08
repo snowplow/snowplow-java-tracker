@@ -131,6 +131,6 @@ public class Structured extends AbstractEvent {
         payload.add(Parameter.SE_PROPERTY, this.property);
         payload.add(Parameter.SE_VALUE,
                 this.value != null ? Double.toString(this.value) : null);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

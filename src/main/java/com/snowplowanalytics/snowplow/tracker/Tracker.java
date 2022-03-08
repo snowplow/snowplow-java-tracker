@@ -187,7 +187,7 @@ public class Tracker {
      * @return the wrapper containing the Tracker parameters
      */
     public TrackerParameters getParameters() {
-        return this.parameters;
+        return parameters;
     }
 
     // --- Event Tracking Functions
@@ -195,21 +195,41 @@ public class Tracker {
     /**
      * Handles tracking the different types of events that
      * the Tracker can encounter.
+     * A TrackerPayload object - or more than one, in the case of eCommerceTransaction events -
+     * will be created from the Event. This is passed to the configured Emitter.
+     * If the event was successfully added to the Emitter buffer for sending,
+     * a list containing the payload's eventId string (a UUID) is returned.
+     * EcommerceTransactions will return all the relevant eventIds in the list.
+     * If the Emitter event buffer is full, the payload will be lost. In this case, this method
+     * returns a list containing null.
+     * <p>
+     * <b>Implementation note: </b><em>As a side effect of adding a payload to the Emitter,
+     * it triggers an Emitter thread to emit a batch of events.</em>
      *
      * @param event the event to track
+     * @return a list of eventIDs (UUIDs)
      */
-    public void track(Event event) {
+    public List<String> track(Event event) {
+        List<String> results = new ArrayList<>();
         // a list because Ecommerce events become multiple Payloads
         List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
         for (Event processedEvent : processedEvents) {
-            // Event ID (eid) and device_created_timestamp (dtm) are generated when the Event is initialised
+            // Event ID (eid) and device_created_timestamp (dtm) are generated when
+            // the TrackerPayload is created
             TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
 
             addTrackerParameters(payload);
             addContext(processedEvent, payload);
             addSubject(processedEvent, payload);
-            this.emitter.add(payload);
+
+            boolean addedToBuffer = emitter.add(payload);
+            if (addedToBuffer) {
+                results.add(payload.getEventId());
+            } else {
+                results.add(null);
+            }
         }
+        return results;
     }
 
     private List<Event> eventTypeSpecificPreProcessing(Event event) {
@@ -223,7 +243,7 @@ public class Tracker {
         if (eventClass.equals(Unstructured.class)) {
             // Need to set the Base64 rule for Unstructured events
             final Unstructured unstructured = (Unstructured) event;
-            unstructured.setBase64Encode(this.parameters.getBase64Encoded());
+            unstructured.setBase64Encode(parameters.getBase64Encoded());
             eventList.add(unstructured);
 
         } else if (eventClass.equals(EcommerceTransaction.class)) {
@@ -231,23 +251,19 @@ public class Tracker {
             eventList.add(ecommerceTransaction);
 
             // Track each item individually
-            for (final EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
-                item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
-                eventList.add(item);
-            }
+            eventList.addAll(ecommerceTransaction.getItems());
+
         } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
             // Timing and ScreenView events are wrapper classes for Unstructured events
             // Need to create Unstructured events from them to send.
             final Unstructured unstructured = Unstructured.builder()
                     .eventData((SelfDescribingJson) event.getPayload())
                     .customContext(event.getContext())
-                    .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
                     .trueTimestamp(event.getTrueTimestamp())
-                    .eventId(event.getEventId())
                     .subject(event.getSubject())
                     .build();
 
-            unstructured.setBase64Encode(this.parameters.getBase64Encoded());
+            unstructured.setBase64Encode(parameters.getBase64Encoded());
             eventList.add(unstructured);
 
         } else {
@@ -257,10 +273,10 @@ public class Tracker {
     }
 
     private void addTrackerParameters(TrackerPayload payload) {
-        payload.add(Parameter.PLATFORM, this.parameters.getPlatform().toString());
-        payload.add(Parameter.APP_ID, this.parameters.getAppId());
-        payload.add(Parameter.NAMESPACE, this.parameters.getNamespace());
-        payload.add(Parameter.TRACKER_VERSION, this.parameters.getTrackerVersion());
+        payload.add(Parameter.PLATFORM, parameters.getPlatform().toString());
+        payload.add(Parameter.APP_ID, parameters.getAppId());
+        payload.add(Parameter.NAMESPACE, parameters.getNamespace());
+        payload.add(Parameter.TRACKER_VERSION, parameters.getTrackerVersion());
     }
 
     private void addContext(Event event, TrackerPayload payload) {
@@ -269,7 +285,7 @@ public class Tracker {
         // Build the final context and add it to the payload
         if (entities != null && entities.size() > 0) {
             SelfDescribingJson envelope = getFinalContext(entities);
-            payload.addMap(envelope.getMap(), this.parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
+            payload.addMap(envelope.getMap(), parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
         }
     }
 
@@ -293,8 +309,8 @@ public class Tracker {
         // Add subject if available
         if (eventSubject != null) {
             payload.addMap(new HashMap<>(eventSubject.getSubject()));
-        } else if (this.subject != null) {
-            payload.addMap(new HashMap<>(this.subject.getSubject()));
+        } else if (subject != null) {
+            payload.addMap(new HashMap<>(subject.getSubject()));
         }
     }
 

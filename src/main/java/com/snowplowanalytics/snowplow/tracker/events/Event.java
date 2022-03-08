@@ -29,26 +29,9 @@ public interface Event {
     List<SelfDescribingJson> getContext();
 
     /**
-     * @return the event's timestamp
-     * Use {@link #getTrueTimestamp()} or {@link #getDeviceCreatedTimestamp()}
-     */
-    @Deprecated
-    long getTimestamp();
-
-    /**
      * @return the event's true timestamp
      */
     Long getTrueTimestamp();
-
-    /**
-     * @return the event's device created timestamp
-     */
-    long getDeviceCreatedTimestamp();
-
-    /**
-     * @return the event id
-     */
-    String getEventId();
 
     /**
      * @return the event subject

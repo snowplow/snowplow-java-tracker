@@ -19,6 +19,8 @@ import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+import java.util.LinkedHashMap;
+
 public class ScreenView extends AbstractEvent {
 
     private final String name;
@@ -79,9 +81,9 @@ public class ScreenView extends AbstractEvent {
      * @return the payload as a SelfDescribingJson.
      */
     public SelfDescribingJson getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameter.SV_ID, this.id);
-        payload.add(Parameter.SV_NAME, this.name);
+        LinkedHashMap<String,Object> payload = new LinkedHashMap<>();
+        payload.put(Parameter.SV_ID, this.id);
+        payload.put(Parameter.SV_NAME, this.name);
         return new SelfDescribingJson(Constants.SCHEMA_SCREEN_VIEW, payload);
     }
 }

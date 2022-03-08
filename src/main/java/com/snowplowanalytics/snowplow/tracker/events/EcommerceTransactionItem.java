@@ -142,25 +142,9 @@ public class EcommerceTransactionItem extends AbstractEvent {
 
     /**
      * @param timestamp the new timestamp
-     * Use {@link #setTrueTimestamp(long)} or {@link #setTrueTimestamp(long)}
-     */
-    @Deprecated
-    public void setTimestamp(long timestamp) {
-        setDeviceCreatedTimestamp(timestamp);
-    }
-
-    /**
-     * @param timestamp the new timestamp
      */
     public void setTrueTimestamp(long timestamp) {
         this.trueTimestamp = timestamp;
-    }
-
-    /**
-     * @param timestamp the new timestamp
-     */
-    public void setDeviceCreatedTimestamp(Long timestamp) {
-        this.deviceCreatedTimestamp = timestamp;
     }
 
     /**
@@ -179,6 +163,6 @@ public class EcommerceTransactionItem extends AbstractEvent {
         payload.add(Parameter.TI_ITEM_PRICE, Double.toString(this.price));
         payload.add(Parameter.TI_ITEM_QUANTITY, Integer.toString(this.quantity));
         payload.add(Parameter.TI_ITEM_CURRENCY, this.currency);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.payload;
 // Java
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 // JUnit
 import org.junit.Test;
@@ -22,6 +23,33 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TrackerPayloadTest {
+
+    @Test
+    public void testGetEventId() {
+        TrackerPayload payload = new TrackerPayload();
+
+        boolean isValidEventId = true;
+        try {
+            UUID.fromString(payload.getEventId());
+        } catch (Exception e) {
+            isValidEventId = false;
+        }
+
+        assertTrue(isValidEventId);
+        assertTrue(payload.getMap().containsKey("eid"));
+        assertEquals(payload.getEventId(), payload.getMap().get("eid"));
+    }
+
+    @Test
+    public void testGetDeviceCreatedTimestamp() {
+        long currentTime = System.currentTimeMillis();
+        TrackerPayload payload = new TrackerPayload();
+        long timeDifference = payload.getDeviceCreatedTimestamp() - currentTime;
+        assertTrue(timeDifference < 1000);
+
+        assertTrue(payload.getMap().containsKey("dtm"));
+        assertEquals(Long.toString(payload.getDeviceCreatedTimestamp()), payload.getMap().get("dtm"));
+    }
 
     @Test
     public void testAddKeyValue() {
