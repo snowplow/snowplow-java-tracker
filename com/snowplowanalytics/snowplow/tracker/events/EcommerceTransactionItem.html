@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":10,"i2":10};
+var methods = {"i0":9,"i1":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -118,8 +118,21 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">EcommerceTransactionItem</span>
 extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html" title="class in com.snowplowanalytics.snowplow.tracker.events">AbstractEvent</a></pre>
-<div class="block">Constructs an EcommerceTransactionItem object, used in EcommerceTransaction events.
- EcommerceTransactionItems cannot be tracked directly.</div>
+<div class="block">Constructs an EcommerceTransactionItem object.
+ <p>
+ <b>Implementation note: </b><em>EcommerceTransaction/EcommerceTransactionItem uses a legacy design.
+ We aim to deprecate it eventually. We advise using Unstructured events instead, and attaching the items
+ as entities. </em>
+
+ EcommerceTransactionItems were designed for attaching data about purchased items to a
+ EcommerceTransaction event. They can technically be sent as events in their own right, but this is
+ not supported.
+
+ To link the "transaction" and "transaction item" events, we recommend using the same orderId for the
+ EcommerceTransaction and all attached EcommerceTransactionItems.
+
+ To use the Currency Conversion pipeline enrichment, the currency string must be
+ a valid Open Exchange Rates value.</div>
 </li>
 </ul>
 </div>
@@ -202,10 +215,6 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
  the local database.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html#setTrueTimestamp-long-">setTrueTimestamp</a></span>(long&nbsp;timestamp)</code>&nbsp;</td>
-</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.com.snowplowanalytics.snowplow.tracker.events.AbstractEvent">
@@ -259,19 +268,6 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
 <li class="blockList">
 <h4>builder</h4>
 <pre>public static&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.Builder.html" title="class in com.snowplowanalytics.snowplow.tracker.events">EcommerceTransactionItem.Builder</a>&lt;?&gt;&nbsp;builder()</pre>
-</li>
-</ul>
-<a name="setTrueTimestamp-long-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setTrueTimestamp</h4>
-<pre>public&nbsp;void&nbsp;setTrueTimestamp(long&nbsp;timestamp)</pre>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>timestamp</code> - the new timestamp</dd>
-</dl>
 </li>
 </ul>
 <a name="getPayload--">
