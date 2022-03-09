@@ -118,12 +118,13 @@ var activeTableTab = "activeTableTab";
 <pre>public abstract class <span class="typeNameLabel">AbstractEvent</span>
 extends java.lang.Object
 implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a></pre>
-<div class="block">Base AbstractEvent class which contains common
- elements to all events:
- - Custom Context: list of custom contexts or null
- - Timestamp: user defined event timestamp or 0
- - Event Id: a unique id for the event
- - Subject: a unique Subject for the event</div>
+<div class="block">Base AbstractEvent class which contains
+ elements that can be set in all events. These are context, trueTimestamp, and Subject.
+
+ Context is a list of custom SelfDescribingJson entities.
+ TrueTimestamp is a user-defined timestamp.
+ Subject is an event-specific Subject. Its fields will override those of the
+ Tracker-associated Subject, if present.</div>
 </li>
 </ul>
 </div>
@@ -172,7 +173,7 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 <tr class="altColor">
 <td class="colFirst"><code>protected java.lang.Long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html#trueTimestamp">trueTimestamp</a></span></code>
-<div class="block">The true timestamp may be null if none is set.</div>
+<div class="block">The trueTimestamp may be null if none is set.</div>
 </td>
 </tr>
 </table>
@@ -273,7 +274,7 @@ implements <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events
 <li class="blockList">
 <h4>trueTimestamp</h4>
 <pre>protected&nbsp;java.lang.Long trueTimestamp</pre>
-<div class="block">The true timestamp may be null if none is set.</div>
+<div class="block">The trueTimestamp may be null if none is set.</div>
 </li>
 </ul>
 <a name="subject">

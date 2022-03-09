@@ -118,6 +118,16 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">EcommerceTransaction</span>
 extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html" title="class in com.snowplowanalytics.snowplow.tracker.events">AbstractEvent</a></pre>
+<div class="block">Constructs an EcommerceTransaction event object. This event type uses a legacy design.
+ Instead of as context entities, the specific items purchased in the
+ transaction are added as EcommerceTransactionItem objects.
+
+ This event type is also different from the others in that it will generate more than one tracked event.
+ There will be one "transaction" event, and one "transaction item" event for every
+ EcommerceTransactionItem included in the EcommerceTransaction.
+
+ To use the Currency Conversion pipeline enrichment, the currency string must be
+ a valid Open Exchange Rates value.</div>
 </li>
 </ul>
 </div>

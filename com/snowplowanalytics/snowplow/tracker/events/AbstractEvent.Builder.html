@@ -174,7 +174,7 @@ extends java.lang.Object</pre>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html#customContext-java.util.List-">customContext</a></span>(java.util.List&lt;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/SelfDescribingJson.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">SelfDescribingJson</a>&gt;&nbsp;context)</code>
-<div class="block">Adds a list of custom contexts.</div>
+<div class="block">Adds a list of custom context entities.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -265,10 +265,10 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>customContext</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a>&nbsp;customContext(java.util.List&lt;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/SelfDescribingJson.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">SelfDescribingJson</a>&gt;&nbsp;context)</pre>
-<div class="block">Adds a list of custom contexts.</div>
+<div class="block">Adds a list of custom context entities.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>context</code> - the list of contexts</dd>
+<dd><code>context</code> - the list of entities</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>itself</dd>
 </dl>
@@ -298,7 +298,8 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>subject</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.Builder.html" title="type parameter in AbstractEvent.Builder">T</a>&nbsp;subject(<a href="../../../../../com/snowplowanalytics/snowplow/tracker/Subject.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject</a>&nbsp;subject)</pre>
-<div class="block">A custom subject for the event.</div>
+<div class="block">A custom subject for the event. Its fields will override those of the
+ Tracker-associated Subject, if present.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>subject</code> - the eventId</dd>
