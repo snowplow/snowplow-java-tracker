@@ -148,13 +148,12 @@ public class Main {
                 .customContext(context)
                 .build();
 
-//        tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
-//        tracker.track(ecommerceTransaction); // This will track two events
-//        tracker.track(unstructured);
-//        tracker.track(screenView);
-//        tracker.track(timing);
-//        tracker.track(structured);
-        tracker.track(item);
+        tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
+        tracker.track(ecommerceTransaction); // This will track two events
+        tracker.track(unstructured);
+        tracker.track(screenView);
+        tracker.track(timing);
+        tracker.track(structured);
 
         // Will close all threads and force send remaining events
         emitter.close();
