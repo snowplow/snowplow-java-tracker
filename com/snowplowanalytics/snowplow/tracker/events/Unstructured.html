@@ -118,7 +118,12 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">Unstructured</span>
 extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/AbstractEvent.html" title="class in com.snowplowanalytics.snowplow.tracker.events">AbstractEvent</a></pre>
-<div class="block">Constructs an Unstructured event object.</div>
+<div class="block">Constructs an Unstructured event object.
+
+ This is a customisable event type which allows you to track anything describable
+ by a JsonSchema.
+
+ When tracked, generates an "unstructured" or "ue" event.</div>
 </li>
 </ul>
 </div>
@@ -197,8 +202,7 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Unstructured.html#getPayload--">getPayload</a></span>()</code>
-<div class="block">Returns a TrackerPayload which can be stored into
- the local database.</div>
+<div class="block">Returns a TrackerPayload which can be passed to an Emitter.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
@@ -280,8 +284,7 @@ extends <a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Ab
 <li class="blockList">
 <h4>getPayload</h4>
 <pre>public&nbsp;<a href="../../../../../com/snowplowanalytics/snowplow/tracker/payload/TrackerPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.payload">TrackerPayload</a>&nbsp;getPayload()</pre>
-<div class="block">Returns a TrackerPayload which can be stored into
- the local database.</div>
+<div class="block">Returns a TrackerPayload which can be passed to an Emitter.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html#getPayload--">getPayload</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a></code></dd>

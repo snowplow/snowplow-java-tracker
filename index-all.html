@@ -614,7 +614,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/EcommerceTransaction.html#getItems--">getItems()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/EcommerceTransaction.html" title="class in com.snowplowanalytics.snowplow.tracker.events">EcommerceTransaction</a></dt>
 <dd>
-<div class="block">The list of Transaction Items passed with the event.</div>
+<div class="block">The list of EcommerceTransactionItems passed with the event.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/payload/Payload.html#getMap--">getMap()</a></span> - Method in interface com.snowplowanalytics.snowplow.tracker.payload.<a href="com/snowplowanalytics/snowplow/tracker/payload/Payload.html" title="interface in com.snowplowanalytics.snowplow.tracker.payload">Payload</a></dt>
 <dd>
@@ -638,20 +638,17 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/EcommerceTransaction.html#getPayload--">getPayload()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/EcommerceTransaction.html" title="class in com.snowplowanalytics.snowplow.tracker.events">EcommerceTransaction</a></dt>
 <dd>
-<div class="block">Returns a TrackerPayload which can be stored into
- the local database.</div>
+<div class="block">Returns a TrackerPayload which can be passed to an Emitter.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html#getPayload--">getPayload()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/EcommerceTransactionItem.html" title="class in com.snowplowanalytics.snowplow.tracker.events">EcommerceTransactionItem</a></dt>
 <dd>
-<div class="block">Returns a TrackerPayload which can be stored into
- the local database.</div>
+<div class="block">Returns a TrackerPayload which can be passed to an Emitter.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/Event.html#getPayload--">getPayload()</a></span> - Method in interface com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/Event.html" title="interface in com.snowplowanalytics.snowplow.tracker.events">Event</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/PageView.html#getPayload--">getPayload()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/PageView.html" title="class in com.snowplowanalytics.snowplow.tracker.events">PageView</a></dt>
 <dd>
-<div class="block">Returns a TrackerPayload which can be stored into
- the local database.</div>
+<div class="block">Returns a TrackerPayload which can be passed to an Emitter.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.html#getPayload--">getPayload()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.html" title="class in com.snowplowanalytics.snowplow.tracker.events">ScreenView</a></dt>
 <dd>
@@ -659,8 +656,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/Structured.html#getPayload--">getPayload()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/Structured.html" title="class in com.snowplowanalytics.snowplow.tracker.events">Structured</a></dt>
 <dd>
-<div class="block">Returns a TrackerPayload which can be stored into
- the local database.</div>
+<div class="block">Returns a TrackerPayload which can be passed to an Emitter.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/Timing.html#getPayload--">getPayload()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/Timing.html" title="class in com.snowplowanalytics.snowplow.tracker.events">Timing</a></dt>
 <dd>
@@ -668,8 +664,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/Unstructured.html#getPayload--">getPayload()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/Unstructured.html" title="class in com.snowplowanalytics.snowplow.tracker.events">Unstructured</a></dt>
 <dd>
-<div class="block">Returns a TrackerPayload which can be stored into
- the local database.</div>
+<div class="block">Returns a TrackerPayload which can be passed to an Emitter.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/emitter/BatchPayload.html#getPayloads--">getPayloads()</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.emitter.<a href="com/snowplowanalytics/snowplow/tracker/emitter/BatchPayload.html" title="class in com.snowplowanalytics.snowplow.tracker.emitter">BatchPayload</a></dt>
 <dd>&nbsp;</dd>
@@ -959,7 +954,9 @@
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html#screenResolution-int-int-">screenResolution(int, int)</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.<a href="com/snowplowanalytics/snowplow/tracker/Subject.SubjectBuilder.html" title="class in com.snowplowanalytics.snowplow.tracker">Subject.SubjectBuilder</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.html" title="class in com.snowplowanalytics.snowplow.tracker.events"><span class="typeNameLink">ScreenView</span></a> - Class in <a href="com/snowplowanalytics/snowplow/tracker/events/package-summary.html">com.snowplowanalytics.snowplow.tracker.events</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Constructs a ScreenView event object.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.html#ScreenView-com.snowplowanalytics.snowplow.tracker.events.ScreenView.Builder-">ScreenView(ScreenView.Builder&lt;?&gt;)</a></span> - Constructor for class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.html" title="class in com.snowplowanalytics.snowplow.tracker.events">ScreenView</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.Builder.html" title="class in com.snowplowanalytics.snowplow.tracker.events"><span class="typeNameLink">ScreenView.Builder</span></a>&lt;<a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.Builder.html" title="type parameter in ScreenView.Builder">T</a> extends <a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.Builder.html" title="class in com.snowplowanalytics.snowplow.tracker.events">ScreenView.Builder</a>&lt;<a href="com/snowplowanalytics/snowplow/tracker/events/ScreenView.Builder.html" title="type parameter in ScreenView.Builder">T</a>&gt;&gt; - Class in <a href="com/snowplowanalytics/snowplow/tracker/events/package-summary.html">com.snowplowanalytics.snowplow.tracker.events</a></dt>
@@ -1195,7 +1192,9 @@
  (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`)</div>
 </dd>
 <dt><a href="com/snowplowanalytics/snowplow/tracker/events/Timing.html" title="class in com.snowplowanalytics.snowplow.tracker.events"><span class="typeNameLink">Timing</span></a> - Class in <a href="com/snowplowanalytics/snowplow/tracker/events/package-summary.html">com.snowplowanalytics.snowplow.tracker.events</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Constructs a Timing event object.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/Timing.html#Timing-com.snowplowanalytics.snowplow.tracker.events.Timing.Builder-">Timing(Timing.Builder&lt;?&gt;)</a></span> - Constructor for class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/Timing.html" title="class in com.snowplowanalytics.snowplow.tracker.events">Timing</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/snowplowanalytics/snowplow/tracker/events/Timing.Builder.html#timing-java.lang.Integer-">timing(Integer)</a></span> - Method in class com.snowplowanalytics.snowplow.tracker.events.<a href="com/snowplowanalytics/snowplow/tracker/events/Timing.Builder.html" title="class in com.snowplowanalytics.snowplow.tracker.events">Timing.Builder</a></dt>
