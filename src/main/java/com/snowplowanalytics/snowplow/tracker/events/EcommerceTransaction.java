@@ -34,7 +34,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
  *
  * The specific items purchased in the transaction must be added as EcommerceTransactionItem objects.
  * This event type is different from the others in that it will generate more than one tracked event.
- * There will be one "transaction" event, and one "transaction item" event for every
+ * There will be one "transaction" ("tr") event, and one "transaction item" ("ti") event for every
  * EcommerceTransactionItem included in the EcommerceTransaction.
  *
  * To link the "transaction" and "transaction item" events, we recommend using the same orderId for the
@@ -214,8 +214,7 @@ public class EcommerceTransaction extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */
@@ -237,7 +236,7 @@ public class EcommerceTransaction extends AbstractEvent {
     }
 
     /**
-     * The list of Transaction Items passed with the event.
+     * The list of EcommerceTransactionItems passed with the event.
      *
      * @return the items.
      */

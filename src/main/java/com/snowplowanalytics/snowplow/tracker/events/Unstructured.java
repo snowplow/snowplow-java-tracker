@@ -23,6 +23,11 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Constructs an Unstructured event object.
+ *
+ * This is a customisable event type which allows you to track anything describable
+ * by a JsonSchema.
+ *
+ * When tracked, generates an "unstructured" or "ue" event.
  */
 public class Unstructured extends AbstractEvent {
 
@@ -34,9 +39,8 @@ public class Unstructured extends AbstractEvent {
         private SelfDescribingJson eventData;
 
         /**
-         * @param selfDescribingJson The properties of the event. Has two field:
-         *                  A "data" field containing the event properties and
-         *                  A "schema" field identifying the schema against which the data is validated
+         * @param selfDescribingJson The properties of the event. Has two fields: "data", containing the event properties,
+         *  and "schema", identifying the schema against which the data is validated
          * @return itself
          */
         public T eventData(SelfDescribingJson selfDescribingJson) {
@@ -77,8 +81,7 @@ public class Unstructured extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */
