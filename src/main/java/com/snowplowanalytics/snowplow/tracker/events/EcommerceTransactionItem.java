@@ -21,6 +21,10 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+/**
+ * Constructs an EcommerceTransactionItem object, used in EcommerceTransaction events.
+ * EcommerceTransactionItems cannot be tracked directly.
+ */
 public class EcommerceTransactionItem extends AbstractEvent {
 
     private final String itemId;

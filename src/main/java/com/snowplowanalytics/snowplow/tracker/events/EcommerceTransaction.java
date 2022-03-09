@@ -25,6 +25,18 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+/**
+ * Constructs an EcommerceTransaction event object. This event type uses a legacy design.
+ * Instead of as context entities, the specific items purchased in the
+ * transaction are added as EcommerceTransactionItem objects.
+ *
+ * This event type is also different from the others in that it will generate more than one tracked event.
+ * There will be one "transaction" event, and one "transaction item" event for every
+ * EcommerceTransactionItem included in the EcommerceTransaction.
+ *
+ * To use the Currency Conversion pipeline enrichment, the currency string must be
+ * a valid Open Exchange Rates value.
+ */
 public class EcommerceTransaction extends AbstractEvent {
 
     private final String orderId;
@@ -133,6 +145,9 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Provide a list of EcommerceTransactionItems.
+         * An empty list is valid, but probably not very useful.
+         *
          * @param items The items in the transaction
          * @return itself
          */
@@ -142,6 +157,9 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Provide EcommerceTransactionItems directly, without explicitly adding them
+         * to a list beforehand.
+         *
          * @param itemArgs The items as a varargs argument
          * @return itself
          */

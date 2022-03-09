@@ -22,26 +22,26 @@ import com.google.common.base.Preconditions;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * Base AbstractEvent class which contains common
- * elements to all events:
- * - Custom Context: list of custom contexts or null
- * - Timestamp: user defined event timestamp or 0
- * - Event Id: a unique id for the event
- * - Subject: a unique Subject for the event
+ * Base AbstractEvent class which contains
+ * elements that can be set in all events. These are context, trueTimestamp, and Subject.
+ *
+ * Context is a list of custom SelfDescribingJson entities.
+ * TrueTimestamp is a user-defined timestamp.
+ * Subject is an event-specific Subject. Its fields will override those of the
+ * Tracker-associated Subject, if present.
  */
 public abstract class AbstractEvent implements Event {
 
     protected final List<SelfDescribingJson> context;
 
     /**
-     * The true timestamp may be null if none is set.
+     * The trueTimestamp may be null if none is set.
      */
     protected Long trueTimestamp;
     protected final Subject subject;
@@ -55,9 +55,9 @@ public abstract class AbstractEvent implements Event {
         protected abstract T self();
 
         /**
-         * Adds a list of custom contexts.
+         * Adds a list of custom context entities.
          *
-         * @param context the list of contexts
+         * @param context the list of entities
          * @return itself
          */
         public T customContext(List<SelfDescribingJson> context) {
@@ -78,7 +78,8 @@ public abstract class AbstractEvent implements Event {
         }
 
         /**
-         * A custom subject for the event.
+         * A custom subject for the event. Its fields will override those of the
+         * Tracker-associated Subject, if present.
          *
          * @param subject the eventId
          * @return itself

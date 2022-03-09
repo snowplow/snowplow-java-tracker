@@ -199,6 +199,48 @@ public class TrackerTest {
     }
 
     @Test
+    public void testEcommerceTransactionItemAlone() throws InterruptedException {
+        // Although surprising, EcommerceTransactionItems are valid events and
+        // can be sent separately from EcommerceTransactions.
+
+        tracker.track(EcommerceTransactionItem.builder()
+                .itemId("order_id")
+                .sku("sku")
+                .price(1.0)
+                .quantity(2)
+                .name("name")
+                .category("category")
+                .currency("currency")
+                .customContext(contexts)
+                .trueTimestamp(456789L)
+                .build());
+
+        // Then
+        Thread.sleep(500);
+
+        Map<String, String> result = mockEmitter.eventList.get(0).getMap();
+        Map<String, String> expected = ImmutableMap.<String, String>builder()
+                .put("ti_nm", "name")
+                .put("ti_id", "order_id")
+                .put("e", "ti")
+                .put("co", EXPECTED_CONTEXTS)
+                .put("tna", "AF003")
+                .put("aid", "cloudfront")
+                .put("ti_cu", "currency")
+                .put("ttm", "456789")
+                .put("tz", "Etc/UTC")
+                .put("ti_pr", "1.0")
+                .put("ti_qu", "2")
+                .put("p", "srv")
+                .put("tv", Version.TRACKER)
+                .put("ti_ca", "category")
+                .put("ti_sk", "sku")
+                .build();
+
+        assertTrue(result.entrySet().containsAll(expected.entrySet()));
+    }
+
+    @Test
     public void testUnstructuredEventWithContext() throws InterruptedException {
         // When
         tracker.track(Unstructured.builder()

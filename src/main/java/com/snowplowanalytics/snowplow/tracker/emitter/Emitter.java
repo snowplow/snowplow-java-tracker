@@ -26,6 +26,7 @@ public interface Emitter {
      * we have reached the buffer limit yet.
      *
      * @param payload a payload to be emitted
+     * @return if the payload was added to the buffer
      */
     boolean add(TrackerPayload payload);
 
