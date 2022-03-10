@@ -29,6 +29,7 @@ import okhttp3.OkHttpClient;
 /**
  * AbstractEmitter class which contains common elements to
  * the emitters wrapped in a builder format.
+ * Note that SimpleEmitter has been deprecated.
  */
 public abstract class AbstractEmitter implements Emitter {
 
