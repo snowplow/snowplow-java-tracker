@@ -47,7 +47,7 @@ public interface EventStore {
     /**
      * Finish processing events after a request has been made.
      *
-     * @param delete delete, or if false move events back to the buffer
+     * @param delete if false, move events back to the buffer instead of deleting
      * @param batchId the ID of the batch of events
      */
     void deleteBatchedEvents(boolean delete, long batchId);

@@ -92,7 +92,7 @@ public class InMemoryEventStore implements EventStore {
      * the events are deleted from the InMemoryEventStore. If not, they are reinserted at the beginning
      * of the buffer queue for another attempt.
      *
-     * @param delete if the batch of events was successfully sent
+     * @param delete if false, move events back to the buffer instead of deleting
      * @param batchId the ID of the batch of events
      */
     @Override
