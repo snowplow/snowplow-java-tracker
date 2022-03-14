@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -24,7 +24,9 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 /**
  * An emitter which sends events one-by-one as soon as they are received, via
  * GET requests. The events are sent asynchronously.
+ * @deprecated Use the BatchEmitter, or create your own Emitter using the provided interface.
  */
+@Deprecated
 public class SimpleEmitter extends AbstractEmitter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleEmitter.class);

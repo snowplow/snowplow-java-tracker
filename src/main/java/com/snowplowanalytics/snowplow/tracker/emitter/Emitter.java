@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -33,7 +33,7 @@ public interface Emitter {
     /**
      * Customize the emitter batch size to any valid integer
      * greater than zero.
-     * - Will only affect the BatchEmitter
+     * Will only affect the BatchEmitter
      *
      * @param batchSize number of events to collect before
      *                   sending
@@ -47,7 +47,7 @@ public interface Emitter {
 
     /**
      * Gets the Emitter Batch Size
-     * - Will always be 1 for SimpleEmitter
+     * Will always be 1 for SimpleEmitter. Note that SimpleEmitter has been deprecated.
      *
      * @return the batch size
      */

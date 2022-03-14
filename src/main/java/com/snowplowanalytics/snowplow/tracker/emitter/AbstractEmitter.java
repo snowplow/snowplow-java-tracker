@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -29,6 +29,7 @@ import okhttp3.OkHttpClient;
 /**
  * AbstractEmitter class which contains common elements to
  * the emitters wrapped in a builder format.
+ * Note that SimpleEmitter has been deprecated.
  */
 public abstract class AbstractEmitter implements Emitter {
 
