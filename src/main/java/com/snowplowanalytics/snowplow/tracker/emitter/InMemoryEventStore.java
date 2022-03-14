@@ -92,17 +92,17 @@ public class InMemoryEventStore implements EventStore {
      * the events are deleted from the InMemoryEventStore. If not, they are reinserted at the beginning
      * of the buffer queue for another attempt.
      *
-     * @param successfullySent if the batch of events was successfully sent
+     * @param delete if the batch of events was successfully sent
      * @param batchId the ID of the batch of events
      */
     @Override
-    public void cleanupAfterSendingAttempt(boolean successfullySent, long batchId) {
+    public void deleteBatchedEvents(boolean delete, long batchId) {
         // Events that successfully sent are deleted from the pending buffer
         List<TrackerPayload> events = eventsBeingSent.remove(batchId);
 
         // Events that didn't send are inserted at the head of the eventBuffer
         // for immediate resending.
-        if (!successfullySent) {
+        if (!delete) {
             while (events.size() > 0) {
                 TrackerPayload payloadToReinsert = events.remove(0);
                 boolean result = eventBuffer.offerFirst(payloadToReinsert);

@@ -47,10 +47,10 @@ public interface EventStore {
     /**
      * Finish processing events after a request has been made.
      *
-     * @param successfullySent if the batch of events was successfully sent
+     * @param delete delete, or if false move events back to the buffer
      * @param batchId the ID of the batch of events
      */
-    void cleanupAfterSendingAttempt(boolean successfullySent, long batchId);
+    void deleteBatchedEvents(boolean delete, long batchId);
 
     /**
      * Get the current size of the buffer.
