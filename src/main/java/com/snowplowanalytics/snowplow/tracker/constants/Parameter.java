@@ -13,6 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.constants;
 
+/**
+ * More constants that define the event properties, which apply to schemas, event types
+ * and sending protocols.
+ */
 public class Parameter {
     // General
     public static final String SCHEMA = "schema";

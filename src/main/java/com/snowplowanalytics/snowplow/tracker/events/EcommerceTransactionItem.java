@@ -21,6 +21,23 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+/**
+ * Constructs an EcommerceTransactionItem object.
+ * <p>
+ * <b>Implementation note: </b><em>EcommerceTransaction/EcommerceTransactionItem uses a legacy design.
+ * We aim to deprecate it eventually. We advise using Unstructured events instead, and attaching the items
+ * as entities. </em>
+ *
+ * EcommerceTransactionItems were designed for attaching data about purchased items to a
+ * EcommerceTransaction event. They can technically be sent as events in their own right, but this is
+ * not supported.
+ *
+ * To link the "transaction" and "transaction item" events, we recommend using the same orderId for the
+ * EcommerceTransaction and all attached EcommerceTransactionItems.
+ *
+ * To use the Currency Conversion pipeline enrichment, the currency string must be
+ * a valid Open Exchange Rates value.
+ */
 public class EcommerceTransactionItem extends AbstractEvent {
 
     private final String itemId;
@@ -42,7 +59,7 @@ public class EcommerceTransactionItem extends AbstractEvent {
         private String currency;
 
         /**
-         * @param itemId Item ID
+         * @param itemId Item ID - ideally the same as the EcommerceTransaction orderId
          * @return itself
          */
         public T itemId(String itemId) {
@@ -141,15 +158,7 @@ public class EcommerceTransactionItem extends AbstractEvent {
     }
 
     /**
-     * @param timestamp the new timestamp
-     */
-    public void setTrueTimestamp(long timestamp) {
-        this.trueTimestamp = timestamp;
-    }
-
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */

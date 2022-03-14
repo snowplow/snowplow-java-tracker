@@ -23,6 +23,11 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
+/**
+ * Constructs a Timing event object.
+ *
+ * When tracked, generates an "unstructured" or "ue" event.
+ */
 public class Timing extends AbstractEvent {
 
     private final String category;
@@ -106,7 +111,8 @@ public class Timing extends AbstractEvent {
     }
 
     /**
-     * Return the payload wrapped into a SelfDescribingJson.
+     * Return the payload wrapped into a SelfDescribingJson. When a Timing event is tracked,
+     * the Tracker creates and tracks an Unstructured event from this SelfDescribingJson.
      *
      * @return the payload as a SelfDescribingJson.
      */

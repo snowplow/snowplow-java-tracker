@@ -22,6 +22,8 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Constructs a PageView event object.
+ *
+ * When tracked, generates a "pv" or "page_view" event.
  */
 public class PageView extends AbstractEvent {
 
@@ -54,7 +56,7 @@ public class PageView extends AbstractEvent {
         }
 
         /**
-         * @param referrer Referrer of the page
+         * @param referrer Referrer URL of the page
          * @return itself
          */
         public T referrer(String referrer) {
@@ -91,8 +93,7 @@ public class PageView extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */

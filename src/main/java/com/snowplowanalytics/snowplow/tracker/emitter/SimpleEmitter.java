@@ -22,8 +22,8 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 
 /**
- * An emitter which sends events as soon as they are received via
- * GET requests.
+ * An emitter which sends events one-by-one as soon as they are received, via
+ * GET requests. The events are sent asynchronously.
  * @deprecated Use the BatchEmitter, or create your own Emitter using the provided interface.
  */
 @Deprecated
@@ -53,9 +53,10 @@ public class SimpleEmitter extends AbstractEmitter {
     }
 
     /**
-     * Adds an event to the buffer and instantly sends it
+     * Adds an event and instantly tries to send it.
      *
      * @param payload a payload
+     * @return true
      */
     @Override
     public boolean add(TrackerPayload payload) {
@@ -67,7 +68,7 @@ public class SimpleEmitter extends AbstractEmitter {
     }
 
     /**
-     * Sends buffered events, but SimpleEmitter does not buffer events
+     * Sends all the buffered events, but SimpleEmitter does not buffer events.
      * So has no effect
      */
     @Override

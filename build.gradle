@@ -111,6 +111,9 @@ task generateSources {
  */
 package com.snowplowanalytics.snowplow.tracker;
 // DO NOT EDIT. AUTO-GENERATED.
+/**
+* The release version of the Snowplow Java tracker.
+*/
 public class Version {
     static final String TRACKER = "java-$project.version";
     static final String VERSION = "$project.version";

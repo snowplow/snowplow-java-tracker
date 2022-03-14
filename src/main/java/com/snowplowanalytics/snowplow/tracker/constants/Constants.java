@@ -13,7 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker.constants;
 
 /**
- * Constants which apply to schemas, event types
+ * Constants that apply to schemas, event types
  * and sending protocols.
  */
 public class Constants {

@@ -16,14 +16,16 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.List;
 
-
+/**
+ * A wrapper for a number of TrackerPayloads.
+ */
 public class BatchPayload {
 
     private final Long batchId;
     private final List<TrackerPayload> payloads;
 
-    public BatchPayload(Long payloadId, List<TrackerPayload> payloads) {
-        this.batchId = payloadId;
+    public BatchPayload(Long batchId, List<TrackerPayload> payloads) {
+        this.batchId = batchId;
         this.payloads = payloads;
     }
 

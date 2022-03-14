@@ -22,6 +22,16 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Constructs a Structured event object.
+ *
+ * This event type is provided to be roughly equivalent to Google Analytics-style events.
+ * Note that it is not automatically clear what data should be placed in what field.
+ * To aid data quality and modeling, agree on business-wide definitions when designing
+ * your tracking strategy.
+ *
+ * We recommend using Unstructured - fully custom - events instead.
+ *
+ * When tracked, generates a "struct" or "se" event.
+ *
  */
 public class Structured extends AbstractEvent {
 
@@ -49,7 +59,7 @@ public class Structured extends AbstractEvent {
         }
 
         /**
-         * @param action The event itself
+         * @param action Describes what happened in the event
          * @return itself
          */
         public T action(String action) {
@@ -58,7 +68,7 @@ public class Structured extends AbstractEvent {
         }
 
         /**
-         * @param label Refer to the object the action is performed on
+         * @param label Refers to the object the action is performed on
          * @return itself
          */
         public T label(String label) {
@@ -117,8 +127,7 @@ public class Structured extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */

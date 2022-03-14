@@ -24,7 +24,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 public interface Event {
 
     /**
-     * @return the events custom context
+     * @return the event's custom context
      */
     List<SelfDescribingJson> getContext();
 
@@ -34,7 +34,7 @@ public interface Event {
     Long getTrueTimestamp();
 
     /**
-     * @return the event subject
+     * @return the event-associated Subject
      */
     Subject getSubject();
 

@@ -14,6 +14,9 @@ package com.snowplowanalytics.snowplow.tracker.payload;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 
+/**
+ * A wrapper for Tracker properties.
+ */
 public class TrackerParameters {
 
     private final String trackerVersion;
