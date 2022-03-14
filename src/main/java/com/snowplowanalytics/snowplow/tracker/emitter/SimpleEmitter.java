@@ -24,7 +24,9 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 /**
  * An emitter which sends events as soon as they are received via
  * GET requests.
+ * @deprecated Use the BatchEmitter, or create your own Emitter using the provided interface.
  */
+@Deprecated
 public class SimpleEmitter extends AbstractEmitter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleEmitter.class);
