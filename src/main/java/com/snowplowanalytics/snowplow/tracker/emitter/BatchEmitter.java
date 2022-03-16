@@ -95,9 +95,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
         /**
          * Provide a denylist of HTTP response codes. Retry will not be attempted if one of these codes
-         * is received. The events in the request will be dropped. An exponential backoff time will
-         * be applied to subsequent requests. We advise, therefore, also setting a maximum bufferCapacity
-         * when providing fatal response codes, to avoid using too much memory storing unsendable events.
+         * is received. The events in the request will be dropped, but the Emitter will continue trying
+         * to send as normal.
          *
          * @param fatalResponseCodes Event sending will not be retried on these codes
          * @return itself
@@ -225,28 +224,28 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             BatchPayload batchedEvents = null;
             try {
                 batchedEvents = eventStore.getEventsBatch(numberOfEvents);
-                List<TrackerPayload> eventsInRequest = batchedEvents.getPayloads();
-
-                if (eventsInRequest.size() == 0) {
+                if (batchedEvents == null || batchedEvents.size() == 0) {
+                    System.out.println("batchedEvents was null");
                     return;
                 }
 
+                List<TrackerPayload> eventsInRequest = batchedEvents.getPayloads();
                 final SelfDescribingJson post = getFinalPost(eventsInRequest);
                 final int code = httpClientAdapter.post(post);
 
                 // Process results
                 if (isSuccessfulSend(code)) {
-                    LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
+                    LOGGER.info("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
                     retryDelay.set(0L);
-                    eventStore.deleteBatchedEvents(true, batchedEvents.getBatchId());
+                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+
+                } else if (fatalResponseCodes.contains(code)) {
+                    LOGGER.info("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
+                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+
                 } else {
-                    if (fatalResponseCodes.contains(code)) {
-                        LOGGER.error("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
-                        eventStore.deleteBatchedEvents(true, batchedEvents.getBatchId());
-                    } else {
-                        LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
-                        eventStore.deleteBatchedEvents(false, batchedEvents.getBatchId());
-                    }
+                    LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
+                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
 
                     // exponentially increase retry backoff time after the first failure
                     if (!retryDelay.compareAndSet(0, 50L)) {
@@ -256,7 +255,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             } catch (Exception e) {
                 LOGGER.error("BatchEmitter event sending error: {}", e.getMessage());
                 if (batchedEvents != null) {
-                    eventStore.deleteBatchedEvents(false, batchedEvents.getBatchId());
+                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
                 }
             }
         };

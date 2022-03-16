@@ -76,9 +76,13 @@ public class InMemoryEventStore implements EventStore {
      */
     @Override
     public BatchPayload getEventsBatch(int numberToGet) {
+        System.out.println("getting events batch, eventBuffer is: " + eventBuffer);
         List<TrackerPayload> eventsToSend = new ArrayList<>();
 
         eventBuffer.drainTo(eventsToSend, numberToGet);
+        if (eventsToSend.isEmpty()) {
+            return null;
+        }
 
         // The batch of events is wrapped as a BatchPayload
         // They're also added to the "pending" event buffer, the eventsBeingSent HashMap
@@ -92,17 +96,17 @@ public class InMemoryEventStore implements EventStore {
      * the events are deleted from the InMemoryEventStore. If not, they are reinserted at the beginning
      * of the buffer queue for another attempt.
      *
-     * @param delete if false, move events back to the buffer instead of deleting
+     * @param needRetry if true, move events back to the buffer instead of deleting
      * @param batchId the ID of the batch of events
      */
     @Override
-    public void deleteBatchedEvents(boolean delete, long batchId) {
+    public void cleanupAfterSendingAttempt(boolean needRetry, long batchId) {
         // Events that successfully sent are deleted from the pending buffer
         List<TrackerPayload> events = eventsBeingSent.remove(batchId);
 
         // Events that didn't send are inserted at the head of the eventBuffer
         // for immediate resending.
-        if (!delete) {
+        if (needRetry) {
             while (events.size() > 0) {
                 TrackerPayload payloadToReinsert = events.remove(0);
                 boolean result = eventBuffer.offerFirst(payloadToReinsert);

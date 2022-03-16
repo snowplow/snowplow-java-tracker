@@ -36,4 +36,8 @@ public class BatchPayload {
     public List<TrackerPayload> getPayloads() {
         return payloads;
     }
+
+    public int size() {
+        return payloads.size();
+    }
 }

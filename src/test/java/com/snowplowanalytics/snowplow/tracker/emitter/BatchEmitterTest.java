@@ -346,10 +346,13 @@ public class BatchEmitterTest {
             emitter.add(payload);
         }
 
-        Thread.sleep(500);
+        Thread.sleep(2000);
+
+        System.out.println(emitter.getBuffer());
+        System.out.println(emitter.getBuffer().size());
 
         Assert.assertEquals(2, failingHttpClientAdapter.failedPostCounter);
-        Assert.assertEquals(100, emitter.getRetryDelay());
+        Assert.assertEquals(0, emitter.getRetryDelay());
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
