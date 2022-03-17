@@ -58,13 +58,13 @@ public class InMemoryEventStoreTest {
     }
 
     @Test
-    public void doNotGetEventsIfFewerPresentThanAskedFor() {
+    public void doNotGetEventsIfFewerPresentThanAskedFor() throws NullPointerException {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
-        List<TrackerPayload> events = eventStore.getEventsBatch(3).getPayloads();
+        BatchPayload events = eventStore.getEventsBatch(3);
 
-        Assert.assertEquals(0, events.size());
+        Assert.assertNull(events);
     }
 
     @Test

@@ -224,7 +224,8 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             BatchPayload batchedEvents = null;
             try {
                 batchedEvents = eventStore.getEventsBatch(numberOfEvents);
-                if (batchedEvents.size() == 0) {
+
+                if (batchedEvents == null || batchedEvents.size() == 0) {
                     return;
                 }
 

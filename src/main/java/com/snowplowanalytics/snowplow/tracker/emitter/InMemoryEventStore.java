@@ -72,7 +72,7 @@ public class InMemoryEventStore implements EventStore {
      * and also stored in a separate collection inside InMemoryEventStore until the result of their POST request is known.
      *
      * @param numberToGet how many payloads to get
-     * @return a BatchPayload wrapper
+     * @return a BatchPayload wrapper, or null
      */
     @Override
     public BatchPayload getEventsBatch(int numberToGet) {
@@ -80,7 +80,7 @@ public class InMemoryEventStore implements EventStore {
 
         synchronized (eventBuffer) {
             if (eventBuffer.size() < numberToGet) {
-                return new BatchPayload(0L, eventsToSend);
+                return null;
             }
             eventBuffer.drainTo(eventsToSend, numberToGet);
         }
