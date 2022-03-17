@@ -76,12 +76,13 @@ public class InMemoryEventStore implements EventStore {
      */
     @Override
     public BatchPayload getEventsBatch(int numberToGet) {
-        System.out.println("getting events batch, eventBuffer is: " + eventBuffer);
         List<TrackerPayload> eventsToSend = new ArrayList<>();
 
-        eventBuffer.drainTo(eventsToSend, numberToGet);
-        if (eventsToSend.isEmpty()) {
-            return null;
+        synchronized (eventBuffer) {
+            if (eventBuffer.size() < numberToGet) {
+                return new BatchPayload(0L, eventsToSend);
+            }
+            eventBuffer.drainTo(eventsToSend, numberToGet);
         }
 
         // The batch of events is wrapped as a BatchPayload

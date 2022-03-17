@@ -224,8 +224,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             BatchPayload batchedEvents = null;
             try {
                 batchedEvents = eventStore.getEventsBatch(numberOfEvents);
-                if (batchedEvents == null || batchedEvents.size() == 0) {
-                    System.out.println("batchedEvents was null");
+                if (batchedEvents.size() == 0) {
                     return;
                 }
 
@@ -235,12 +234,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
                 // Process results
                 if (isSuccessfulSend(code)) {
-                    LOGGER.info("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
+                    LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
                     retryDelay.set(0L);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
 
                 } else if (fatalResponseCodes.contains(code)) {
-                    LOGGER.info("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
+                    LOGGER.debug("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
 
                 } else {
@@ -255,7 +254,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             } catch (Exception e) {
                 LOGGER.error("BatchEmitter event sending error: {}", e.getMessage());
                 if (batchedEvents != null) {
-                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
                 }
             }
         };

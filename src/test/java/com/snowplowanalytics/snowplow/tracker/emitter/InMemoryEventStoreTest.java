@@ -58,13 +58,13 @@ public class InMemoryEventStoreTest {
     }
 
     @Test
-    public void getAllEventsIfAskedForMoreEventsThanAreStored() {
+    public void doNotGetEventsIfFewerPresentThanAskedFor() {
         eventStore.addEvent(trackerPayload);
         eventStore.addEvent(trackerPayload);
 
         List<TrackerPayload> events = eventStore.getEventsBatch(3).getPayloads();
 
-        Assert.assertEquals(2, events.size());
+        Assert.assertEquals(0, events.size());
     }
 
     @Test

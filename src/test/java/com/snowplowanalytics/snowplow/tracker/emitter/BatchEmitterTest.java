@@ -335,7 +335,7 @@ public class BatchEmitterTest {
 
         // the FailingHttpClientAdapter always returns 403
         FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
-        emitter = BatchEmitter.builder()
+        BatchEmitter emitter = BatchEmitter.builder()
                 .httpClientAdapter(failingHttpClientAdapter)
                 .batchSize(2)
                 .fatalResponseCodes(noRetry)
@@ -346,10 +346,7 @@ public class BatchEmitterTest {
             emitter.add(payload);
         }
 
-        Thread.sleep(2000);
-
-        System.out.println(emitter.getBuffer());
-        System.out.println(emitter.getBuffer().size());
+        Thread.sleep(500);
 
         Assert.assertEquals(2, failingHttpClientAdapter.failedPostCounter);
         Assert.assertEquals(0, emitter.getRetryDelay());
