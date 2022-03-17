@@ -50,12 +50,14 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     private int batchSize;
     private final EventStore eventStore;
     private final AtomicLong retryDelay;
+    private final List<Integer> fatalResponseCodes;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
 
         private int batchSize = 50; // Optional
         private int bufferCapacity = Integer.MAX_VALUE;
         private EventStore eventStore;
+        private List<Integer> fatalResponseCodes;
 
         /**
          * The default batch size is 50.
@@ -91,6 +93,19 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             return self();
         }
 
+        /**
+         * Provide a denylist of HTTP response codes. Retry will not be attempted if one of these codes
+         * is received. The events in the request will be dropped, but the Emitter will continue trying
+         * to send as normal.
+         *
+         * @param fatalResponseCodes Event sending will not be retried on these codes
+         * @return itself
+         */
+        public T fatalResponseCodes(final List<Integer> fatalResponseCodes) {
+            this.fatalResponseCodes = fatalResponseCodes;
+            return self();
+        }
+
         public BatchEmitter build() {
             return new BatchEmitter(this);
         }
@@ -120,6 +135,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             eventStore = builder.eventStore;
         }
         retryDelay = new AtomicLong(0L);
+
+        if (builder.fatalResponseCodes != null) {
+            fatalResponseCodes = builder.fatalResponseCodes;
+        } else {
+            fatalResponseCodes = new ArrayList<>();
+        }
     }
 
     /**
@@ -203,12 +224,12 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             BatchPayload batchedEvents = null;
             try {
                 batchedEvents = eventStore.getEventsBatch(numberOfEvents);
-                List<TrackerPayload> eventsInRequest = batchedEvents.getPayloads();
 
-                if (eventsInRequest.size() == 0) {
+                if (batchedEvents == null || batchedEvents.size() == 0) {
                     return;
                 }
 
+                List<TrackerPayload> eventsInRequest = batchedEvents.getPayloads();
                 final SelfDescribingJson post = getFinalPost(eventsInRequest);
                 final int code = httpClientAdapter.post(post);
 
@@ -216,10 +237,15 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 if (isSuccessfulSend(code)) {
                     LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
                     retryDelay.set(0L);
-                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
+                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+
+                } else if (fatalResponseCodes.contains(code)) {
+                    LOGGER.debug("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
+                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+
                 } else {
                     LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
-                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
 
                     // exponentially increase retry backoff time after the first failure
                     if (!retryDelay.compareAndSet(0, 50L)) {
@@ -229,7 +255,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
             } catch (Exception e) {
                 LOGGER.error("BatchEmitter event sending error: {}", e.getMessage());
                 if (batchedEvents != null) {
-                    eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
                 }
             }
         };

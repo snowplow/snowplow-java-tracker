@@ -33,9 +33,10 @@ import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 public class BatchEmitterTest {
 
     private MockHttpClientAdapter mockHttpClientAdapter;
-    private FailingHttpClientAdapter failingHttpClientAdapter;
+    private FlakyHttpClientAdapter flakyHttpClientAdapter;
     private BatchEmitter emitter;
 
+    // MockHttpClientAdapter always returns 200
     public static class MockHttpClientAdapter implements HttpClientAdapter {
         public boolean isGetCalled = false;
         public boolean isPostCalled = false;
@@ -65,7 +66,7 @@ public class BatchEmitterTest {
 
     // this class fails to "send" the first 4 requests
     // but returns a successful result (200) subsequently
-    static class FailingHttpClientAdapter implements HttpClientAdapter {
+    static class FlakyHttpClientAdapter implements HttpClientAdapter {
         int failedPostCounter = 0;
         int successfulPostCounter = 0;
         @Override
@@ -89,10 +90,29 @@ public class BatchEmitterTest {
         public Object getHttpClient() { return null; }
     }
 
+    // This class always returns failure code 403
+    static class FailingHttpClientAdapter implements HttpClientAdapter {
+        int failedPostCounter = 0;
+        @Override
+        public int post(SelfDescribingJson payload) {
+            failedPostCounter++;
+            return 403;
+        }
+
+        @Override
+        public int get(TrackerPayload payload) { return 0; }
+
+        @Override
+        public String getUrl() { return null; }
+
+        @Override
+        public Object getHttpClient() { return null; }
+    }
+
     @Before
     public void setUp() {
         mockHttpClientAdapter = new MockHttpClientAdapter();
-        failingHttpClientAdapter = new FailingHttpClientAdapter();
+        flakyHttpClientAdapter = new FlakyHttpClientAdapter();
         emitter = BatchEmitter.builder()
                 .httpClientAdapter(mockHttpClientAdapter)
                 .batchSize(10)
@@ -252,7 +272,7 @@ public class BatchEmitterTest {
     @Test
     public void eventsThatFailToSendAreReturnedToEventBuffer() throws InterruptedException {
         emitter = BatchEmitter.builder()
-                .httpClientAdapter(new FailingHttpClientAdapter())
+                .httpClientAdapter(new FlakyHttpClientAdapter())
                 .batchSize(10)
                 .build();
 
@@ -273,7 +293,7 @@ public class BatchEmitterTest {
     @Test
     public void eventSendingFailureIncreasesBackoffTime() throws InterruptedException {
         emitter = BatchEmitter.builder()
-                .httpClientAdapter(failingHttpClientAdapter)
+                .httpClientAdapter(flakyHttpClientAdapter)
                 .batchSize(1)
                 .build();
 
@@ -288,11 +308,11 @@ public class BatchEmitterTest {
 
     @Test
     public void successfulSendAfterFailureResetsBackoffTime() throws InterruptedException {
-        // the FailingHttpClientAdapter returns 500 for the first 4 requests
+        // the FlakyHttpClientAdapter returns 500 for the first 4 requests
         // then subsequently returns 200
-        FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
+        FlakyHttpClientAdapter flakyHttpClientAdapter = new FlakyHttpClientAdapter();
         emitter = BatchEmitter.builder()
-                .httpClientAdapter(failingHttpClientAdapter)
+                .httpClientAdapter(flakyHttpClientAdapter)
                 .batchSize(1)
                 .threadCount(1)
                 .build();
@@ -304,8 +324,33 @@ public class BatchEmitterTest {
 
         Thread.sleep(500);
 
-        Assert.assertEquals(2, failingHttpClientAdapter.successfulPostCounter);
+        Assert.assertEquals(2, flakyHttpClientAdapter.successfulPostCounter);
         Assert.assertEquals(0, emitter.getRetryDelay());
+    }
+
+    @Test
+    public void noRetryAfterDenylistResponseCode() throws InterruptedException {
+        List<Integer> noRetry = new ArrayList<>();
+        noRetry.add(403);
+
+        // the FailingHttpClientAdapter always returns 403
+        FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(failingHttpClientAdapter)
+                .batchSize(2)
+                .fatalResponseCodes(noRetry)
+                .build();
+
+        List<TrackerPayload> payloads = createPayloads(4);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
+        }
+
+        Thread.sleep(500);
+
+        Assert.assertEquals(2, failingHttpClientAdapter.failedPostCounter);
+        Assert.assertEquals(0, emitter.getRetryDelay());
+        Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
     private TrackerPayload createPayload() {

@@ -72,13 +72,18 @@ public class InMemoryEventStore implements EventStore {
      * and also stored in a separate collection inside InMemoryEventStore until the result of their POST request is known.
      *
      * @param numberToGet how many payloads to get
-     * @return a BatchPayload wrapper
+     * @return a BatchPayload wrapper, or null
      */
     @Override
     public BatchPayload getEventsBatch(int numberToGet) {
         List<TrackerPayload> eventsToSend = new ArrayList<>();
 
-        eventBuffer.drainTo(eventsToSend, numberToGet);
+        synchronized (eventBuffer) {
+            if (eventBuffer.size() < numberToGet) {
+                return null;
+            }
+            eventBuffer.drainTo(eventsToSend, numberToGet);
+        }
 
         // The batch of events is wrapped as a BatchPayload
         // They're also added to the "pending" event buffer, the eventsBeingSent HashMap
@@ -92,17 +97,17 @@ public class InMemoryEventStore implements EventStore {
      * the events are deleted from the InMemoryEventStore. If not, they are reinserted at the beginning
      * of the buffer queue for another attempt.
      *
-     * @param successfullySent if the batch of events was successfully sent
+     * @param needRetry if true, move events back to the buffer instead of deleting
      * @param batchId the ID of the batch of events
      */
     @Override
-    public void cleanupAfterSendingAttempt(boolean successfullySent, long batchId) {
+    public void cleanupAfterSendingAttempt(boolean needRetry, long batchId) {
         // Events that successfully sent are deleted from the pending buffer
         List<TrackerPayload> events = eventsBeingSent.remove(batchId);
 
         // Events that didn't send are inserted at the head of the eventBuffer
         // for immediate resending.
-        if (!successfullySent) {
+        if (needRetry) {
             while (events.size() > 0) {
                 TrackerPayload payloadToReinsert = events.remove(0);
                 boolean result = eventBuffer.offerFirst(payloadToReinsert);
