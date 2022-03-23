@@ -39,6 +39,8 @@ public class Unstructured extends AbstractEvent {
         private SelfDescribingJson eventData;
 
         /**
+         * Required.
+         *
          * @param selfDescribingJson The properties of the event. Has two fields: "data", containing the event properties,
          *  and "schema", identifying the schema against which the data is validated
          * @return itself

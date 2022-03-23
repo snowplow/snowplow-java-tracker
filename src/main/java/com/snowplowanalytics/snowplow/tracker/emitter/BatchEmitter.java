@@ -200,7 +200,7 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     /**
-     * Gets the Emitter `batchSize`
+     * Gets the Emitter batchSize
      *
      * @return the batch size
      */

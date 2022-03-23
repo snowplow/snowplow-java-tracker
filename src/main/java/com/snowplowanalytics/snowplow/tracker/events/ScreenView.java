@@ -36,6 +36,8 @@ public class ScreenView extends AbstractEvent {
         private String id;
 
         /**
+         * One of name or id is required.
+         *
          * @param name The (human-readable) name of the screen view
          * @return itself
          */
@@ -45,6 +47,8 @@ public class ScreenView extends AbstractEvent {
         }
 
         /**
+         * One of name or id is required.
+         *
          * @param id Screen view ID
          * @return itself
          */

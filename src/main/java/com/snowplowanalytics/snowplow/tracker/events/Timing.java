@@ -43,6 +43,8 @@ public class Timing extends AbstractEvent {
         private String label;
 
         /**
+         * Required.
+         *
          * @param category The category of the timed event
          * @return itself
          */
@@ -52,6 +54,8 @@ public class Timing extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param variable Identify the timing being recorded
          * @return itself
          */
@@ -61,6 +65,8 @@ public class Timing extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param timing The number of milliseconds in elapsed time to report
          * @return itself
          */
@@ -70,6 +76,8 @@ public class Timing extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param label Optional description of this timing
          * @return itself
          */
