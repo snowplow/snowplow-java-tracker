@@ -59,6 +59,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         private String currency;
 
         /**
+         * Required.
+         *
          * @param itemId Item ID - ideally the same as the EcommerceTransaction orderId
          * @return itself
          */
@@ -68,6 +70,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param sku Item SKU
          * @return itself
          */
@@ -77,6 +81,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param price Item price
          * @return itself
          */
@@ -86,6 +92,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param quantity Item quantity
          * @return itself
          */
@@ -95,6 +103,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param name Item name
          * @return itself
          */
@@ -104,6 +114,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param category Item category
          * @return itself
          */
@@ -113,6 +125,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param currency The currency the price is expressed in
          * @return itself
          */

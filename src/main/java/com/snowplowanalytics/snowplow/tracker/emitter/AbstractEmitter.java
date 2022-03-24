@@ -45,7 +45,7 @@ public abstract class AbstractEmitter implements Emitter {
         protected abstract T self();
 
         /**
-         * Set a custom ScheduledExecutorService to send http request.
+         * Set a custom ScheduledExecutorService to send http requests (default is ScheduledThreadPoolExecutor).
          * <p>
          * <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
          * has a side-effect and will shutdown that ExecutorService.</em>
@@ -59,7 +59,7 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         /**
-         * Adds a custom HttpClientAdapter to the AbstractEmitter. The default is OkHttpClientAdapter.
+         * Adds a custom HttpClientAdapter to the AbstractEmitter (default is OkHttpClientAdapter).
          *
          * @param httpClientAdapter the adapter to use
          * @return itself
@@ -70,7 +70,7 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         /**
-         * Sets the Thread Count for the ScheduledExecutorService. The default is 50.
+         * Sets the Thread Count for the ScheduledExecutorService (default is 50).
          *
          * @param threadCount the size of the thread pool
          * @return itself

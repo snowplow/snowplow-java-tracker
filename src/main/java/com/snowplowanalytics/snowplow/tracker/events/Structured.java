@@ -50,6 +50,8 @@ public class Structured extends AbstractEvent {
         private Double value;
 
         /**
+         * Required.
+         *
          * @param category Category of the event
          * @return itself
          */
@@ -59,6 +61,8 @@ public class Structured extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param action Describes what happened in the event
          * @return itself
          */
@@ -68,6 +72,8 @@ public class Structured extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param label Refers to the object the action is performed on
          * @return itself
          */
@@ -77,6 +83,8 @@ public class Structured extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param property Property associated with either the action or the object
          * @return itself
          */
@@ -86,6 +94,8 @@ public class Structured extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param value A value associated with the user action
          * @return itself
          */

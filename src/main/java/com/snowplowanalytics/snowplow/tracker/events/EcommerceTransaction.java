@@ -70,6 +70,8 @@ public class EcommerceTransaction extends AbstractEvent {
         private List<EcommerceTransactionItem> items;
 
         /**
+         * Required.
+         *
          * @param orderId ID of the eCommerce transaction
          * @return itself
          */
@@ -79,6 +81,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param totalValue Total transaction value
          * @return itself
          */
@@ -88,6 +92,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param affiliation Transaction affiliation
          * @return itself
          */
@@ -97,6 +103,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param taxValue Transaction tax value
          * @return itself
          */
@@ -106,6 +114,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param shipping Delivery cost charged
          * @return itself
          */
@@ -115,6 +125,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param city Delivery address city
          * @return itself
          */
@@ -124,6 +136,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param state Delivery address state
          * @return itself
          */
@@ -133,6 +147,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param country Delivery address country
          * @return itself
          */
@@ -142,6 +158,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param currency The currency the price is expressed in
          * @return itself
          */

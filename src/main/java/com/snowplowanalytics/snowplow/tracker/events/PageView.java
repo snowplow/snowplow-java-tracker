@@ -38,6 +38,8 @@ public class PageView extends AbstractEvent {
         private String referrer;
 
         /**
+         * Required.
+         *
          * @param pageUrl URL of the viewed page
          * @return itself
          */
@@ -47,6 +49,8 @@ public class PageView extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param pageTitle Title of the viewed page
          * @return itself
          */
@@ -56,6 +60,8 @@ public class PageView extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param referrer Referrer URL of the page
          * @return itself
          */

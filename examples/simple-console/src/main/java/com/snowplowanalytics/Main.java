@@ -18,14 +18,12 @@ import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
-import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 import java.util.List;
 import static java.util.Collections.singletonList;
 
 import com.google.common.collect.ImmutableMap;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public class Main {
 

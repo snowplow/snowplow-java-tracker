@@ -35,7 +35,7 @@ public class SelfDescribingJson implements Payload {
 
     /**
      * Creates a SelfDescribingJson with only a Schema
-     * String and an empty data map. Data can be added later using {@link #setData(Object)}.
+     * String and an empty data map. Data can be added later using setData() methods.
      *
      * @param schema the schema string
      */

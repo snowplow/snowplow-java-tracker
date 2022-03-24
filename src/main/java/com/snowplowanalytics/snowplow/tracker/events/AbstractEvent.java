@@ -78,7 +78,7 @@ public abstract class AbstractEvent implements Event {
         }
 
         /**
-         * A custom subject for the event. Its fields will override those of the
+         * A custom Subject for the event. Its fields will override those of the
          * Tracker-associated Subject, if present.
          *
          * @param subject the eventId
