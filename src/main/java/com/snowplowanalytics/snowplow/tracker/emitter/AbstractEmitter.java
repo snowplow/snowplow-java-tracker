@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,8 +13,8 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,43 +22,44 @@ import com.google.common.base.Preconditions;
 
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import okhttp3.OkHttpClient;
 
 /**
  * AbstractEmitter class which contains common elements to
  * the emitters wrapped in a builder format.
+ * Note that SimpleEmitter has been deprecated.
  */
 public abstract class AbstractEmitter implements Emitter {
 
     protected HttpClientAdapter httpClientAdapter;
-    protected RequestCallback requestCallback;
-    protected ExecutorService executor;
+    protected ScheduledExecutorService executor;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private HttpClientAdapter httpClientAdapter; // Optional
-        private RequestCallback requestCallback = null; // Optional
         private int threadCount = 50; // Optional
-        private ExecutorService requestExecutorService = null; // Optional
+        private ScheduledExecutorService requestExecutorService = null; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
         protected abstract T self();
 
         /**
-         * Set a custom ExecutorService to send http request.
+         * Set a custom ScheduledExecutorService to send http requests (default is ScheduledThreadPoolExecutor).
+         * <p>
+         * <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
+         * has a side-effect and will shutdown that ExecutorService.</em>
          *
-         *  /!\ Be aware that calling `close()` on a BatchEmitter instance has a side-effect and will shutdown that ExecutorService.
-         * @param executorService the ExecutorService to use
+         * @param executorService the ScheduledExecutorService to use
          * @return itself
          */
-        public T requestExecutorService(final ExecutorService executorService) {
+        public T requestExecutorService(final ScheduledExecutorService executorService) {
             this.requestExecutorService = executorService;
             return self();
         }
 
         /**
-         * Adds the HttpClientAdapter to the AbstractEmitter
+         * Adds a custom HttpClientAdapter to the AbstractEmitter (default is OkHttpClientAdapter).
          *
          * @param httpClientAdapter the adapter to use
          * @return itself
@@ -69,19 +70,7 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         /**
-         * An optional Request Callback for adding the ability to handle failure cases
-         * for sending.
-         *
-         * @param requestCallback the emitter request callback
-         * @return itself
-         */
-        public T requestCallback(final RequestCallback requestCallback) {
-            this.requestCallback = requestCallback;
-            return self();
-        }
-
-        /**
-         * Sets the Thread Count for the ExecutorService
+         * Sets the Thread Count for the ScheduledExecutorService (default is 50).
          *
          * @param threadCount the size of the thread pool
          * @return itself
@@ -92,8 +81,8 @@ public abstract class AbstractEmitter implements Emitter {
         }
 
         /**
-         * Sets the emitter url for when a httpClientAdapter is not specified
-         * Will be used to create the default OkHttpClientAdapter.
+         * Sets the emitter url for when a httpClientAdapter is not specified.
+         * It will be used to create the default OkHttpClientAdapter.
          *
          * @param collectorUrl the url for the default httpClientAdapter
          * @return itself
@@ -132,8 +121,6 @@ public abstract class AbstractEmitter implements Emitter {
                     .build();
         }
 
-        this.requestCallback = builder.requestCallback;
-      
         if (builder.requestExecutorService != null) {
             this.executor = builder.requestExecutorService;
         } else {
@@ -142,52 +129,43 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     /**
-     * Adds an event to the buffer
+     * Adds a payload to the buffer
      *
-     * @param event an event
+     * @param payload an payload
      */
     @Override
-    public abstract void emit(TrackerEvent event);
+    public abstract boolean add(TrackerPayload payload);
 
     /**
-     * Customize the emitter buffer size to any valid integer greater than zero.
+     * Customize the emitter batch size to any valid integer greater than zero.
      * Has no effect on SimpleEmitter
      *
-     * @param bufferSize number of events to collect before sending
+     * @param batchSize number of events to collect before sending
      */
     @Override
-    public abstract void setBufferSize(final int bufferSize);
+    public abstract void setBatchSize(final int batchSize);
 
     /**
-     * Removes all events from the buffer and sends them
+     * Removes all payloads from the buffer and sends them
      */
     @Override
     public abstract void flushBuffer();
 
     /**
-     * Gets the Emitter Buffer Size - Will always be 1 for SimpleEmitter
+     * Gets the Emitter Batch Size - Will always be 1 for SimpleEmitter
      *
-     * @return the buffer size
+     * @return the batch size
      */
     @Override
-    public abstract int getBufferSize();
+    public abstract int getBatchSize();
 
     /**
-     * Returns List of Events that are in the buffer.
+     * Returns List of Payloads that are in the buffer.
      *
      * @return the buffered events
      */
     @Override
-    public abstract List<TrackerEvent> getBuffer();
-
-    /**
-     * Sends a runnable to the executor service.
-     *
-     * @param runnable the runnable to be queued
-     */
-    protected void execute(final Runnable runnable) {
-        this.executor.execute(runnable);
-    }
+    public abstract List<TrackerPayload> getBuffer();
 
     /**
      * Checks whether the response code was a success or not.

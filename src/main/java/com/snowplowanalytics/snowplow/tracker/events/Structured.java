@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,6 +22,16 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Constructs a Structured event object.
+ *
+ * This event type is provided to be roughly equivalent to Google Analytics-style events.
+ * Note that it is not automatically clear what data should be placed in what field.
+ * To aid data quality and modeling, agree on business-wide definitions when designing
+ * your tracking strategy.
+ *
+ * We recommend using Unstructured - fully custom - events instead.
+ *
+ * When tracked, generates a "struct" or "se" event.
+ *
  */
 public class Structured extends AbstractEvent {
 
@@ -40,6 +50,8 @@ public class Structured extends AbstractEvent {
         private Double value;
 
         /**
+         * Required.
+         *
          * @param category Category of the event
          * @return itself
          */
@@ -49,7 +61,9 @@ public class Structured extends AbstractEvent {
         }
 
         /**
-         * @param action The event itself
+         * Required.
+         *
+         * @param action Describes what happened in the event
          * @return itself
          */
         public T action(String action) {
@@ -58,7 +72,9 @@ public class Structured extends AbstractEvent {
         }
 
         /**
-         * @param label Refer to the object the action is performed on
+         * Optional.
+         *
+         * @param label Refers to the object the action is performed on
          * @return itself
          */
         public T label(String label) {
@@ -67,6 +83,8 @@ public class Structured extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param property Property associated with either the action or the object
          * @return itself
          */
@@ -76,6 +94,8 @@ public class Structured extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param value A value associated with the user action
          * @return itself
          */
@@ -117,8 +137,7 @@ public class Structured extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */
@@ -131,6 +150,6 @@ public class Structured extends AbstractEvent {
         payload.add(Parameter.SE_PROPERTY, this.property);
         payload.add(Parameter.SE_VALUE,
                 this.value != null ? Double.toString(this.value) : null);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

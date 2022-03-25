@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -17,8 +17,14 @@ import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+import java.util.LinkedHashMap;
+
+/**
+ * Constructs a ScreenView event object.
+ *
+ * When tracked, generates an "unstructured" or "ue" event.
+ */
 public class ScreenView extends AbstractEvent {
 
     private final String name;
@@ -30,7 +36,9 @@ public class ScreenView extends AbstractEvent {
         private String id;
 
         /**
-         * @param name The name of the screen view event
+         * One of name or id is required.
+         *
+         * @param name The (human-readable) name of the screen view
          * @return itself
          */
         public T name(String name) {
@@ -39,6 +47,8 @@ public class ScreenView extends AbstractEvent {
         }
 
         /**
+         * One of name or id is required.
+         *
          * @param id Screen view ID
          * @return itself
          */
@@ -74,14 +84,15 @@ public class ScreenView extends AbstractEvent {
     }
 
     /**
-     * Return the payload wrapped into a SelfDescribingJson.
+     * Return the payload wrapped into a SelfDescribingJson. When a ScreenView is tracked,
+     * the Tracker creates and tracks an Unstructured event from this SelfDescribingJson.
      *
      * @return the payload as a SelfDescribingJson.
      */
     public SelfDescribingJson getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameter.SV_ID, this.id);
-        payload.add(Parameter.SV_NAME, this.name);
+        LinkedHashMap<String,Object> payload = new LinkedHashMap<>();
+        payload.put(Parameter.SV_ID, this.id);
+        payload.put(Parameter.SV_NAME, this.name);
         return new SelfDescribingJson(Constants.SCHEMA_SCREEN_VIEW, payload);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -23,6 +23,11 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Constructs an Unstructured event object.
+ *
+ * This is a customisable event type which allows you to track anything describable
+ * by a JsonSchema.
+ *
+ * When tracked, generates an "unstructured" or "ue" event.
  */
 public class Unstructured extends AbstractEvent {
 
@@ -34,9 +39,10 @@ public class Unstructured extends AbstractEvent {
         private SelfDescribingJson eventData;
 
         /**
-         * @param selfDescribingJson The properties of the event. Has two field:
-         *                  A "data" field containing the event properties and
-         *                  A "schema" field identifying the schema against which the data is validated
+         * Required.
+         *
+         * @param selfDescribingJson The properties of the event. Has two fields: "data", containing the event properties,
+         *  and "schema", identifying the schema against which the data is validated
          * @return itself
          */
         public T eventData(SelfDescribingJson selfDescribingJson) {
@@ -77,8 +83,7 @@ public class Unstructured extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */
@@ -89,6 +94,6 @@ public class Unstructured extends AbstractEvent {
         payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
         payload.addMap(envelope.getMap(), this.base64Encode,
                 Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

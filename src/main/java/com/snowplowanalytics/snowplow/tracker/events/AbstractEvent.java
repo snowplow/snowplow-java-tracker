@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,77 +22,46 @@ import com.google.common.base.Preconditions;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * Base AbstractEvent class which contains common
- * elements to all events:
- * - Custom Context: list of custom contexts or null
- * - Timestamp: user defined event timestamp or 0
- * - Event Id: a unique id for the event
- * - Subject: a unique Subject for the event
+ * Base AbstractEvent class which contains
+ * elements that can be set in all events. These are context, trueTimestamp, and Subject.
+ *
+ * Context is a list of custom SelfDescribingJson entities.
+ * TrueTimestamp is a user-defined timestamp.
+ * Subject is an event-specific Subject. Its fields will override those of the
+ * Tracker-associated Subject, if present.
  */
 public abstract class AbstractEvent implements Event {
 
     protected final List<SelfDescribingJson> context;
 
-    protected long deviceCreatedTimestamp;
-
     /**
-     * The true timestamp may be null if none is set.
+     * The trueTimestamp may be null if none is set.
      */
     protected Long trueTimestamp;
-
-    protected final String eventId;
     protected final Subject subject;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private List<SelfDescribingJson> context = new LinkedList<>();
-        private long deviceCreatedTimestamp = System.currentTimeMillis();
         protected Long trueTimestamp = null;
-        private String eventId = Utils.getEventId();
         private Subject subject = null;
 
         protected abstract T self();
 
         /**
-         * Adds a list of custom contexts.
+         * Adds a list of custom context entities.
          *
-         * @param context the list of contexts
+         * @param context the list of entities
          * @return itself
          */
         public T customContext(List<SelfDescribingJson> context) {
             this.context = context;
-            return self();
-        }
-
-        /**
-         * A custom event timestamp.
-         *
-         * @param timestamp the event timestamp as
-         *                  unix epoch
-         * @return itself
-         * Use {@link #trueTimestamp} or {@link #deviceCreatedTimestamp}
-         */
-        @Deprecated
-        public T timestamp(long timestamp) {
-            return deviceCreatedTimestamp(timestamp);
-        }
-
-        /**
-         * Adjust the device-created timestamp. This is usually not what you want, check {@link #trueTimestamp}.
-         *
-         * @param timestamp the event timestamp as
-         *                  unix epoch
-         * @return itself
-         */
-        public T deviceCreatedTimestamp(long timestamp) {
-            this.deviceCreatedTimestamp = timestamp;
             return self();
         }
 
@@ -109,18 +78,8 @@ public abstract class AbstractEvent implements Event {
         }
 
         /**
-         * A custom eventId for the event.
-         *
-         * @param eventId the eventId
-         * @return itself
-         */
-        public T eventId(String eventId) {
-            this.eventId = eventId;
-            return self();
-        }
-
-        /**
-         * A custom subject for the event.
+         * A custom Subject for the event. Its fields will override those of the
+         * Tracker-associated Subject, if present.
          *
          * @param subject the eventId
          * @return itself
@@ -146,13 +105,9 @@ public abstract class AbstractEvent implements Event {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.context);
-        Preconditions.checkNotNull(builder.eventId);
-        Preconditions.checkArgument(!builder.eventId.isEmpty(), "eventId cannot be empty");
 
         this.context = builder.context;
-        this.deviceCreatedTimestamp = builder.deviceCreatedTimestamp;
         this.trueTimestamp = builder.trueTimestamp;
-        this.eventId = builder.eventId;
         this.subject = builder.subject;
     }
 
@@ -165,36 +120,11 @@ public abstract class AbstractEvent implements Event {
     }
 
     /**
-     * @return the event's timestamp
-     * @deprecated Use {@link #getTrueTimestamp()} or {@link #getDeviceCreatedTimestamp()}
-     */
-    @Override
-    public long getTimestamp() {
-        return this.deviceCreatedTimestamp;
-    }
-
-    /**
-     * @return the event's device created timestamp.
-     */
-    @Override
-    public long getDeviceCreatedTimestamp() {
-        return deviceCreatedTimestamp;
-    }
-
-    /**
      * @return the event's true timestamp.
      */
     @Override
     public Long getTrueTimestamp() {
         return trueTimestamp;
-    }
-
-    /**
-     * @return the event id
-     */
-    @Override
-    public String getEventId() {
-        return this.eventId;
     }
 
     /**
@@ -214,15 +144,13 @@ public abstract class AbstractEvent implements Event {
     /**
      * Adds the default parameters to a TrackerPayload object.
      *
-     * @param payload the payload to add too.
+     * @param payload the payload to add to.
      * @return the TrackerPayload with appended values.
      */
-    protected TrackerPayload putDefaultParams(TrackerPayload payload) {
-        payload.add(Parameter.EID, getEventId());
-        if (getTrueTimestamp()!=null) {
+    protected TrackerPayload putTrueTimestamp(TrackerPayload payload) {
+        if (getTrueTimestamp() != null) {
             payload.add(Parameter.TRUE_TIMESTAMP, Long.toString(getTrueTimestamp()));
         }
-        payload.add(Parameter.DEVICE_CREATED_TIMESTAMP, Long.toString(getDeviceCreatedTimestamp()));
         return payload;
     }
 }

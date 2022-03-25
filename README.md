@@ -10,10 +10,10 @@ With this tracker you can collect event data from your Java-based desktop and se
 
 ## Find out more
 
-| Snowplow Docs                   | Contributing                      |
-|---------------------------------|-----------------------------------|
-| ![i1][techdocs-image]           |  ![i4][contributing-image]         |
-| **[Snowplow Docs][techdocs]**  | **[Contributing](CONTRIBUTING.md)**  |
+| Snowplow Docs                 | API Docs | Contributing                      |
+|-------------------------------|-----------|-----------------------------------|
+| ![i1][techdocs-image]         | ![i1][techdocs-image] |  ![i4][contributing-image]         |
+| **[Snowplow Docs][techdocs]** | **[Javadoc Docs][apidocs]** | **[Contributing](CONTRIBUTING.md)**  |
 
 ## Maintainer Quickstart
 
@@ -33,15 +33,22 @@ To run the tests using your installed JDK, run:
 $ ./gradlew build
 ```
 
-We have also included a simple demo, found in the `examples/simple-console` folder. You will need a JDK installed to run it. When run, it sends several events to your event collector.
+We have also included a simple demo, found in the `examples/simple-console` folder. You will need a JDK installed to run it. When run, it sends several events to your event collector. For a simple event collector, we advise using the [Snowplow Micro][micro] testing pipeline.
 
+To run simple-console using the current Maven Central version of the Java tracker:
+```bash
+$ cd examples/simple-console
+$ ./gradlew jar
+$ java -jar ./build/libs/simple-console-all-0.0.1.jar "http://<your-collector-domain>"
+```
+
+To run simple-console using a local version of the Java tracker:
 ```bash
 $ ./gradlew publishToMavenLocal
 $ cd examples/simple-console
 $ ./gradlew jar
 $ java -jar ./build/libs/simple-console-all-0.0.1.jar "http://<your-collector-domain>"
 ```
-For a simple event collector, we advise using the [Snowplow Micro][micro] testing pipeline.
 
 ## Copyright and license
 
@@ -78,6 +85,7 @@ limitations under the License.
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
 [techdocs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/java-tracker/
+[apidocs]: https://snowplow.github.io/snowplow-java-tracker/index.html?overview-summary.html
 
 [tracker-classification]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/tracker-maintenance-classification/
 [early-release]: https://img.shields.io/static/v1?style=flat&label=Snowplow&message=Early%20Release&color=014477&labelColor=9ba0aa&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAeFBMVEVMaXGXANeYANeXANZbAJmXANeUANSQAM+XANeMAMpaAJhZAJeZANiXANaXANaOAM2WANVnAKWXANZ9ALtmAKVaAJmXANZaAJlXAJZdAJxaAJlZAJdbAJlbAJmQAM+UANKZANhhAJ+EAL+BAL9oAKZnAKVjAKF1ALNBd8J1AAAAKHRSTlMAa1hWXyteBTQJIEwRgUh2JjJon21wcBgNfmc+JlOBQjwezWF2l5dXzkW3/wAAAHpJREFUeNokhQOCA1EAxTL85hi7dXv/E5YPCYBq5DeN4pcqV1XbtW/xTVMIMAZE0cBHEaZhBmIQwCFofeprPUHqjmD/+7peztd62dWQRkvrQayXkn01f/gWp2CrxfjY7rcZ5V7DEMDQgmEozFpZqLUYDsNwOqbnMLwPAJEwCopZxKttAAAAAElFTkSuQmCC 

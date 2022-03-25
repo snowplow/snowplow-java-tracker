@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -23,6 +23,11 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
+/**
+ * Constructs a Timing event object.
+ *
+ * When tracked, generates an "unstructured" or "ue" event.
+ */
 public class Timing extends AbstractEvent {
 
     private final String category;
@@ -38,6 +43,8 @@ public class Timing extends AbstractEvent {
         private String label;
 
         /**
+         * Required.
+         *
          * @param category The category of the timed event
          * @return itself
          */
@@ -47,6 +54,8 @@ public class Timing extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param variable Identify the timing being recorded
          * @return itself
          */
@@ -56,6 +65,8 @@ public class Timing extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param timing The number of milliseconds in elapsed time to report
          * @return itself
          */
@@ -65,6 +76,8 @@ public class Timing extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param label Optional description of this timing
          * @return itself
          */
@@ -106,7 +119,8 @@ public class Timing extends AbstractEvent {
     }
 
     /**
-     * Return the payload wrapped into a SelfDescribingJson.
+     * Return the payload wrapped into a SelfDescribingJson. When a Timing event is tracked,
+     * the Tracker creates and tracks an Unstructured event from this SelfDescribingJson.
      *
      * @return the payload as a SelfDescribingJson.
      */

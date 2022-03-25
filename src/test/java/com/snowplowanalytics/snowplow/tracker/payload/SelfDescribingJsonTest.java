@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -47,8 +47,12 @@ public class SelfDescribingJsonTest {
     public void testMakeSdjWithTrackerPayload() {
         TrackerPayload data = new TrackerPayload();
         data.add("value", "key");
+        String eventId = data.getEventId();
+        String dtm = Long.toString(data.getDeviceCreatedTimestamp());
+
         SelfDescribingJson sdj = new SelfDescribingJson("schema_string", data);
-        String expected = "{\"schema\":\"schema_string\",\"data\":{\"value\":\"key\"}}";
+
+        String expected = "{\"schema\":\"schema_string\",\"data\":{\"eid\":\"" + eventId + "\",\"dtm\":\"" + dtm + "\",\"value\":\"key\"}}";
         String sdjString = sdj.toString();
         assertNotNull(sdj);
         assertEquals(expected, sdjString);

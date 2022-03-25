@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -14,7 +14,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import java.util.List;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Emitter interface.
@@ -22,43 +22,41 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 public interface Emitter {
 
     /**
-     * Adds an event to the buffer and checks whether
+     * Adds a payload to the buffer and checks whether
      * we have reached the buffer limit yet.
      *
-     * @param event an event to be emitted
+     * @param payload a payload to be emitted
+     * @return if the payload was added to the buffer
      */
-    void emit(TrackerEvent event);
+    boolean add(TrackerPayload payload);
 
     /**
-     * Customize the emitter buffer size to any valid integer
+     * Customize the emitter batch size to any valid integer
      * greater than zero.
-     * - Will only effect the BatchEmitter
+     * Will only affect the BatchEmitter
      *
-     * @param bufferSize number of events to collect before
+     * @param batchSize number of events to collect before
      *                   sending
      */
-    void setBufferSize(int bufferSize);
+    void setBatchSize(int batchSize);
 
     /**
-     * When the buffer limit is reached sending of the buffer is
-     * initiated.
-     *
-     * This can be used to manually start sending.
+     * This can be used to manually send all buffered events.
      */
     void flushBuffer();
 
     /**
-     * Gets the Emitter Buffer Size
-     * - Will always be 1 for SimpleEmitter
+     * Gets the Emitter Batch Size
+     * Will always be 1 for SimpleEmitter. Note that SimpleEmitter has been deprecated.
      *
-     * @return the buffer size
+     * @return the batch size
      */
-    int getBufferSize();
+    int getBatchSize();
 
     /**
-     * Returns the List of Events that are in the buffer.
+     * Returns the List of Payloads that are in the buffer.
      *
      * @return the buffer events
      */
-    List<TrackerEvent> getBuffer();
+    List<TrackerPayload> getBuffer();
 }

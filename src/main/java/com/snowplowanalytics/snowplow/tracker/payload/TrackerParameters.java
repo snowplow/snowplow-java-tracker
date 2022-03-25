@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -15,9 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.payload;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 
 /**
- * A TrackerEvent which allows the TrackerPayload to be filled later. The
- * payload will be filled by the Emitter in the Emitter thread, using the
- * getTrackerPayload() method.
+ * A wrapper for Tracker properties.
  */
 public class TrackerParameters {
 

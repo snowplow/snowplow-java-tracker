@@ -10,31 +10,34 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
-package com.snowplowanalytics;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import org.junit.Test;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+/**
+ * A wrapper for a number of TrackerPayloads.
+ */
+public class BatchPayload {
 
-public class MainTest {
+    private final Long batchId;
+    private final List<TrackerPayload> payloads;
 
-    @Test
-    public void testGetUrl() {
-        String[] sample = {"com.acme", "world"};
-        assertEquals("com.acme", Main.getUrlFromArgs(sample));
+    public BatchPayload(Long batchId, List<TrackerPayload> payloads) {
+        this.batchId = batchId;
+        this.payloads = payloads;
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetUrlNull() {
-        Main.getUrlFromArgs(null);
+    public Long getBatchId() {
+        return batchId;
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetUrlEmpty() {
-        Main.getUrlFromArgs(new String[]{});
+    public List<TrackerPayload> getPayloads() {
+        return payloads;
     }
 
+    public int size() {
+        return payloads.size();
+    }
 }

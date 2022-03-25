@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -14,18 +14,13 @@
 package com.snowplowanalytics;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
 import static java.util.Collections.singletonList;
 
 import com.google.common.collect.ImmutableMap;
@@ -39,11 +34,8 @@ public class Main {
         return args[0];
     }
 
-    public static void main(String[] args) {
-        Set<String> failedEventIds = new HashSet<String>();
+    public static void main(String[] args) throws InterruptedException {
         String collectorEndpoint = getUrlFromArgs(args);
-
-        System.out.println("Sending events to " + collectorEndpoint);
 
         // the application id to attach to events
         String appId = "java-tracker-sample-console-app";
@@ -53,20 +45,7 @@ public class Main {
         // build an emitter, this is used by the tracker to batch and schedule transmission of events
         BatchEmitter emitter = BatchEmitter.builder()
                 .url(collectorEndpoint)
-                .requestCallback(new RequestCallback() {
-                    // let us know on successes (may be called multiple times)
-                    @Override
-                    public synchronized void onSuccess(int successCount) {
-                        System.out.println("Successfully sent " + successCount + " events");
-                    }
-
-                    // let us know if something has gone wrong (may be called multiple times)
-                    @Override
-                    public synchronized void onFailure(int successCount, List<Event> failedEvents) {
-                        System.err.println("Successfully sent " + successCount + " events; failed to send " + failedEvents.size() + " events");
-                    }
-                })
-                .bufferSize(4) // send an event every time one is given (no batching). In production this number should be higher, depending on the size/event volume
+                .batchSize(4) // send batches of 4 events. In production this number should be higher, depending on the size/event volume
                 .build();
 
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
@@ -75,22 +54,32 @@ public class Main {
             .platform(DevicePlatform.ServerSideApp)
             .build();
 
-        // This is an example of a custom context
-        List<SelfDescribingJson> contexts = singletonList(
+        System.out.println("Sending events to " + collectorEndpoint);
+        System.out.println("Using tracker version " + tracker.getTrackerVersion());
+
+        // This is an example of a custom context entity
+        List<SelfDescribingJson> context = singletonList(
             new SelfDescribingJson(
                 "iglu:com.snowplowanalytics.iglu/anything-c/jsonschema/1-0-0",
                 ImmutableMap.of("foo", "bar")));
 
-        // This is a sample page view event, many other event types (such as self-describing events) are available
+        // This is an example of a eventSubject for adding user data
+        Subject eventSubject = new Subject.SubjectBuilder().build();
+        eventSubject.setUserId("example@snowplowanalytics.com");
+        eventSubject.setLanguage("EN");
+
+        // This is a sample page view event
+        // the eventSubject has been included in this event
         PageView pageViewEvent = PageView.builder()
             .pageTitle("Snowplow Analytics")
             .pageUrl("https://www.snowplowanalytics.com")
             .referrer("https://www.google.com")
-            .customContext(contexts)
+            .customContext(context)
+            .subject(eventSubject)
             .build();
         
-        tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
-
+        // EcommerceTransactionItems are tracked as part of an EcommerceTransaction event
+        // They are processed into separate events during the `track()` call
         EcommerceTransactionItem item = EcommerceTransactionItem.builder()
             .itemId("order_id")
             .sku("sku")
@@ -99,9 +88,10 @@ public class Main {
             .name("name")
             .category("category")
             .currency("currency")
-            .customContext(contexts)
+            .customContext(context)
             .build();
 
+        // EcommerceTransaction event
         EcommerceTransaction ecommerceTransaction = EcommerceTransaction.builder()
             .orderId("order_id")
             .totalValue(1.0)
@@ -112,31 +102,30 @@ public class Main {
             .state("state")
             .country("country")
             .currency("currency")
-            .items(item) // EcommerceTransactionItem events are added to a parent EcommerceTransaction
-            .customContext(contexts)
+            .items(item) // EcommerceTransactionItem events are added to a parent EcommerceTransaction here
+            .customContext(context)
             .build();
 
-        tracker.track(ecommerceTransaction); // This will track two events
 
-        // This is an example of a custom "Unsutrcutred" event based on a schema
+        // This is an example of a custom "Unstructured" event based on a schema
+        // Unstructured events are also called "self-describing" events
+        // because of their SelfDescribingJson base
         Unstructured unstructured = Unstructured.builder()
             .eventData(new SelfDescribingJson(
                     "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
                     ImmutableMap.of("foo", "bar")
             ))
-            .customContext(contexts)
+            .customContext(context)
             .build();
 
-        tracker.track(unstructured);
 
         // This is an example of a ScreenView event which will be translated into an Unstructured event
         ScreenView screenView = ScreenView.builder()
             .name("name")
             .id("id")
-            .customContext(contexts)
+            .customContext(context)
             .build();
 
-        tracker.track(screenView);
 
         // This is an example of a Timing event which will be translated into an Unstructured event
         Timing timing = Timing.builder()
@@ -144,14 +133,31 @@ public class Main {
             .label("label")
             .variable("variable")
             .timing(10)
-            .customContext(contexts)
+            .customContext(context)
             .build();
 
+        // This is an example of a Structured event
+        Structured structured = Structured.builder()
+                .category("category")
+                .action("action")
+                .label("label")
+                .property("property")
+                .value(12.34)
+                .customContext(context)
+                .build();
+
+        tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
+        tracker.track(ecommerceTransaction); // This will track two events
+        tracker.track(unstructured);
+        tracker.track(screenView);
         tracker.track(timing);
+        tracker.track(structured);
 
         // Will close all threads and force send remaining events
-        // should be 1 left to flush, as we send 5 events with a bufferSize of 4
         emitter.close();
+        Thread.sleep(5000);
+
+        System.out.println("Tracked 7 events");
     }
 
 }

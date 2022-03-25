@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,6 +22,8 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
  * Constructs a PageView event object.
+ *
+ * When tracked, generates a "pv" or "page_view" event.
  */
 public class PageView extends AbstractEvent {
 
@@ -36,6 +38,8 @@ public class PageView extends AbstractEvent {
         private String referrer;
 
         /**
+         * Required.
+         *
          * @param pageUrl URL of the viewed page
          * @return itself
          */
@@ -45,6 +49,8 @@ public class PageView extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param pageTitle Title of the viewed page
          * @return itself
          */
@@ -54,7 +60,9 @@ public class PageView extends AbstractEvent {
         }
 
         /**
-         * @param referrer Referrer of the page
+         * Optional.
+         *
+         * @param referrer Referrer URL of the page
          * @return itself
          */
         public T referrer(String referrer) {
@@ -91,8 +99,7 @@ public class PageView extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */
@@ -102,6 +109,6 @@ public class PageView extends AbstractEvent {
         payload.add(Parameter.PAGE_URL, this.pageUrl);
         payload.add(Parameter.PAGE_TITLE, this.pageTitle);
         payload.add(Parameter.PAGE_REFR, this.referrer);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

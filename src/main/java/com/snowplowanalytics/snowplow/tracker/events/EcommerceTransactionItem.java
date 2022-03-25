@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -21,6 +21,23 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+/**
+ * Constructs an EcommerceTransactionItem object.
+ * <p>
+ * <b>Implementation note: </b><em>EcommerceTransaction/EcommerceTransactionItem uses a legacy design.
+ * We aim to deprecate it eventually. We advise using Unstructured events instead, and attaching the items
+ * as entities. </em>
+ *
+ * EcommerceTransactionItems were designed for attaching data about purchased items to a
+ * EcommerceTransaction event. They can technically be sent as events in their own right, but this is
+ * not supported.
+ *
+ * To link the "transaction" and "transaction item" events, we recommend using the same orderId for the
+ * EcommerceTransaction and all attached EcommerceTransactionItems.
+ *
+ * To use the Currency Conversion pipeline enrichment, the currency string must be
+ * a valid Open Exchange Rates value.
+ */
 public class EcommerceTransactionItem extends AbstractEvent {
 
     private final String itemId;
@@ -42,7 +59,9 @@ public class EcommerceTransactionItem extends AbstractEvent {
         private String currency;
 
         /**
-         * @param itemId Item ID
+         * Required.
+         *
+         * @param itemId Item ID - ideally the same as the EcommerceTransaction orderId
          * @return itself
          */
         public T itemId(String itemId) {
@@ -51,6 +70,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param sku Item SKU
          * @return itself
          */
@@ -60,6 +81,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param price Item price
          * @return itself
          */
@@ -69,6 +92,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param quantity Item quantity
          * @return itself
          */
@@ -78,6 +103,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param name Item name
          * @return itself
          */
@@ -87,6 +114,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param category Item category
          * @return itself
          */
@@ -96,6 +125,8 @@ public class EcommerceTransactionItem extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param currency The currency the price is expressed in
          * @return itself
          */
@@ -141,31 +172,7 @@ public class EcommerceTransactionItem extends AbstractEvent {
     }
 
     /**
-     * @param timestamp the new timestamp
-     * Use {@link #setTrueTimestamp(long)} or {@link #setTrueTimestamp(long)}
-     */
-    @Deprecated
-    public void setTimestamp(long timestamp) {
-        setDeviceCreatedTimestamp(timestamp);
-    }
-
-    /**
-     * @param timestamp the new timestamp
-     */
-    public void setTrueTimestamp(long timestamp) {
-        this.trueTimestamp = timestamp;
-    }
-
-    /**
-     * @param timestamp the new timestamp
-     */
-    public void setDeviceCreatedTimestamp(Long timestamp) {
-        this.deviceCreatedTimestamp = timestamp;
-    }
-
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */
@@ -179,6 +186,6 @@ public class EcommerceTransactionItem extends AbstractEvent {
         payload.add(Parameter.TI_ITEM_PRICE, Double.toString(this.price));
         payload.add(Parameter.TI_ITEM_QUANTITY, Integer.toString(this.quantity));
         payload.add(Parameter.TI_ITEM_CURRENCY, this.currency);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 }

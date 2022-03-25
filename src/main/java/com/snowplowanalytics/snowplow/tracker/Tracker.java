@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -14,11 +14,19 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.base.Preconditions;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerParameters;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+import java.util.*;
+
+/**
+ * Allows tracking of Events.
+ */
 public class Tracker {
 
     private Emitter emitter;
@@ -42,6 +50,7 @@ public class Tracker {
         this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
         this.emitter = builder.emitter;
         this.subject = builder.subject;
+
     }
 
     /**
@@ -77,6 +86,8 @@ public class Tracker {
         }
 
         /**
+         * The {@link DevicePlatform} the tracker is running on (default is "srv", ServerSideApp).
+         *
          * @param platform The device platform the tracker is running on
          * @return itself
          */
@@ -86,7 +97,9 @@ public class Tracker {
         }
 
         /**
-         * @param base64 Whether JSONs in the payload should be base-64 encoded
+         * Whether JSONs in the payload should be base-64 encoded (default is true)
+         *
+         * @param base64 JSONs should be encoded or not
          * @return itself
          */
         public TrackerBuilder base64(Boolean base64) {
@@ -107,6 +120,8 @@ public class Tracker {
     // --- Setters
 
     /**
+     * Change the Emitter used to send events.
+     *
      * @param emitter a new emitter
      */
     public void setEmitter(Emitter emitter) {
@@ -133,14 +148,16 @@ public class Tracker {
     }
 
     /**
-     * @return the Tracker Subject
+     * @return the Tracker-associated Subject
      */
     public Subject getSubject() {
         return this.subject;
     }
 
     /**
-     * @return the tracker version that was set
+     * The Java tracker release version, e.g. 0.12.0.
+     *
+     * @return the tracker version
      */
     public String getTrackerVersion() {
         return this.parameters.getTrackerVersion();
@@ -154,7 +171,7 @@ public class Tracker {
     }
 
     /**
-     * @return the trackers set Application ID
+     * @return the tracker Application ID
      */
     public String getAppId() {
         return this.parameters.getAppId();
@@ -168,7 +185,7 @@ public class Tracker {
     }
 
     /**
-     * @return the Tracker platform
+     * @return the Tracker platform, e.g. "srv"
      */
     public DevicePlatform getPlatform() {
         return this.parameters.getPlatform();
@@ -178,19 +195,131 @@ public class Tracker {
      * @return the wrapper containing the Tracker parameters
      */
     public TrackerParameters getParameters() {
-        return this.parameters;
+        return parameters;
     }
 
     // --- Event Tracking Functions
 
     /**
-     * Handles tracking the different types of events that
-     * the Tracker can encounter.
+     * Handles tracking the different types of events.
+     *
+     * A TrackerPayload object - or more than one, in the case of eCommerceTransaction events -
+     * will be created from the Event. This is passed to the configured Emitter.
+     * If the event was successfully added to the Emitter buffer for sending,
+     * a list containing the payload's eventId string (a UUID) is returned.
+     * EcommerceTransactions will return all the relevant eventIds in the list.
+     * If the Emitter event buffer is full, the payload will be lost. In this case, this method
+     * returns a list containing null.
+     * <p>
+     * <b>Implementation note: </b><em>As a side effect of adding a payload to the Emitter,
+     * it triggers an Emitter thread to emit a batch of events.</em>
      *
      * @param event the event to track
+     * @return a list of eventIDs (UUIDs)
      */
-    public void track(Event event) {
-        // Emit the event
-        this.emitter.emit(new TrackerEvent(event, this.parameters, this.subject));
+    public List<String> track(Event event) {
+        List<String> results = new ArrayList<>();
+        // a list because Ecommerce events become multiple Payloads
+        List<Event> processedEvents = eventTypeSpecificPreProcessing(event);
+        for (Event processedEvent : processedEvents) {
+            // Event ID (eid) and device_created_timestamp (dtm) are generated now when
+            // the TrackerPayload is created
+            TrackerPayload payload = (TrackerPayload) processedEvent.getPayload();
+
+            addTrackerParameters(payload);
+            addContext(processedEvent, payload);
+            addSubject(processedEvent, payload);
+
+            boolean addedToBuffer = emitter.add(payload);
+            if (addedToBuffer) {
+                results.add(payload.getEventId());
+            } else {
+                results.add(null);
+            }
+        }
+        return results;
     }
+
+    private List<Event> eventTypeSpecificPreProcessing(Event event) {
+        // Different event types must be processed in slightly different ways.
+        // EcommerceTransaction events are an outlier, as they are processed into
+        // multiple payloads (a "tr" event plus one "ti" event per item).
+        // Because of this, this method returns a list of Events.
+        List<Event> eventList = new ArrayList<>();
+        final Class<?> eventClass = event.getClass();
+
+        if (eventClass.equals(Unstructured.class)) {
+            // Need to set the Base64 rule for Unstructured events
+            final Unstructured unstructured = (Unstructured) event;
+            unstructured.setBase64Encode(parameters.getBase64Encoded());
+            eventList.add(unstructured);
+
+        } else if (eventClass.equals(EcommerceTransaction.class)) {
+            final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
+            eventList.add(ecommerceTransaction);
+
+            // Track each item individually
+            eventList.addAll(ecommerceTransaction.getItems());
+
+        } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
+            // Timing and ScreenView events are wrapper classes for Unstructured events
+            // Need to create Unstructured events from them to send.
+            final Unstructured unstructured = Unstructured.builder()
+                    .eventData((SelfDescribingJson) event.getPayload())
+                    .customContext(event.getContext())
+                    .trueTimestamp(event.getTrueTimestamp())
+                    .subject(event.getSubject())
+                    .build();
+
+            unstructured.setBase64Encode(parameters.getBase64Encoded());
+            eventList.add(unstructured);
+
+        } else {
+            eventList.add(event);
+        }
+        return eventList;
+    }
+
+    private void addTrackerParameters(TrackerPayload payload) {
+        payload.add(Parameter.PLATFORM, parameters.getPlatform().toString());
+        payload.add(Parameter.APP_ID, parameters.getAppId());
+        payload.add(Parameter.NAMESPACE, parameters.getNamespace());
+        payload.add(Parameter.TRACKER_VERSION, parameters.getTrackerVersion());
+    }
+
+    private void addContext(Event event, TrackerPayload payload) {
+        List<SelfDescribingJson> entities = event.getContext();
+
+        // Build the final context and add it to the payload
+        if (entities != null && entities.size() > 0) {
+            SelfDescribingJson envelope = getFinalContext(entities);
+            payload.addMap(envelope.getMap(), parameters.getBase64Encoded(), Parameter.CONTEXT_ENCODED, Parameter.CONTEXT);
+        }
+    }
+
+    /**
+     * Builds the final event context.
+     *
+     * @param entities the base event context
+     * @return the final event context json with many entities inside
+     */
+    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> entities) {
+        List<Map<String, Object>> entityMaps = new LinkedList<>();
+        for (SelfDescribingJson selfDescribingJson : entities) {
+            entityMaps.add(selfDescribingJson.getMap());
+        }
+        return new SelfDescribingJson(Constants.SCHEMA_CONTEXTS, entityMaps);
+    }
+
+    private void addSubject(Event event, TrackerPayload payload) {
+        Subject eventSubject = event.getSubject();
+
+        // Add subject if available
+        if (eventSubject != null) {
+            payload.addMap(new HashMap<>(eventSubject.getSubject()));
+        } else if (subject != null) {
+            payload.addMap(new HashMap<>(subject.getSubject()));
+        }
+    }
+
 }

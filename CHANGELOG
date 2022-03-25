@@ -1,3 +1,20 @@
+Java 0.12.0 (2022-03-24)
+-----------------------
+Choose HTTP response codes not to retry (#316)
+Add Javadoc generation (#137)
+Deprecate SimpleEmitter (#309)
+Update junit and jackson-databind (#294)
+Update copyright notices to 2022 (#312)
+Return eventId from Tracker.track() (#304)
+Add retry to in-memory storage system (#156)
+Rename bufferSize to batchSize (#306)
+Add benchmarking tests (#300)
+Update simple-console example (#295)
+Provide method for stopping Tracker executorService (#297)
+Refactor TrackerEvents for event payload creation (#291)
+Extract event storage from Emitter (#290)
+Attribute community contributions in changelog (#289)
+
 Java 0.11.0 (2021-12-14)
 -----------------------
 Remove logging of user supplied values (#286)

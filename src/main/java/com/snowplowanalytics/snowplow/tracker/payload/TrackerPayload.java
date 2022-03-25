@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -16,23 +16,49 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.snowplowanalytics.snowplow.tracker.Utils;
 
 /**
- * Returns a standard Tracker Payload consisting of
- * many key - pair values.
+ * A TrackerPayload stores a map of key - pair values.
+ *
+ * When the Emitter attempts to send a TrackerPayload, these pairs are extracted
+ * and added to the HTTP request (via a SelfDescribingJson).
+ * The deviceSentTimestamp ("stm") is added at that point.
+ *
+ * EventId and deviceCreatedTimestamp are added to the internal map at
+ * TrackerPayload initialization.
  */
 public class TrackerPayload implements Payload {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackerPayload.class);
     protected final Map<String, String> payload = new LinkedHashMap<>();
+    private final String eventId;
+    private final Long deviceCreatedTimestamp;
+
+
+    public TrackerPayload() {
+        eventId = Utils.getEventId();
+        deviceCreatedTimestamp = System.currentTimeMillis();
+
+        add(Parameter.EID, eventId);
+        add(Parameter.DEVICE_CREATED_TIMESTAMP, Long.toString(deviceCreatedTimestamp));
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public Long getDeviceCreatedTimestamp() {
+        return deviceCreatedTimestamp;
+    }
 
     /**
-     * Add a key-value pair to the payload: - Checks that the key is not null or
-     * empty - Checks that the value is not null or empty
+     * Add a key-value pair to the payload.
+     * Checks that neither the key nor the value are null or empty.
      *
      * @param key   The parameter key
      * @param value The parameter value as a String
@@ -53,7 +79,7 @@ public class TrackerPayload implements Payload {
 
     /**
      * Add all the mappings from the specified map. The effect is the equivalent to
-     * that of calling: - add(String key, String value) for each key value pair.
+     * that of calling {@link #add(String, String)} for each key value pair.
      *
      * @param map Key-Value pairs to be stored in this payload
      */

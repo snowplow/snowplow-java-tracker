@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -24,16 +24,9 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 public interface Event {
 
     /**
-     * @return the events custom context
+     * @return the event's custom context
      */
     List<SelfDescribingJson> getContext();
-
-    /**
-     * @return the event's timestamp
-     * Use {@link #getTrueTimestamp()} or {@link #getDeviceCreatedTimestamp()}
-     */
-    @Deprecated
-    long getTimestamp();
 
     /**
      * @return the event's true timestamp
@@ -41,17 +34,7 @@ public interface Event {
     Long getTrueTimestamp();
 
     /**
-     * @return the event's device created timestamp
-     */
-    long getDeviceCreatedTimestamp();
-
-    /**
-     * @return the event id
-     */
-    String getEventId();
-
-    /**
-     * @return the event subject
+     * @return the event-associated Subject
      */
     Subject getSubject();
 

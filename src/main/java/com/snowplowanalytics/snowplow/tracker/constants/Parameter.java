@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,6 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.constants;
 
+/**
+ * More constants that define the event properties, which apply to schemas, event types
+ * and sending protocols.
+ */
 public class Parameter {
     // General
     public static final String SCHEMA = "schema";

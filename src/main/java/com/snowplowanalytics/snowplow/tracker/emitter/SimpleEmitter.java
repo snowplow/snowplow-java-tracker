@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -18,15 +18,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
-import com.snowplowanalytics.snowplow.tracker.events.Event;
 
 /**
- * An emitter which sends events as soon as they are received via
- * GET requests.
+ * An emitter which sends events one-by-one as soon as they are received, via
+ * GET requests. The events are sent asynchronously.
+ * @deprecated Use the BatchEmitter, or create your own Emitter using the provided interface.
  */
+@Deprecated
 public class SimpleEmitter extends AbstractEmitter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleEmitter.class);
@@ -53,17 +53,22 @@ public class SimpleEmitter extends AbstractEmitter {
     }
 
     /**
-     * Adds an event to the buffer and instantly sends it
+     * Adds an event and instantly tries to send it.
      *
-     * @param event an event
+     * @param payload a payload
+     * @return true
      */
     @Override
-    public void emit(final TrackerEvent event) {
-        execute(getRequestRunnable(event));
+    public boolean add(TrackerPayload payload) {
+        executor.execute(getGetRequestRunnable(payload));
+
+        // This result doesn't mean anything
+        // The return type is for BatchEmitter's benefit
+        return true;
     }
 
     /**
-     * Sends buffered events, but SimpleEmitter does not buffer events
+     * Sends all the buffered events, but SimpleEmitter does not buffer events.
      * So has no effect
      */
     @Override
@@ -74,42 +79,23 @@ public class SimpleEmitter extends AbstractEmitter {
     /**
      * Returns a Runnable GET Request operation
      *
-     * @param event the event to be sent
+     * @param payload the event to be sent
      * @return the new Callable object
      */
-    private Runnable getRequestRunnable(final TrackerEvent event) {
+    private Runnable getGetRequestRunnable(final TrackerPayload payload) {
         return new Runnable() {
             @Override
             public void run() {
-                int success = 0;
-                int failure = 0;
-                
-                List<TrackerPayload> payloads = event.getTrackerPayloads();
+                payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
+                final int code = httpClientAdapter.get(payload);
 
-                for (TrackerPayload payload : payloads) {
-                    payload.add(Parameter.DEVICE_SENT_TIMESTAMP, Long.toString(System.currentTimeMillis()));
-                    final int code = httpClientAdapter.get(payload);
-
-                    // Process results
-                    if (!isSuccessfulSend(code)) {
-                        LOGGER.error("SimpleEmitter failed to send {} events: code: {}", 1, code);
-                        failure += 1;
-                    } else {
-                        LOGGER.debug("SimpleEmitter successfully sent {} events: code: {}", 1, code);
-                        success += 1;
-                    }
+                // Process results
+                if (!isSuccessfulSend(code)) {
+                    LOGGER.error("SimpleEmitter failed to send {} events: code: {}", 1, code);
+                } else {
+                    LOGGER.debug("SimpleEmitter successfully sent {} events: code: {}", 1, code);
                 }
 
-                // Send the callback if available
-                if (requestCallback != null) {
-                    if (failure != 0) {
-                        final List<Event> buffer = new ArrayList<>();
-                        buffer.add(event.getEvent());
-                        requestCallback.onFailure(success, buffer);
-                    } else {
-                        requestCallback.onSuccess(success);
-                    }
-                }
             }
         };
     }
@@ -121,30 +107,30 @@ public class SimpleEmitter extends AbstractEmitter {
      * @return the empty buffer
      */
     @Override
-    public List<TrackerEvent> getBuffer() {
+    public List<TrackerPayload> getBuffer() {
         return new ArrayList<>();
     }
 
     /**
-     * Customize the emitter buffer size to any valid integer greater than zero.
+     * Customize the emitter batch size to any valid integer greater than zero.
      * Has no effect on SimpleEmitter
      *
-     * @param bufferSize number of events to collect before sending
+     * @param batchSize number of events to collect before sending
      */
     @Override
-    public void setBufferSize(final int bufferSize) {
-        if (bufferSize != 1) {
-            LOGGER.debug("Noop. SimpleEmitter buffer size must always be 1.");
+    public void setBatchSize(final int batchSize) {
+        if (batchSize != 1) {
+            LOGGER.debug("Noop. SimpleEmitter batch size must always be 1.");
         }
     }
 
     /**
-     * Gets the Emitter Buffer Size - Will always be 1 for SimpleEmitter
+     * Gets the Emitter batch Size - Will always be 1 for SimpleEmitter
      *
-     * @return the buffer size
+     * @return the batch size
      */
     @Override
-    public int getBufferSize() {
+    public int getBatchSize() {
         return 1;
     }
 }

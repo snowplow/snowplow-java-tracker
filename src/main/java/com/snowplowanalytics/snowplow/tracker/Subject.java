@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -21,6 +21,8 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 
 /**
  * An object for managing extra event decoration.
+ * All the properties are optional. However, the timezone is set by default,
+ * to that of the server.
  */
 public class Subject {
 
@@ -113,6 +115,8 @@ public class Subject {
         }
 
         /**
+         * Note that timezone is set by default to the server's timezone
+         * (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`)
          * @param timezone a timezone string
          * @return itself
          */
@@ -234,7 +238,8 @@ public class Subject {
     }
 
     /**
-     * Sets the timezone parameter
+     * Sets the timezone parameter. Note that timezone is set by default to the server's timezone
+     * (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`);
      *
      * @param timezone a timezone string
      */

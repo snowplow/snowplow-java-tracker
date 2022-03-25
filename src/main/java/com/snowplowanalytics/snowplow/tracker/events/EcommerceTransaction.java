@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -25,6 +25,24 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+/**
+ * Constructs an EcommerceTransaction event object.
+ * <p>
+ * <b>Implementation note: </b><em>EcommerceTransaction/EcommerceTransactionItem uses a legacy design.
+ * We aim to deprecate it eventually. We advise using Unstructured events instead, and attaching the items
+ * as entities. </em>
+ *
+ * The specific items purchased in the transaction must be added as EcommerceTransactionItem objects.
+ * This event type is different from the others in that it will generate more than one tracked event.
+ * There will be one "transaction" ("tr") event, and one "transaction item" ("ti") event for every
+ * EcommerceTransactionItem included in the EcommerceTransaction.
+ *
+ * To link the "transaction" and "transaction item" events, we recommend using the same orderId for the
+ * EcommerceTransaction and all attached EcommerceTransactionItems.
+ *
+ * To use the Currency Conversion pipeline enrichment, the currency string must be
+ * a valid Open Exchange Rates value.
+ */
 public class EcommerceTransaction extends AbstractEvent {
 
     private final String orderId;
@@ -52,6 +70,8 @@ public class EcommerceTransaction extends AbstractEvent {
         private List<EcommerceTransactionItem> items;
 
         /**
+         * Required.
+         *
          * @param orderId ID of the eCommerce transaction
          * @return itself
          */
@@ -61,6 +81,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Required.
+         *
          * @param totalValue Total transaction value
          * @return itself
          */
@@ -70,6 +92,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param affiliation Transaction affiliation
          * @return itself
          */
@@ -79,6 +103,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param taxValue Transaction tax value
          * @return itself
          */
@@ -88,6 +114,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param shipping Delivery cost charged
          * @return itself
          */
@@ -97,6 +125,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param city Delivery address city
          * @return itself
          */
@@ -106,6 +136,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param state Delivery address state
          * @return itself
          */
@@ -115,6 +147,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param country Delivery address country
          * @return itself
          */
@@ -124,6 +158,8 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Optional.
+         *
          * @param currency The currency the price is expressed in
          * @return itself
          */
@@ -133,6 +169,9 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Provide a list of EcommerceTransactionItems.
+         * An empty list is valid, but probably not very useful.
+         *
          * @param items The items in the transaction
          * @return itself
          */
@@ -142,6 +181,9 @@ public class EcommerceTransaction extends AbstractEvent {
         }
 
         /**
+         * Provide EcommerceTransactionItems directly, without explicitly adding them
+         * to a list beforehand.
+         *
          * @param itemArgs The items as a varargs argument
          * @return itself
          */
@@ -190,8 +232,7 @@ public class EcommerceTransaction extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * Returns a TrackerPayload which can be passed to an Emitter.
      *
      * @return the payload to be sent.
      */
@@ -209,11 +250,11 @@ public class EcommerceTransaction extends AbstractEvent {
         payload.add(Parameter.TR_STATE, this.state);
         payload.add(Parameter.TR_COUNTRY, this.country);
         payload.add(Parameter.TR_CURRENCY, this.currency);
-        return putDefaultParams(payload);
+        return putTrueTimestamp(payload);
     }
 
     /**
-     * The list of Transaction Items passed with the event.
+     * The list of EcommerceTransactionItems passed with the event.
      *
      * @return the items.
      */

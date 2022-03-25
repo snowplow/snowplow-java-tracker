@@ -11,30 +11,26 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics;
+import org.gradle.api.tasks.JavaExec
 
-import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import org.junit.Test;
+plugins {
+    id 'java'
+    id "me.champeau.jmh" version "0.6.6"
+}
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+group 'com.snowplowanalytics'
+version '1.0'
 
-public class MainTest {
-
-    @Test
-    public void testGetUrl() {
-        String[] sample = {"com.acme", "world"};
-        assertEquals("com.acme", Main.getUrlFromArgs(sample));
+repositories {
+    mavenLocal {
+        content {
+            includeGroup "com.snowplowanalytics"
+        }
     }
+    mavenCentral()
+}
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetUrlNull() {
-        Main.getUrlFromArgs(null);
-    }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetUrlEmpty() {
-        Main.getUrlFromArgs(new String[]{});
-    }
-
+dependencies {
+    jmh 'com.snowplowanalytics:snowplow-java-tracker:0.10.1'
 }

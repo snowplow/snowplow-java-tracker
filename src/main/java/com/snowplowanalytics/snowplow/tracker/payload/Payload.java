@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -21,9 +21,9 @@ import java.util.Map;
 public interface Payload {
 
     /**
-     * Add a key-value pair to the payload:
-     * - Checks that the key is not null or empty
-     * - Checks that the value is not null or empty
+     * Add a key-value pair to the payload.
+     *
+     * It checks that neither the key nor value is null or empty.
      *
      * @param key The parameter key
      * @param value The parameter value as a String
@@ -31,8 +31,8 @@ public interface Payload {
     void add(String key, String value);
 
     /**
-     * Add all the mappings from the specified map. The effect is the equivalent to that of calling:
-     *  - add(String key, String value) for each key value pair.
+     * Add all the mappings from the specified map. The effect is the equivalent to that of calling
+     *  {@link #add(String, String)} for each key value pair.
      *
      * @param map Key-Value pairs to be stored in this payload
      */

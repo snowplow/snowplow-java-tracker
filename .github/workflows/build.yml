@@ -43,6 +43,12 @@ jobs:
     - name: Test with Gradle Wrapper
       run: ./gradlew test
 
+    - name: Build simple-console example
+      run: |
+        ./gradlew publishToMavenLocal
+        cd examples/simple-console
+        ./gradlew build
+
     - name: Upload report if failed
       if: ${{ failure() }}
       uses: actions/upload-artifact@v2
