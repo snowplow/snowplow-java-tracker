@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:1.7.30'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testCompileOnly 'junit:junit:4.13'
+    testCompileOnly 'junit:junit:4.13.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
 }
 
