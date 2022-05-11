@@ -580,7 +580,7 @@ public class TrackerTest {
     @Test
     public void testGetTrackerVersion() {
         Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
-        assertEquals("java-0.12.0", tracker.getTrackerVersion());
+        assertEquals("java-0.12.1", tracker.getTrackerVersion());
     }
 
     @Test
