@@ -1,3 +1,16 @@
+Java 0.12.1 (2022-05-11)
+-----------------------
+Bump junit to 4.13.2 (#330)
+Bump mockwebserver to 4.9.3 (#329)
+Bump junit-jupiter-api to 5.8.2 (#328)
+Bump guava to 31.1-jre (#327)
+Bump jackson-databind to 2.13.2.2 (#326)
+Bump slf4j-simple to 1.7.36 (#325)
+Bump slf4j-api to 1.7.36 (#324)
+Bump okhttp to 4.9.3 (#323)
+Bump httpasyncclient to 4.1.5 (#322)
+Bump commons-codec to 1.15 (#321)
+
 Java 0.12.0 (2022-03-24)
 -----------------------
 Choose HTTP response codes not to retry (#316)
