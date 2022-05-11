@@ -79,7 +79,7 @@ dependencies {
     api 'com.google.guava:guava:31.0-jre'
 
     // Testing libraries
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testCompileOnly 'junit:junit:4.13.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
 
