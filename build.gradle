@@ -73,7 +73,7 @@ dependencies {
     testImplementation 'org.slf4j:slf4j-simple:1.7.30'
 
     // Jackson JSON processor
-    api 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
 
     // Preconditions
     api 'com.google.guava:guava:31.1-jre'
