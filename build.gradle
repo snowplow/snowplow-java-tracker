@@ -76,7 +76,7 @@ dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
 
     // Preconditions
-    api 'com.google.guava:guava:31.0-jre'
+    api 'com.google.guava:guava:31.1-jre'
 
     // Testing libraries
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
