@@ -17,13 +17,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collector;
 
 import com.google.common.base.Preconditions;
 
+import com.snowplowanalytics.snowplow.tracker.http.CollectorCookieJar;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 
 /**
@@ -42,6 +45,7 @@ public abstract class AbstractEmitter implements Emitter {
         private int threadCount = 50; // Optional
         private ScheduledExecutorService requestExecutorService = null; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
+        private CookieJar cookieJar; // Optional
         protected abstract T self();
 
         /**
@@ -91,6 +95,17 @@ public abstract class AbstractEmitter implements Emitter {
             this.collectorUrl = collectorUrl;
             return self();
         }
+
+        /**
+         * Adds a custom CookieJar to be used with OkHttpClientAdapters.
+         *
+         * @param cookieJar the CookieJar to use
+         * @return itself
+         */
+        public T cookieJar(final CookieJar cookieJar) {
+            this.cookieJar = cookieJar;
+            return self();
+        }
     }
 
     private static class Builder2 extends Builder<Builder2> {
@@ -118,6 +133,7 @@ public abstract class AbstractEmitter implements Emitter {
                     .url(builder.collectorUrl)
                     .httpClient(
                         new OkHttpClient()) // use okhttp as a default
+                    .cookieJar(builder.cookieJar)
                     .build();
         }
 

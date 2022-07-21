@@ -19,11 +19,7 @@ import java.io.IOException;
 import com.google.common.base.Preconditions;
 
 // SquareUp
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.MediaType;
-import okhttp3.Response;
-import okhttp3.RequestBody;
+import okhttp3.*;
 
 // Slf4j
 import org.slf4j.Logger;
@@ -41,10 +37,12 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientAdapter.class);
     private final MediaType JSON = MediaType.get(Constants.POST_CONTENT_TYPE);
     private OkHttpClient httpClient;
+    private CookieJar cookieJar = null; // Optional
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
         private OkHttpClient httpClient; // Required
+        private CookieJar cookieJar; // Optional
 
         /**
          * @param httpClient The Apache HTTP Client to use
@@ -52,6 +50,11 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
          */
         public T httpClient(OkHttpClient httpClient) {
             this.httpClient = httpClient;
+            return self();
+        }
+
+        public T cookieJar(CookieJar cookieJar) {
+            this.cookieJar = cookieJar;
             return self();
         }
 
@@ -77,7 +80,8 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         // Precondition checks
         Preconditions.checkNotNull(builder.httpClient);
 
-        this.httpClient = builder.httpClient;
+        cookieJar = builder.cookieJar == null ? new CollectorCookieJar() : builder.cookieJar;
+        httpClient = builder.httpClient;
     }
 
     /**
