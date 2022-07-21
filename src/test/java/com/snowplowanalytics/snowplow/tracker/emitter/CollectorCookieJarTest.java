@@ -83,13 +83,12 @@ public class CollectorCookieJarTest {
     public void testMaintainsCookiesAcrossJarInstances() {
         requestCookies.add(cookie1);
         cookieJar.saveFromResponse(
-                HttpUrl.parse("http://acme.test.url.com"),
+                HttpUrl.parse(domain1),
                 requestCookies
         );
 
         CollectorCookieJar cookieJar2 = new CollectorCookieJar();
-
-        List<Cookie> cookies2 = cookieJar2.loadForRequest(HttpUrl.parse("http://acme.test.url.com"));
+        List<Cookie> cookies2 = cookieJar2.loadForRequest(HttpUrl.parse(domain1));
         assertFalse(cookies2.isEmpty());
 
         cookieJar.clear();

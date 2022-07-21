@@ -7,10 +7,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CollectorCookieJar implements okhttp3.CookieJar {
-    private Set<CollectorCookie> cookies;
+    private static final Set<CollectorCookie> cookies = Collections.newSetFromMap(new ConcurrentHashMap<CollectorCookie, Boolean>());
 
     public CollectorCookieJar() {
-        cookies = Collections.newSetFromMap(new ConcurrentHashMap<CollectorCookie, Boolean>());
     }
 
     @Override
