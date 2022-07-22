@@ -98,6 +98,7 @@ public abstract class AbstractEmitter implements Emitter {
 
         /**
          * Adds a custom CookieJar to be used with OkHttpClientAdapters.
+         * Will be ignored if a custom httpClientAdapter is provided.
          *
          * @param cookieJar the CookieJar to use
          * @return itself
@@ -129,11 +130,12 @@ public abstract class AbstractEmitter implements Emitter {
         } else {
             Preconditions.checkNotNull(builder.collectorUrl, "Collector url must be specified if not using a httpClientAdapter");
 
-            this.httpClientAdapter = OkHttpClientAdapter.builder()
+            this.httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
                     .url(builder.collectorUrl)
                     .httpClient(
-                        new OkHttpClient()) // use okhttp as a default
-                    .cookieJar(builder.cookieJar)
+                        new OkHttpClient.Builder()
+                                .cookieJar(builder.cookieJar == null ? new CollectorCookieJar() : builder.cookieJar)
+                                .build())
                     .build();
         }
 

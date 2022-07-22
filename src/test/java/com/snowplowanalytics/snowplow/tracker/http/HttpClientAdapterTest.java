@@ -15,10 +15,12 @@ package com.snowplowanalytics.snowplow.tracker.http;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ImmutableMap;
 
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -129,5 +131,34 @@ public class HttpClientAdapterTest {
     @Test
     public void testGetWithNullArgument() {
         Assert.assertThrows(NullPointerException.class, () -> adapter.get(null));
+    }
+
+    @Test
+    public void testRequestWithCookies() throws IOException, InterruptedException {
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .connectTimeout(1, TimeUnit.SECONDS)
+                .readTimeout(1, TimeUnit.SECONDS)
+                .writeTimeout(1, TimeUnit.SECONDS)
+                .cookieJar(new CollectorCookieJar())
+                .build();
+        adapter = OkHttpClientAdapter.builder()
+                .url(mockWebServer.url("/").toString())
+                .httpClient(httpClient)
+                .build();
+
+        mockWebServer.enqueue(new MockResponse().addHeader("Set-Cookie", "sp=test"));
+
+        SelfDescribingJson payload = new SelfDescribingJson("schema", ImmutableMap.of("foo", "bar"));
+
+        adapter.post(payload);
+        adapter.post(payload);
+
+        assertEquals(2, mockWebServer.getRequestCount());
+        mockWebServer.takeRequest();
+        RecordedRequest recordedRequest2 = mockWebServer.takeRequest();
+
+        assertEquals("sp=test", recordedRequest2.getHeader("Cookie"));
+
+        mockWebServer.shutdown();
     }
 }

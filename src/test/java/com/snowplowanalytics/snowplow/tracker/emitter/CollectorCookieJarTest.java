@@ -12,7 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
+import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.http.CollectorCookieJar;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import okhttp3.Cookie;
@@ -94,14 +97,39 @@ public class CollectorCookieJarTest {
         cookieJar.clear();
     }
 
-//    @Test
-//    public void testRemovesInvalidCookies() {
-//        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        SharedPreferences sharedPreferences = context.getSharedPreferences(COOKIE_PERSISTANCE, Context.MODE_PRIVATE);
-//        sharedPreferences.edit().putString("x", "y").apply();
-//        assertEquals(1, sharedPreferences.getAll().size());
-//
-//        new CollectorCookieJar(context);
-//        assertEquals(0, sharedPreferences.getAll().size());
-//    }
+    @Test
+    public void testClearsCookies() {
+        requestCookies.add(cookie1);
+        cookieJar.saveFromResponse(
+                HttpUrl.parse(domain1),
+                requestCookies
+        );
+
+        List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(domain1));
+        assertFalse(cookies.isEmpty());
+
+        cookieJar.clear();
+        List<Cookie> cookies2 = cookieJar.loadForRequest(HttpUrl.parse(domain1));
+        assertTrue(cookies2.isEmpty());
+    }
+
+    @Test
+    public void testRemovesExpiredCookies() {
+        Cookie cookie2 = new Cookie.Builder()
+                .name("sp")
+                .value("xxx")
+                .domain("snowplow.test.url.com")
+                .expiresAt(1654869235L)
+                .build();
+
+        requestCookies.add(cookie2);
+        cookieJar.saveFromResponse(
+                HttpUrl.parse(domain1),
+                requestCookies
+        );
+
+        List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(domain1));
+        assertTrue(cookies.isEmpty());
+    }
+
 }

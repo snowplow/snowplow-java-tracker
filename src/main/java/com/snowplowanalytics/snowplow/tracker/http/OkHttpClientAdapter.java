@@ -37,24 +37,17 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientAdapter.class);
     private final MediaType JSON = MediaType.get(Constants.POST_CONTENT_TYPE);
     private OkHttpClient httpClient;
-    private CookieJar cookieJar = null; // Optional
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
         private OkHttpClient httpClient; // Required
-        private CookieJar cookieJar; // Optional
 
         /**
-         * @param httpClient The Apache HTTP Client to use
+         * @param httpClient The OkHTTP Client to use
          * @return itself
          */
         public T httpClient(OkHttpClient httpClient) {
             this.httpClient = httpClient;
-            return self();
-        }
-
-        public T cookieJar(CookieJar cookieJar) {
-            this.cookieJar = cookieJar;
             return self();
         }
 
@@ -80,7 +73,6 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         // Precondition checks
         Preconditions.checkNotNull(builder.httpClient);
 
-        cookieJar = builder.cookieJar == null ? new CollectorCookieJar() : builder.cookieJar;
         httpClient = builder.httpClient;
     }
 
