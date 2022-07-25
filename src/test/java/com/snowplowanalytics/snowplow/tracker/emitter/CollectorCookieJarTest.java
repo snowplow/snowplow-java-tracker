@@ -18,7 +18,7 @@ import okhttp3.HttpUrl;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -28,7 +28,7 @@ public class CollectorCookieJarTest {
     String domain2 = "http://other.test.url.com";
     Cookie cookie1;
     CollectorCookieJar cookieJar;
-    ArrayList<Cookie> requestCookies;
+    List<Cookie> requestCookies;
 
     @Before
     public void setUp() {
@@ -38,18 +38,17 @@ public class CollectorCookieJarTest {
                 .domain("snowplow.test.url.com")
                 .build();
         cookieJar = new CollectorCookieJar();
-        requestCookies = new ArrayList<>();
     }
 
     @Test
     public void testNoCookiesAtStartup() {
-        List<Cookie> cookies1 = cookieJar.loadForRequest(HttpUrl.parse(domain1));
-        assertTrue(cookies1.isEmpty());
+        List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(domain1));
+        assertTrue(cookies.isEmpty());
     }
 
     @Test
     public void testReturnsCookiesAfterSetInResponse() {
-        requestCookies.add(cookie1);
+        requestCookies = Collections.singletonList(cookie1);
         cookieJar.saveFromResponse(
                 HttpUrl.parse(domain1),
                 requestCookies
@@ -64,7 +63,7 @@ public class CollectorCookieJarTest {
 
     @Test
     public void testDoesntReturnCookiesForDifferentDomain() {
-        requestCookies.add(cookie1);
+        requestCookies = Collections.singletonList(cookie1);
         cookieJar.saveFromResponse(
                 HttpUrl.parse(domain1),
                 requestCookies
@@ -78,7 +77,7 @@ public class CollectorCookieJarTest {
 
     @Test
     public void testMaintainsCookiesAcrossJarInstances() {
-        requestCookies.add(cookie1);
+        requestCookies = Collections.singletonList(cookie1);
         cookieJar.saveFromResponse(
                 HttpUrl.parse(domain1),
                 requestCookies
@@ -93,7 +92,7 @@ public class CollectorCookieJarTest {
 
     @Test
     public void testClearsCookies() {
-        requestCookies.add(cookie1);
+        requestCookies = Collections.singletonList(cookie1);
         cookieJar.saveFromResponse(
                 HttpUrl.parse(domain1),
                 requestCookies
@@ -116,7 +115,7 @@ public class CollectorCookieJarTest {
                 .expiresAt(1654869235L)
                 .build();
 
-        requestCookies.add(cookie2);
+        requestCookies = Collections.singletonList(cookie2);
         cookieJar.saveFromResponse(
                 HttpUrl.parse(domain1),
                 requestCookies
