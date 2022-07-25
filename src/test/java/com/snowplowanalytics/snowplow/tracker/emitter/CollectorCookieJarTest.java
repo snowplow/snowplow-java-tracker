@@ -12,15 +12,9 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
-import com.snowplowanalytics.snowplow.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.events.PageView;
-import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.http.CollectorCookieJar;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
