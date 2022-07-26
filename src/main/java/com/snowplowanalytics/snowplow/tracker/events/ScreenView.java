@@ -23,7 +23,7 @@ import java.util.LinkedHashMap;
 /**
  * Constructs a ScreenView event object.
  *
- * When tracked, generates an "unstructured" or "ue" event.
+ * When tracked, generates an "unstructured" or "ue" event (this was the old name for SelfDescribing events).
  */
 public class ScreenView extends AbstractEvent {
 
@@ -85,7 +85,7 @@ public class ScreenView extends AbstractEvent {
 
     /**
      * Return the payload wrapped into a SelfDescribingJson. When a ScreenView is tracked,
-     * the Tracker creates and tracks an Unstructured event from this SelfDescribingJson.
+     * the Tracker creates and tracks an SelfDescribing event from this SelfDescribingJson.
      *
      * @return the payload as a SelfDescribingJson.
      */

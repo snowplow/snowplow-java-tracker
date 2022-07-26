@@ -29,7 +29,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
  * Constructs an EcommerceTransaction event object.
  * <p>
  * <b>Implementation note: </b><em>EcommerceTransaction/EcommerceTransactionItem uses a legacy design.
- * We aim to deprecate it eventually. We advise using Unstructured events instead, and attaching the items
+ * We aim to deprecate it eventually. We advise using SelfDescribing events instead, and attaching the items
  * as entities. </em>
  *
  * The specific items purchased in the transaction must be added as EcommerceTransactionItem objects.

@@ -107,10 +107,10 @@ public class Main {
             .build();
 
 
-        // This is an example of a custom "Unstructured" event based on a schema
-        // Unstructured events are also called "self-describing" events
-        // because of their SelfDescribingJson base
-        Unstructured unstructured = Unstructured.builder()
+        // This is an example of a custom SelfDescribing event based on a schema
+        // SelfDescribing events used to be called "unstructured" events
+        // in comparison to Structured events. However, they are in fact more highly structured.
+        SelfDescribing selfDescribing = SelfDescribing.builder()
             .eventData(new SelfDescribingJson(
                     "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
                     ImmutableMap.of("foo", "bar")
@@ -148,7 +148,7 @@ public class Main {
 
         tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
         tracker.track(ecommerceTransaction); // This will track two events
-        tracker.track(unstructured);
+        tracker.track(selfDescribing);
         tracker.track(screenView);
         tracker.track(timing);
         tracker.track(structured);

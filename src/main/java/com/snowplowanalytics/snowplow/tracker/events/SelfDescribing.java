@@ -22,14 +22,14 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * Constructs an Unstructured event object.
+ * Constructs a SelfDescribing event object.
  *
  * This is a customisable event type which allows you to track anything describable
  * by a JsonSchema.
  *
- * When tracked, generates an "unstructured" or "ue" event.
+ * When tracked, generates an "unstructured" or "ue" event (this was the old name for SelfDescribing events).
  */
-public class Unstructured extends AbstractEvent {
+public class SelfDescribing extends AbstractEvent {
 
     private final SelfDescribingJson eventData;
     private boolean base64Encode;
@@ -50,8 +50,8 @@ public class Unstructured extends AbstractEvent {
             return self();
         }
 
-        public Unstructured build() {
-            return new Unstructured(this);
+        public SelfDescribing build() {
+            return new SelfDescribing(this);
         }
     }
 
@@ -66,7 +66,7 @@ public class Unstructured extends AbstractEvent {
         return new Builder2();
     }
 
-    protected Unstructured(Builder<?> builder) {
+    protected SelfDescribing(Builder<?> builder) {
         super(builder);
 
         // Precondition checks
