@@ -45,7 +45,7 @@ public abstract class AbstractEmitter implements Emitter {
         private int threadCount = 50; // Optional
         private ScheduledExecutorService requestExecutorService = null; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
-        private CookieJar cookieJar; // Optional
+        private CookieJar cookieJar = null; // Optional
         protected abstract T self();
 
         /**
@@ -121,28 +121,34 @@ public abstract class AbstractEmitter implements Emitter {
     }
 
     protected AbstractEmitter(final Builder<?> builder) {
+        OkHttpClient client;
 
         // Precondition checks
         Preconditions.checkArgument(builder.threadCount > 0, "threadCount must be greater than 0");
 
         if (builder.httpClientAdapter != null) {
-            this.httpClientAdapter = builder.httpClientAdapter;
+            httpClientAdapter = builder.httpClientAdapter;
         } else {
             Preconditions.checkNotNull(builder.collectorUrl, "Collector url must be specified if not using a httpClientAdapter");
 
-            this.httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
+            if (builder.cookieJar != null) {
+                client = new OkHttpClient.Builder()
+                        .cookieJar(builder.cookieJar)
+                        .build();
+            } else {
+                client = new OkHttpClient.Builder().build();
+            }
+
+            httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
                     .url(builder.collectorUrl)
-                    .httpClient(
-                        new OkHttpClient.Builder()
-                                .cookieJar(builder.cookieJar == null ? new CollectorCookieJar() : builder.cookieJar)
-                                .build())
+                    .httpClient(client)
                     .build();
         }
 
         if (builder.requestExecutorService != null) {
-            this.executor = builder.requestExecutorService;
+            executor = builder.requestExecutorService;
         } else {
-            this.executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
+            executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
         }
     }
 
