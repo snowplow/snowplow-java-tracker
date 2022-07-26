@@ -16,15 +16,22 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
+import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
+import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,22 +49,53 @@ import org.slf4j.LoggerFactory;
  *
  * If the buffer becomes full due to network problems, newer events will be lost.
  */
-public class BatchEmitter extends AbstractEmitter implements Closeable {
+public class BatchEmitter implements Emitter, Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
     private boolean isClosing = false;
-  
-    private int batchSize;
-    private final EventStore eventStore;
     private final AtomicLong retryDelay;
+    private int batchSize;
+
+    private final HttpClientAdapter httpClientAdapter;
+    private final ScheduledExecutorService executor;
+    private final EventStore eventStore;
     private final List<Integer> fatalResponseCodes;
 
-    public static abstract class Builder<T extends Builder<T>> extends AbstractEmitter.Builder<T> {
+    public static abstract class Builder<T extends Builder<T>> {
+        protected abstract T self();
 
+        private HttpClientAdapter httpClientAdapter; // Optional
+        private String collectorUrl = null; // Required if not specifying a httpClientAdapter
         private int batchSize = 50; // Optional
         private int bufferCapacity = Integer.MAX_VALUE;
-        private EventStore eventStore;
-        private List<Integer> fatalResponseCodes;
+        private EventStore eventStore = null;  // Optional
+        private List<Integer> fatalResponseCodes = null;  // Optional
+        private int threadCount = 50; // Optional
+        private ScheduledExecutorService requestExecutorService = null; // Optional
+
+        /**
+         * Adds a custom HttpClientAdapter to the Emitter (default is OkHttpClientAdapter).
+         *
+         * @param httpClientAdapter the adapter to use
+         * @return itself
+         */
+        public T httpClientAdapter(final HttpClientAdapter httpClientAdapter) {
+            this.httpClientAdapter = httpClientAdapter;
+            return self();
+        }
+
+
+        /**
+         * Sets the emitter url for when a httpClientAdapter is not specified.
+         * It will be used to create the default OkHttpClientAdapter.
+         *
+         * @param collectorUrl the url for the default httpClientAdapter
+         * @return itself
+         */
+        public T url(final String collectorUrl) {
+            this.collectorUrl = collectorUrl;
+            return self();
+        }
 
         /**
          * The default batch size is 50.
@@ -67,17 +105,6 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
          */
         public T batchSize(final int batchSize) {
             this.batchSize = batchSize;
-            return self();
-        }
-
-        /**
-         * The default EventStore is InMemoryEventStore.
-         *
-         * @param eventStore The EventStore to use
-         * @return itself
-         */
-        public T eventStore(final EventStore eventStore) {
-            this.eventStore = eventStore;
             return self();
         }
 
@@ -94,6 +121,17 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
         }
 
         /**
+         * The default EventStore is InMemoryEventStore.
+         *
+         * @param eventStore The EventStore to use
+         * @return itself
+         */
+        public T eventStore(final EventStore eventStore) {
+            this.eventStore = eventStore;
+            return self();
+        }
+
+        /**
          * Provide a denylist of HTTP response codes. Retry will not be attempted if one of these codes
          * is received. The events in the request will be dropped, but the Emitter will continue trying
          * to send as normal.
@@ -103,6 +141,31 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
          */
         public T fatalResponseCodes(final List<Integer> fatalResponseCodes) {
             this.fatalResponseCodes = fatalResponseCodes;
+            return self();
+        }
+
+        /**
+         * Sets the Thread Count for the ScheduledExecutorService (default is 50).
+         *
+         * @param threadCount the size of the thread pool
+         * @return itself
+         */
+        public T threadCount(final int threadCount) {
+            this.threadCount = threadCount;
+            return self();
+        }
+
+        /**
+         * Set a custom ScheduledExecutorService to send http requests (default is ScheduledThreadPoolExecutor).
+         * <p>
+         * <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
+         * has a side-effect and will shutdown that ExecutorService.</em>
+         *
+         * @param requestExecutorService the ScheduledExecutorService to use
+         * @return itself
+         */
+        public T requestExecutorService(final ScheduledExecutorService requestExecutorService) {
+            this.requestExecutorService = requestExecutorService;
             return self();
         }
 
@@ -123,23 +186,41 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
     }
 
     protected BatchEmitter(final Builder<?> builder) {
-        super(builder);
-
         // Precondition checks
+        Preconditions.checkArgument(builder.threadCount > 0, "threadCount must be greater than 0");
         Preconditions.checkArgument(builder.batchSize > 0, "batchSize must be greater than 0");
+
+        if (builder.httpClientAdapter != null) {
+            httpClientAdapter = builder.httpClientAdapter;
+        } else {
+            Preconditions.checkNotNull(builder.collectorUrl, "Collector url must be specified if not using a httpClientAdapter");
+
+            httpClientAdapter = OkHttpClientAdapter.builder()
+                    .url(builder.collectorUrl)
+                    .httpClient(
+                            new OkHttpClient()) // use okhttp as a default
+                    .build();
+        }
+
+        retryDelay = new AtomicLong(0L);
         batchSize = builder.batchSize;
 
-        if (builder.eventStore == null) {
-            eventStore = new InMemoryEventStore(builder.bufferCapacity);
-        } else {
+        if (builder.eventStore != null) {
             eventStore = builder.eventStore;
+        } else {
+            eventStore = new InMemoryEventStore(builder.bufferCapacity);
         }
-        retryDelay = new AtomicLong(0L);
 
         if (builder.fatalResponseCodes != null) {
             fatalResponseCodes = builder.fatalResponseCodes;
         } else {
             fatalResponseCodes = new ArrayList<>();
+        }
+
+        if (builder.requestExecutorService != null) {
+            executor = builder.requestExecutorService;
+        } else {
+            executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
         }
     }
 
@@ -211,6 +292,16 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
 
     long getRetryDelay() {
         return retryDelay.get();
+    }
+
+    /**
+     * Checks whether the response code was a success or not.
+     *
+     * @param code the response code
+     * @return whether it is in the success range
+     */
+    protected boolean isSuccessfulSend(final int code) {
+        return code >= 200 && code < 300;
     }
 
     /**
@@ -306,6 +397,36 @@ public class BatchEmitter extends AbstractEmitter implements Closeable {
                 executor.shutdownNow();
                 Thread.currentThread().interrupt();
             }
+        }
+    }
+
+    /**
+     * Copied from `Executors.defaultThreadFactory()`.
+     * The only change is the generated name prefix.
+     */
+    static class EmitterThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        EmitterThreadFactory() {
+            SecurityManager securityManager = System.getSecurityManager();
+            group = securityManager != null ? securityManager.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            namePrefix = "snowplow-emitter-pool-" + poolNumber.getAndIncrement() + "-request-thread-";
+        }
+
+        public Thread newThread(Runnable runnable) {
+            Thread thread = new Thread(group, runnable, namePrefix + threadNumber.getAndIncrement(), 0L);
+            if (thread.isDaemon()) {
+                thread.setDaemon(false);
+            }
+
+            if (thread.getPriority() != 5) {
+                thread.setPriority(5);
+            }
+
+            return thread;
         }
     }
 }
