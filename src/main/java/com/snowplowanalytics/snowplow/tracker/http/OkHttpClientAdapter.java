@@ -19,11 +19,7 @@ import java.io.IOException;
 import com.google.common.base.Preconditions;
 
 // SquareUp
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.MediaType;
-import okhttp3.Response;
-import okhttp3.RequestBody;
+import okhttp3.*;
 
 // Slf4j
 import org.slf4j.Logger;
@@ -47,7 +43,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         private OkHttpClient httpClient; // Required
 
         /**
-         * @param httpClient The Apache HTTP Client to use
+         * @param httpClient The OkHTTP Client to use
          * @return itself
          */
         public T httpClient(OkHttpClient httpClient) {
@@ -77,7 +73,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         // Precondition checks
         Preconditions.checkNotNull(builder.httpClient);
 
-        this.httpClient = builder.httpClient;
+        httpClient = builder.httpClient;
     }
 
     /**
