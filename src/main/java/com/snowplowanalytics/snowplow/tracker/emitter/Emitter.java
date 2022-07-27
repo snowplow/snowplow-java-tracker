@@ -33,7 +33,6 @@ public interface Emitter {
     /**
      * Customize the emitter batch size to any valid integer
      * greater than zero.
-     * Will only affect the BatchEmitter
      *
      * @param batchSize number of events to collect before
      *                   sending
@@ -47,7 +46,6 @@ public interface Emitter {
 
     /**
      * Gets the Emitter Batch Size
-     * Will always be 1 for SimpleEmitter. Note that SimpleEmitter has been deprecated.
      *
      * @return the batch size
      */
