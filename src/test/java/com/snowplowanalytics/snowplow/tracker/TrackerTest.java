@@ -241,7 +241,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithContext() throws InterruptedException {
+    public void testSelfDescribingEventWithContext() throws InterruptedException {
         // When
         tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
@@ -272,7 +272,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithoutContext() throws InterruptedException {
+    public void testSelfDescribingEventWithoutContext() throws InterruptedException {
         // When
         tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
@@ -301,7 +301,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithoutTrueTimestamp() throws InterruptedException {
+    public void testSelfDescribingEventWithoutTrueTimestamp() throws InterruptedException {
         // When
         tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(

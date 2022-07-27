@@ -26,7 +26,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 /**
  * Constructs a Timing event object.
  *
- * When tracked, generates an "unstructured" or "ue" event (this was the old name for SelfDescribing events).
+ * When tracked, generates a SelfDescribing event (event type "ue").
  */
 public class Timing extends AbstractEvent {
 

@@ -108,8 +108,6 @@ public class Main {
 
 
         // This is an example of a custom SelfDescribing event based on a schema
-        // SelfDescribing events used to be called "unstructured" events
-        // in comparison to Structured events. However, they are in fact more highly structured.
         SelfDescribing selfDescribing = SelfDescribing.builder()
             .eventData(new SelfDescribingJson(
                     "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
@@ -119,7 +117,7 @@ public class Main {
             .build();
 
 
-        // This is an example of a ScreenView event which will be translated into an Unstructured event
+        // This is an example of a ScreenView event which will be translated into a SelfDescribing event
         ScreenView screenView = ScreenView.builder()
             .name("name")
             .id("id")
@@ -127,7 +125,7 @@ public class Main {
             .build();
 
 
-        // This is an example of a Timing event which will be translated into an Unstructured event
+        // This is an example of a Timing event which will be translated into a SelfDescribing event
         Timing timing = Timing.builder()
             .category("category")
             .label("label")

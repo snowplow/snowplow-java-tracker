@@ -23,7 +23,7 @@ import java.util.LinkedHashMap;
 /**
  * Constructs a ScreenView event object.
  *
- * When tracked, generates an "unstructured" or "ue" event (this was the old name for SelfDescribing events).
+ * When tracked, generates a SelfDescribing event (event type "ue").
  */
 public class ScreenView extends AbstractEvent {
 

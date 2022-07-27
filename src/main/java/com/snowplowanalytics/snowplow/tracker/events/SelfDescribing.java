@@ -27,7 +27,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
  * This is a customisable event type which allows you to track anything describable
  * by a JsonSchema.
  *
- * When tracked, generates an "unstructured" or "ue" event (this was the old name for SelfDescribing events).
+ * When tracked, generates a self-describing event (event type "ue").
  */
 public class SelfDescribing extends AbstractEvent {
 
@@ -90,10 +90,10 @@ public class SelfDescribing extends AbstractEvent {
     public TrackerPayload getPayload() {
         TrackerPayload payload = new TrackerPayload();
         SelfDescribingJson envelope = new SelfDescribingJson(
-                Constants.SCHEMA_UNSTRUCT_EVENT, this.eventData.getMap());
-        payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
+                Constants.SCHEMA_SELF_DESCRIBING_EVENT, this.eventData.getMap());
+        payload.add(Parameter.EVENT, Constants.EVENT_SELF_DESCRIBING);
         payload.addMap(envelope.getMap(), this.base64Encode,
-                Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
+                Parameter.SELF_DESCRIBING_ENCODED, Parameter.SELF_DESCRIBING);
         return putTrueTimestamp(payload);
     }
 }
