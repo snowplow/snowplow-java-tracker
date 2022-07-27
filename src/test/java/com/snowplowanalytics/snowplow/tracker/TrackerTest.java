@@ -68,7 +68,7 @@ public class TrackerTest {
     @Test
     public void testTrackReturnsEventIdIfSuccessful() throws InterruptedException {
         // a list to allow for eCommerceTransaction
-        List<String> result = tracker.track(Unstructured.builder()
+        List<String> result = tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
                         ImmutableMap.of("foo", "bar")
@@ -104,7 +104,7 @@ public class TrackerTest {
         FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
         tracker = new Tracker.TrackerBuilder(failingMockEmitter, "AF003", "cloudfront").build();
 
-        List<String> result = tracker.track(Unstructured.builder()
+        List<String> result = tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
                         ImmutableMap.of("foo", "bar")
@@ -241,9 +241,9 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithContext() throws InterruptedException {
+    public void testSelfDescribingEventWithContext() throws InterruptedException {
         // When
-        tracker.track(Unstructured.builder()
+        tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
                         ImmutableMap.of("foo", "bar")
@@ -272,9 +272,9 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithoutContext() throws InterruptedException {
+    public void testSelfDescribingEventWithoutContext() throws InterruptedException {
         // When
-        tracker.track(Unstructured.builder()
+        tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
                         ImmutableMap.of("foo", "baær")
@@ -301,9 +301,9 @@ public class TrackerTest {
     }
 
     @Test
-    public void testUnstructuredEventWithoutTrueTimestamp() throws InterruptedException {
+    public void testSelfDescribingEventWithoutTrueTimestamp() throws InterruptedException {
         // When
-        tracker.track(Unstructured.builder()
+        tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
                         ImmutableMap.of("foo", "bar")
@@ -375,7 +375,7 @@ public class TrackerTest {
                 .trueTimestamp(123456L)
                 .build());
 
-        tracker.track(Unstructured.builder()
+        tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
                         ImmutableMap.of("foo", "bar")
