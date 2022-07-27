@@ -28,7 +28,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
  * To aid data quality and modeling, agree on business-wide definitions when designing
  * your tracking strategy.
  *
- * We recommend using Unstructured - fully custom - events instead.
+ * We recommend using SelfDescribing - fully custom - events instead.
  *
  * When tracked, generates a "struct" or "se" event.
  *

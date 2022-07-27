@@ -39,8 +39,8 @@ public class Parameter {
     public static final String UID = "uid";
     public static final String CONTEXT = "co";
     public static final String CONTEXT_ENCODED = "cx";
-    public static final String UNSTRUCTURED = "ue_pr";
-    public static final String UNSTRUCTURED_ENCODED = "ue_px";
+    public static final String SELF_DESCRIBING = "ue_pr";
+    public static final String SELF_DESCRIBING_ENCODED = "ue_px";
 
     // Subject class
     public static final String PLATFORM = "p";

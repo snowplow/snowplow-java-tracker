@@ -248,11 +248,11 @@ public class Tracker {
         List<Event> eventList = new ArrayList<>();
         final Class<?> eventClass = event.getClass();
 
-        if (eventClass.equals(Unstructured.class)) {
-            // Need to set the Base64 rule for Unstructured events
-            final Unstructured unstructured = (Unstructured) event;
-            unstructured.setBase64Encode(parameters.getBase64Encoded());
-            eventList.add(unstructured);
+        if (eventClass.equals(SelfDescribing.class)) {
+            // Need to set the Base64 rule for SelfDescribing events
+            final SelfDescribing selfDescribing = (SelfDescribing) event;
+            selfDescribing.setBase64Encode(parameters.getBase64Encoded());
+            eventList.add(selfDescribing);
 
         } else if (eventClass.equals(EcommerceTransaction.class)) {
             final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
@@ -262,17 +262,17 @@ public class Tracker {
             eventList.addAll(ecommerceTransaction.getItems());
 
         } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
-            // Timing and ScreenView events are wrapper classes for Unstructured events
-            // Need to create Unstructured events from them to send.
-            final Unstructured unstructured = Unstructured.builder()
+            // Timing and ScreenView events are wrapper classes for SelfDescribing events
+            // Need to create SelfDescribing events from them to send.
+            final SelfDescribing selfDescribing = SelfDescribing.builder()
                     .eventData((SelfDescribingJson) event.getPayload())
                     .customContext(event.getContext())
                     .trueTimestamp(event.getTrueTimestamp())
                     .subject(event.getSubject())
                     .build();
 
-            unstructured.setBase64Encode(parameters.getBase64Encoded());
-            eventList.add(unstructured);
+            selfDescribing.setBase64Encode(parameters.getBase64Encoded());
+            eventList.add(selfDescribing);
 
         } else {
             eventList.add(event);
