@@ -340,7 +340,7 @@ public class BatchEmitter implements Emitter, Closeable {
 
                     // exponentially increase retry backoff time after the first failure, up to the maximum wait time
                     if (!retryDelay.compareAndSet(0, 100)) {
-                        retryDelay.getAndSet(calculateRetryDelay());
+                        retryDelay.updateAndGet(this::calculateRetryDelay);
                     }
                 }
             } catch (Exception e) {
@@ -370,8 +370,7 @@ public class BatchEmitter implements Emitter, Closeable {
         return new SelfDescribingJson(Constants.SCHEMA_PAYLOAD_DATA, toSendPayloads);
     }
 
-    private int calculateRetryDelay() {
-        int currentDelay = retryDelay.get();
+    private int calculateRetryDelay(int currentDelay) {
         double newDelay;
         double jitter = Math.random();
         int randomChoice = (Math.random() < 0.5) ? 0 : 1;
