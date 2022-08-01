@@ -21,7 +21,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
@@ -54,7 +53,8 @@ public class BatchEmitter implements Emitter, Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEmitter.class);
     private boolean isClosing = false;
-    private final AtomicLong retryDelay;
+    private final AtomicInteger retryDelay;
+    private final int maximumRetryDelay = 600000; // ms (10 min)
     private int batchSize;
 
     private final HttpClientAdapter httpClientAdapter;
@@ -225,7 +225,7 @@ public class BatchEmitter implements Emitter, Closeable {
                     .build();
         }
 
-        retryDelay = new AtomicLong(0L);
+        retryDelay = new AtomicInteger(0);
         batchSize = builder.batchSize;
 
         if (builder.eventStore != null) {
@@ -313,7 +313,7 @@ public class BatchEmitter implements Emitter, Closeable {
         return batchSize;
     }
 
-    long getRetryDelay() {
+    int getRetryDelay() {
         return retryDelay.get();
     }
 
@@ -350,7 +350,7 @@ public class BatchEmitter implements Emitter, Closeable {
                 // Process results
                 if (isSuccessfulSend(code)) {
                     LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
-                    retryDelay.set(0L);
+                    retryDelay.set(0);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
 
                 } else if (fatalResponseCodes.contains(code)) {
@@ -361,9 +361,9 @@ public class BatchEmitter implements Emitter, Closeable {
                     LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
                     eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
 
-                    // exponentially increase retry backoff time after the first failure
-                    if (!retryDelay.compareAndSet(0, 50L)) {
-                        retryDelay.updateAndGet(currentDelay -> currentDelay * 2);
+                    // exponentially increase retry backoff time after the first failure, up to the maximum wait time
+                    if (!retryDelay.compareAndSet(0, 100)) {
+                        retryDelay.updateAndGet(this::calculateRetryDelay);
                     }
                 }
             } catch (Exception e) {
@@ -391,6 +391,24 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         return new SelfDescribingJson(Constants.SCHEMA_PAYLOAD_DATA, toSendPayloads);
+    }
+
+    private int calculateRetryDelay(int currentDelay) {
+        double newDelay;
+        double jitter = Math.random();
+        int randomChoice = (Math.random() < 0.5) ? 0 : 1;
+
+        switch (randomChoice) {
+            case 0:
+                newDelay = currentDelay * (2.0 + jitter);
+                break;
+            case 1:
+                newDelay = currentDelay * (2.0 - jitter);
+                break;
+            default:
+                newDelay = currentDelay;
+        }
+        return Math.min((int) newDelay, maximumRetryDelay);
     }
 
     /**

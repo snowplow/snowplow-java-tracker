@@ -297,13 +297,17 @@ public class BatchEmitterTest {
                 .batchSize(1)
                 .build();
 
-        List<TrackerPayload> payloads = createPayloads(2);
-        for (TrackerPayload payload : payloads) {
-            emitter.add(payload);
-        }
+        emitter.add(createPayload());
         Thread.sleep(500);
 
-        Assert.assertEquals(100, emitter.getRetryDelay());
+        int firstDelay = emitter.getRetryDelay();
+        Assert.assertNotEquals(0, firstDelay);
+
+        emitter.add(createPayload());
+        Thread.sleep(500);
+
+        int secondDelay = emitter.getRetryDelay();
+        Assert.assertTrue(secondDelay > firstDelay);
     }
 
     @Test
