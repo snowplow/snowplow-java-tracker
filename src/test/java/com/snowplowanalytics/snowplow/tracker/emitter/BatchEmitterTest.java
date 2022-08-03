@@ -355,6 +355,145 @@ public class BatchEmitterTest {
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
 
+    @Test
+    public void callsSuccessCallbackAfterSending() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            List<TrackerPayload> payloads;
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+                this.payloads = payloads;
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+            }
+        };
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(new MockHttpClientAdapter())
+                .batchSize(1)
+                .callback(callback)
+                .build();
+
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        Thread.sleep(500);
+
+        Assert.assertEquals(callback.payloads.get(0), payload);
+    }
+
+    @Test
+    public void callsFailureCallbackWhenRejectedNeedsRetry() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            FailureType failureType;
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                this.failureType = failureType;
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        };
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(new FailingHttpClientAdapter())
+                .batchSize(1)
+                .callback(callback)
+                .build();
+
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.REJECTED_BY_COLLECTOR, callback.failureType);
+        Assert.assertTrue(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload);
+    }
+
+    @Test
+    public void callsFailureCallbackWhenRejectedNoRetry() throws InterruptedException {
+        List<Integer> noRetry = new ArrayList<>();
+        noRetry.add(403);
+
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            FailureType failureType;
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                this.failureType = failureType;
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        };
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(new FailingHttpClientAdapter())
+                .batchSize(1)
+                .callback(callback)
+                .fatalResponseCodes(noRetry)
+                .build();
+
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.REJECTED_BY_COLLECTOR, callback.failureType);
+        Assert.assertFalse(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload);
+    }
+
+    @Test
+    public void callsFailureCallbackIfStorageIsFull() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            FailureType failureType;
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                this.failureType = failureType;
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        };
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(mockHttpClientAdapter)
+                .bufferCapacity(1)
+                .callback(callback)
+                .build();
+
+        emitter.add(createPayload());
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.TRACKER_STORAGE_FULL, callback.failureType);
+        Assert.assertFalse(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload);
+    }
+
     private TrackerPayload createPayload() {
         PageView pv = PageView.builder()
                 .pageUrl("https://www.snowplowanalytics.com/")

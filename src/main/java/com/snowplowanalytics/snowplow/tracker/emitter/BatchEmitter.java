@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,6 +62,7 @@ public class BatchEmitter implements Emitter, Closeable {
     private final ScheduledExecutorService executor;
     private final EventStore eventStore;
     private final List<Integer> fatalResponseCodes;
+    private final EmitterCallback callback;
 
     public static abstract class Builder<T extends Builder<T>> {
         protected abstract T self();
@@ -74,6 +76,7 @@ public class BatchEmitter implements Emitter, Closeable {
         private int threadCount = 50; // Optional
         private CookieJar cookieJar = null; // Optional
         private ScheduledExecutorService requestExecutorService = null; // Optional
+        private EmitterCallback callback = null; // Optional
 
         /**
          * Adds a custom HttpClientAdapter to the Emitter (default is OkHttpClientAdapter).
@@ -183,6 +186,17 @@ public class BatchEmitter implements Emitter, Closeable {
             return self();
         }
 
+        /**
+         * Provide a custom EmitterCallback to access successfully sent or failed event payloads.
+         *
+         * @param callback an EmitterCallback
+         * @return itself
+         */
+        public T callback(final EmitterCallback callback) {
+            this.callback = callback;
+            return self();
+        }
+
         public BatchEmitter build() {
             return new BatchEmitter(this);
         }
@@ -252,6 +266,17 @@ public class BatchEmitter implements Emitter, Closeable {
         } else {
             executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
         }
+
+        if (builder.callback != null) {
+            callback = builder.callback;
+        } else {
+            callback = new EmitterCallback() {
+                @Override
+                public void onSuccess(List<TrackerPayload> payloads) {}
+                @Override
+                public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {}
+            };
+        }
     }
 
     /**
@@ -276,6 +301,7 @@ public class BatchEmitter implements Emitter, Closeable {
         
         if (!result) {
             LOGGER.error("Unable to add payload to emitter, emitter buffer is full");
+            callback.onFailure(FailureType.TRACKER_STORAGE_FULL, false, Collections.singletonList(payload));
         }
 
         return result;
@@ -352,7 +378,7 @@ public class BatchEmitter implements Emitter, Closeable {
                     return;
                 }
 
-                List<TrackerPayload> eventsInRequest = batchedEvents.getPayloads();
+                List<TrackerPayload> eventsInRequest = new ArrayList<>(batchedEvents.getPayloads());
                 final SelfDescribingJson post = getFinalPost(eventsInRequest);
                 final int code = httpClientAdapter.post(post);
 
@@ -361,14 +387,18 @@ public class BatchEmitter implements Emitter, Closeable {
                     LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
                     retryDelay.set(0);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+                    callback.onSuccess(eventsInRequest);
+
 
                 } else if (fatalResponseCodes.contains(code)) {
                     LOGGER.debug("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
+                    callback.onFailure(FailureType.REJECTED_BY_COLLECTOR, false, eventsInRequest);
 
                 } else {
                     LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
                     eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
+                    callback.onFailure(FailureType.REJECTED_BY_COLLECTOR, true, eventsInRequest);
 
                     // exponentially increase retry backoff time after the first failure, up to the maximum wait time
                     if (!retryDelay.compareAndSet(0, 100)) {
@@ -379,6 +409,7 @@ public class BatchEmitter implements Emitter, Closeable {
                 LOGGER.error("BatchEmitter event sending error: {}", e.getMessage());
                 if (batchedEvents != null) {
                     eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
+                    callback.onFailure(FailureType.CONNECTION_FAILURE, true, new ArrayList<>(batchedEvents.getPayloads()));
                 }
             }
         };
