@@ -35,24 +35,54 @@ import java.util.concurrent.atomic.AtomicLong;
 public class InMemoryEventStore implements EventStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryEventStore.class);
     private final AtomicLong batchId = new AtomicLong(1);
+    private final EmitterCallback callback;
 
     private final LinkedBlockingDeque<TrackerPayload> eventBuffer;
     private final ConcurrentHashMap<Long, List<TrackerPayload>> eventsBeingSent = new ConcurrentHashMap<>();
 
     /**
-     * Make a new InMemoryEventStore with default queue capacity (Integer.MAX_VALUE).
+     * Create a InMemoryEventStore object with custom buffer size (the default is Integer.MAX_VALUE)
+     * and custom callback to return TrackerPayloads that are deleted due to full storage.
+     * @param callback an EmitterCallback
+     * @param bufferCapacity the maximum capacity of the buffer queue
      */
-    public InMemoryEventStore() {
-        eventBuffer = new LinkedBlockingDeque<>();
+    public InMemoryEventStore(EmitterCallback callback, int bufferCapacity) {
+        this.callback = callback;
+        eventBuffer = new LinkedBlockingDeque<>(bufferCapacity);
     }
 
     /**
-     * Make a new InMemoryEventStore with user-set queue capacity.
-     *
-     * @param bufferCapacity the maximum number of events to buffer at once
+     * Create a InMemoryEventStore object with custom callback to return TrackerPayloads
+     * that are deleted due to full storage.
+     * @param callback an EmitterCallback
+     */
+    public InMemoryEventStore(EmitterCallback callback) {
+        this(callback, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Create a InMemoryEventStore object with custom buffer size (the default is Integer.MAX_VALUE)..
+     * @param bufferCapacity the maximum capacity of the buffer queue
      */
     public InMemoryEventStore(int bufferCapacity) {
-        eventBuffer = new LinkedBlockingDeque<>(bufferCapacity);
+        this(new EmitterCallback() {
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {}
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {}
+        }, bufferCapacity);
+    }
+
+    /**
+     * Create a default InMemoryEventStore object.
+     */
+    public InMemoryEventStore() {
+        this(new EmitterCallback() {
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {}
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {}
+        }, Integer.MAX_VALUE);
     }
 
     /**
@@ -113,7 +143,8 @@ public class InMemoryEventStore implements EventStore {
                 boolean result = eventBuffer.offerFirst(payloadToReinsert);
                 if (!result) {
                     LOGGER.error("Event buffer is full. Dropping newer payload to reinsert older payload");
-                    eventBuffer.removeLast();
+                    TrackerPayload removedPayload =  eventBuffer.removeLast();
+                    callback.onFailure(FailureType.TRACKER_STORAGE_FULL, false, Collections.singletonList(removedPayload));
                     eventBuffer.offerFirst(payloadToReinsert);
                 }
             }

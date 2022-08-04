@@ -249,10 +249,21 @@ public class BatchEmitter implements Emitter, Closeable {
         retryDelay = new AtomicInteger(0);
         batchSize = builder.batchSize;
 
+        if (builder.callback != null) {
+            callback = builder.callback;
+        } else {
+            callback = new EmitterCallback() {
+                @Override
+                public void onSuccess(List<TrackerPayload> payloads) {}
+                @Override
+                public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {}
+            };
+        }
+
         if (builder.eventStore != null) {
             eventStore = builder.eventStore;
         } else {
-            eventStore = new InMemoryEventStore(builder.bufferCapacity);
+            eventStore = new InMemoryEventStore(callback, builder.bufferCapacity);
         }
 
         if (builder.fatalResponseCodes != null) {
@@ -267,16 +278,6 @@ public class BatchEmitter implements Emitter, Closeable {
             executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
         }
 
-        if (builder.callback != null) {
-            callback = builder.callback;
-        } else {
-            callback = new EmitterCallback() {
-                @Override
-                public void onSuccess(List<TrackerPayload> payloads) {}
-                @Override
-                public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {}
-            };
-        }
     }
 
     /**

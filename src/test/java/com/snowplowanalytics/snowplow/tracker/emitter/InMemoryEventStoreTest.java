@@ -109,7 +109,44 @@ public class InMemoryEventStoreTest {
         eventStore.cleanupAfterSendingAttempt(true, 1L);
         Assert.assertEquals(3, eventStore.size());
         Assert.assertTrue(eventStore.getAllEvents().contains(differentPayload));
+    }
 
+    @Test
+    public void callFailureCallbackIfDropEvents() {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            FailureType failureType;
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                this.failureType = failureType;
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        };
+
+        TestCallback callback = new TestCallback();
+        eventStore = new InMemoryEventStore(callback, 3);
+
+        TrackerPayload differentPayload = createTrackerPayload();
+
+        eventStore.addEvent(differentPayload);
+        eventStore.getEventsBatch(1);
+
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+        eventStore.addEvent(trackerPayload);
+
+        eventStore.cleanupAfterSendingAttempt(true, 1L);
+
+        Assert.assertEquals(FailureType.TRACKER_STORAGE_FULL, callback.failureType);
+        Assert.assertFalse(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), trackerPayload);
     }
 
     private TrackerPayload createTrackerPayload() {
