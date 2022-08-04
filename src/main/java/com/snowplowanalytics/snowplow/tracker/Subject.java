@@ -18,7 +18,6 @@ import java.util.Map;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
-import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 
 /**
  * An object for managing extra event decoration.
