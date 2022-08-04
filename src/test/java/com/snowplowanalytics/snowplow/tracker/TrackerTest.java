@@ -53,7 +53,7 @@ public class TrackerTest {
     @Before
     public void setUp() {
         mockEmitter = new MockEmitter();
-        tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
+        tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
                 .subject(new Subject.SubjectBuilder().build())
                 .base64(false)
                 .build();
@@ -100,7 +100,7 @@ public class TrackerTest {
             public List<TrackerPayload> getBuffer() { return null; }
         }
         FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
-        tracker = new Tracker.TrackerBuilder(failingMockEmitter, "AF003", "cloudfront").build();
+        tracker = Tracker.builder(failingMockEmitter, "AF003", "cloudfront").build();
 
         List<String> result = tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
