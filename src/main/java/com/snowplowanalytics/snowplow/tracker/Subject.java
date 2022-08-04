@@ -18,6 +18,7 @@ import java.util.Map;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
+import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 
 /**
  * An object for managing extra event decoration.
@@ -53,6 +54,10 @@ public class Subject {
      */
     public Subject(Subject subject){
       this.standardPairs.putAll(subject.getSubject());
+    }
+
+    public static SubjectBuilder builder() {
+        return new SubjectBuilder();
     }
 
     /**
