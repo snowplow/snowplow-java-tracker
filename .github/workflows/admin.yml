@@ -22,3 +22,15 @@ jobs:
         uses: snowplow-incubator/labels-helper-action@v1
         env:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  link-pr-issue:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Match the issue to the PR
+        uses: snowplow-incubator/pull-request-helper-action@v1
+        env:
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
