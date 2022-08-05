@@ -20,10 +20,10 @@ import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
-import java.util.List;
+import java.util.Collections;
 import static java.util.Collections.singletonList;
+import java.util.List;
 
-import com.google.common.collect.ImmutableMap;
 
 public class Main {
 
@@ -61,7 +61,7 @@ public class Main {
         List<SelfDescribingJson> context = singletonList(
             new SelfDescribingJson(
                 "iglu:com.snowplowanalytics.iglu/anything-c/jsonschema/1-0-0",
-                ImmutableMap.of("foo", "bar")));
+                Collections.singletonMap("foo", "bar")));
 
         // This is an example of a eventSubject for adding user data
         Subject eventSubject = new Subject.SubjectBuilder().build();
@@ -111,7 +111,7 @@ public class Main {
         SelfDescribing selfDescribing = SelfDescribing.builder()
             .eventData(new SelfDescribingJson(
                     "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
-                    ImmutableMap.of("foo", "bar")
+                    Collections.singletonMap("foo", "bar")
             ))
             .customContext(context)
             .build();
