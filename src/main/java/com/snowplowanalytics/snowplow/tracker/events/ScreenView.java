@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-import com.google.common.base.Preconditions;
-
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -77,7 +75,9 @@ public class ScreenView extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkArgument(builder.name != null || builder.id != null);
+        if (builder.name == null || builder.id == null) {
+            throw new IllegalArgumentException();
+        }
 
         this.name = builder.name;
         this.id = builder.id;

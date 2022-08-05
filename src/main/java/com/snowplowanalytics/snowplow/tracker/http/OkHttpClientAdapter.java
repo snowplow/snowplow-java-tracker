@@ -14,9 +14,7 @@ package com.snowplowanalytics.snowplow.tracker.http;
 
 // Java
 import java.io.IOException;
-
-// Google
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 // SquareUp
 import okhttp3.*;
@@ -71,7 +69,7 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.httpClient);
+        Objects.requireNonNull(builder.httpClient);
 
         httpClient = builder.httpClient;
     }

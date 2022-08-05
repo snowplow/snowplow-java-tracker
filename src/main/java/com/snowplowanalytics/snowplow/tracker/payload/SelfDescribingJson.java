@@ -14,8 +14,7 @@ package com.snowplowanalytics.snowplow.tracker.payload;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,8 +93,11 @@ public class SelfDescribingJson implements Payload {
      * @return this SelfDescribingJson
      */
     public SelfDescribingJson setSchema(String schema) {
-        Preconditions.checkNotNull(schema, "schema cannot be null");
-        Preconditions.checkArgument(!schema.isEmpty(), "schema cannot be empty.");
+        Objects.requireNonNull(schema, "schema cannot be null");
+        if (schema.isEmpty()) {
+            throw new IllegalArgumentException("schema cannot be empty");
+        }
+
         payload.put(Parameter.SCHEMA, schema);
         return this;
     }

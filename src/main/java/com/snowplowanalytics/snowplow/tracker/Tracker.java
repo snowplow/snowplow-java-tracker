@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.google.common.base.Preconditions;
-
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
@@ -41,11 +39,15 @@ public class Tracker {
     private Tracker(TrackerBuilder builder) {
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.emitter);
-        Preconditions.checkNotNull(builder.namespace);
-        Preconditions.checkNotNull(builder.appId);
-        Preconditions.checkArgument(!builder.namespace.isEmpty(), "namespace cannot be empty");
-        Preconditions.checkArgument(!builder.appId.isEmpty(), "appId cannot be empty");
+        Objects.requireNonNull(builder.emitter);
+        Objects.requireNonNull(builder.namespace);
+        Objects.requireNonNull(builder.appId);
+        if (builder.namespace.isEmpty()) {
+            throw new IllegalArgumentException("namespace cannot be empty");
+        }
+        if (builder.appId.isEmpty()) {
+            throw new IllegalArgumentException("appId cannot be empty");
+        }
 
         this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
         this.emitter = builder.emitter;

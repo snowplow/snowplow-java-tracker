@@ -12,14 +12,12 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-// Google
-
-import com.google.common.base.Preconditions;
-
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+import java.util.Objects;
 
 /**
  * Constructs an EcommerceTransactionItem object.
@@ -155,12 +153,16 @@ public class EcommerceTransactionItem extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.itemId);
-        Preconditions.checkNotNull(builder.sku);
-        Preconditions.checkNotNull(builder.price);
-        Preconditions.checkNotNull(builder.quantity);
-        Preconditions.checkArgument(!builder.itemId.isEmpty(), "itemId cannot be empty");
-        Preconditions.checkArgument(!builder.sku.isEmpty(), "sku cannot be empty");
+        Objects.requireNonNull(builder.itemId);
+        Objects.requireNonNull(builder.sku);
+        Objects.requireNonNull(builder.price);
+        Objects.requireNonNull(builder.quantity);
+        if (builder.itemId.isEmpty()) {
+            throw new IllegalArgumentException("itemId cannot be empty");
+        }
+        if (builder.sku.isEmpty()) {
+            throw new IllegalArgumentException("sku cannot be empty");
+        }
 
         this.itemId = builder.itemId;
         this.sku = builder.sku;

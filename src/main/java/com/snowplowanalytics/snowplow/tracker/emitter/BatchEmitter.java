@@ -16,13 +16,13 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.common.base.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
@@ -203,13 +203,20 @@ public class BatchEmitter implements Emitter, Closeable {
         OkHttpClient client;
 
         // Precondition checks
-        Preconditions.checkArgument(builder.threadCount > 0, "threadCount must be greater than 0");
-        Preconditions.checkArgument(builder.batchSize > 0, "batchSize must be greater than 0");
+        if (builder.threadCount <= 0) {
+            throw new IllegalArgumentException("threadCount must be greater than 0");
+        }
+        if (builder.batchSize <= 0) {
+            throw new IllegalArgumentException("batchSize must be greater than 0");
+        }
+        if (builder.bufferCapacity <= 0) {
+            throw new IllegalArgumentException("bufferCapacity must be greater than 0");
+        }
 
         if (builder.httpClientAdapter != null) {
             httpClientAdapter = builder.httpClientAdapter;
         } else {
-            Preconditions.checkNotNull(builder.collectorUrl, "Collector url must be specified if not using a httpClientAdapter");
+            Objects.requireNonNull(builder.collectorUrl, "Collector url must be specified if not using a httpClientAdapter");
 
             if (builder.cookieJar != null) {
                 client = new OkHttpClient.Builder()
@@ -299,7 +306,9 @@ public class BatchEmitter implements Emitter, Closeable {
      */
     @Override
     public void setBatchSize(final int batchSize) {
-        Preconditions.checkArgument(batchSize > 0, "batchSize must be greater than 0");
+        if (batchSize <= 0) {
+            throw new IllegalArgumentException("batchSize must be greater than 0");
+        }
         this.batchSize = batchSize;
     }
 

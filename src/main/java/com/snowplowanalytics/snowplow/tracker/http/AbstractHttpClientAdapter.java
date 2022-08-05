@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-import com.google.common.base.Preconditions;
-
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -56,7 +54,9 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
 
     protected AbstractHttpClientAdapter(Builder<?> builder) {
         // Precondition checks
-        Preconditions.checkArgument(Utils.isValidUrl(builder.url));
+        if (!Utils.isValidUrl(builder.url)) {
+            throw new IllegalArgumentException();
+        }
 
         this.url = builder.url;
     }
