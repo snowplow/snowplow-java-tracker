@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.google.common.base.Preconditions;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
@@ -50,6 +51,25 @@ public class Tracker {
         this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
         this.emitter = builder.emitter;
         this.subject = builder.subject;
+
+    }
+
+    public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
+        this(trackerConfig, emitter, new Subject.SubjectBuilder().build());
+    }
+
+    public Tracker(TrackerConfiguration trackerConfig, Emitter emitter, Subject subject) {
+
+        // Precondition checks
+        Preconditions.checkNotNull(emitter);
+        Preconditions.checkNotNull(trackerConfig.getNamespace());
+        Preconditions.checkNotNull(trackerConfig.getAppId());
+        Preconditions.checkArgument(!trackerConfig.getNamespace().isEmpty(), "namespace cannot be empty");
+        Preconditions.checkArgument(!trackerConfig.getAppId().isEmpty(), "appId cannot be empty");
+
+        this.parameters = new TrackerParameters(trackerConfig.getAppId(), trackerConfig.getPlatform(), trackerConfig.getNamespace(), Version.TRACKER, trackerConfig.isBase64Encoded());
+        this.emitter = emitter;
+        this.subject = subject;
 
     }
 
@@ -113,7 +133,10 @@ public class Tracker {
          * @return a new Tracker object
          */
         public Tracker build() {
-            return new Tracker(this);
+            TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId)
+                    .platform(platform)
+                    .base64Encoded(base64Encoded);
+            return new Tracker(trackerConfig, emitter, subject);
         }
     }
 

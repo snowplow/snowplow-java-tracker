@@ -186,7 +186,20 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         public BatchEmitter build() {
-            return new BatchEmitter(this);
+            NetworkConfiguration networkConfig = new NetworkConfiguration()
+                    .collectorUrl(collectorUrl)
+                    .httpClientAdapter(httpClientAdapter)
+                    .cookieJar(cookieJar);
+
+            EmitterConfiguration emitterConfig = new EmitterConfiguration()
+                    .batchSize(batchSize)
+                    .bufferCapacity(bufferCapacity)
+                    .eventStore(eventStore)
+                    .fatalResponseCodes(fatalResponseCodes)
+                    .threadCount(threadCount)
+                    .requestExecutorService(requestExecutorService);
+
+            return new BatchEmitter(networkConfig, emitterConfig);
         }
     }
 
@@ -201,55 +214,7 @@ public class BatchEmitter implements Emitter, Closeable {
         return new Builder2();
     }
 
-    protected BatchEmitter(final Builder<?> builder) {
-        OkHttpClient client;
-
-        // Precondition checks
-        Preconditions.checkArgument(builder.threadCount > 0, "threadCount must be greater than 0");
-        Preconditions.checkArgument(builder.batchSize > 0, "batchSize must be greater than 0");
-
-        if (builder.httpClientAdapter != null) {
-            httpClientAdapter = builder.httpClientAdapter;
-        } else {
-            Preconditions.checkNotNull(builder.collectorUrl, "Collector url must be specified if not using a httpClientAdapter");
-
-            if (builder.cookieJar != null) {
-                client = new OkHttpClient.Builder()
-                        .cookieJar(builder.cookieJar)
-                        .build();
-            } else {
-                client = new OkHttpClient.Builder().build();
-            }
-
-            httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
-                    .url(builder.collectorUrl)
-                    .httpClient(client)
-                    .build();
-        }
-
-        retryDelay = new AtomicInteger(0);
-        batchSize = builder.batchSize;
-
-        if (builder.eventStore != null) {
-            eventStore = builder.eventStore;
-        } else {
-            eventStore = new InMemoryEventStore(builder.bufferCapacity);
-        }
-
-        if (builder.fatalResponseCodes != null) {
-            fatalResponseCodes = builder.fatalResponseCodes;
-        } else {
-            fatalResponseCodes = new ArrayList<>();
-        }
-
-        if (builder.requestExecutorService != null) {
-            executor = builder.requestExecutorService;
-        } else {
-            executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
-        }
-    }
-
-    public BatchEmitter(EmitterConfiguration emitterConfig, NetworkConfiguration networkConfig) {
+    public BatchEmitter(NetworkConfiguration networkConfig, EmitterConfiguration emitterConfig) {
         OkHttpClient client;
 
         // Precondition checks
@@ -295,6 +260,10 @@ public class BatchEmitter implements Emitter, Closeable {
         } else {
             executor = Executors.newScheduledThreadPool(emitterConfig.getThreadCount(), new EmitterThreadFactory());
         }
+    }
+
+    public BatchEmitter(NetworkConfiguration networkConfig) {
+        this(networkConfig, new EmitterConfiguration());
     }
 
     /**

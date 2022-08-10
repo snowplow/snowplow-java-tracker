@@ -91,12 +91,12 @@ public class SnowplowTest {
     @Test
     public void createsTrackerFromConfigs() {
         TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
-        EmitterConfiguration emitterConfig = new EmitterConfiguration();
         NetworkConfiguration networkConfig = new NetworkConfiguration().collectorUrl("http://collector-endpoint");
 
-        BatchEmitter emitter = new BatchEmitter(emitterConfig, networkConfig);
-
-//        Tracker tracker = Snowplow.createTracker(trackerConfig, emitterConfig, networkConfig);
+        BatchEmitter emitter = new BatchEmitter(networkConfig);
+        int size = emitter.getBatchSize();
+        System.out.println(size);
+//        Tracker tracker = Snowplow.createTracker(trackerConfig, networkConfig);
 //        Tracker retrievedTracker = Snowplow.getTracker("namespace");
 //
 //        assertFalse(Snowplow.getTrackers().isEmpty());
