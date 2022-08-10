@@ -13,9 +13,6 @@
 package com.snowplowanalytics.snowplow.tracker.configuration;
 
 import com.snowplowanalytics.snowplow.tracker.Utils;
-import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import okhttp3.CookieJar;
-import sun.awt.www.content.image.png;
 
 public class SubjectConfiguration {
 
