@@ -12,7 +12,11 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
+import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import org.junit.After;
 import org.junit.Test;
 
@@ -82,5 +86,23 @@ public class SnowplowTest {
         Snowplow.registerTracker(tracker);
         assertEquals(tracker, Snowplow.getDefaultTracker());
         assertEquals(1, Snowplow.getTrackers().size());
+    }
+
+    @Test
+    public void createsTrackerFromConfigs() {
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
+        EmitterConfiguration emitterConfig = new EmitterConfiguration();
+        NetworkConfiguration networkConfig = new NetworkConfiguration().collectorUrl("http://collector-endpoint");
+
+        BatchEmitter emitter = new BatchEmitter(emitterConfig, networkConfig);
+
+//        Tracker tracker = Snowplow.createTracker(trackerConfig, emitterConfig, networkConfig);
+//        Tracker retrievedTracker = Snowplow.getTracker("namespace");
+//
+//        assertFalse(Snowplow.getTrackers().isEmpty());
+//        assertEquals(tracker, retrievedTracker);
+//        assertEquals("namespace", tracker.getNamespace());
+//        assertEquals("appId", tracker.getAppId());
+//        assertTrue(tracker.getBase64Encoded());
     }
 }

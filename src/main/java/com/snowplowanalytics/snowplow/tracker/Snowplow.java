@@ -12,7 +12,11 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
+import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +44,10 @@ public class Snowplow {
         registerTracker(tracker);
         return tracker;
     }
+
+//    public static Tracker createTracker(TrackerConfiguration trackerConfig, EmitterConfiguration emitterConfig, NetworkConfiguration networkConfig) {
+//
+//    }
 
     public static void registerTracker(Tracker tracker) {
         String namespace = tracker.getNamespace();

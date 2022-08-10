@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Preconditions;
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
@@ -244,6 +246,54 @@ public class BatchEmitter implements Emitter, Closeable {
             executor = builder.requestExecutorService;
         } else {
             executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
+        }
+    }
+
+    public BatchEmitter(EmitterConfiguration emitterConfig, NetworkConfiguration networkConfig) {
+        OkHttpClient client;
+
+        // Precondition checks
+        Preconditions.checkArgument(emitterConfig.getThreadCount() > 0, "threadCount must be greater than 0");
+        Preconditions.checkArgument(emitterConfig.getBatchSize() > 0, "batchSize must be greater than 0");
+
+        if (networkConfig.getHttpClientAdapter() != null) {
+            httpClientAdapter = networkConfig.getHttpClientAdapter();
+        } else {
+            Preconditions.checkNotNull(networkConfig.getCollectorUrl(), "Collector url must be specified if not using a httpClientAdapter");
+
+            if (networkConfig.getCookieJar() != null) {
+                client = new OkHttpClient.Builder()
+                        .cookieJar(networkConfig.getCookieJar())
+                        .build();
+            } else {
+                client = new OkHttpClient.Builder().build();
+            }
+
+            httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
+                    .url(networkConfig.getCollectorUrl())
+                    .httpClient(client)
+                    .build();
+        }
+
+        retryDelay = new AtomicInteger(0);
+        batchSize = emitterConfig.getBatchSize();
+
+        if (emitterConfig.getEventStore() != null) {
+            eventStore = emitterConfig.getEventStore();
+        } else {
+            eventStore = new InMemoryEventStore(emitterConfig.getBufferCapacity());
+        }
+
+        if (emitterConfig.getFatalResponseCodes() != null) {
+            fatalResponseCodes = emitterConfig.getFatalResponseCodes();
+        } else {
+            fatalResponseCodes = new ArrayList<>();
+        }
+
+        if (emitterConfig.getRequestExecutorService() != null) {
+            executor = emitterConfig.getRequestExecutorService();
+        } else {
+            executor = Executors.newScheduledThreadPool(emitterConfig.getThreadCount(), new EmitterThreadFactory());
         }
     }
 
