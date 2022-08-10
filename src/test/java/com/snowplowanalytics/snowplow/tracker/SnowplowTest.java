@@ -12,17 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.google.common.collect.ImmutableMap;
+import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.events.*;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
-
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 
 public class SnowplowTest {
@@ -77,16 +70,12 @@ public class SnowplowTest {
     }
 
     @Test
-    public void addsDefaultTrackerIfNotCurrentlyStored() {
-//        assertNull(Snowplow.getDefaultTracker());
-//
-//        Tracker tracker = Snowplow.createTracker("http://endpoint", "namespace", "appId");
-//        assertEquals(tracker, Snowplow.getDefaultTracker());
-//
-//        Tracker tracker2 = Snowplow.createTracker("http://endpoint", "namespace2", "appId");
-//        assertEquals(tracker, Snowplow.getDefaultTracker());
-//
-//        Snowplow.setDefaultTracker(tracker2);
-//        assertEquals(tracker2, Snowplow.getDefaultTracker());
+    public void registersATrackerMadeWithoutSnowplowClass() {
+        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
+
+        Snowplow.registerTracker(tracker);
+        assertEquals(tracker, Snowplow.getDefaultTracker());
+        assertEquals(1, Snowplow.getTrackers().size());
     }
 }

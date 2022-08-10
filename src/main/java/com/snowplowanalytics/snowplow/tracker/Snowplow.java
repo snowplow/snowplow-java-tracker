@@ -26,6 +26,14 @@ public class Snowplow {
         return trackers;
     }
 
+    public static Tracker getDefaultTracker() {
+        return defaultTracker;
+    }
+
+    public static void setDefaultTracker(Tracker tracker) {
+        defaultTracker = tracker;
+    }
+
     public static Tracker createTracker(String collectorUrl, String namespace, String appId) {
         BatchEmitter emitter = BatchEmitter.builder().url(collectorUrl).build();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId).build();
@@ -61,15 +69,4 @@ public class Snowplow {
     public static boolean removeTracker(Tracker tracker) {
         return removeTracker(tracker.getNamespace());
     }
-
-
-    public static Tracker getDefaultTracker() {
-        return defaultTracker;
-    }
-
-    public static void setDefaultTracker(Tracker tracker) {
-        defaultTracker = tracker;
-    }
-
-
 }
