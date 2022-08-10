@@ -20,6 +20,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
@@ -272,7 +274,61 @@ public class BatchEmitter implements Emitter, Closeable {
         } else {
             executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
         }
+    }
 
+    public BatchEmitter(EmitterConfiguration emitterConfig, NetworkConfiguration networkConfig) {
+        OkHttpClient client;
+
+        // Precondition checks
+        if (emitterConfig.getThreadCount() <= 0) {
+            throw new IllegalArgumentException("threadCount must be greater than 0");
+        }
+        if (emitterConfig.getBatchSize() <= 0) {
+            throw new IllegalArgumentException("batchSize must be greater than 0");
+        }
+        if (emitterConfig.getBufferCapacity() <= 0) {
+            throw new IllegalArgumentException("bufferCapacity must be greater than 0");
+        }
+
+        if (networkConfig.getHttpClientAdapter() != null) {
+            httpClientAdapter = networkConfig.getHttpClientAdapter();
+        } else {
+            Objects.requireNonNull(networkConfig.getCollectorUrl(), "Collector url must be specified if not using a httpClientAdapter");
+
+            if (networkConfig.getCookieJar() != null) {
+                client = new OkHttpClient.Builder()
+                        .cookieJar(networkConfig.getCookieJar())
+                        .build();
+            } else {
+                client = new OkHttpClient.Builder().build();
+            }
+
+            httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
+                    .url(networkConfig.getCollectorUrl())
+                    .httpClient(client)
+                    .build();
+        }
+
+        retryDelay = new AtomicInteger(0);
+        batchSize = emitterConfig.getBatchSize();
+
+        if (emitterConfig.getEventStore() != null) {
+            eventStore = emitterConfig.getEventStore();
+        } else {
+            eventStore = new InMemoryEventStore(emitterConfig.getBufferCapacity());
+        }
+
+        if (emitterConfig.getFatalResponseCodes() != null) {
+            customRetryForStatusCodes = emitterConfig.getFatalResponseCodes();
+        } else {
+            customRetryForStatusCodes = new HashMap<>();
+        }
+
+        if (emitterConfig.getRequestExecutorService() != null) {
+            executor = emitterConfig.getRequestExecutorService();
+        } else {
+            executor = Executors.newScheduledThreadPool(emitterConfig.getThreadCount(), new EmitterThreadFactory());
+        }
     }
 
     /**
@@ -405,7 +461,6 @@ public class BatchEmitter implements Emitter, Closeable {
                     retryDelay.set(0);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
                     callback.onSuccess(eventsInRequest);
-
 
                 } else if (!shouldRetry(code)) {
                     LOGGER.debug("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
