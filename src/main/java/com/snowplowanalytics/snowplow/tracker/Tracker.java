@@ -39,25 +39,12 @@ public class Tracker {
      *
      * @param builder The builder that constructs a tracker
      */
-    private Tracker(TrackerBuilder builder) {
 
-        // Precondition checks
-        Preconditions.checkNotNull(builder.emitter);
-        Preconditions.checkNotNull(builder.namespace);
-        Preconditions.checkNotNull(builder.appId);
-        Preconditions.checkArgument(!builder.namespace.isEmpty(), "namespace cannot be empty");
-        Preconditions.checkArgument(!builder.appId.isEmpty(), "appId cannot be empty");
-
-        this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
-        this.emitter = builder.emitter;
-        this.subject = builder.subject;
-
-    }
 
     public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
         this(trackerConfig, emitter, new Subject.SubjectBuilder().build());
     }
-
+    
     public Tracker(TrackerConfiguration trackerConfig, Emitter emitter, Subject subject) {
 
         // Precondition checks

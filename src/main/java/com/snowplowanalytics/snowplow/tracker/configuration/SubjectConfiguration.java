@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker.configuration;
 
 import com.snowplowanalytics.snowplow.tracker.Utils;
+import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 
 public class SubjectConfiguration {
 
@@ -157,7 +158,94 @@ public class SubjectConfiguration {
 
     // Builder methods
 
+    public SubjectConfiguration userId(String userId) {
+        this.userId = userId;
+        return this;
+    }
 
+    public SubjectConfiguration screenResolution(int width, int height) {
+        screenResWidth = width;
+        screenResHeight = height;
+        return this;
+    }
 
+    public SubjectConfiguration viewPort(int width, int height) {
+        viewPortWidth = width;
+        viewPortHeight = height;
+        return this;
+    }
 
+    /**
+     * @param depth a color depth integer
+     * @return itself
+     */
+    public SubjectConfiguration colorDepth(int depth) {
+        colorDepth = depth;
+        return this;
+    }
+
+    /**
+     * Note that timezone is set by default to the server's timezone
+     * (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`)
+     * @param timezone a timezone string
+     * @return itself
+     */
+    public SubjectConfiguration timezone(String timezone) {
+        this.timezone = timezone;
+        return this;
+    }
+
+    /**
+     * @param language a language string
+     * @return itself
+     */
+    public SubjectConfiguration language(String language) {
+        this.language = language;
+        return this;
+    }
+
+    /**
+     * @param ipAddress a ipAddress string
+     * @return itself
+     */
+    public SubjectConfiguration ipAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+        return this;
+    }
+
+    /**
+     * @param useragent a useragent string
+     * @return itself
+     */
+    public SubjectConfiguration useragent(String useragent) {
+        this.useragent = useragent;
+        return this;
+    }
+
+    /**
+     * @param networkUserId a networkUserId string
+     * @return itself
+     */
+    public SubjectConfiguration networkUserId(String networkUserId) {
+        this.networkUserId = networkUserId;
+        return this;
+    }
+
+    /**
+     * @param domainUserId a domainUserId string
+     * @return itself
+     */
+    public SubjectConfiguration domainUserId(String domainUserId) {
+        this.domainUserId = domainUserId;
+        return this;
+    }
+
+    /**
+     * @param domainSessionId a domainSessionId string
+     * @return itself
+     */
+    public SubjectConfiguration domainSessionId(String domainSessionId) {
+        this.domainSessionId = domainSessionId;
+        return this;
+    }
 }

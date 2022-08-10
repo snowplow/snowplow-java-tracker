@@ -51,8 +51,27 @@ public class Snowplow {
                                         EmitterConfiguration emitterConfig,
                                         SubjectConfiguration subjectConfig) {
         BatchEmitter emitter = new BatchEmitter(networkConfig, emitterConfig);
-//        Subject subject = new Subject(subjectConfig);
-        return new Tracker(trackerConfig, emitter);
+        Subject subject = new Subject(subjectConfig);
+        Tracker tracker =  new Tracker(trackerConfig, emitter, subject);
+        registerTracker(tracker);
+        return tracker;
+    }
+
+    public static Tracker createTracker(TrackerConfiguration trackerConfig,
+                                        NetworkConfiguration networkConfig,
+                                        EmitterConfiguration emitterConfig) {
+        return createTracker(trackerConfig, networkConfig, emitterConfig, new SubjectConfiguration());
+    }
+
+    public static Tracker createTracker(TrackerConfiguration trackerConfig,
+                                        NetworkConfiguration networkConfig) {
+        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), new SubjectConfiguration());
+    }
+
+    public static Tracker createTracker(TrackerConfiguration trackerConfig,
+                                        NetworkConfiguration networkConfig,
+                                        SubjectConfiguration subjectConfig) {
+        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), subjectConfig);
     }
 
     public static void registerTracker(Tracker tracker) {

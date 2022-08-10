@@ -93,16 +93,13 @@ public class SnowplowTest {
         TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
         NetworkConfiguration networkConfig = new NetworkConfiguration().collectorUrl("http://collector-endpoint");
 
-        BatchEmitter emitter = new BatchEmitter(networkConfig);
-        int size = emitter.getBatchSize();
-        System.out.println(size);
-//        Tracker tracker = Snowplow.createTracker(trackerConfig, networkConfig);
-//        Tracker retrievedTracker = Snowplow.getTracker("namespace");
-//
-//        assertFalse(Snowplow.getTrackers().isEmpty());
-//        assertEquals(tracker, retrievedTracker);
-//        assertEquals("namespace", tracker.getNamespace());
-//        assertEquals("appId", tracker.getAppId());
-//        assertTrue(tracker.getBase64Encoded());
+        Tracker tracker = Snowplow.createTracker(trackerConfig, networkConfig);
+        Tracker retrievedTracker = Snowplow.getTracker("namespace");
+
+        assertFalse(Snowplow.getTrackers().isEmpty());
+        assertEquals(tracker, retrievedTracker);
+        assertEquals("namespace", tracker.getNamespace());
+        assertEquals("appId", tracker.getAppId());
+        assertTrue(tracker.getBase64Encoded());
     }
 }
