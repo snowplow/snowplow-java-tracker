@@ -13,12 +13,17 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
+import org.junit.After;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class SnowplowTest {
+
+    @After
+    public void cleanUp(){
+        Snowplow.reset();
+    }
 
     @Test
     public void createsAndRetrievesATracker() {

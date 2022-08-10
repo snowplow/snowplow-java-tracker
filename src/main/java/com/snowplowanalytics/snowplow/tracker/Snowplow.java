@@ -69,4 +69,9 @@ public class Snowplow {
     public static boolean removeTracker(Tracker tracker) {
         return removeTracker(tracker.getNamespace());
     }
+
+    public static void reset() {
+        trackers.clear();
+        defaultTracker = null;
+    }
 }
