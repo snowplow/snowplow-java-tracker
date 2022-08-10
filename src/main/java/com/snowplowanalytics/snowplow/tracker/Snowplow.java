@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
@@ -45,9 +46,33 @@ public class Snowplow {
         return tracker;
     }
 
-//    public static Tracker createTracker(TrackerConfiguration trackerConfig, EmitterConfiguration emitterConfig, NetworkConfiguration networkConfig) {
-//
-//    }
+    public static Tracker createTracker(TrackerConfiguration trackerConfig,
+                                        NetworkConfiguration networkConfig,
+                                        EmitterConfiguration emitterConfig,
+                                        SubjectConfiguration subjectConfig) {
+        BatchEmitter emitter = new BatchEmitter(networkConfig, emitterConfig);
+        Subject subject = new Subject(subjectConfig);
+        Tracker tracker =  new Tracker(trackerConfig, emitter, subject);
+        registerTracker(tracker);
+        return tracker;
+    }
+
+    public static Tracker createTracker(TrackerConfiguration trackerConfig,
+                                        NetworkConfiguration networkConfig,
+                                        EmitterConfiguration emitterConfig) {
+        return createTracker(trackerConfig, networkConfig, emitterConfig, new SubjectConfiguration());
+    }
+
+    public static Tracker createTracker(TrackerConfiguration trackerConfig,
+                                        NetworkConfiguration networkConfig) {
+        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), new SubjectConfiguration());
+    }
+
+    public static Tracker createTracker(TrackerConfiguration trackerConfig,
+                                        NetworkConfiguration networkConfig,
+                                        SubjectConfiguration subjectConfig) {
+        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), subjectConfig);
+    }
 
     public static void registerTracker(Tracker tracker) {
         String namespace = tracker.getNamespace();
