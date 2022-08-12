@@ -53,8 +53,8 @@ public class TrackerTest {
     @Before
     public void setUp() {
         mockEmitter = new MockEmitter();
-        tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
-                .subject(new Subject.SubjectBuilder().build())
+        tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
+                .subject(Subject.builder().build())
                 .base64(false)
                 .build();
         tracker.getSubject().setTimezone("Etc/UTC");
@@ -100,7 +100,7 @@ public class TrackerTest {
             public List<TrackerPayload> getBuffer() { return null; }
         }
         FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
-        tracker = new Tracker.TrackerBuilder(failingMockEmitter, "AF003", "cloudfront").build();
+        tracker = Tracker.builder(failingMockEmitter, "AF003", "cloudfront").build();
 
         List<String> result = tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
@@ -321,8 +321,8 @@ public class TrackerTest {
 
     @Test
     public void testTrackPageView() throws InterruptedException {
-        tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
-                .subject(new Subject.SubjectBuilder().build())
+        tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
+                .subject(Subject.builder().build())
                 .base64(false)
                 .build();
         tracker.getSubject().setTimezone("Etc/UTC");
@@ -524,7 +524,7 @@ public class TrackerTest {
     @Test
     public void testTrackTimingWithSubject() throws InterruptedException {
         // Make Subject
-        Subject s1 = new Subject.SubjectBuilder().build();
+        Subject s1 = Subject.builder().build();
         s1.setIpAddress("127.0.0.1");
         s1.setTimezone("Etc/UTC");
 
@@ -563,13 +563,13 @@ public class TrackerTest {
 
     @Test
     public void testGetTrackerVersion() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
+        Tracker tracker = Tracker.builder(mockEmitter, "namespace", "an-app-id").build();
         assertEquals("java-0.12.2", tracker.getTrackerVersion());
     }
 
     @Test
     public void testSetDefaultPlatform() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
+        Tracker tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
                 .platform(DevicePlatform.Desktop)
                 .build();
         assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
@@ -580,13 +580,13 @@ public class TrackerTest {
         // Subject objects always have timezone set
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
 
-        Subject s1 = new Subject.SubjectBuilder().build();
+        Subject s1 = Subject.builder().build();
         s1.setLanguage("EN");
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
+        Tracker tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
                 .subject(s1)
                 .build();
 
-        Subject s2 = new Subject.SubjectBuilder().build();
+        Subject s2 = Subject.builder().build();
         s2.setColorDepth(24);
         tracker.setSubject(s2);
 
@@ -599,7 +599,7 @@ public class TrackerTest {
 
     @Test
     public void testSetBase64Encoded() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
+        Tracker tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
                 .base64(false)
                 .build();
         assertFalse(tracker.getBase64Encoded());
@@ -607,13 +607,13 @@ public class TrackerTest {
 
     @Test
     public void testSetAppId() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "an-app-id").build();
+        Tracker tracker = Tracker.builder(mockEmitter, "AF003", "an-app-id").build();
         assertEquals("an-app-id", tracker.getAppId());
     }
 
     @Test
     public void testSetNamespace() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
+        Tracker tracker = Tracker.builder(mockEmitter, "namespace", "an-app-id").build();
         assertEquals("namespace", tracker.getNamespace());
     }
 }

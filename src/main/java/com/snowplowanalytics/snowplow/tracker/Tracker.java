@@ -55,6 +55,10 @@ public class Tracker {
 
     }
 
+    public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
+        return new TrackerBuilder(emitter, namespace, appId);
+    }
+
     /**
      * Builder for the Tracker
      */

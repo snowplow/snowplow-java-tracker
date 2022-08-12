@@ -55,6 +55,10 @@ public class Subject {
       this.standardPairs.putAll(subject.getSubject());
     }
 
+    public static SubjectBuilder builder() {
+        return new SubjectBuilder();
+    }
+
     /**
      * Builder for the Subject
      */

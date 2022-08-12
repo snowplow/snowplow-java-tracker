@@ -49,7 +49,7 @@ public class Main {
                 .build();
 
         // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
-        final Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
+        final Tracker tracker = Tracker.builder(emitter, namespace, appId)
             .base64(true)
             .platform(DevicePlatform.ServerSideApp)
             .build();
@@ -64,7 +64,7 @@ public class Main {
                 Collections.singletonMap("foo", "bar")));
 
         // This is an example of a eventSubject for adding user data
-        Subject eventSubject = new Subject.SubjectBuilder().build();
+        Subject eventSubject = Subject.builder().build();
         eventSubject.setUserId("example@snowplowanalytics.com");
         eventSubject.setLanguage("EN");
 
