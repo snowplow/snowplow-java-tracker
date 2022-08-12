@@ -16,9 +16,7 @@ package com.snowplowanalytics.snowplow.tracker.events;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-// Google
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
@@ -214,10 +212,12 @@ public class EcommerceTransaction extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.orderId);
-        Preconditions.checkNotNull(builder.totalValue);
-        Preconditions.checkNotNull(builder.items);
-        Preconditions.checkArgument(!builder.orderId.isEmpty(), "orderId cannot be empty");
+        Objects.requireNonNull(builder.orderId);
+        Objects.requireNonNull(builder.totalValue);
+        Objects.requireNonNull(builder.items);
+        if (builder.orderId.isEmpty()) {
+            throw new IllegalArgumentException("orderId cannot be empty");
+        }
 
         this.orderId = builder.orderId;
         this.totalValue = builder.totalValue;

@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.Lists;
-
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import org.junit.Assert;
 import org.junit.Before;
@@ -368,7 +366,7 @@ public class BatchEmitterTest {
     }
 
     private List<TrackerPayload> createPayloads(int numPayloads) {
-        final List<TrackerPayload> payloads = Lists.newArrayList();
+        final List<TrackerPayload> payloads = new ArrayList<>();
         for (int i = 0; i < numPayloads; i++) {
             payloads.add(createPayload());
         }

@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-import com.google.common.base.Preconditions;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -25,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
+
+import java.util.Objects;
 
 /**
  * A HttpClient built using Apache to send events via
@@ -68,7 +68,7 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.httpClient);
+        Objects.requireNonNull(builder.httpClient);
 
         this.httpClient = builder.httpClient;
     }

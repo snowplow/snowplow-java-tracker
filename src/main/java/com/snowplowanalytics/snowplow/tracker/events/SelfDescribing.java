@@ -12,14 +12,13 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-// Google
-import com.google.common.base.Preconditions;
-
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+import java.util.Objects;
 
 /**
  * Constructs a SelfDescribing event object.
@@ -70,7 +69,7 @@ public class SelfDescribing extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.eventData);
+        Objects.requireNonNull(builder.eventData);
 
         this.eventData = builder.eventData;
     }

@@ -12,13 +12,12 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-// Google
-import com.google.common.base.Preconditions;
-
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+import java.util.Objects;
 
 /**
  * Constructs a PageView event object.
@@ -90,8 +89,10 @@ public class PageView extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.pageUrl);
-        Preconditions.checkArgument(!builder.pageUrl.isEmpty(), "pageUrl cannot be empty");
+        Objects.requireNonNull(builder.pageUrl);
+        if (builder.pageUrl.isEmpty()) {
+            throw new IllegalArgumentException("pageUrl cannot be empty");
+        }
 
         this.pageUrl = builder.pageUrl;
         this.pageTitle = builder.pageTitle;

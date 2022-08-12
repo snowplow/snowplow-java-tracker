@@ -14,9 +14,7 @@ package com.snowplowanalytics.snowplow.tracker.events;
 
 // Java
 import java.util.LinkedHashMap;
-
-// Google
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
@@ -106,11 +104,15 @@ public class Timing extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.category);
-        Preconditions.checkNotNull(builder.timing);
-        Preconditions.checkNotNull(builder.variable);
-        Preconditions.checkArgument(!builder.category.isEmpty(), "category cannot be empty");
-        Preconditions.checkArgument(!builder.variable.isEmpty(), "variable cannot be empty");
+        Objects.requireNonNull(builder.category);
+        Objects.requireNonNull(builder.timing);
+        Objects.requireNonNull(builder.variable);
+        if (builder.category.isEmpty()) {
+            throw new IllegalArgumentException("category cannot be empty");
+        }
+        if (builder.variable.isEmpty()) {
+            throw new IllegalArgumentException("variable cannot be empty");
+        }
 
         this.category = builder.category;
         this.variable = builder.variable;

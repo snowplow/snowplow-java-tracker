@@ -75,9 +75,6 @@ dependencies {
     // Jackson JSON processor
     api 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 
-    // Preconditions
-    api 'com.google.guava:guava:31.1-jre'
-
     // Testing libraries
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testCompileOnly 'junit:junit:4.13.2'

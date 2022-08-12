@@ -15,12 +15,9 @@ package com.snowplowanalytics.snowplow.tracker.http;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.collect.ImmutableMap;
-
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -112,7 +109,7 @@ public class HttpClientAdapterTest {
         mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
         // When
-        adapter.post(new SelfDescribingJson("schema", ImmutableMap.of("foo", "bar")));
+        adapter.post(new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar")));
 
         // Then
         assertEquals(1, mockWebServer.getRequestCount());
@@ -148,7 +145,7 @@ public class HttpClientAdapterTest {
 
         mockWebServer.enqueue(new MockResponse().addHeader("Set-Cookie", "sp=test"));
 
-        SelfDescribingJson payload = new SelfDescribingJson("schema", ImmutableMap.of("foo", "bar"));
+        SelfDescribingJson payload = new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar"));
 
         adapter.post(payload);
         adapter.post(payload);
