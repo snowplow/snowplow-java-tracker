@@ -494,6 +494,53 @@ public class BatchEmitterTest {
         Assert.assertEquals(callback.payloads.get(0), payload);
     }
 
+    @Test
+    public void callsFailureCallbackIfStorageIsFullWhenReturningEventsForRetry() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            FailureType failureType;
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                // Ignore the first call when payload1's request gets a 500 status code
+                if (failureType.equals(FailureType.REJECTED_BY_COLLECTOR)) {
+                    return;
+                }
+
+                this.failureType = failureType;
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        };
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(new FlakyHttpClientAdapter())
+                .bufferCapacity(2)
+                .callback(callback)
+                .build();
+
+        TrackerPayload payload1 = createPayload();
+        TrackerPayload payload2 = createPayload();
+        TrackerPayload payload3 = createPayload();
+
+        emitter.add(payload1);
+        emitter.flushBuffer();
+
+        emitter.add(payload2);
+        emitter.add(payload3);
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.TRACKER_STORAGE_FULL, callback.failureType);
+        Assert.assertFalse(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload3);
+    }
+
     private TrackerPayload createPayload() {
         PageView pv = PageView.builder()
                 .pageUrl("https://www.snowplowanalytics.com/")

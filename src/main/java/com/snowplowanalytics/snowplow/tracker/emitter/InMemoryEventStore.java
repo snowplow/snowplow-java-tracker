@@ -131,9 +131,10 @@ public class InMemoryEventStore implements EventStore {
      * @param batchId the ID of the batch of events
      */
     @Override
-    public void cleanupAfterSendingAttempt(boolean needRetry, long batchId) {
+    public List<TrackerPayload> cleanupAfterSendingAttempt(boolean needRetry, long batchId) {
         // Events that successfully sent are deleted from the pending buffer
         List<TrackerPayload> events = eventsBeingSent.remove(batchId);
+        List<TrackerPayload> removedEvents = new ArrayList<>();
 
         // Events that didn't send are inserted at the head of the eventBuffer
         // for immediate resending.
@@ -149,6 +150,7 @@ public class InMemoryEventStore implements EventStore {
                 }
             }
         }
+        return removedEvents;
     }
 
     /**

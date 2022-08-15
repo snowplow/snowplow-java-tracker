@@ -50,7 +50,7 @@ public interface EventStore {
      * @param needRetry if another attempt should be made to send the events
      * @param batchId the ID of the batch of events
      */
-    void cleanupAfterSendingAttempt(boolean needRetry, long batchId);
+    List<TrackerPayload> cleanupAfterSendingAttempt(boolean needRetry, long batchId);
 
     /**
      * Get the current size of the buffer.
