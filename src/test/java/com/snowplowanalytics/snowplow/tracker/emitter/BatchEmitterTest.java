@@ -12,10 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
@@ -331,16 +328,12 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void noRetryAfterDenylistResponseCode() throws InterruptedException {
-        List<Integer> noRetry = new ArrayList<>();
-        noRetry.add(403);
-
+    public void noRetryAfterDefaultNoRetryResponseCode() throws InterruptedException {
         // the FailingHttpClientAdapter always returns 403
         FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
         BatchEmitter emitter = BatchEmitter.builder()
                 .httpClientAdapter(failingHttpClientAdapter)
                 .batchSize(2)
-                .fatalResponseCodes(noRetry)
                 .build();
 
         List<TrackerPayload> payloads = createPayloads(4);
@@ -351,6 +344,54 @@ public class BatchEmitterTest {
         Thread.sleep(500);
 
         Assert.assertEquals(2, failingHttpClientAdapter.failedPostCounter);
+        Assert.assertEquals(0, emitter.getRetryDelay());
+        Assert.assertEquals(0, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void retryWithCustomRulesOverridingDefault() throws InterruptedException {
+        Map<Integer, Boolean> customRetry = new HashMap<>();
+        customRetry.put(403, true);
+
+        // the FailingHttpClientAdapter always returns 403, which by default isn't retried
+        FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(failingHttpClientAdapter)
+                .customRetryForStatusCodes(customRetry)
+                .batchSize(2)
+                .build();
+
+        List<TrackerPayload> payloads = createPayloads(4);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
+        }
+
+        Thread.sleep(500);
+        Assert.assertNotEquals(0, emitter.getRetryDelay());
+        Assert.assertEquals(4, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void noRetryWithCustomRulesOverridingDefault() throws InterruptedException {
+        Map<Integer, Boolean> customRetry = new HashMap<>();
+        customRetry.put(500, false);
+
+        // the FlakyHttpClientAdapter returns 500 for the first 4 requests
+        // by default, requests with code 500 are retried
+        FlakyHttpClientAdapter flakyHttpClientAdapter = new FlakyHttpClientAdapter();
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(flakyHttpClientAdapter)
+                .customRetryForStatusCodes(customRetry)
+                .batchSize(2)
+                .build();
+
+        List<TrackerPayload> payloads = createPayloads(4);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
+        }
+
+        Thread.sleep(500);
+
         Assert.assertEquals(0, emitter.getRetryDelay());
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
