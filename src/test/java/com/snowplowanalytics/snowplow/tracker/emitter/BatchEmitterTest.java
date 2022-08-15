@@ -368,7 +368,7 @@ public class BatchEmitterTest {
 
         Thread.sleep(500);
         Assert.assertNotEquals(0, emitter.getRetryDelay());
-        Assert.assertEquals(4, emitter.getBuffer().size());;
+        Assert.assertEquals(4, emitter.getBuffer().size());
     }
 
     @Test
