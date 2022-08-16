@@ -65,7 +65,7 @@ public class BatchEmitter implements Emitter, Closeable {
         private HttpClientAdapter httpClientAdapter; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
         private int batchSize = 50; // Optional
-        private int bufferCapacity = Integer.MAX_VALUE;
+        private int bufferCapacity = 10000;
         private EventStore eventStore = null;  // Optional
         private Map<Integer, Boolean> customRetryForStatusCodes = null; // Optional
         private int threadCount = 50; // Optional
