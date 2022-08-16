@@ -263,7 +263,7 @@ public class BatchEmitter implements Emitter, Closeable {
         if (builder.eventStore != null) {
             eventStore = builder.eventStore;
         } else {
-            eventStore = new InMemoryEventStore(callback, builder.bufferCapacity);
+            eventStore = new InMemoryEventStore(builder.bufferCapacity);
         }
 
         if (builder.fatalResponseCodes != null) {
@@ -372,6 +372,11 @@ public class BatchEmitter implements Emitter, Closeable {
     private Runnable getPostRequestRunnable(int numberOfEvents) {
         return () -> {
             BatchPayload batchedEvents = null;
+
+            // If the InMemoryEventStore queue is full when events are returned for retry,
+            // newer events are removed to make space
+            List<TrackerPayload> eventsDeletedFromStorage = new ArrayList<>();
+
             try {
                 batchedEvents = eventStore.getEventsBatch(numberOfEvents);
 
@@ -382,6 +387,8 @@ public class BatchEmitter implements Emitter, Closeable {
                 List<TrackerPayload> eventsInRequest = new ArrayList<>(batchedEvents.getPayloads());
                 final SelfDescribingJson post = getFinalPost(eventsInRequest);
                 final int code = httpClientAdapter.post(post);
+
+
 
                 // Process results
                 if (isSuccessfulSend(code)) {
@@ -398,8 +405,12 @@ public class BatchEmitter implements Emitter, Closeable {
 
                 } else {
                     LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
-                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
+                    eventsDeletedFromStorage = eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
                     callback.onFailure(FailureType.REJECTED_BY_COLLECTOR, true, eventsInRequest);
+
+                    if (!eventsDeletedFromStorage.isEmpty()) {
+                        callback.onFailure(FailureType.TRACKER_STORAGE_FULL, false, eventsDeletedFromStorage);
+                    }
 
                     // exponentially increase retry backoff time after the first failure, up to the maximum wait time
                     if (!retryDelay.compareAndSet(0, 100)) {
@@ -409,8 +420,12 @@ public class BatchEmitter implements Emitter, Closeable {
             } catch (Exception e) {
                 LOGGER.error("BatchEmitter event sending error: {}", e.getMessage());
                 if (batchedEvents != null) {
-                    eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
+                    eventsDeletedFromStorage = eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
                     callback.onFailure(FailureType.CONNECTION_FAILURE, true, new ArrayList<>(batchedEvents.getPayloads()));
+
+                    if (!eventsDeletedFromStorage.isEmpty()) {
+                        callback.onFailure(FailureType.TRACKER_STORAGE_FULL, false, eventsDeletedFromStorage);
+                    }
                 }
             }
         };

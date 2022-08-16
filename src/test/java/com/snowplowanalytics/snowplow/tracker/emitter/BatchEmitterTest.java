@@ -499,7 +499,7 @@ public class BatchEmitterTest {
         class TestCallback implements EmitterCallback {
             boolean willRetry;
             List<TrackerPayload> payloads;
-            FailureType failureType;
+            final List<FailureType> failureTypes = new ArrayList<>();
 
             @Override
             public void onSuccess(List<TrackerPayload> payloads) {
@@ -507,12 +507,7 @@ public class BatchEmitterTest {
 
             @Override
             public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
-                // Ignore the first call when payload1's request gets a 500 status code
-                if (failureType.equals(FailureType.REJECTED_BY_COLLECTOR)) {
-                    return;
-                }
-
-                this.failureType = failureType;
+                failureTypes.add(failureType);
                 this.willRetry = willRetry;
                 this.payloads = payloads;
             }
@@ -531,12 +526,14 @@ public class BatchEmitterTest {
 
         emitter.add(payload1);
         emitter.flushBuffer();
+        Thread.sleep(10);
 
         emitter.add(payload2);
         emitter.add(payload3);
         Thread.sleep(500);
 
-        Assert.assertEquals(FailureType.TRACKER_STORAGE_FULL, callback.failureType);
+        Assert.assertEquals(FailureType.REJECTED_BY_COLLECTOR, callback.failureTypes.get(0));
+        Assert.assertEquals(FailureType.TRACKER_STORAGE_FULL, callback.failureTypes.get(1));
         Assert.assertFalse(callback.willRetry);
         Assert.assertEquals(callback.payloads.get(0), payload3);
     }
