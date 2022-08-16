@@ -108,8 +108,8 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         /**
-         * The default buffer capacity is Integer.MAX_VALUE. Your application would likely run out
-         * of memory before buffering this many events. When the buffer is full, new events are lost.
+         * The default buffer capacity is 10 000 events.
+         * When the buffer is full (due to network outage), new events are lost.
          *
          * @param bufferCapacity The maximum capacity of the default InMemoryEventStore event buffer
          * @return itself
