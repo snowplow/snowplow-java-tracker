@@ -388,8 +388,6 @@ public class BatchEmitter implements Emitter, Closeable {
                 final SelfDescribingJson post = getFinalPost(eventsInRequest);
                 final int code = httpClientAdapter.post(post);
 
-
-
                 // Process results
                 if (isSuccessfulSend(code)) {
                     LOGGER.debug("BatchEmitter successfully sent {} events: code: {}", eventsInRequest.size(), code);
@@ -406,7 +404,12 @@ public class BatchEmitter implements Emitter, Closeable {
                 } else {
                     LOGGER.error("BatchEmitter failed to send {} events: code: {}", eventsInRequest.size(), code);
                     eventsDeletedFromStorage = eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
-                    callback.onFailure(FailureType.REJECTED_BY_COLLECTOR, true, eventsInRequest);
+
+                    if (code == -1) {
+                        callback.onFailure(FailureType.HTTP_CONNECTION_FAILURE, true, eventsInRequest);
+                    } else {
+                        callback.onFailure(FailureType.REJECTED_BY_COLLECTOR, true, eventsInRequest);
+                    }
 
                     if (!eventsDeletedFromStorage.isEmpty()) {
                         callback.onFailure(FailureType.TRACKER_STORAGE_FULL, false, eventsDeletedFromStorage);
@@ -421,7 +424,7 @@ public class BatchEmitter implements Emitter, Closeable {
                 LOGGER.error("BatchEmitter event sending error: {}", e.getMessage());
                 if (batchedEvents != null) {
                     eventsDeletedFromStorage = eventStore.cleanupAfterSendingAttempt(true, batchedEvents.getBatchId());
-                    callback.onFailure(FailureType.CONNECTION_FAILURE, true, new ArrayList<>(batchedEvents.getPayloads()));
+                    callback.onFailure(FailureType.EMITTER_REQUEST_FAILURE, true, new ArrayList<>(batchedEvents.getPayloads()));
 
                     if (!eventsDeletedFromStorage.isEmpty()) {
                         callback.onFailure(FailureType.TRACKER_STORAGE_FULL, false, eventsDeletedFromStorage);
