@@ -65,7 +65,7 @@ public class BatchEmitter implements Emitter, Closeable {
         private HttpClientAdapter httpClientAdapter; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
         private int batchSize = 50; // Optional
-        private int bufferCapacity = Integer.MAX_VALUE;
+        private int bufferCapacity = 10000;
         private EventStore eventStore = null;  // Optional
         private Map<Integer, Boolean> customRetryForStatusCodes = null; // Optional
         private int threadCount = 50; // Optional
@@ -108,8 +108,8 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         /**
-         * The default buffer capacity is Integer.MAX_VALUE. Your application would likely run out
-         * of memory before buffering this many events. When the buffer is full, new events are lost.
+         * The default buffer capacity is 10 000 events.
+         * When the buffer is full (due to network outage), new events are lost.
          *
          * @param bufferCapacity The maximum capacity of the default InMemoryEventStore event buffer
          * @return itself

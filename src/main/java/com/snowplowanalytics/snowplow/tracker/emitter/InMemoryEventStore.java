@@ -34,20 +34,21 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class InMemoryEventStore implements EventStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryEventStore.class);
+    private static final int DEFAULT_BUFFER_SIZE = 10000;
     private final AtomicLong batchId = new AtomicLong(1);
 
     private final LinkedBlockingDeque<TrackerPayload> eventBuffer;
     private final ConcurrentHashMap<Long, List<TrackerPayload>> eventsBeingSent = new ConcurrentHashMap<>();
 
     /**
-     * Make a new InMemoryEventStore with default queue capacity (Integer.MAX_VALUE).
+     * Make a new InMemoryEventStore with default queue capacity (10 000 events).
      */
     public InMemoryEventStore() {
-        eventBuffer = new LinkedBlockingDeque<>();
+        this(DEFAULT_BUFFER_SIZE);
     }
 
     /**
-     * Make a new InMemoryEventStore with user-set queue capacity.
+     * Make a new InMemoryEventStore with user-set queue capacity. The default is 10 000 events.
      *
      * @param bufferCapacity the maximum number of events to buffer at once
      */
