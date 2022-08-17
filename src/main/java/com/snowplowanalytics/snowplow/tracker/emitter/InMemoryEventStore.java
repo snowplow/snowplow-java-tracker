@@ -41,19 +41,18 @@ public class InMemoryEventStore implements EventStore {
     private final ConcurrentHashMap<Long, List<TrackerPayload>> eventsBeingSent = new ConcurrentHashMap<>();
 
     /**
-     * Make a new InMemoryEventStore with default queue capacity (10 000 events).
-     */
-    public InMemoryEventStore() {
-        this(DEFAULT_BUFFER_SIZE);
-    }
-
-    /**
-     * Make a new InMemoryEventStore with user-set queue capacity. The default is 10 000 events.
-     *
+     * Create a InMemoryEventStore object with custom queue capacity. The default is 10 000 events.
      * @param bufferCapacity the maximum number of events to buffer at once
      */
     public InMemoryEventStore(int bufferCapacity) {
         eventBuffer = new LinkedBlockingDeque<>(bufferCapacity);
+    }
+
+    /**
+     * Create a InMemoryEventStore object with default buffer size (10 000 events).
+     */
+    public InMemoryEventStore() {
+        this(DEFAULT_BUFFER_SIZE);
     }
 
     /**
@@ -100,11 +99,13 @@ public class InMemoryEventStore implements EventStore {
      *
      * @param needRetry if true, move events back to the buffer instead of deleting
      * @param batchId the ID of the batch of events
+     * @return newer TrackerPayloads deleted from the queue to make space for older payloads
      */
     @Override
-    public void cleanupAfterSendingAttempt(boolean needRetry, long batchId) {
+    public List<TrackerPayload> cleanupAfterSendingAttempt(boolean needRetry, long batchId) {
         // Events that successfully sent are deleted from the pending buffer
         List<TrackerPayload> events = eventsBeingSent.remove(batchId);
+        List<TrackerPayload> removedEvents = new ArrayList<>();
 
         // Events that didn't send are inserted at the head of the eventBuffer
         // for immediate resending.
@@ -114,11 +115,12 @@ public class InMemoryEventStore implements EventStore {
                 boolean result = eventBuffer.offerFirst(payloadToReinsert);
                 if (!result) {
                     LOGGER.error("Event buffer is full. Dropping newer payload to reinsert older payload");
-                    eventBuffer.removeLast();
+                    removedEvents.add(eventBuffer.removeLast());
                     eventBuffer.offerFirst(payloadToReinsert);
                 }
             }
         }
+        return removedEvents;
     }
 
     /**
