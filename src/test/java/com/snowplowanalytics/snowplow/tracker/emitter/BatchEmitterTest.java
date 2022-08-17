@@ -425,9 +425,6 @@ public class BatchEmitterTest {
 
     @Test
     public void callsFailureCallbackWhenRejectedNoRetry() throws InterruptedException {
-        List<Integer> noRetry = new ArrayList<>();
-        noRetry.add(403);
-
         class TestCallback implements EmitterCallback {
             boolean willRetry;
             List<TrackerPayload> payloads;
@@ -450,7 +447,6 @@ public class BatchEmitterTest {
                 .httpClientAdapter(new MockHttpClientAdapter(403))
                 .batchSize(1)
                 .callback(callback)
-                .fatalResponseCodes(noRetry)
                 .build();
 
         TrackerPayload payload = createPayload();
