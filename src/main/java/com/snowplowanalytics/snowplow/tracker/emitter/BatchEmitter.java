@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -61,7 +62,7 @@ public class BatchEmitter implements Emitter, Closeable {
     private final HttpClientAdapter httpClientAdapter;
     private final ScheduledExecutorService executor;
     private final EventStore eventStore;
-    private final List<Integer> fatalResponseCodes;
+    private final Map<Integer, Boolean> customRetryForStatusCodes;
     private final EmitterCallback callback;
 
     public static abstract class Builder<T extends Builder<T>> {
@@ -70,9 +71,9 @@ public class BatchEmitter implements Emitter, Closeable {
         private HttpClientAdapter httpClientAdapter; // Optional
         private String collectorUrl = null; // Required if not specifying a httpClientAdapter
         private int batchSize = 50; // Optional
-        private int bufferCapacity = Integer.MAX_VALUE;
+        private int bufferCapacity = 10000;
         private EventStore eventStore = null;  // Optional
-        private List<Integer> fatalResponseCodes = null;  // Optional
+        private Map<Integer, Boolean> customRetryForStatusCodes = null; // Optional
         private int threadCount = 50; // Optional
         private CookieJar cookieJar = null; // Optional
         private ScheduledExecutorService requestExecutorService = null; // Optional
@@ -114,8 +115,8 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         /**
-         * The default buffer capacity is Integer.MAX_VALUE. Your application would likely run out
-         * of memory before buffering this many events. When the buffer is full, new events are lost.
+         * The default buffer capacity is 10 000 events.
+         * When the buffer is full (due to network outage), new events are lost.
          *
          * @param bufferCapacity The maximum capacity of the default InMemoryEventStore event buffer
          * @return itself
@@ -137,15 +138,14 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         /**
-         * Provide a denylist of HTTP response codes. Retry will not be attempted if one of these codes
-         * is received. The events in the request will be dropped, but the Emitter will continue trying
-         * to send as normal.
-         *
-         * @param fatalResponseCodes Event sending will not be retried on these codes
+         * Set custom retry rules for HTTP status codes received in emit responses from the Collector.
+         * By default, retry will not occur for status codes 400, 401, 403, 410 or 422. This can be overridden here.
+         * Note that 2xx codes will never retry as they are considered successful.
+         * @param customRetryForStatusCodes Mapping of integers (status codes) to booleans (true for retry and false for not retry)
          * @return itself
          */
-        public T fatalResponseCodes(final List<Integer> fatalResponseCodes) {
-            this.fatalResponseCodes = fatalResponseCodes;
+        public T customRetryForStatusCodes(Map<Integer, Boolean> customRetryForStatusCodes) {
+            this.customRetryForStatusCodes = customRetryForStatusCodes;
             return self();
         }
 
@@ -266,10 +266,10 @@ public class BatchEmitter implements Emitter, Closeable {
             eventStore = new InMemoryEventStore(builder.bufferCapacity);
         }
 
-        if (builder.fatalResponseCodes != null) {
-            fatalResponseCodes = builder.fatalResponseCodes;
+        if (builder.customRetryForStatusCodes != null) {
+            customRetryForStatusCodes = builder.customRetryForStatusCodes;
         } else {
-            fatalResponseCodes = new ArrayList<>();
+            customRetryForStatusCodes = new HashMap<>();
         }
 
         if (builder.requestExecutorService != null) {
@@ -363,6 +363,22 @@ public class BatchEmitter implements Emitter, Closeable {
         return code >= 200 && code < 300;
     }
 
+    protected boolean shouldRetry(int code) {
+        // don't retry if successful
+        if (isSuccessfulSend(code)) {
+            return false;
+        }
+
+        // status code has a custom retry rule
+        if (customRetryForStatusCodes.containsKey(code)) {
+            return Objects.requireNonNull(customRetryForStatusCodes.get(code));
+        }
+
+        // retry if status code is not in the list of no-retry status codes
+        Set<Integer> dontRetryStatusCodes = new HashSet<>(Arrays.asList(400, 401, 403, 410, 422));
+        return !dontRetryStatusCodes.contains(code);
+    }
+
     /**
      * Returns a Runnable POST Request operation
      *
@@ -396,7 +412,7 @@ public class BatchEmitter implements Emitter, Closeable {
                     callback.onSuccess(eventsInRequest);
 
 
-                } else if (fatalResponseCodes.contains(code)) {
+                } else if (!shouldRetry(code)) {
                     LOGGER.debug("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
                     callback.onFailure(FailureType.REJECTED_BY_COLLECTOR, false, eventsInRequest);

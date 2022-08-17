@@ -12,10 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
@@ -315,15 +312,37 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void noRetryAfterDenylistResponseCode() throws InterruptedException {
-        List<Integer> noRetry = new ArrayList<>();
-        noRetry.add(403);
+    public void retryWithCustomRulesOverridingDefault() throws InterruptedException {
+        Map<Integer, Boolean> customRetry = new HashMap<>();
+        customRetry.put(403, true);
 
-        MockHttpClientAdapter failingHttpClientAdapter = new MockHttpClientAdapter(403);
+        // by default 403 isn't retried
         BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(failingHttpClientAdapter)
+                .httpClientAdapter(new MockHttpClientAdapter(403))
+                .customRetryForStatusCodes(customRetry)
                 .batchSize(2)
-                .fatalResponseCodes(noRetry)
+                .build();
+
+        List<TrackerPayload> payloads = createPayloads(4);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
+        }
+
+        Thread.sleep(500);
+        Assert.assertNotEquals(0, emitter.getRetryDelay());
+        Assert.assertEquals(4, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void noRetryWithCustomRulesOverridingDefault() throws InterruptedException {
+        Map<Integer, Boolean> customRetry = new HashMap<>();
+        customRetry.put(500, false);
+
+        // by default, requests with code 500 are retried
+        BatchEmitter emitter = BatchEmitter.builder()
+                .httpClientAdapter(new MockHttpClientAdapter(500))
+                .customRetryForStatusCodes(customRetry)
+                .batchSize(2)
                 .build();
 
         List<TrackerPayload> payloads = createPayloads(4);
@@ -333,7 +352,6 @@ public class BatchEmitterTest {
 
         Thread.sleep(500);
 
-        Assert.assertEquals(2, failingHttpClientAdapter.postCounter);
         Assert.assertEquals(0, emitter.getRetryDelay());
         Assert.assertEquals(0, emitter.getBuffer().size());
     }
