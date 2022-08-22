@@ -206,7 +206,8 @@ public class BatchEmitter implements Emitter, Closeable {
                     .eventStore(eventStore)
                     .customRetryForStatusCodes(customRetryForStatusCodes)
                     .threadCount(threadCount)
-                    .requestExecutorService(requestExecutorService);
+                    .requestExecutorService(requestExecutorService)
+                    .callback(callback);
 
             return new BatchEmitter(networkConfig, emitterConfig);
         }

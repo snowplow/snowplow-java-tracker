@@ -39,7 +39,7 @@ public class Tracker {
 
 
     public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
-        this(trackerConfig, emitter, new Subject.SubjectBuilder().build());
+        this(trackerConfig, emitter, null);
     }
 
     public Tracker(TrackerConfiguration trackerConfig, Emitter emitter, Subject subject) {
