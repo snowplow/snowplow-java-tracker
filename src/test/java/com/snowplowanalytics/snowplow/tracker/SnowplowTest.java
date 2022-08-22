@@ -12,11 +12,9 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import org.junit.After;
 import org.junit.Test;
 

@@ -13,7 +13,6 @@
 package com.snowplowanalytics.snowplow.tracker.configuration;
 
 import com.snowplowanalytics.snowplow.tracker.Utils;
-import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 
 public class SubjectConfiguration {
 
