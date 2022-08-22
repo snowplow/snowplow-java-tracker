@@ -63,16 +63,41 @@ public class SnowplowTest {
     }
 
     @Test
-    public void hasDefaultTracker() {
+    public void doesNotDeleteUnregisteredTracker() {
+        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
+
+        boolean result = Snowplow.removeTracker(tracker);
+        assertFalse(result);
+
+        boolean result2 = Snowplow.removeTracker("not registered");
+        assertFalse(result2);
+    }
+
+    @Test
+    public void setsDefaultTrackerFromObject() {
         assertNull(Snowplow.getDefaultTracker());
 
         Tracker tracker = Snowplow.createTracker("http://endpoint", "namespace", "appId");
         assertEquals(tracker, Snowplow.getDefaultTracker());
 
         Tracker tracker2 = Snowplow.createTracker("http://endpoint", "namespace2", "appId");
+        // The first tracker is still the default
         assertEquals(tracker, Snowplow.getDefaultTracker());
 
         Snowplow.setDefaultTracker(tracker2);
+        assertEquals(tracker2, Snowplow.getDefaultTracker());
+    }
+
+    @Test
+    public void setsDefaultTrackerFromNamespace() {
+        assertNull(Snowplow.getDefaultTracker());
+
+        Snowplow.createTracker("http://endpoint", "namespace", "appId");
+        Tracker tracker2 = Snowplow.createTracker("http://endpoint", "namespace2", "appId");
+
+        boolean result = Snowplow.setDefaultTracker("namespace2");
+        assertTrue(result);
         assertEquals(tracker2, Snowplow.getDefaultTracker());
     }
 
@@ -82,13 +107,27 @@ public class SnowplowTest {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
 
         Snowplow.registerTracker(tracker);
+
         assertEquals(tracker, Snowplow.getDefaultTracker());
         assertEquals(1, Snowplow.getTrackers().size());
     }
 
     @Test
+    public void settingNewDefaultTrackerRegistersIt() {
+        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "new_tracker", "appId").build();
+
+        Snowplow.setDefaultTracker(tracker);
+
+        assertEquals(1, Snowplow.getTrackers().size());
+        assertEquals("new_tracker", Snowplow.getDefaultTracker().getNamespace());
+    }
+
+    @Test
     public void createsTrackerFromConfigs() {
-        TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId")
+                .base64Encoded(false)
+                .platform(DevicePlatform.Desktop);
         NetworkConfiguration networkConfig = new NetworkConfiguration().collectorUrl("http://collector-endpoint");
 
         Tracker tracker = Snowplow.createTracker(trackerConfig, networkConfig);
@@ -98,6 +137,7 @@ public class SnowplowTest {
         assertEquals(tracker, retrievedTracker);
         assertEquals("namespace", tracker.getNamespace());
         assertEquals("appId", tracker.getAppId());
-        assertTrue(tracker.getBase64Encoded());
+        assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
+        assertFalse(tracker.getBase64Encoded());
     }
 }
