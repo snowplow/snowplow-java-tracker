@@ -185,20 +185,18 @@ public class Subject {
          * @return a new Subject object
          */
         public Subject build() {
-            SubjectConfiguration subjectConfig = new SubjectConfiguration();
-
-
-//            setUserId(subjectConfig.getUserId());
-//            setScreenResolution(subjectConfig.getScreenResWidth(), subjectConfig.getScreenResHeight());
-//            setViewPort(subjectConfig.getViewPortWidth(), subjectConfig.getViewPortHeight());
-//            setColorDepth(subjectConfig.getColorDepth());
-//            setTimezone(subjectConfig.getTimezone());
-//            setLanguage(subjectConfig.getLanguage());
-//            setIpAddress(subjectConfig.getIpAddress());
-//            setUseragent(subjectConfig.getUseragent());
-//            setNetworkUserId(subjectConfig.getNetworkUserId());
-//            setDomainUserId(subjectConfig.getDomainUserId());
-//            setDomainSessionId(subjectConfig.getDomainSessionId());
+            SubjectConfiguration subjectConfig = new SubjectConfiguration()
+                    .userId(userId)
+                    .screenResolution(screenResWidth, screenResHeight)
+                    .viewPort(viewPortWidth, viewPortHeight)
+                    .colorDepth(colorDepth)
+                    .timezone(timezone)
+                    .language(language)
+                    .ipAddress(ipAddress)
+                    .useragent(useragent)
+                    .networkUserId(networkUserId)
+                    .domainUserId(domainUserId)
+                    .domainSessionId(domainSessionId);
 
             return new Subject(subjectConfig);
         }
