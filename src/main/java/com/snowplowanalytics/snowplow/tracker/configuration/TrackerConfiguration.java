@@ -58,11 +58,23 @@ public class TrackerConfiguration {
 
     // Builder methods
 
+    /**
+     * The {@link DevicePlatform} the tracker is running on (default is "srv", ServerSideApp).
+     *
+     * @param platform The device platform the tracker is running on
+     * @return itself
+     */
     public TrackerConfiguration platform(DevicePlatform platform) {
         this.platform = platform;
         return this;
     }
 
+    /**
+     * Whether JSONs in the payload should be base-64 encoded (default is true)
+     *
+     * @param base64Encoded JSONs should be encoded or not
+     * @return itself
+     */
     public TrackerConfiguration base64Encoded(boolean base64Encoded) {
         this.base64Encoded = base64Encoded;
         return this;

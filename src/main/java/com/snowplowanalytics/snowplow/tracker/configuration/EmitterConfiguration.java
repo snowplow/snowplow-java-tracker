@@ -100,36 +100,83 @@ public class EmitterConfiguration {
 
     // Builder methods
 
+    /**
+     * The default batch size is 50.
+     *
+     * @param batchSize The count of events to send in one HTTP request
+     * @return itself
+     */
     public EmitterConfiguration batchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;
     }
 
+    /**
+     * The default buffer capacity is 10 000 events.
+     * When the buffer is full (due to network outage), new events are lost.
+     *
+     * @param bufferCapacity The maximum capacity of the default InMemoryEventStore event buffer
+     * @return itself
+     */
     public EmitterConfiguration bufferCapacity(int bufferCapacity) {
         this.bufferCapacity = bufferCapacity;
         return this;
     }
 
+    /**
+     * The default EventStore is InMemoryEventStore.
+     *
+     * @param eventStore The EventStore to use
+     * @return itself
+     */
     public EmitterConfiguration eventStore(EventStore eventStore) {
         this.eventStore = eventStore;
         return this;
     }
 
+    /**
+     * Set custom retry rules for HTTP status codes received in emit responses from the Collector.
+     * By default, retry will not occur for status codes 400, 401, 403, 410 or 422. This can be overridden here.
+     * Note that 2xx codes will never retry as they are considered successful.
+     * @param customRetryForStatusCodes Mapping of integers (status codes) to booleans (true for retry and false for not retry)
+     * @return itself
+     */
     public EmitterConfiguration customRetryForStatusCodes(Map<Integer, Boolean> customRetryForStatusCodes) {
         this.customRetryForStatusCodes = customRetryForStatusCodes;
         return this;
     }
 
+    /**
+     * Sets the Thread Count for the ScheduledExecutorService (default is 50).
+     *
+     * @param threadCount the size of the thread pool
+     * @return itself
+     */
     public EmitterConfiguration threadCount(int threadCount) {
         this.threadCount = threadCount;
         return this;
     }
 
+    /**
+     * Set a custom ScheduledExecutorService to send http requests (default is ScheduledThreadPoolExecutor).
+     * <p>
+     * <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
+     * has a side-effect and will shutdown that ExecutorService.</em>
+     *
+     * @param requestExecutorService the ScheduledExecutorService to use
+     * @return itself
+     */
     public EmitterConfiguration requestExecutorService(ScheduledExecutorService requestExecutorService) {
         this.requestExecutorService = requestExecutorService;
         return this;
     }
 
+    /**
+     * Provide a custom EmitterCallback to access successfully sent or failed event payloads.
+     *
+     * @param callback an EmitterCallback
+     * @return itself
+     */
     public EmitterConfiguration callback(EmitterCallback callback) {
         this.callback = callback;
         return this;

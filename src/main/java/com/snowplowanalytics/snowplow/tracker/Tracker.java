@@ -35,13 +35,22 @@ public class Tracker {
     /**
      * Creates a new Snowplow Tracker.
      *
+     * @param trackerConfig a TrackerConfiguration object
+     * @param emitter an Emitter
+     *
      */
-
-
     public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
         this(trackerConfig, emitter, null);
     }
 
+    /**
+     * Creates a new Snowplow Tracker.
+     *
+     * @param trackerConfig a TrackerConfiguration object
+     * @param emitter an Emitter
+     * @param subject a Subject
+     *
+     */
     public Tracker(TrackerConfiguration trackerConfig, Emitter emitter, Subject subject) {
 
         // Precondition checks
@@ -59,10 +68,6 @@ public class Tracker {
         this.emitter = emitter;
         this.subject = subject;
 
-    }
-
-    public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
-        return new TrackerBuilder(emitter, namespace, appId);
     }
 
     /**
@@ -130,6 +135,10 @@ public class Tracker {
                     .base64Encoded(base64Encoded);
             return new Tracker(trackerConfig, emitter, subject);
         }
+    }
+
+    public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
+        return new TrackerBuilder(emitter, namespace, appId);
     }
 
     // --- Setters

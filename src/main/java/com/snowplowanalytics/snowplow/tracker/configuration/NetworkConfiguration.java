@@ -58,16 +58,36 @@ public class NetworkConfiguration {
 
     // Builder methods
 
+    /**
+     * Sets a custom HttpClientAdapter (default is OkHttpClientAdapter).
+     *
+     * @param httpClientAdapter the adapter to use
+     * @return itself
+     */
     public NetworkConfiguration httpClientAdapter(HttpClientAdapter httpClientAdapter) {
         this.httpClientAdapter = httpClientAdapter;
         return this;
     }
 
+    /**
+     * Sets the endpoint url for when a httpClientAdapter is not specified.
+     * It will be used to create the default OkHttpClientAdapter.
+     *
+     * @param collectorUrl the url for the default httpClientAdapter
+     * @return itself
+     */
     public NetworkConfiguration collectorUrl(String collectorUrl) {
         this.collectorUrl = collectorUrl;
         return this;
     }
 
+    /**
+     * Adds a custom CookieJar to be used with OkHttpClientAdapters.
+     * Will be ignored if a custom httpClientAdapter is provided.
+     *
+     * @param cookieJar the CookieJar to use
+     * @return itself
+     */
     public NetworkConfiguration cookieJar(CookieJar cookieJar) {
         this.cookieJar = cookieJar;
         return this;
