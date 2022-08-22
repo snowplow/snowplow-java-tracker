@@ -12,9 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.tracker.configuration;
 
+import com.snowplowanalytics.snowplow.tracker.emitter.EmitterCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.EventStore;
 
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class EmitterConfiguration {
@@ -22,9 +23,10 @@ public class EmitterConfiguration {
     private int batchSize; // Optional
     private int bufferCapacity; // Optional
     private EventStore eventStore;  // Optional
-    private List<Integer> fatalResponseCodes;  // Optional
+    private Map<Integer, Boolean> customRetryForStatusCodes;  // Optional
     private int threadCount; // Optional
     private ScheduledExecutorService requestExecutorService; // Optional
+    private EmitterCallback callback; // Optional
 
     // Getters and Setters
 
@@ -52,12 +54,12 @@ public class EmitterConfiguration {
         this.eventStore = eventStore;
     }
 
-    public List<Integer> getFatalResponseCodes() {
-        return fatalResponseCodes;
+    public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
+        return customRetryForStatusCodes;
     }
 
-    public void setFatalResponseCodes(List<Integer> fatalResponseCodes) {
-        this.fatalResponseCodes = fatalResponseCodes;
+    public void setCustomRetryForStatusCodes(Map<Integer, Boolean> customRetryForStatusCodes) {
+        this.customRetryForStatusCodes = customRetryForStatusCodes;
     }
 
     public int getThreadCount() {
@@ -76,15 +78,24 @@ public class EmitterConfiguration {
         this.requestExecutorService = requestExecutorService;
     }
 
+    public EmitterCallback getCallback() {
+        return callback;
+    }
+
+    public void setCallback(EmitterCallback callback) {
+        this.callback = callback;
+    }
+
     // Constructor
 
     public EmitterConfiguration() {
         batchSize = 50;
-        bufferCapacity = Integer.MAX_VALUE;
+        bufferCapacity = 10000;
         eventStore = null;
-        fatalResponseCodes = null;
+        customRetryForStatusCodes = null;
         threadCount = 50;
         requestExecutorService = null;
+        callback = null;
     }
 
     // Builder methods
@@ -104,8 +115,8 @@ public class EmitterConfiguration {
         return this;
     }
 
-    public EmitterConfiguration fatalResponseCodes(List<Integer> fatalResponseCodes) {
-        this.fatalResponseCodes = fatalResponseCodes;
+    public EmitterConfiguration customRetryForStatusCodes(Map<Integer, Boolean> customRetryForStatusCodes) {
+        this.customRetryForStatusCodes = customRetryForStatusCodes;
         return this;
     }
 
@@ -116,6 +127,11 @@ public class EmitterConfiguration {
 
     public EmitterConfiguration requestExecutorService(ScheduledExecutorService requestExecutorService) {
         this.requestExecutorService = requestExecutorService;
+        return this;
+    }
+
+    public EmitterConfiguration callback(EmitterCallback callback) {
+        this.callback = callback;
         return this;
     }
 }

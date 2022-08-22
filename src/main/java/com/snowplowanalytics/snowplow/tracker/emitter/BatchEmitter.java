@@ -204,7 +204,7 @@ public class BatchEmitter implements Emitter, Closeable {
                     .batchSize(batchSize)
                     .bufferCapacity(bufferCapacity)
                     .eventStore(eventStore)
-                    .fatalResponseCodes(fatalResponseCodes)
+                    .customRetryForStatusCodes(customRetryForStatusCodes)
                     .threadCount(threadCount)
                     .requestExecutorService(requestExecutorService);
 
@@ -259,8 +259,8 @@ public class BatchEmitter implements Emitter, Closeable {
         retryDelay = new AtomicInteger(0);
         batchSize = emitterConfig.getBatchSize();
 
-        if (builder.callback != null) {
-            callback = builder.callback;
+        if (emitterConfig.getCallback() != null) {
+            callback = emitterConfig.getCallback();
         } else {
             callback = new EmitterCallback() {
                 @Override
