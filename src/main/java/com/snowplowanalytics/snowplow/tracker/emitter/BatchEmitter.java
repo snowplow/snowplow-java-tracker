@@ -224,6 +224,12 @@ public class BatchEmitter implements Emitter, Closeable {
         return new Builder2();
     }
 
+    /**
+     * Creates a BatchEmitter object from configuration objects.
+     *
+     * @param networkConfig a NetworkConfiguration object
+     * @param emitterConfig an EmitterConfiguration object
+     */
     public BatchEmitter(NetworkConfiguration networkConfig, EmitterConfiguration emitterConfig) {
         OkHttpClient client;
 
@@ -290,6 +296,11 @@ public class BatchEmitter implements Emitter, Closeable {
         }
     }
 
+    /**
+     * Creates a BatchEmitter instance using a NetworkConfiguration.
+     *
+     * @param networkConfig a NetworkConfiguration object
+     */
     public BatchEmitter(NetworkConfiguration networkConfig) {
         this(networkConfig, new EmitterConfiguration());
     }

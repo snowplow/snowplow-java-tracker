@@ -29,6 +29,11 @@ public class Subject {
 
     private HashMap<String, String> standardPairs = new HashMap<>();
 
+    /**
+     * Creates a Subject instance from a SubjectConfiguration.
+     *
+     * @param subjectConfig a SubjectConfiguration
+     */
     public Subject(SubjectConfiguration subjectConfig) {
         setUserId(subjectConfig.getUserId());
         setScreenResolution(subjectConfig.getScreenResWidth(), subjectConfig.getScreenResHeight());

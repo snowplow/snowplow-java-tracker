@@ -49,6 +49,13 @@ public class TrackerConfiguration {
 
     // Constructor
 
+    /**
+     * Create a TrackerConfiguration instance. The namespace is the unique identifier for the instance.
+     * By default, the platform is ServerSideApp, and JSONs will be base64 encoded.
+     *
+     * @param namespace identifier for the Tracker instance
+     * @param appId application ID
+     */
     public TrackerConfiguration(String namespace, String appId) {
         this.namespace = namespace;
         this.appId = appId;

@@ -74,7 +74,7 @@ public class Snowplow {
     }
 
     /**
-     * Create a Snowplow tracker by providing three parameters.
+     * Create a Snowplow tracker with default configuration by providing three parameters.
      *
      * @param collectorUrl collector endpoint
      * @param namespace unique identifier for the Tracker instance
@@ -92,8 +92,8 @@ public class Snowplow {
      * Create a Snowplow tracker using Configuration objects.
      *
      * @param trackerConfig a TrackerConfiguration
-     * @param networkConfig a NetworkConfiguration
-     * @param emitterConfig an EmitterConfiguration
+     * @param networkConfig a NetworkConfiguration (will be used to create an OkHttpClientAdapter)
+     * @param emitterConfig an EmitterConfiguration (will be used to create a BatchEmitter)
      * @param subjectConfig a SubjectConfiguration
      * @return the created Tracker
      */

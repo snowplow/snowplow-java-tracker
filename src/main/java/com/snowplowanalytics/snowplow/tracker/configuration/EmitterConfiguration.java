@@ -88,6 +88,14 @@ public class EmitterConfiguration {
 
     // Constructor
 
+    /**
+     * Create an EmitterConfiguration instance. The default configuration is:
+     * 50 batched events per request;
+     * maximum 10 000 events buffered in memory;
+     * 50 threads;
+     * no retry for request status codes 400, 401, 403, 410 or 422;
+     * and OkHttp (OkHttpClientAdapter) used for HTTP requests.
+     */
     public EmitterConfiguration() {
         batchSize = 50;
         bufferCapacity = 10000;

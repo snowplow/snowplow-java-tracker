@@ -128,7 +128,7 @@ public class SnowplowTest {
         TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId")
                 .base64Encoded(false)
                 .platform(DevicePlatform.Desktop);
-        NetworkConfiguration networkConfig = new NetworkConfiguration().collectorUrl("http://collector-endpoint");
+        NetworkConfiguration networkConfig = new NetworkConfiguration("http://collector-endpoint");
 
         Tracker tracker = Snowplow.createTracker(trackerConfig, networkConfig);
         Tracker retrievedTracker = Snowplow.getTracker("namespace");

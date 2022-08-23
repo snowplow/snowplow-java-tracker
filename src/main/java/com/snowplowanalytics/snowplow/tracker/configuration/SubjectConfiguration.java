@@ -139,6 +139,9 @@ public class SubjectConfiguration {
 
     // Constructor
 
+    /**
+     * Create a Subject instance. By default, timezone is set to the server's timezone.
+     */
     public SubjectConfiguration() {
         userId = null; // Optional
         screenResWidth = 0; // Optional

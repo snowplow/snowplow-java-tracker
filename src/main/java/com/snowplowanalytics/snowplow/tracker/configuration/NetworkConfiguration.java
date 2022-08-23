@@ -50,9 +50,37 @@ public class NetworkConfiguration {
 
     // Constructor
 
+    /**
+     * Create a NetworkConfiguration instance. No arguments are required for this constructor, but you will need to
+     * provide either a collector URL or an HttpClientAdapter object before using this NetworkConfiguration.
+     */
     public NetworkConfiguration() {
         httpClientAdapter = null;
         collectorUrl = null;
+        cookieJar = null;
+    }
+
+    /**
+     * Create a NetworkConfiguration instance and specify a custom HttpClientAdapter to use
+     * (the default is OkHttpClientAdapter).
+     *
+     * @param httpClientAdapter the adapter to use
+     */
+    public NetworkConfiguration(HttpClientAdapter httpClientAdapter) {
+        this.httpClientAdapter = httpClientAdapter;
+        collectorUrl = null;
+        cookieJar = null;
+    }
+
+    /**
+     * Create a NetworkConfiguration instance with a collector endpoint URL. The URL will be used
+     * to create the default OkHttpClientAdapter.
+     *
+     * @param collectorUrl the url for the default httpClientAdapter
+     */
+    public NetworkConfiguration(String collectorUrl) {
+        httpClientAdapter = null;
+        this.collectorUrl = collectorUrl;
         cookieJar = null;
     }
 

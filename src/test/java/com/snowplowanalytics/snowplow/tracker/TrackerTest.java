@@ -15,6 +15,9 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
+import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -560,6 +563,18 @@ public class TrackerTest {
     }
 
     // --- Tracker Setter & Getter Tests
+
+    @Test
+    public void testCreateWithConfiguration() {
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
+        trackerConfig.base64Encoded(false);
+        trackerConfig.platform(DevicePlatform.General);
+        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
+        Tracker tracker = new Tracker(trackerConfig, emitter);
+
+        assertEquals("namespace", tracker.getNamespace());
+        assertEquals(emitter, tracker.getEmitter());
+    }
 
     @Test
     public void testGetTrackerVersion() {

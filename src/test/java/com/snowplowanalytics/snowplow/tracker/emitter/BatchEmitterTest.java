@@ -15,6 +15,8 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,7 +32,6 @@ public class BatchEmitterTest {
     private MockHttpClientAdapter mockHttpClientAdapter;
     private BatchEmitter emitter;
 
-    // MockHttpClientAdapter always returns 200
     public static class MockHttpClientAdapter implements HttpClientAdapter {
         private final int statusCode;
         public boolean isGetCalled = false;
@@ -246,6 +247,15 @@ public class BatchEmitterTest {
             emitter.add(payload);
         }
         Assert.assertEquals(20, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void createEmitterWithConfiguration() {
+        NetworkConfiguration networkConfig = new NetworkConfiguration().collectorUrl("http://endpoint");
+        EmitterConfiguration emitterConfig = new EmitterConfiguration().batchSize(5);
+        BatchEmitter emitter = new BatchEmitter(networkConfig, emitterConfig);
+
+        Assert.assertEquals(5, emitter.getBatchSize());
     }
 
     @Test
