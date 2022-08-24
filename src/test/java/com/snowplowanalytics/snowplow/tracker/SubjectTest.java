@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // JUnit
+import com.snowplowanalytics.snowplow.tracker.configuration.SubjectConfiguration;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
@@ -110,5 +111,29 @@ public class SubjectTest {
         expected.put("uid", "user1");
 
         assertEquals(expected, subject.getSubject());
+    }
+
+    @Test
+    public void testCreateWithBuilder() {
+        Subject subject = Subject.builder()
+                .domainSessionId("domain session ID")
+                .viewPort(123, 456)
+                .language("en")
+                .build();
+
+        assertEquals("domain session ID", subject.getSubject().get("sid"));
+        assertEquals("123x456", subject.getSubject().get("vp"));
+        assertEquals("en", subject.getSubject().get("lang"));
+    }
+
+    @Test
+    public void testCreateFromConfig() {
+        SubjectConfiguration subjectConfig = new SubjectConfiguration()
+                .ipAddress("xxx.000.xxx.111")
+                .useragent("Mac OS");
+        Subject subject = new Subject(subjectConfig);
+
+        assertEquals("xxx.000.xxx.111", subject.getSubject().get("ip"));
+        assertEquals("Mac OS", subject.getSubject().get("ua"));
     }
 }

@@ -12,6 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
@@ -34,29 +35,39 @@ public class Tracker {
     /**
      * Creates a new Snowplow Tracker.
      *
-     * @param builder The builder that constructs a tracker
+     * @param trackerConfig a TrackerConfiguration object
+     * @param emitter an Emitter
+     *
      */
-    private Tracker(TrackerBuilder builder) {
+    public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
+        this(trackerConfig, emitter, null);
+    }
+
+    /**
+     * Creates a new Snowplow Tracker.
+     *
+     * @param trackerConfig a TrackerConfiguration object
+     * @param emitter an Emitter
+     * @param subject a Subject
+     *
+     */
+    public Tracker(TrackerConfiguration trackerConfig, Emitter emitter, Subject subject) {
 
         // Precondition checks
-        Objects.requireNonNull(builder.emitter);
-        Objects.requireNonNull(builder.namespace);
-        Objects.requireNonNull(builder.appId);
-        if (builder.namespace.isEmpty()) {
+        Objects.requireNonNull(emitter);
+        Objects.requireNonNull(trackerConfig.getNamespace());
+        Objects.requireNonNull(trackerConfig.getAppId());
+        if (trackerConfig.getNamespace().isEmpty()) {
             throw new IllegalArgumentException("namespace cannot be empty");
         }
-        if (builder.appId.isEmpty()) {
+        if (trackerConfig.getAppId().isEmpty()) {
             throw new IllegalArgumentException("appId cannot be empty");
         }
 
-        this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
-        this.emitter = builder.emitter;
-        this.subject = builder.subject;
+        this.parameters = new TrackerParameters(trackerConfig.getAppId(), trackerConfig.getPlatform(), trackerConfig.getNamespace(), Version.TRACKER, trackerConfig.isBase64Encoded());
+        this.emitter = emitter;
+        this.subject = subject;
 
-    }
-
-    public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
-        return new TrackerBuilder(emitter, namespace, appId);
     }
 
     /**
@@ -119,8 +130,15 @@ public class Tracker {
          * @return a new Tracker object
          */
         public Tracker build() {
-            return new Tracker(this);
+            TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId)
+                    .platform(platform)
+                    .base64Encoded(base64Encoded);
+            return new Tracker(trackerConfig, emitter, subject);
         }
+    }
+
+    public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
+        return new TrackerBuilder(emitter, namespace, appId);
     }
 
     // --- Setters

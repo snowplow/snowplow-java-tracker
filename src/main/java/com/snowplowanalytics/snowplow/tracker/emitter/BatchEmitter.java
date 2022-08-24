@@ -20,6 +20,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
@@ -193,7 +195,20 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         public BatchEmitter build() {
-            return new BatchEmitter(this);
+            NetworkConfiguration networkConfig = new NetworkConfiguration(collectorUrl)
+                    .httpClientAdapter(httpClientAdapter)
+                    .cookieJar(cookieJar);
+
+            EmitterConfiguration emitterConfig = new EmitterConfiguration()
+                    .batchSize(batchSize)
+                    .bufferCapacity(bufferCapacity)
+                    .eventStore(eventStore)
+                    .customRetryForStatusCodes(customRetryForStatusCodes)
+                    .threadCount(threadCount)
+                    .requestExecutorService(requestExecutorService)
+                    .callback(callback);
+
+            return new BatchEmitter(networkConfig, emitterConfig);
         }
     }
 
@@ -208,44 +223,50 @@ public class BatchEmitter implements Emitter, Closeable {
         return new Builder2();
     }
 
-    protected BatchEmitter(final Builder<?> builder) {
+    /**
+     * Creates a BatchEmitter object from configuration objects.
+     *
+     * @param networkConfig a NetworkConfiguration object
+     * @param emitterConfig an EmitterConfiguration object
+     */
+    public BatchEmitter(NetworkConfiguration networkConfig, EmitterConfiguration emitterConfig) {
         OkHttpClient client;
 
         // Precondition checks
-        if (builder.threadCount <= 0) {
+        if (emitterConfig.getThreadCount() <= 0) {
             throw new IllegalArgumentException("threadCount must be greater than 0");
         }
-        if (builder.batchSize <= 0) {
+        if (emitterConfig.getBatchSize() <= 0) {
             throw new IllegalArgumentException("batchSize must be greater than 0");
         }
-        if (builder.bufferCapacity <= 0) {
+        if (emitterConfig.getBufferCapacity() <= 0) {
             throw new IllegalArgumentException("bufferCapacity must be greater than 0");
         }
 
-        if (builder.httpClientAdapter != null) {
-            httpClientAdapter = builder.httpClientAdapter;
+        if (networkConfig.getHttpClientAdapter() != null) {
+            httpClientAdapter = networkConfig.getHttpClientAdapter();
         } else {
-            Objects.requireNonNull(builder.collectorUrl, "Collector url must be specified if not using a httpClientAdapter");
+            Objects.requireNonNull(networkConfig.getCollectorUrl(), "Collector url must be specified if not using a httpClientAdapter");
 
-            if (builder.cookieJar != null) {
+            if (networkConfig.getCookieJar() != null) {
                 client = new OkHttpClient.Builder()
-                        .cookieJar(builder.cookieJar)
+                        .cookieJar(networkConfig.getCookieJar())
                         .build();
             } else {
                 client = new OkHttpClient.Builder().build();
             }
 
             httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
-                    .url(builder.collectorUrl)
+                    .url(networkConfig.getCollectorUrl())
                     .httpClient(client)
                     .build();
         }
 
         retryDelay = new AtomicInteger(0);
-        batchSize = builder.batchSize;
+        batchSize = emitterConfig.getBatchSize();
 
-        if (builder.callback != null) {
-            callback = builder.callback;
+        if (emitterConfig.getCallback() != null) {
+            callback = emitterConfig.getCallback();
         } else {
             callback = new EmitterCallback() {
                 @Override
@@ -255,24 +276,32 @@ public class BatchEmitter implements Emitter, Closeable {
             };
         }
 
-        if (builder.eventStore != null) {
-            eventStore = builder.eventStore;
+        if (emitterConfig.getEventStore() != null) {
+            eventStore = emitterConfig.getEventStore();
         } else {
-            eventStore = new InMemoryEventStore(builder.bufferCapacity);
+            eventStore = new InMemoryEventStore(emitterConfig.getBufferCapacity());
         }
 
-        if (builder.customRetryForStatusCodes != null) {
-            customRetryForStatusCodes = builder.customRetryForStatusCodes;
+        if (emitterConfig.getCustomRetryForStatusCodes() != null) {
+            customRetryForStatusCodes = emitterConfig.getCustomRetryForStatusCodes();
         } else {
             customRetryForStatusCodes = new HashMap<>();
         }
 
-        if (builder.requestExecutorService != null) {
-            executor = builder.requestExecutorService;
+        if (emitterConfig.getRequestExecutorService() != null) {
+            executor = emitterConfig.getRequestExecutorService();
         } else {
-            executor = Executors.newScheduledThreadPool(builder.threadCount, new EmitterThreadFactory());
+            executor = Executors.newScheduledThreadPool(emitterConfig.getThreadCount(), new EmitterThreadFactory());
         }
+    }
 
+    /**
+     * Creates a BatchEmitter instance using a NetworkConfiguration.
+     *
+     * @param networkConfig a NetworkConfiguration object
+     */
+    public BatchEmitter(NetworkConfiguration networkConfig) {
+        this(networkConfig, new EmitterConfiguration());
     }
 
     /**
@@ -405,7 +434,6 @@ public class BatchEmitter implements Emitter, Closeable {
                     retryDelay.set(0);
                     eventStore.cleanupAfterSendingAttempt(false, batchedEvents.getBatchId());
                     callback.onSuccess(eventsInRequest);
-
 
                 } else if (!shouldRetry(code)) {
                     LOGGER.debug("BatchEmitter failed to send {} events. No retry for code {}: events dropped", eventsInRequest.size(), code);
