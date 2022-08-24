@@ -32,54 +32,106 @@ public class SubjectConfiguration {
 
     // Getters and Setters
 
+    /**
+     * Returns the user ID.
+     * @return user ID
+     */
     public String getUserId() {
         return userId;
     }
 
+    /**
+     * Returns the screen resolution width, in pixels.
+     * @return screen width
+     */
     public int getScreenResWidth() {
         return screenResWidth;
     }
 
+    /**
+     * Returns the screen resolution height, in pixels.
+     * @return screen height
+     */
     public int getScreenResHeight() {
         return screenResHeight;
     }
 
+    /**
+     * Returns the viewport width, in pixels.
+     * @return viewport width
+     */
     public int getViewPortWidth() {
         return viewPortWidth;
     }
 
+    /**
+     * Returns the viewport height, in pixels.
+     * @return viewport height
+     */
     public int getViewPortHeight() {
         return viewPortHeight;
     }
 
+    /**
+     * Returns the color depth.
+     * @return color depth
+     */
     public int getColorDepth() {
         return colorDepth;
     }
 
+    /**
+     * Returns the timezone. Automatically set by default to that of the server.
+     * @return timezone
+     */
     public String getTimezone() {
         return timezone;
     }
 
+    /**
+     * Returns the device language.
+     * @return language
+     */
     public String getLanguage() {
         return language;
     }
 
+    /**
+     * Returns the IP address.
+     * @return IP address
+     */
     public String getIpAddress() {
         return ipAddress;
     }
 
+    /**
+     * Returns the useragent.
+     * @return useragent
+     */
     public String getUseragent() {
         return useragent;
     }
 
+    /**
+     * Returns the network user ID (UUID string).
+     * @return network user ID
+     */
     public String getNetworkUserId() {
         return networkUserId;
     }
 
+    /**
+     * Returns the domain user ID (UUID string).
+     * @return domain user ID
+     */
     public String getDomainUserId() {
         return domainUserId;
     }
 
+    /**
+     * Returns the domain session ID (UUID string).
+     * @return domain session ID
+     */
     public String getDomainSessionId() {
         return domainSessionId;
     }
@@ -107,17 +159,34 @@ public class SubjectConfiguration {
 
     // Builder methods
 
+    /**
+     * Set a unique user ID.
+     * @param userId a user ID
+     * @return itself
+     */
     public SubjectConfiguration userId(String userId) {
         this.userId = userId;
         return this;
     }
 
+    /**
+     * Set the screen resolution.
+     * @param width width in pixels
+     * @param height height in pixels
+     * @return itself
+     */
     public SubjectConfiguration screenResolution(int width, int height) {
         screenResWidth = width;
         screenResHeight = height;
         return this;
     }
 
+    /**
+     * Set the viewport size.
+     * @param width width in pixels
+     * @param height height in pixels
+     * @return itself
+     */
     public SubjectConfiguration viewPort(int width, int height) {
         viewPortWidth = width;
         viewPortHeight = height;
@@ -172,6 +241,7 @@ public class SubjectConfiguration {
     }
 
     /**
+     * This overrides the network user ID set by the Collector in response Cookies.
      * @param networkUserId a networkUserId string
      * @return itself
      */

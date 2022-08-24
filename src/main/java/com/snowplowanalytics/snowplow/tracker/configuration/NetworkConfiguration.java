@@ -24,14 +24,26 @@ public class NetworkConfiguration {
 
     // Getters and Setters
 
+    /**
+     * Returns the HttpClientAdapter used.
+     * @return HttpClientAdapter object
+     */
     public HttpClientAdapter getHttpClientAdapter() {
         return httpClientAdapter;
     }
 
+    /**
+     * Returns the event collector URL endpoint.
+     * @return collector URL
+     */
     public String getCollectorUrl() {
         return collectorUrl;
     }
 
+    /**
+     * Returns the OkHttp CookieJar used for persisting cookies.
+     * @return CookieJar object
+     */
     public CookieJar getCookieJar() {
         return cookieJar;
     }

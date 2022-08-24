@@ -30,30 +30,60 @@ public class EmitterConfiguration {
 
     // Getters and Setters
 
+    /**
+     * Returns the number of events to send per request (batched).
+     * @return the batch size
+     */
     public int getBatchSize() {
         return batchSize;
     }
 
+    /**
+     * Returns the maximum number of events to buffer in memory.
+     * @return maximum buffer capacity
+     */
     public int getBufferCapacity() {
         return bufferCapacity;
     }
 
+    /**
+     * Returns the EventStore used to buffer events.
+     * @return EventStore instance
+     */
     public EventStore getEventStore() {
         return eventStore;
     }
 
+    /**
+     * Returns the custom configuration for HTTP status codes. "True" means the
+     * @return map of integers (status codes) to booleans (true for retry and false for not retry)
+     */
     public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
         return customRetryForStatusCodes;
     }
 
+    /**
+     * Returns the number of threads used for event sending using the ScheduledExecutorService.
+     * @return thread count
+     */
     public int getThreadCount() {
         return threadCount;
     }
 
+    /**
+     * Returns the ScheduledExecutorService used for sending events.
+     * @return ScheduledExecutorService object
+     */
     public ScheduledExecutorService getRequestExecutorService() {
         return requestExecutorService;
     }
 
+    /**
+     * Returns the custom callback which is called when events are successfully sent to the collector,
+     * or after certain failure conditions.
+     *
+     * @return EmitterCallback object
+     */
     public EmitterCallback getCallback() {
         return callback;
     }

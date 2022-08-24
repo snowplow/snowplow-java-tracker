@@ -23,18 +23,34 @@ public class TrackerConfiguration {
 
     // Getters and Setters
 
+    /**
+     * Returns the unique tracker namespace.
+     * @return tracker namespace
+     */
     public String getNamespace() {
         return namespace;
     }
 
+    /**
+     * Returns the application ID.
+     * @return application ID
+     */
     public String getAppId() {
         return appId;
     }
 
+    /**
+     * Returns the DevicePlatform for the tracker.
+     * @return what platform the app is running on
+     */
     public DevicePlatform getPlatform() {
         return platform;
     }
 
+    /**
+     * Returns whether JSONs in the payload are base-64 encoded.
+     * @return true if encoded
+     */
     public boolean isBase64Encoded() {
         return base64Encoded;
     }
