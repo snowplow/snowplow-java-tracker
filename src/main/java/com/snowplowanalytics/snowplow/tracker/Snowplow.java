@@ -106,7 +106,7 @@ public class Snowplow {
         TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId);
         NetworkConfiguration networkConfig = new NetworkConfiguration(collectorUrl);
 
-        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), new SubjectConfiguration());
+        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), null);
     }
 
     /**
@@ -120,7 +120,7 @@ public class Snowplow {
     public static Tracker createTracker(TrackerConfiguration trackerConfig,
                                         NetworkConfiguration networkConfig,
                                         EmitterConfiguration emitterConfig) {
-        return createTracker(trackerConfig, networkConfig, emitterConfig, new SubjectConfiguration());
+        return createTracker(trackerConfig, networkConfig, emitterConfig, null);
     }
 
     /**
@@ -132,7 +132,7 @@ public class Snowplow {
      */
     public static Tracker createTracker(TrackerConfiguration trackerConfig,
                                         NetworkConfiguration networkConfig) {
-        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), new SubjectConfiguration());
+        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), null);
     }
 
     /**
