@@ -18,9 +18,9 @@ import okhttp3.CookieJar;
 
 public class NetworkConfiguration {
 
-    private HttpClientAdapter httpClientAdapter; // Optional
-    private String collectorUrl; // Required if not specifying a httpClientAdapter
-    private CookieJar cookieJar; // Optional
+    private HttpClientAdapter httpClientAdapter = null; // Optional
+    private String collectorUrl = null; // Required if not specifying a httpClientAdapter
+    private CookieJar cookieJar = null; // Optional
 
     // Getters and Setters
 
@@ -48,17 +48,7 @@ public class NetworkConfiguration {
         return cookieJar;
     }
 
-    // Constructor
-
-    /**
-     * Create a NetworkConfiguration instance. No arguments are required for this constructor, but you will need to
-     * provide either a collector URL or an HttpClientAdapter object before using this NetworkConfiguration.
-     */
-    public NetworkConfiguration() {
-        httpClientAdapter = null;
-        collectorUrl = null;
-        cookieJar = null;
-    }
+    // Constructors
 
     /**
      * Create a NetworkConfiguration instance and specify a custom HttpClientAdapter to use
@@ -68,8 +58,6 @@ public class NetworkConfiguration {
      */
     public NetworkConfiguration(HttpClientAdapter httpClientAdapter) {
         this.httpClientAdapter = httpClientAdapter;
-        collectorUrl = null;
-        cookieJar = null;
     }
 
     /**
@@ -79,9 +67,7 @@ public class NetworkConfiguration {
      * @param collectorUrl the url for the default httpClientAdapter
      */
     public NetworkConfiguration(String collectorUrl) {
-        httpClientAdapter = null;
         this.collectorUrl = collectorUrl;
-        cookieJar = null;
     }
 
     // Builder methods

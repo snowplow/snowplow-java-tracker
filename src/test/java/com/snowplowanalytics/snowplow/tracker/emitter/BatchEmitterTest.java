@@ -251,7 +251,7 @@ public class BatchEmitterTest {
 
     @Test
     public void createEmitterWithConfiguration() {
-        NetworkConfiguration networkConfig = new NetworkConfiguration().collectorUrl("http://endpoint");
+        NetworkConfiguration networkConfig = new NetworkConfiguration("http://endpoint");
         EmitterConfiguration emitterConfig = new EmitterConfiguration().batchSize(5);
         BatchEmitter emitter = new BatchEmitter(networkConfig, emitterConfig);
 

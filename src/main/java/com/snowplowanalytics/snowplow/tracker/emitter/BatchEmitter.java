@@ -195,8 +195,7 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         public BatchEmitter build() {
-            NetworkConfiguration networkConfig = new NetworkConfiguration()
-                    .collectorUrl(collectorUrl)
+            NetworkConfiguration networkConfig = new NetworkConfiguration(collectorUrl)
                     .httpClientAdapter(httpClientAdapter)
                     .cookieJar(cookieJar);
 
