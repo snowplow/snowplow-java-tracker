@@ -31,7 +31,7 @@ public class SnowplowTest {
     public void createsAndRetrievesATracker() {
         assertTrue(Snowplow.getInstancedTrackerNamespaces().isEmpty());
 
-        Tracker tracker = Snowplow.createTracker("http://endpoint", "namespace", "appId");
+        Tracker tracker = Snowplow.createTracker("namespace", "http://endpoint", "appId");
         Tracker retrievedTracker = Snowplow.getTracker("namespace");
 
         assertFalse(Snowplow.getInstancedTrackerNamespaces().isEmpty());
@@ -44,8 +44,8 @@ public class SnowplowTest {
     @Test
     public void preventsDuplicateNamespaces() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            Snowplow.createTracker("http://endpoint", "namespace", "appId");
-            Snowplow.createTracker("http://endpoint2", "namespace", "appId2");
+            Snowplow.createTracker("namespace", "http://endpoint", "appId");
+            Snowplow.createTracker("namespace", "http://collector", "appId2");
         });
 
         assertEquals("Tracker with this namespace already exists.", exception.getMessage());
@@ -53,11 +53,11 @@ public class SnowplowTest {
 
     @Test
     public void deletesStoredTracker() {
-        Snowplow.createTracker("http://endpoint", "namespace", "appId");
+        Snowplow.createTracker("namespace", "http://endpoint", "appId");
         boolean result = Snowplow.removeTracker("namespace");
         assertTrue(result);
 
-        Tracker tracker = Snowplow.createTracker("http://endpoint", "namespace2", "appId");
+        Tracker tracker = Snowplow.createTracker("namespace2", "http://endpoint", "appId");
         boolean result2 = Snowplow.removeTracker(tracker);
         assertTrue(result2);
     }
@@ -78,10 +78,10 @@ public class SnowplowTest {
     public void setsDefaultTrackerFromObject() {
         assertNull(Snowplow.getDefaultTracker());
 
-        Tracker tracker = Snowplow.createTracker("http://endpoint", "namespace", "appId");
+        Tracker tracker = Snowplow.createTracker("namespace", "http://endpoint", "appId");
         assertEquals(tracker, Snowplow.getDefaultTracker());
 
-        Tracker tracker2 = Snowplow.createTracker("http://endpoint", "namespace2", "appId");
+        Tracker tracker2 = Snowplow.createTracker("namespace2", "http://endpoint", "appId");
         // The first tracker is still the default
         assertEquals(tracker, Snowplow.getDefaultTracker());
 
@@ -94,8 +94,8 @@ public class SnowplowTest {
     public void setsDefaultTrackerFromNamespace() {
         assertNull(Snowplow.getDefaultTracker());
 
-        Snowplow.createTracker("http://endpoint", "namespace", "appId");
-        Tracker tracker2 = Snowplow.createTracker("http://endpoint", "namespace2", "appId");
+        Snowplow.createTracker("namespace", "http://endpoint", "appId");
+        Tracker tracker2 = Snowplow.createTracker("namespace2", "http://endpoint", "appId");
 
         boolean result = Snowplow.setDefaultTracker("namespace2");
         assertTrue(result);
