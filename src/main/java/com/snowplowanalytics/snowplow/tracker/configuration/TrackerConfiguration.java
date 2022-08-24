@@ -35,16 +35,8 @@ public class TrackerConfiguration {
         return platform;
     }
 
-    public void setPlatform(DevicePlatform platform) {
-        this.platform = platform;
-    }
-
     public boolean isBase64Encoded() {
         return base64Encoded;
-    }
-
-    public void setBase64Encoded(boolean base64Encoded) {
-        this.base64Encoded = base64Encoded;
     }
 
     // Constructor

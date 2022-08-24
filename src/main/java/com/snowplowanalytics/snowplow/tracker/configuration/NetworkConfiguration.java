@@ -28,24 +28,12 @@ public class NetworkConfiguration {
         return httpClientAdapter;
     }
 
-    public void setHttpClientAdapter(HttpClientAdapter httpClientAdapter) {
-        this.httpClientAdapter = httpClientAdapter;
-    }
-
     public String getCollectorUrl() {
         return collectorUrl;
     }
 
-    public void setCollectorUrl(String collectorUrl) {
-        this.collectorUrl = collectorUrl;
-    }
-
     public CookieJar getCookieJar() {
         return cookieJar;
-    }
-
-    public void setCookieJar(CookieJar cookieJar) {
-        this.cookieJar = cookieJar;
     }
 
     // Constructor

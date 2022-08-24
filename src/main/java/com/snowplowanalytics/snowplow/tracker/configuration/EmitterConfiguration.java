@@ -34,56 +34,28 @@ public class EmitterConfiguration {
         return batchSize;
     }
 
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-    }
-
     public int getBufferCapacity() {
         return bufferCapacity;
-    }
-
-    public void setBufferCapacity(int bufferCapacity) {
-        this.bufferCapacity = bufferCapacity;
     }
 
     public EventStore getEventStore() {
         return eventStore;
     }
 
-    public void setEventStore(EventStore eventStore) {
-        this.eventStore = eventStore;
-    }
-
     public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
         return customRetryForStatusCodes;
-    }
-
-    public void setCustomRetryForStatusCodes(Map<Integer, Boolean> customRetryForStatusCodes) {
-        this.customRetryForStatusCodes = customRetryForStatusCodes;
     }
 
     public int getThreadCount() {
         return threadCount;
     }
 
-    public void setThreadCount(int threadCount) {
-        this.threadCount = threadCount;
-    }
-
     public ScheduledExecutorService getRequestExecutorService() {
         return requestExecutorService;
     }
 
-    public void setRequestExecutorService(ScheduledExecutorService requestExecutorService) {
-        this.requestExecutorService = requestExecutorService;
-    }
-
     public EmitterCallback getCallback() {
         return callback;
-    }
-
-    public void setCallback(EmitterCallback callback) {
-        this.callback = callback;
     }
 
     // Constructor
