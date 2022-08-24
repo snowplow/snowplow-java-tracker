@@ -93,10 +93,8 @@ public class BatchEmitterTest {
     @Before
     public void setUp() {
         mockHttpClientAdapter = new MockHttpClientAdapter(200);
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(mockHttpClientAdapter)
-                .batchSize(10)
-                .build();
+        EmitterConfiguration emitterConfig = new EmitterConfiguration().batchSize(10);
+        emitter = new BatchEmitter(new NetworkConfiguration(mockHttpClientAdapter), emitterConfig);
     }
 
     @Test
@@ -129,11 +127,9 @@ public class BatchEmitterTest {
 
     @Test
     public void addToBuffer_doesNotAddEventIfBufferFull() {
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(mockHttpClientAdapter)
-                .bufferCapacity(1)
-                .build();
-
+        emitter = new BatchEmitter(
+                new NetworkConfiguration(mockHttpClientAdapter),
+                new EmitterConfiguration().bufferCapacity(1));
         emitter.add(createPayload());
 
         TrackerPayload differentPayload = createPayload();
@@ -213,7 +209,7 @@ public class BatchEmitterTest {
             threadNames.add(thread.getName());
         }
 
-        // Because the threadpools are named by a static ThreadFactory,
+        // Because the thread pools are named by a static ThreadFactory,
         // the pool number varies if this test is run in isolation or not
         boolean matchResult = false;
         for (String name : threadNames) {
@@ -260,10 +256,9 @@ public class BatchEmitterTest {
 
     @Test
     public void eventsThatFailToSendAreReturnedToEventBuffer() throws InterruptedException {
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(new FlakyHttpClientAdapter())
-                .batchSize(10)
-                .build();
+        emitter = new BatchEmitter(
+                new NetworkConfiguration(new FlakyHttpClientAdapter()),
+                new EmitterConfiguration().batchSize(10));
 
         List<TrackerPayload> payloads = createPayloads(2);
         for (TrackerPayload payload : payloads) {
@@ -281,10 +276,9 @@ public class BatchEmitterTest {
 
     @Test
     public void eventSendingFailureIncreasesBackoffTime() throws InterruptedException {
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(new MockHttpClientAdapter(500))
-                .batchSize(1)
-                .build();
+        emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(500)),
+                new EmitterConfiguration().batchSize(1));
 
         emitter.add(createPayload());
         Thread.sleep(500);
@@ -304,11 +298,9 @@ public class BatchEmitterTest {
         // the FlakyHttpClientAdapter returns 500 for the first 4 requests
         // then subsequently returns 200
         FlakyHttpClientAdapter flakyHttpClientAdapter = new FlakyHttpClientAdapter();
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(flakyHttpClientAdapter)
-                .batchSize(1)
-                .threadCount(1)
-                .build();
+        emitter = new BatchEmitter(
+                new NetworkConfiguration(flakyHttpClientAdapter),
+                new EmitterConfiguration().batchSize(1).threadCount(1));
 
         List<TrackerPayload> payloads = createPayloads(6);
         for (TrackerPayload payload : payloads) {
@@ -327,11 +319,9 @@ public class BatchEmitterTest {
         customRetry.put(403, true);
 
         // by default 403 isn't retried
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(new MockHttpClientAdapter(403))
-                .customRetryForStatusCodes(customRetry)
-                .batchSize(2)
-                .build();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(403)),
+                new EmitterConfiguration().batchSize(2).customRetryForStatusCodes(customRetry));
 
         List<TrackerPayload> payloads = createPayloads(4);
         for (TrackerPayload payload : payloads) {
@@ -349,11 +339,9 @@ public class BatchEmitterTest {
         customRetry.put(500, false);
 
         // by default, requests with code 500 are retried
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(new MockHttpClientAdapter(500))
-                .customRetryForStatusCodes(customRetry)
-                .batchSize(2)
-                .build();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(500)),
+                new EmitterConfiguration().batchSize(2).customRetryForStatusCodes(customRetry));
 
         List<TrackerPayload> payloads = createPayloads(4);
         for (TrackerPayload payload : payloads) {
@@ -381,14 +369,12 @@ public class BatchEmitterTest {
             public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
                 failureTypes.add(failureType);
             }
-        };
+        }
 
         TestCallback callback = new TestCallback();
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(new MockHttpClientAdapter(200))
-                .batchSize(1)
-                .callback(callback)
-                .build();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(200)),
+                new EmitterConfiguration().batchSize(1).callback(callback));
 
         TrackerPayload payload = createPayload();
         emitter.add(payload);
@@ -415,14 +401,12 @@ public class BatchEmitterTest {
                 this.willRetry = willRetry;
                 this.payloads = payloads;
             }
-        };
+        }
 
         TestCallback callback = new TestCallback();
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(new MockHttpClientAdapter(500))
-                .batchSize(1)
-                .callback(callback)
-                .build();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(500)),
+                new EmitterConfiguration().batchSize(1).callback(callback));
 
         TrackerPayload payload = createPayload();
         emitter.add(payload);
@@ -450,14 +434,12 @@ public class BatchEmitterTest {
                 this.willRetry = willRetry;
                 this.payloads = payloads;
             }
-        };
+        }
 
         TestCallback callback = new TestCallback();
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(new MockHttpClientAdapter(403))
-                .batchSize(1)
-                .callback(callback)
-                .build();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(403)),
+                new EmitterConfiguration().batchSize(1).callback(callback));
 
         TrackerPayload payload = createPayload();
         emitter.add(payload);
@@ -486,14 +468,12 @@ public class BatchEmitterTest {
                 this.willRetry = willRetry;
                 this.payloads = payloads;
             }
-        };
+        }
 
         TestCallback callback = new TestCallback();
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(mockHttpClientAdapter)
-                .bufferCapacity(1)
-                .callback(callback)
-                .build();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(200)),
+                new EmitterConfiguration().bufferCapacity(1).callback(callback));
 
         emitter.add(createPayload());
         TrackerPayload payload = createPayload();
@@ -523,14 +503,12 @@ public class BatchEmitterTest {
                 this.willRetry = willRetry;
                 this.payloads = payloads;
             }
-        };
+        }
 
         TestCallback callback = new TestCallback();
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(new MockHttpClientAdapter(-1))
-                .bufferCapacity(1)
-                .callback(callback)
-                .build();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(-1)),
+                new EmitterConfiguration().bufferCapacity(1).callback(callback));
 
         TrackerPayload payload = createPayload();
         emitter.add(payload);
@@ -560,14 +538,12 @@ public class BatchEmitterTest {
                 this.willRetry = willRetry;
                 this.payloads = payloads;
             }
-        };
+        }
 
         TestCallback callback = new TestCallback();
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(new MockHttpClientAdapter(500))
-                .bufferCapacity(2)
-                .callback(callback)
-                .build();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(500)),
+                new EmitterConfiguration().bufferCapacity(2).callback(callback));
 
         TrackerPayload payload1 = createPayload();
         TrackerPayload payload2 = createPayload();

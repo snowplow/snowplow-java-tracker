@@ -50,10 +50,7 @@ public class HttpClientAdapterTest {
                 {new HttpClientAdapterProvider() {
                     @Override
                     public HttpClientAdapter provide(String url) {
-                        return ApacheHttpClientAdapter.builder()
-                                .url(url)
-                                .httpClient(HttpClients.createDefault())
-                                .build();
+                        return new ApacheHttpClientAdapter(url, HttpClients.createDefault());
                     }
                 }},
                 {new HttpClientAdapterProvider() {
@@ -64,10 +61,7 @@ public class HttpClientAdapterTest {
                             .readTimeout(1, TimeUnit.SECONDS)
                             .writeTimeout(1, TimeUnit.SECONDS)
                             .build();
-                        return OkHttpClientAdapter.builder()
-                                .url(url)
-                                .httpClient(httpClient)
-                                .build();
+                        return new OkHttpClientAdapter(url, httpClient);
                     }
                 }
             }
@@ -138,10 +132,7 @@ public class HttpClientAdapterTest {
                 .writeTimeout(1, TimeUnit.SECONDS)
                 .cookieJar(new CollectorCookieJar())
                 .build();
-        adapter = OkHttpClientAdapter.builder()
-                .url(mockWebServer.url("/").toString())
-                .httpClient(httpClient)
-                .build();
+        adapter = new OkHttpClientAdapter(mockWebServer.url("/").toString(), httpClient);
 
         mockWebServer.enqueue(new MockResponse().addHeader("Set-Cookie", "sp=test"));
 

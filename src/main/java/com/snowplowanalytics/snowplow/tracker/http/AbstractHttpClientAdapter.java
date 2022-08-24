@@ -24,6 +24,14 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
 
     protected final String url;
 
+    public AbstractHttpClientAdapter(String url) {
+        this.url = url.replaceFirst("/*$", "");
+    }
+
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param <T>
+     */
     public static abstract class Builder<T extends Builder<T>> {
 
         private String url; // Required
@@ -48,10 +56,18 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
         }
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @return Builder object
+     */
     public static Builder<?> builder() {
         return new Builder2();
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param builder Builder object
+     */
     protected AbstractHttpClientAdapter(Builder<?> builder) {
         // Precondition checks
         if (!Utils.isValidUrl(builder.url)) {

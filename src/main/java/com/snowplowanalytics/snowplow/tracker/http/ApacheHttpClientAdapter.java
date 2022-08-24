@@ -35,6 +35,19 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApacheHttpClientAdapter.class);
     private CloseableHttpClient httpClient;
 
+    public ApacheHttpClientAdapter(String url, CloseableHttpClient httpClient) {
+        super(url);
+
+        // Precondition checks
+        Objects.requireNonNull(httpClient);
+
+        this.httpClient = httpClient;
+    }
+
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param <T>
+     */
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
         private CloseableHttpClient httpClient; // Required
@@ -60,10 +73,18 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
         }
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @return Builder object
+     */
     public static Builder<?> builder() {
         return new Builder2();
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param builder Builder object
+     */
     protected ApacheHttpClientAdapter(Builder<?> builder) {
         super(builder);
 
