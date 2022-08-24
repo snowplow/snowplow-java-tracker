@@ -18,6 +18,11 @@ import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import org.junit.After;
 import org.junit.Test;
 
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import static org.junit.Assert.*;
 
 public class SnowplowTest {
@@ -29,12 +34,12 @@ public class SnowplowTest {
 
     @Test
     public void createsAndRetrievesATracker() {
-        assertTrue(Snowplow.getTrackers().isEmpty());
+        assertTrue(Snowplow.getInstancedTrackerNamespaces().isEmpty());
 
         Tracker tracker = Snowplow.createTracker("http://endpoint", "namespace", "appId");
         Tracker retrievedTracker = Snowplow.getTracker("namespace");
 
-        assertFalse(Snowplow.getTrackers().isEmpty());
+        assertFalse(Snowplow.getInstancedTrackerNamespaces().isEmpty());
         assertEquals(tracker, retrievedTracker);
         assertEquals("namespace", tracker.getNamespace());
         assertEquals("appId", tracker.getAppId());
@@ -87,6 +92,7 @@ public class SnowplowTest {
 
         Snowplow.setDefaultTracker(tracker2);
         assertEquals(tracker2, Snowplow.getDefaultTracker());
+        assertEquals(2, Snowplow.getInstancedTrackerNamespaces().size());
     }
 
     @Test
@@ -109,7 +115,7 @@ public class SnowplowTest {
         Snowplow.registerTracker(tracker);
 
         assertEquals(tracker, Snowplow.getDefaultTracker());
-        assertEquals(1, Snowplow.getTrackers().size());
+        assertEquals(1, Snowplow.getInstancedTrackerNamespaces().size());
     }
 
     @Test
@@ -119,7 +125,7 @@ public class SnowplowTest {
 
         Snowplow.setDefaultTracker(tracker);
 
-        assertEquals(1, Snowplow.getTrackers().size());
+        assertEquals(1, Snowplow.getInstancedTrackerNamespaces().size());
         assertEquals("new_tracker", Snowplow.getDefaultTracker().getNamespace());
     }
 
@@ -133,7 +139,7 @@ public class SnowplowTest {
         Tracker tracker = Snowplow.createTracker(trackerConfig, networkConfig);
         Tracker retrievedTracker = Snowplow.getTracker("namespace");
 
-        assertFalse(Snowplow.getTrackers().isEmpty());
+        assertFalse(Snowplow.getInstancedTrackerNamespaces().isEmpty());
         assertEquals(tracker, retrievedTracker);
         assertEquals("namespace", tracker.getNamespace());
         assertEquals("appId", tracker.getAppId());

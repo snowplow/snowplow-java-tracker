@@ -20,6 +20,7 @@ import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Snowplow {
 
@@ -27,10 +28,10 @@ public class Snowplow {
     private static Tracker defaultTracker;
 
     /**
-     * @return the stored Trackers (the key is the tracker namespace)
+     * @return the stored tracker namespaces
      */
-    public static Map<String, Tracker> getTrackers() {
-        return trackers;
+    public static Set<String> getInstancedTrackerNamespaces() {
+        return trackers.keySet();
     }
 
     /**
