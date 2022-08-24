@@ -71,17 +71,6 @@ public class Tracker {
     }
 
     /**
-     * Creates a new Snowplow Tracker.
-     *
-     * @param namespace unique tracker namespace
-     * @param appId application ID
-     * @param emitter an Emitter
-     */
-    public Tracker(String namespace, String appId, Emitter emitter) {
-        this(new TrackerConfiguration(namespace, appId), emitter);
-    }
-
-    /**
      * Builder for the Tracker
      * @deprecated Use TrackerConfiguration class instead
      */

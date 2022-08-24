@@ -102,7 +102,7 @@ public class TrackerTest {
             public List<TrackerPayload> getBuffer() { return null; }
         }
         FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
-        tracker = new Tracker("AF003", "cloudfront", failingMockEmitter);
+        tracker = new Tracker(new TrackerConfiguration("AF003", "cloudfront"), failingMockEmitter);
 
         List<String> result = tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
@@ -572,7 +572,7 @@ public class TrackerTest {
 
     @Test
     public void testGetTrackerVersion() {
-        Tracker tracker = new Tracker("namespace", "an-app-id", mockEmitter);
+        Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "an-app-id"), mockEmitter);
         assertEquals("java-0.12.2", tracker.getTrackerVersion());
     }
 
