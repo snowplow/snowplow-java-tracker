@@ -64,7 +64,7 @@ public class BatchEmitter implements Emitter, Closeable {
 
     /**
      * @deprecated Use EmitterConfiguration class instead
-     * @param <T>
+     * @param <T> Builder
      */
     public static abstract class Builder<T extends Builder<T>> {
         protected abstract T self();

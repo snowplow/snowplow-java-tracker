@@ -46,7 +46,7 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
 
     /**
      * @deprecated Create HttpClientAdapter directly instead
-     * @param <T>
+     * @param <T> Builder
      */
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
