@@ -75,21 +75,6 @@ public class Snowplow {
     }
 
     /**
-     * Create a Snowplow tracker with default configuration by providing three parameters.
-     *
-     * @param collectorUrl collector endpoint
-     * @param namespace unique identifier for the Tracker instance
-     * @param appId application ID
-     * @return the created Tracker
-     */
-    public static Tracker createTracker(String collectorUrl, String namespace, String appId) {
-        BatchEmitter emitter = BatchEmitter.builder().url(collectorUrl).build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId).build();
-        registerTracker(tracker);
-        return tracker;
-    }
-
-    /**
      * Create a Snowplow tracker using Configuration objects.
      *
      * @param trackerConfig a TrackerConfiguration
@@ -107,6 +92,21 @@ public class Snowplow {
         Tracker tracker =  new Tracker(trackerConfig, emitter, subject);
         registerTracker(tracker);
         return tracker;
+    }
+
+    /**
+     * Create a Snowplow tracker with default configuration by providing three parameters.
+     *
+     * @param collectorUrl collector endpoint
+     * @param namespace unique identifier for the Tracker instance
+     * @param appId application ID
+     * @return the created Tracker
+     */
+    public static Tracker createTracker(String collectorUrl, String namespace, String appId) {
+        TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId);
+        NetworkConfiguration networkConfig = new NetworkConfiguration(collectorUrl);
+
+        return createTracker(trackerConfig, networkConfig, new EmitterConfiguration(), new SubjectConfiguration());
     }
 
     /**

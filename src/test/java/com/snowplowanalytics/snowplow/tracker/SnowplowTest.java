@@ -18,11 +18,6 @@ import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import org.junit.After;
 import org.junit.Test;
 
-import java.sql.Array;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import static org.junit.Assert.*;
 
 public class SnowplowTest {
