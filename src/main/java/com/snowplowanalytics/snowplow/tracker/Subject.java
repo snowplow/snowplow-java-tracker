@@ -53,15 +53,20 @@ public class Subject {
      * @param subject The subject from which the map is copied.
      */
     public Subject(Subject subject){
-      this.standardPairs.putAll(subject.getSubject());
+        standardPairs.putAll(subject.getSubject());
     }
 
+    /**
+     * @deprecated Use SubjectConfiguration class instead
+     * @return a SubjectBuilder object
+     */
     public static SubjectBuilder builder() {
         return new SubjectBuilder();
     }
 
     /**
      * Builder for the Subject
+     * @deprecated Use SubjectConfiguration class instead
      */
     public static class SubjectBuilder {
 

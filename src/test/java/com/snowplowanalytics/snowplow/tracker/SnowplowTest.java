@@ -64,8 +64,8 @@ public class SnowplowTest {
 
     @Test
     public void doesNotDeleteUnregisteredTracker() {
-        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("http://collector"));
+        Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "appId"), emitter);
 
         boolean result = Snowplow.removeTracker(tracker);
         assertFalse(result);
@@ -104,8 +104,8 @@ public class SnowplowTest {
 
     @Test
     public void registersATrackerMadeWithoutSnowplowClass() {
-        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("http://collector"));
+        Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "appId"), emitter);
 
         Snowplow.registerTracker(tracker);
 
@@ -115,8 +115,8 @@ public class SnowplowTest {
 
     @Test
     public void settingNewDefaultTrackerRegistersIt() {
-        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "new_tracker", "appId").build();
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("http://collector"));
+        Tracker tracker = new Tracker(new TrackerConfiguration("new_tracker", "appId"), emitter);
 
         Snowplow.setDefaultTracker(tracker);
 

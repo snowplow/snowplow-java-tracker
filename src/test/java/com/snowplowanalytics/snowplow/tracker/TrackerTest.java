@@ -16,6 +16,7 @@ import java.util.*;
 import static java.util.Collections.singletonList;
 
 import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import org.junit.Before;
@@ -56,10 +57,8 @@ public class TrackerTest {
     @Before
     public void setUp() {
         mockEmitter = new MockEmitter();
-        tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
-                .subject(Subject.builder().build())
-                .base64(false)
-                .build();
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("AF003", "cloudfront").base64Encoded(false);
+        tracker = new Tracker(trackerConfig, mockEmitter, new Subject(new SubjectConfiguration()));
         tracker.getSubject().setTimezone("Etc/UTC");
         contexts = singletonList(new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar")));
     }
@@ -103,7 +102,7 @@ public class TrackerTest {
             public List<TrackerPayload> getBuffer() { return null; }
         }
         FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
-        tracker = Tracker.builder(failingMockEmitter, "AF003", "cloudfront").build();
+        tracker = new Tracker("AF003", "cloudfront", failingMockEmitter);
 
         List<String> result = tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
@@ -324,12 +323,6 @@ public class TrackerTest {
 
     @Test
     public void testTrackPageView() throws InterruptedException {
-        tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
-                .subject(Subject.builder().build())
-                .base64(false)
-                .build();
-        tracker.getSubject().setTimezone("Etc/UTC");
-
         // When
         tracker.track(PageView.builder()
                 .pageUrl("url")
@@ -527,7 +520,7 @@ public class TrackerTest {
     @Test
     public void testTrackTimingWithSubject() throws InterruptedException {
         // Make Subject
-        Subject s1 = Subject.builder().build();
+        Subject s1 = new Subject(new SubjectConfiguration());
         s1.setIpAddress("127.0.0.1");
         s1.setTimezone("Etc/UTC");
 
@@ -569,7 +562,8 @@ public class TrackerTest {
         TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
         trackerConfig.base64Encoded(false);
         trackerConfig.platform(DevicePlatform.General);
-        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
+
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("http://collector"));
         Tracker tracker = new Tracker(trackerConfig, emitter);
 
         assertEquals("namespace", tracker.getNamespace());
@@ -578,15 +572,16 @@ public class TrackerTest {
 
     @Test
     public void testGetTrackerVersion() {
-        Tracker tracker = Tracker.builder(mockEmitter, "namespace", "an-app-id").build();
+        Tracker tracker = new Tracker("namespace", "an-app-id", mockEmitter);
         assertEquals("java-0.12.2", tracker.getTrackerVersion());
     }
 
     @Test
     public void testSetDefaultPlatform() {
-        Tracker tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
-                .platform(DevicePlatform.Desktop)
-                .build();
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("AF003", "cloudfront")
+                .platform(DevicePlatform.Desktop);
+
+        Tracker tracker = new Tracker(trackerConfig, mockEmitter);
         assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
     }
 
@@ -595,13 +590,11 @@ public class TrackerTest {
         // Subject objects always have timezone set
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
 
-        Subject s1 = Subject.builder().build();
+        Subject s1 = new Subject(new SubjectConfiguration());
         s1.setLanguage("EN");
-        Tracker tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
-                .subject(s1)
-                .build();
+        Tracker tracker = new Tracker(new TrackerConfiguration("AF003", "cloudfront"), mockEmitter, s1);
 
-        Subject s2 = Subject.builder().build();
+        Subject s2 = new Subject(new SubjectConfiguration());
         s2.setColorDepth(24);
         tracker.setSubject(s2);
 
@@ -614,21 +607,22 @@ public class TrackerTest {
 
     @Test
     public void testSetBase64Encoded() {
-        Tracker tracker = Tracker.builder(mockEmitter, "AF003", "cloudfront")
-                .base64(false)
-                .build();
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("AF003", "cloudfront").base64Encoded(false);
+        tracker = new Tracker(trackerConfig, mockEmitter);
+
         assertFalse(tracker.getBase64Encoded());
     }
 
     @Test
     public void testSetAppId() {
-        Tracker tracker = Tracker.builder(mockEmitter, "AF003", "an-app-id").build();
+        Tracker tracker = new Tracker(new TrackerConfiguration("AF003", "an-app-id"), mockEmitter);
         assertEquals("an-app-id", tracker.getAppId());
     }
 
     @Test
     public void testSetNamespace() {
-        Tracker tracker = Tracker.builder(mockEmitter, "namespace", "an-app-id").build();
+        Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "an-app-id"), mockEmitter);
+
         assertEquals("namespace", tracker.getNamespace());
     }
 }
