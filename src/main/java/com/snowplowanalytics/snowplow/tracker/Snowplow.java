@@ -102,11 +102,11 @@ public class Snowplow {
      * Create a Snowplow tracker with default configuration by providing three parameters.
      *
      * @param namespace unique identifier for the Tracker instance
-     * @param collectorUrl collector endpoint
      * @param appId application ID
+     * @param collectorUrl collector endpoint
      * @return the created Tracker
      */
-    public static Tracker createTracker(String namespace, String collectorUrl, String appId) {
+    public static Tracker createTracker(String namespace, String appId, String collectorUrl) {
         TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId);
         NetworkConfiguration networkConfig = new NetworkConfiguration(collectorUrl);
 
