@@ -63,7 +63,7 @@ public class BatchEmitter implements Emitter, Closeable {
     private final EmitterCallback callback;
 
     /**
-     * @deprecated Use EmitterConfiguration class instead
+     * @deprecated Use NetworkConfiguration/EmitterConfiguration classes instead
      * @param <T> Builder
      */
     public static abstract class Builder<T extends Builder<T>> {
@@ -224,7 +224,7 @@ public class BatchEmitter implements Emitter, Closeable {
     }
 
     /**
-     * @deprecated Use EmitterConfiguration class instead
+     * @deprecated Use NetworkConfiguration/EmitterConfiguration classes instead
      * @return Builder object
      */
     public static Builder<?> builder() {
