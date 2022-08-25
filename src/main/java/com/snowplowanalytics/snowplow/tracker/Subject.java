@@ -49,6 +49,13 @@ public class Subject {
     }
 
     /**
+     * Creates a Subject instance with default configuration (only the timezone is set).
+     */
+    public Subject() {
+        this(new SubjectConfiguration());
+    }
+
+    /**
      * Creates a new {@link Subject} object based on the map of another {@link Subject} object.
      * @param subject The subject from which the map is copied.
      */

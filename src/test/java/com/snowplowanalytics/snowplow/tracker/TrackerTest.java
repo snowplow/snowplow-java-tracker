@@ -58,7 +58,7 @@ public class TrackerTest {
     public void setUp() {
         mockEmitter = new MockEmitter();
         TrackerConfiguration trackerConfig = new TrackerConfiguration("AF003", "cloudfront").base64Encoded(false);
-        tracker = new Tracker(trackerConfig, mockEmitter, new Subject(new SubjectConfiguration()));
+        tracker = new Tracker(trackerConfig, mockEmitter, new Subject());
         tracker.getSubject().setTimezone("Etc/UTC");
         contexts = singletonList(new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar")));
     }
@@ -520,7 +520,7 @@ public class TrackerTest {
     @Test
     public void testTrackTimingWithSubject() throws InterruptedException {
         // Make Subject
-        Subject s1 = new Subject(new SubjectConfiguration());
+        Subject s1 = new Subject();
         s1.setIpAddress("127.0.0.1");
         s1.setTimezone("Etc/UTC");
 
@@ -590,11 +590,11 @@ public class TrackerTest {
         // Subject objects always have timezone set
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
 
-        Subject s1 = new Subject(new SubjectConfiguration());
+        Subject s1 = new Subject();
         s1.setLanguage("EN");
         Tracker tracker = new Tracker(new TrackerConfiguration("AF003", "cloudfront"), mockEmitter, s1);
 
-        Subject s2 = new Subject(new SubjectConfiguration());
+        Subject s2 = new Subject();
         s2.setColorDepth(24);
         tracker.setSubject(s2);
 

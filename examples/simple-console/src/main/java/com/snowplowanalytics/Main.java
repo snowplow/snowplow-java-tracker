@@ -64,7 +64,7 @@ public class Main {
                 Collections.singletonMap("foo", "bar")));
 
         // This is an example of a eventSubject for adding user data
-        Subject eventSubject = new Subject(new SubjectConfiguration());
+        Subject eventSubject = new Subject();
         eventSubject.setUserId("example@snowplowanalytics.com");
         eventSubject.setLanguage("EN");
 
