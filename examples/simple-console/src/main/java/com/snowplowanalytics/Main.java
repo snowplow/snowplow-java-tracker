@@ -77,6 +77,7 @@ public class Main {
             .subject(eventSubject)
             .build();
         
+        // EcommerceTransactions will be deprecated soon: we advise using SelfDescribing events instead
         // EcommerceTransactionItems are tracked as part of an EcommerceTransaction event
         // They are processed into separate events during the `track()` call
         EcommerceTransactionItem item = EcommerceTransactionItem.builder()
@@ -151,8 +152,7 @@ public class Main {
         tracker.track(structured);
 
         // Will close all threads and force send remaining events
-        BatchEmitter emitter = (BatchEmitter) tracker.getEmitter();
-        emitter.close();
+        tracker.close();
         Thread.sleep(5000);
 
         System.out.println("Tracked 7 events");

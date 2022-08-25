@@ -47,6 +47,8 @@ public class TrackerTest {
         public int getBatchSize() { return 0; }
         @Override
         public List<TrackerPayload> getBuffer() { return null; }
+        @Override
+        public void close() {}
     }
 
     MockEmitter mockEmitter;
@@ -99,6 +101,8 @@ public class TrackerTest {
             public int getBatchSize() { return 0; }
             @Override
             public List<TrackerPayload> getBuffer() { return null; }
+            @Override
+            public void close() {}
         }
         FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
         tracker = new Tracker(new TrackerConfiguration("AF003", "cloudfront"), failingMockEmitter);
