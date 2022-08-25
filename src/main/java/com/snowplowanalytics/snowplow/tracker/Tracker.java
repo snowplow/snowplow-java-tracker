@@ -37,17 +37,6 @@ public class Tracker {
      *
      * @param trackerConfig a TrackerConfiguration object
      * @param emitter an Emitter
-     *
-     */
-    public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
-        this(trackerConfig, emitter, null);
-    }
-
-    /**
-     * Creates a new Snowplow Tracker.
-     *
-     * @param trackerConfig a TrackerConfiguration object
-     * @param emitter an Emitter
      * @param subject a Subject
      *
      */
@@ -71,8 +60,21 @@ public class Tracker {
     }
 
     /**
-     * Builder for the Tracker
+     * Creates a new Snowplow Tracker.
+     *
+     * @param trackerConfig a TrackerConfiguration object
+     * @param emitter an Emitter
+     *
      */
+    public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
+        this(trackerConfig, emitter, null);
+    }
+
+    /**
+     * Builder for the Tracker
+     * @deprecated Use TrackerConfiguration class instead
+     */
+    @Deprecated
     public static class TrackerBuilder {
 
         private final Emitter emitter; // Required
@@ -137,6 +139,14 @@ public class Tracker {
         }
     }
 
+    /**
+     * @deprecated Use TrackerConfiguration class instead
+     * @param emitter Emitter object
+     * @param namespace unique tracker namespace
+     * @param appId application ID
+     * @return TrackerBuilder object
+     */
+    @Deprecated
     public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
         return new TrackerBuilder(emitter, namespace, appId);
     }

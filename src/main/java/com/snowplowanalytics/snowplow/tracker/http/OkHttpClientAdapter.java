@@ -36,6 +36,20 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
     private final MediaType JSON = MediaType.get(Constants.POST_CONTENT_TYPE);
     private OkHttpClient httpClient;
 
+    public OkHttpClientAdapter(String url, OkHttpClient httpClient) {
+        super(url);
+
+        // Precondition checks
+        Objects.requireNonNull(httpClient);
+
+        this.httpClient = httpClient;
+    }
+
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param <T> Builder
+     */
+    @Deprecated
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
         private OkHttpClient httpClient; // Required
@@ -61,10 +75,20 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         }
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @return Builder object
+     */
+    @Deprecated
     public static Builder<?> builder() {
         return new Builder2();
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param builder Builder object
+     */
+    @Deprecated
     protected OkHttpClientAdapter(Builder<?> builder) {
         super(builder);
 

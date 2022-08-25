@@ -31,7 +31,7 @@ public class SnowplowTest {
     public void createsAndRetrievesATracker() {
         assertTrue(Snowplow.getInstancedTrackerNamespaces().isEmpty());
 
-        Tracker tracker = Snowplow.createTracker("namespace", "http://endpoint", "appId");
+        Tracker tracker = Snowplow.createTracker("namespace", "appId", "http://endpoint");
         Tracker retrievedTracker = Snowplow.getTracker("namespace");
 
         assertFalse(Snowplow.getInstancedTrackerNamespaces().isEmpty());
@@ -44,8 +44,8 @@ public class SnowplowTest {
     @Test
     public void preventsDuplicateNamespaces() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            Snowplow.createTracker("namespace", "http://endpoint", "appId");
-            Snowplow.createTracker("namespace", "http://collector", "appId2");
+            Snowplow.createTracker("namespace", "appId", "http://endpoint");
+            Snowplow.createTracker("namespace", "appId2", "http://collector");
         });
 
         assertEquals("Tracker with this namespace already exists.", exception.getMessage());
@@ -53,19 +53,19 @@ public class SnowplowTest {
 
     @Test
     public void deletesStoredTracker() {
-        Snowplow.createTracker("namespace", "http://endpoint", "appId");
+        Snowplow.createTracker("namespace", "appId", "http://endpoint");
         boolean result = Snowplow.removeTracker("namespace");
         assertTrue(result);
 
-        Tracker tracker = Snowplow.createTracker("namespace2", "http://endpoint", "appId");
+        Tracker tracker = Snowplow.createTracker("namespace2", "appId", "http://endpoint");
         boolean result2 = Snowplow.removeTracker(tracker);
         assertTrue(result2);
     }
 
     @Test
     public void doesNotDeleteUnregisteredTracker() {
-        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("http://collector"));
+        Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "appId"), emitter);
 
         boolean result = Snowplow.removeTracker(tracker);
         assertFalse(result);
@@ -78,10 +78,10 @@ public class SnowplowTest {
     public void setsDefaultTrackerFromObject() {
         assertNull(Snowplow.getDefaultTracker());
 
-        Tracker tracker = Snowplow.createTracker("namespace", "http://endpoint", "appId");
+        Tracker tracker = Snowplow.createTracker("namespace", "appId", "http://endpoint");
         assertEquals(tracker, Snowplow.getDefaultTracker());
 
-        Tracker tracker2 = Snowplow.createTracker("namespace2", "http://endpoint", "appId");
+        Tracker tracker2 = Snowplow.createTracker("namespace2", "appId", "http://endpoint");
         // The first tracker is still the default
         assertEquals(tracker, Snowplow.getDefaultTracker());
 
@@ -94,8 +94,8 @@ public class SnowplowTest {
     public void setsDefaultTrackerFromNamespace() {
         assertNull(Snowplow.getDefaultTracker());
 
-        Snowplow.createTracker("namespace", "http://endpoint", "appId");
-        Tracker tracker2 = Snowplow.createTracker("namespace2", "http://endpoint", "appId");
+        Snowplow.createTracker("namespace", "appId", "http://endpoint");
+        Tracker tracker2 = Snowplow.createTracker("namespace2", "appId", "http://endpoint");
 
         boolean result = Snowplow.setDefaultTracker("namespace2");
         assertTrue(result);
@@ -104,8 +104,8 @@ public class SnowplowTest {
 
     @Test
     public void registersATrackerMadeWithoutSnowplowClass() {
-        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId").build();
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("http://collector"));
+        Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "appId"), emitter);
 
         Snowplow.registerTracker(tracker);
 
@@ -115,8 +115,8 @@ public class SnowplowTest {
 
     @Test
     public void settingNewDefaultTrackerRegistersIt() {
-        BatchEmitter emitter = BatchEmitter.builder().url("http://collector").build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "new_tracker", "appId").build();
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("http://collector"));
+        Tracker tracker = new Tracker(new TrackerConfiguration("new_tracker", "appId"), emitter);
 
         Snowplow.setDefaultTracker(tracker);
 

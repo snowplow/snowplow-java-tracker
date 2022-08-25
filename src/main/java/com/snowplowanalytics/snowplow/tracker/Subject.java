@@ -49,20 +49,34 @@ public class Subject {
     }
 
     /**
+     * Creates a Subject instance with default configuration (only the timezone is set).
+     */
+    public Subject() {
+        this(new SubjectConfiguration());
+    }
+
+    /**
      * Creates a new {@link Subject} object based on the map of another {@link Subject} object.
      * @param subject The subject from which the map is copied.
      */
     public Subject(Subject subject){
-      this.standardPairs.putAll(subject.getSubject());
+        standardPairs.putAll(subject.getSubject());
     }
 
+    /**
+     * @deprecated Use SubjectConfiguration class instead
+     * @return a SubjectBuilder object
+     */
+    @Deprecated
     public static SubjectBuilder builder() {
         return new SubjectBuilder();
     }
 
     /**
      * Builder for the Subject
+     * @deprecated Use SubjectConfiguration class instead
      */
+    @Deprecated
     public static class SubjectBuilder {
 
         private String userId; // Optional

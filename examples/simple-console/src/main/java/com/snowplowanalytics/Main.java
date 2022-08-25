@@ -13,9 +13,12 @@
 
 package com.snowplowanalytics;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.Snowplow;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -42,17 +45,13 @@ public class Main {
         // the namespace to attach to events
         String namespace = "demo";
 
-        // build an emitter, this is used by the tracker to batch and schedule transmission of events
-        BatchEmitter emitter = BatchEmitter.builder()
-                .url(collectorEndpoint)
-                .batchSize(4) // send batches of 4 events. In production this number should be higher, depending on the size/event volume
-                .build();
+        // The easiest way to build a tracker is with configuration classes
+        TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId);
+        NetworkConfiguration networkConfig = new NetworkConfiguration(collectorEndpoint);
+        EmitterConfiguration emitterConfig = new EmitterConfiguration().batchSize(4); // send batches of 4 events. In production this number should be higher, depending on the size/event volume
 
-        // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
-        final Tracker tracker = Tracker.builder(emitter, namespace, appId)
-            .base64(true)
-            .platform(DevicePlatform.ServerSideApp)
-            .build();
+        // We need a tracker to turn our events into something a Snowplow collector can understand
+        final Tracker tracker = Snowplow.createTracker(trackerConfig, networkConfig, emitterConfig);
 
         System.out.println("Sending events to " + collectorEndpoint);
         System.out.println("Using tracker version " + tracker.getTrackerVersion());
@@ -64,7 +63,7 @@ public class Main {
                 Collections.singletonMap("foo", "bar")));
 
         // This is an example of a eventSubject for adding user data
-        Subject eventSubject = Subject.builder().build();
+        Subject eventSubject = new Subject();
         eventSubject.setUserId("example@snowplowanalytics.com");
         eventSubject.setLanguage("EN");
 
@@ -152,6 +151,7 @@ public class Main {
         tracker.track(structured);
 
         // Will close all threads and force send remaining events
+        BatchEmitter emitter = (BatchEmitter) tracker.getEmitter();
         emitter.close();
         Thread.sleep(5000);
 

@@ -62,6 +62,11 @@ public class BatchEmitter implements Emitter, Closeable {
     private final Map<Integer, Boolean> customRetryForStatusCodes;
     private final EmitterCallback callback;
 
+    /**
+     * @deprecated Use NetworkConfiguration/EmitterConfiguration classes instead
+     * @param <T> Builder
+     */
+    @Deprecated
     public static abstract class Builder<T extends Builder<T>> {
         protected abstract T self();
 
@@ -219,6 +224,11 @@ public class BatchEmitter implements Emitter, Closeable {
         }
     }
 
+    /**
+     * @deprecated Use NetworkConfiguration/EmitterConfiguration classes instead
+     * @return Builder object
+     */
+    @Deprecated
     public static Builder<?> builder() {
         return new Builder2();
     }
