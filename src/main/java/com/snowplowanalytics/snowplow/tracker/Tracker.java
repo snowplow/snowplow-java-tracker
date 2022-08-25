@@ -74,6 +74,7 @@ public class Tracker {
      * Builder for the Tracker
      * @deprecated Use TrackerConfiguration class instead
      */
+    @Deprecated
     public static class TrackerBuilder {
 
         private final Emitter emitter; // Required
@@ -145,6 +146,7 @@ public class Tracker {
      * @param appId application ID
      * @return TrackerBuilder object
      */
+    @Deprecated
     public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
         return new TrackerBuilder(emitter, namespace, appId);
     }

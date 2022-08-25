@@ -60,6 +60,7 @@ public class Subject {
      * @deprecated Use SubjectConfiguration class instead
      * @return a SubjectBuilder object
      */
+    @Deprecated
     public static SubjectBuilder builder() {
         return new SubjectBuilder();
     }
@@ -68,6 +69,7 @@ public class Subject {
      * Builder for the Subject
      * @deprecated Use SubjectConfiguration class instead
      */
+    @Deprecated
     public static class SubjectBuilder {
 
         private String userId; // Optional

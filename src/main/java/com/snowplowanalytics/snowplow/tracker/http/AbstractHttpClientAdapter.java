@@ -32,6 +32,7 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
      * @deprecated Create HttpClientAdapter directly instead
      * @param <T> Builder
      */
+    @Deprecated
     public static abstract class Builder<T extends Builder<T>> {
 
         private String url; // Required
@@ -60,6 +61,7 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
      * @deprecated Create HttpClientAdapter directly instead
      * @return Builder object
      */
+    @Deprecated
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -68,6 +70,7 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
      * @deprecated Create HttpClientAdapter directly instead
      * @param builder Builder object
      */
+    @Deprecated
     protected AbstractHttpClientAdapter(Builder<?> builder) {
         // Precondition checks
         if (!Utils.isValidUrl(builder.url)) {

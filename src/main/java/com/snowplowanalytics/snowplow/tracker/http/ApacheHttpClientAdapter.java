@@ -48,6 +48,7 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
      * @deprecated Create HttpClientAdapter directly instead
      * @param <T> Builder
      */
+    @Deprecated
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
         private CloseableHttpClient httpClient; // Required
@@ -77,6 +78,7 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
      * @deprecated Create HttpClientAdapter directly instead
      * @return Builder object
      */
+    @Deprecated
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -85,6 +87,7 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
      * @deprecated Create HttpClientAdapter directly instead
      * @param builder Builder object
      */
+    @Deprecated
     protected ApacheHttpClientAdapter(Builder<?> builder) {
         super(builder);
 
