@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
@@ -47,6 +48,8 @@ public class TrackerTest {
         public int getBatchSize() { return 0; }
         @Override
         public List<TrackerPayload> getBuffer() { return null; }
+        @Override
+        public void close() {}
     }
 
     MockEmitter mockEmitter;
@@ -99,6 +102,8 @@ public class TrackerTest {
             public int getBatchSize() { return 0; }
             @Override
             public List<TrackerPayload> getBuffer() { return null; }
+            @Override
+            public void close() {}
         }
         FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
         tracker = new Tracker(new TrackerConfiguration("AF003", "cloudfront"), failingMockEmitter);

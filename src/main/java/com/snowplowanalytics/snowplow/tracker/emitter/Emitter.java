@@ -57,4 +57,9 @@ public interface Emitter {
      * @return the buffer events
      */
     List<TrackerPayload> getBuffer();
+
+    /**
+     * Safely shuts down the Emitter.
+     */
+    void close();
 }

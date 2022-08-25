@@ -356,4 +356,14 @@ public class Tracker {
         }
     }
 
+    /**
+     * Attempts to send all remaining events, then shuts down the Emitter so that no more events can be sent.
+     * This method calls the Emitter.close() method. For the default BatchEmitter,
+     * this stops the ScheduledExecutorService and the thread pool (non-daemon threads).
+     * There is no way to restart the Emitter after calling close().
+     */
+    public void close() {
+        emitter.close();
+    }
+
 }
