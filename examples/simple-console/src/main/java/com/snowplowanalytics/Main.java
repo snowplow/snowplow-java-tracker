@@ -18,7 +18,6 @@ import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
-import com.snowplowanalytics.snowplow.tracker.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.events.*;
