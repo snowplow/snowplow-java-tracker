@@ -33,7 +33,7 @@ public enum FailureType {
     TRACKER_STORAGE_FULL,
 
     /**
-     * An exception or unsuccessful POST request in OkHttpClientAdapter.
+     * An exception or unsuccessful POST request in the HttpClientAdapter.
      */
     HTTP_CONNECTION_FAILURE,
 
