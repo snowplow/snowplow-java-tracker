@@ -1,3 +1,19 @@
+Java 1.0.0 (2022-09-06)
+-----------------------
+Add close() to Emitter interface and Tracker (#357)
+Deprecate Builder classes (#355)
+Reduce the default maximum event buffer capacity (#352)
+Add admin workflow for automatic issue labelling (#346)
+Remove SimpleEmitter (#341)
+Add a Snowplow interface with the ability to initialize and manage multiple trackers (#340)
+Restore Emitter callbacks for success and failure (#339)
+Add a maximum wait time and jitter to event sending retry (#338)
+Set default HTTP status codes not to retry on (#337)
+Add support for storing cookies in OkHttpClientAdapter (#336)
+Remove Guava dependency (#320)
+Standardise API for Tracker and Subject Builders (#302)
+Rename Unstructured events to SelfDescribing (#296)
+
 Java 0.12.2 (2022-06-17)
 -----------------------
 Bump jackson-databind to 2.13.3 (#333)
