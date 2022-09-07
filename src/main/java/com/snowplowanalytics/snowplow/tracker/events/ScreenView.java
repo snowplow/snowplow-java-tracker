@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-import com.google.common.base.Preconditions;
-
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -23,7 +21,7 @@ import java.util.LinkedHashMap;
 /**
  * Constructs a ScreenView event object.
  *
- * When tracked, generates an "unstructured" or "ue" event.
+ * When tracked, generates a SelfDescribing event (event type "ue").
  */
 public class ScreenView extends AbstractEvent {
 
@@ -77,7 +75,9 @@ public class ScreenView extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkArgument(builder.name != null || builder.id != null);
+        if (builder.name == null || builder.id == null) {
+            throw new IllegalArgumentException();
+        }
 
         this.name = builder.name;
         this.id = builder.id;
@@ -85,7 +85,7 @@ public class ScreenView extends AbstractEvent {
 
     /**
      * Return the payload wrapped into a SelfDescribingJson. When a ScreenView is tracked,
-     * the Tracker creates and tracks an Unstructured event from this SelfDescribingJson.
+     * the Tracker creates and tracks an SelfDescribing event from this SelfDescribingJson.
      *
      * @return the payload as a SelfDescribingJson.
      */

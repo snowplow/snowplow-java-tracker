@@ -18,8 +18,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-
 public class InMemoryEventStoreTest {
 
     private TrackerPayload trackerPayload;
@@ -109,7 +107,6 @@ public class InMemoryEventStoreTest {
         eventStore.cleanupAfterSendingAttempt(true, 1L);
         Assert.assertEquals(3, eventStore.size());
         Assert.assertTrue(eventStore.getAllEvents().contains(differentPayload));
-
     }
 
     private TrackerPayload createTrackerPayload() {

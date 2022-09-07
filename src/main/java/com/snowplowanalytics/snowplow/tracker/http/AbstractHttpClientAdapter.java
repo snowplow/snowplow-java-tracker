@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-import com.google.common.base.Preconditions;
-
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.Utils;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -26,6 +24,15 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
 
     protected final String url;
 
+    public AbstractHttpClientAdapter(String url) {
+        this.url = url.replaceFirst("/*$", "");
+    }
+
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param <T> Builder
+     */
+    @Deprecated
     public static abstract class Builder<T extends Builder<T>> {
 
         private String url; // Required
@@ -50,13 +57,25 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
         }
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @return Builder object
+     */
+    @Deprecated
     public static Builder<?> builder() {
         return new Builder2();
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param builder Builder object
+     */
+    @Deprecated
     protected AbstractHttpClientAdapter(Builder<?> builder) {
         // Precondition checks
-        Preconditions.checkArgument(Utils.isValidUrl(builder.url));
+        if (!Utils.isValidUrl(builder.url)) {
+            throw new IllegalArgumentException();
+        }
 
         this.url = builder.url;
     }

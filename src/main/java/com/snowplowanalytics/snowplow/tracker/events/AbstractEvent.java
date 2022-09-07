@@ -16,9 +16,7 @@ package com.snowplowanalytics.snowplow.tracker.events;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-// Google
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.Subject;
@@ -104,7 +102,7 @@ public abstract class AbstractEvent implements Event {
     protected AbstractEvent(Builder<?> builder) {
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.context);
+        Objects.requireNonNull(builder.context);
 
         this.context = builder.context;
         this.trueTimestamp = builder.trueTimestamp;

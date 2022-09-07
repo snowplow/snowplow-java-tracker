@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-import com.google.common.base.Preconditions;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -26,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 
+import java.util.Objects;
+
 /**
  * A HttpClient built using Apache to send events via
  * GET or POST requests.
@@ -35,6 +35,20 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApacheHttpClientAdapter.class);
     private CloseableHttpClient httpClient;
 
+    public ApacheHttpClientAdapter(String url, CloseableHttpClient httpClient) {
+        super(url);
+
+        // Precondition checks
+        Objects.requireNonNull(httpClient);
+
+        this.httpClient = httpClient;
+    }
+
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param <T> Builder
+     */
+    @Deprecated
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
         private CloseableHttpClient httpClient; // Required
@@ -60,15 +74,25 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
         }
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @return Builder object
+     */
+    @Deprecated
     public static Builder<?> builder() {
         return new Builder2();
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param builder Builder object
+     */
+    @Deprecated
     protected ApacheHttpClientAdapter(Builder<?> builder) {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.httpClient);
+        Objects.requireNonNull(builder.httpClient);
 
         this.httpClient = builder.httpClient;
     }

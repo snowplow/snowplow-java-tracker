@@ -12,24 +12,23 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-// Google
-import com.google.common.base.Preconditions;
-
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+import java.util.Objects;
+
 /**
- * Constructs an Unstructured event object.
+ * Constructs a SelfDescribing event object.
  *
  * This is a customisable event type which allows you to track anything describable
  * by a JsonSchema.
  *
- * When tracked, generates an "unstructured" or "ue" event.
+ * When tracked, generates a self-describing event (event type "ue").
  */
-public class Unstructured extends AbstractEvent {
+public class SelfDescribing extends AbstractEvent {
 
     private final SelfDescribingJson eventData;
     private boolean base64Encode;
@@ -50,8 +49,8 @@ public class Unstructured extends AbstractEvent {
             return self();
         }
 
-        public Unstructured build() {
-            return new Unstructured(this);
+        public SelfDescribing build() {
+            return new SelfDescribing(this);
         }
     }
 
@@ -66,11 +65,11 @@ public class Unstructured extends AbstractEvent {
         return new Builder2();
     }
 
-    protected Unstructured(Builder<?> builder) {
+    protected SelfDescribing(Builder<?> builder) {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.eventData);
+        Objects.requireNonNull(builder.eventData);
 
         this.eventData = builder.eventData;
     }
@@ -90,10 +89,10 @@ public class Unstructured extends AbstractEvent {
     public TrackerPayload getPayload() {
         TrackerPayload payload = new TrackerPayload();
         SelfDescribingJson envelope = new SelfDescribingJson(
-                Constants.SCHEMA_UNSTRUCT_EVENT, this.eventData.getMap());
-        payload.add(Parameter.EVENT, Constants.EVENT_UNSTRUCTURED);
+                Constants.SCHEMA_SELF_DESCRIBING_EVENT, this.eventData.getMap());
+        payload.add(Parameter.EVENT, Constants.EVENT_SELF_DESCRIBING);
         payload.addMap(envelope.getMap(), this.base64Encode,
-                Parameter.UNSTRUCTURED_ENCODED, Parameter.UNSTRUCTURED);
+                Parameter.SELF_DESCRIBING_ENCODED, Parameter.SELF_DESCRIBING);
         return putTrueTimestamp(payload);
     }
 }

@@ -14,16 +14,10 @@ package com.snowplowanalytics.snowplow.tracker.http;
 
 // Java
 import java.io.IOException;
-
-// Google
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 // SquareUp
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.MediaType;
-import okhttp3.Response;
-import okhttp3.RequestBody;
+import okhttp3.*;
 
 // Slf4j
 import org.slf4j.Logger;
@@ -42,12 +36,26 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
     private final MediaType JSON = MediaType.get(Constants.POST_CONTENT_TYPE);
     private OkHttpClient httpClient;
 
+    public OkHttpClientAdapter(String url, OkHttpClient httpClient) {
+        super(url);
+
+        // Precondition checks
+        Objects.requireNonNull(httpClient);
+
+        this.httpClient = httpClient;
+    }
+
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param <T> Builder
+     */
+    @Deprecated
     public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
 
         private OkHttpClient httpClient; // Required
 
         /**
-         * @param httpClient The Apache HTTP Client to use
+         * @param httpClient The OkHTTP Client to use
          * @return itself
          */
         public T httpClient(OkHttpClient httpClient) {
@@ -67,17 +75,27 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         }
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @return Builder object
+     */
+    @Deprecated
     public static Builder<?> builder() {
         return new Builder2();
     }
 
+    /**
+     * @deprecated Create HttpClientAdapter directly instead
+     * @param builder Builder object
+     */
+    @Deprecated
     protected OkHttpClientAdapter(Builder<?> builder) {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.httpClient);
+        Objects.requireNonNull(builder.httpClient);
 
-        this.httpClient = builder.httpClient;
+        httpClient = builder.httpClient;
     }
 
     /**

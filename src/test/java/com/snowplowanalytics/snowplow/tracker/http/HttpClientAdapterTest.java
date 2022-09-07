@@ -15,9 +15,8 @@ package com.snowplowanalytics.snowplow.tracker.http;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
-
-import com.google.common.collect.ImmutableMap;
 
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
@@ -51,10 +50,7 @@ public class HttpClientAdapterTest {
                 {new HttpClientAdapterProvider() {
                     @Override
                     public HttpClientAdapter provide(String url) {
-                        return ApacheHttpClientAdapter.builder()
-                                .url(url)
-                                .httpClient(HttpClients.createDefault())
-                                .build();
+                        return new ApacheHttpClientAdapter(url, HttpClients.createDefault());
                     }
                 }},
                 {new HttpClientAdapterProvider() {
@@ -65,10 +61,7 @@ public class HttpClientAdapterTest {
                             .readTimeout(1, TimeUnit.SECONDS)
                             .writeTimeout(1, TimeUnit.SECONDS)
                             .build();
-                        return OkHttpClientAdapter.builder()
-                                .url(url)
-                                .httpClient(httpClient)
-                                .build();
+                        return new OkHttpClientAdapter(url, httpClient);
                     }
                 }
             }
@@ -110,7 +103,7 @@ public class HttpClientAdapterTest {
         mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
         // When
-        adapter.post(new SelfDescribingJson("schema", ImmutableMap.of("foo", "bar")));
+        adapter.post(new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar")));
 
         // Then
         assertEquals(1, mockWebServer.getRequestCount());
@@ -129,5 +122,31 @@ public class HttpClientAdapterTest {
     @Test
     public void testGetWithNullArgument() {
         Assert.assertThrows(NullPointerException.class, () -> adapter.get(null));
+    }
+
+    @Test
+    public void testRequestWithCookies() throws IOException, InterruptedException {
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .connectTimeout(1, TimeUnit.SECONDS)
+                .readTimeout(1, TimeUnit.SECONDS)
+                .writeTimeout(1, TimeUnit.SECONDS)
+                .cookieJar(new CollectorCookieJar())
+                .build();
+        adapter = new OkHttpClientAdapter(mockWebServer.url("/").toString(), httpClient);
+
+        mockWebServer.enqueue(new MockResponse().addHeader("Set-Cookie", "sp=test"));
+
+        SelfDescribingJson payload = new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar"));
+
+        adapter.post(payload);
+        adapter.post(payload);
+
+        assertEquals(2, mockWebServer.getRequestCount());
+        mockWebServer.takeRequest();
+        RecordedRequest recordedRequest2 = mockWebServer.takeRequest();
+
+        assertEquals("sp=test", recordedRequest2.getHeader("Cookie"));
+
+        mockWebServer.shutdown();
     }
 }

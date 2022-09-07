@@ -12,13 +12,12 @@
  */
 package com.snowplowanalytics.snowplow.tracker.events;
 
-// Google
-import com.google.common.base.Preconditions;
-
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+import java.util.Objects;
 
 /**
  * Constructs a Structured event object.
@@ -28,7 +27,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
  * To aid data quality and modeling, agree on business-wide definitions when designing
  * your tracking strategy.
  *
- * We recommend using Unstructured - fully custom - events instead.
+ * We recommend using SelfDescribing - fully custom - events instead.
  *
  * When tracked, generates a "struct" or "se" event.
  *
@@ -124,10 +123,14 @@ public class Structured extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.category);
-        Preconditions.checkNotNull(builder.action);
-        Preconditions.checkArgument(!builder.category.isEmpty(), "category cannot be empty");
-        Preconditions.checkArgument(!builder.action.isEmpty(), "action cannot be empty");
+        Objects.requireNonNull(builder.category);
+        Objects.requireNonNull(builder.action);
+        if (builder.category.isEmpty()) {
+            throw new IllegalArgumentException("category cannot be empty");
+        }
+        if (builder.action.isEmpty()) {
+            throw new IllegalArgumentException("action cannot be empty");
+        }
 
         this.category = builder.category;
         this.action = builder.action;

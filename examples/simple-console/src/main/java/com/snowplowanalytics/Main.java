@@ -13,17 +13,19 @@
 
 package com.snowplowanalytics;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.Snowplow;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.events.*;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
-import java.util.List;
+import java.util.Collections;
 import static java.util.Collections.singletonList;
+import java.util.List;
 
-import com.google.common.collect.ImmutableMap;
 
 public class Main {
 
@@ -42,17 +44,13 @@ public class Main {
         // the namespace to attach to events
         String namespace = "demo";
 
-        // build an emitter, this is used by the tracker to batch and schedule transmission of events
-        BatchEmitter emitter = BatchEmitter.builder()
-                .url(collectorEndpoint)
-                .batchSize(4) // send batches of 4 events. In production this number should be higher, depending on the size/event volume
-                .build();
+        // The easiest way to build a tracker is with configuration classes
+        TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId);
+        NetworkConfiguration networkConfig = new NetworkConfiguration(collectorEndpoint);
+        EmitterConfiguration emitterConfig = new EmitterConfiguration().batchSize(4); // send batches of 4 events. In production this number should be higher, depending on the size/event volume
 
-        // now we have the emitter, we need a tracker to turn our events into something a Snowplow collector can understand
-        final Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
-            .base64(true)
-            .platform(DevicePlatform.ServerSideApp)
-            .build();
+        // We need a tracker to turn our events into something a Snowplow collector can understand
+        final Tracker tracker = Snowplow.createTracker(trackerConfig, networkConfig, emitterConfig);
 
         System.out.println("Sending events to " + collectorEndpoint);
         System.out.println("Using tracker version " + tracker.getTrackerVersion());
@@ -61,10 +59,10 @@ public class Main {
         List<SelfDescribingJson> context = singletonList(
             new SelfDescribingJson(
                 "iglu:com.snowplowanalytics.iglu/anything-c/jsonschema/1-0-0",
-                ImmutableMap.of("foo", "bar")));
+                Collections.singletonMap("foo", "bar")));
 
         // This is an example of a eventSubject for adding user data
-        Subject eventSubject = new Subject.SubjectBuilder().build();
+        Subject eventSubject = new Subject();
         eventSubject.setUserId("example@snowplowanalytics.com");
         eventSubject.setLanguage("EN");
 
@@ -78,6 +76,7 @@ public class Main {
             .subject(eventSubject)
             .build();
         
+        // EcommerceTransactions will be deprecated soon: we advise using SelfDescribing events instead
         // EcommerceTransactionItems are tracked as part of an EcommerceTransaction event
         // They are processed into separate events during the `track()` call
         EcommerceTransactionItem item = EcommerceTransactionItem.builder()
@@ -107,19 +106,17 @@ public class Main {
             .build();
 
 
-        // This is an example of a custom "Unstructured" event based on a schema
-        // Unstructured events are also called "self-describing" events
-        // because of their SelfDescribingJson base
-        Unstructured unstructured = Unstructured.builder()
+        // This is an example of a custom SelfDescribing event based on a schema
+        SelfDescribing selfDescribing = SelfDescribing.builder()
             .eventData(new SelfDescribingJson(
                     "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
-                    ImmutableMap.of("foo", "bar")
+                    Collections.singletonMap("foo", "bar")
             ))
             .customContext(context)
             .build();
 
 
-        // This is an example of a ScreenView event which will be translated into an Unstructured event
+        // This is an example of a ScreenView event which will be translated into a SelfDescribing event
         ScreenView screenView = ScreenView.builder()
             .name("name")
             .id("id")
@@ -127,7 +124,7 @@ public class Main {
             .build();
 
 
-        // This is an example of a Timing event which will be translated into an Unstructured event
+        // This is an example of a Timing event which will be translated into a SelfDescribing event
         Timing timing = Timing.builder()
             .category("category")
             .label("label")
@@ -148,13 +145,13 @@ public class Main {
 
         tracker.track(pageViewEvent); // the .track method schedules the event for delivery to Snowplow
         tracker.track(ecommerceTransaction); // This will track two events
-        tracker.track(unstructured);
+        tracker.track(selfDescribing);
         tracker.track(screenView);
         tracker.track(timing);
         tracker.track(structured);
 
         // Will close all threads and force send remaining events
-        emitter.close();
+        tracker.close();
         Thread.sleep(5000);
 
         System.out.println("Tracked 7 events");

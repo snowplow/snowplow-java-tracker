@@ -16,9 +16,7 @@ package com.snowplowanalytics.snowplow.tracker.events;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-// Google
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 // This library
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
@@ -29,7 +27,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
  * Constructs an EcommerceTransaction event object.
  * <p>
  * <b>Implementation note: </b><em>EcommerceTransaction/EcommerceTransactionItem uses a legacy design.
- * We aim to deprecate it eventually. We advise using Unstructured events instead, and attaching the items
+ * We aim to deprecate it eventually. We advise using SelfDescribing events instead, and attaching the items
  * as entities. </em>
  *
  * The specific items purchased in the transaction must be added as EcommerceTransactionItem objects.
@@ -214,10 +212,12 @@ public class EcommerceTransaction extends AbstractEvent {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.orderId);
-        Preconditions.checkNotNull(builder.totalValue);
-        Preconditions.checkNotNull(builder.items);
-        Preconditions.checkArgument(!builder.orderId.isEmpty(), "orderId cannot be empty");
+        Objects.requireNonNull(builder.orderId);
+        Objects.requireNonNull(builder.totalValue);
+        Objects.requireNonNull(builder.items);
+        if (builder.orderId.isEmpty()) {
+            throw new IllegalArgumentException("orderId cannot be empty");
+        }
 
         this.orderId = builder.orderId;
         this.totalValue = builder.totalValue;

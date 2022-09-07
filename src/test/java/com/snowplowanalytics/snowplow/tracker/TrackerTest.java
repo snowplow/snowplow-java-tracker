@@ -15,11 +15,13 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
+import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
-
-import com.google.common.collect.ImmutableMap;
 
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
@@ -46,6 +48,8 @@ public class TrackerTest {
         public int getBatchSize() { return 0; }
         @Override
         public List<TrackerPayload> getBuffer() { return null; }
+        @Override
+        public void close() {}
     }
 
     MockEmitter mockEmitter;
@@ -55,12 +59,10 @@ public class TrackerTest {
     @Before
     public void setUp() {
         mockEmitter = new MockEmitter();
-        tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
-                .subject(new Subject.SubjectBuilder().build())
-                .base64(false)
-                .build();
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("AF003", "cloudfront").base64Encoded(false);
+        tracker = new Tracker(trackerConfig, mockEmitter, new Subject());
         tracker.getSubject().setTimezone("Etc/UTC");
-        contexts = singletonList(new SelfDescribingJson("schema", ImmutableMap.of("foo", "bar")));
+        contexts = singletonList(new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar")));
     }
 
     // --- Event Tests
@@ -68,10 +70,10 @@ public class TrackerTest {
     @Test
     public void testTrackReturnsEventIdIfSuccessful() throws InterruptedException {
         // a list to allow for eCommerceTransaction
-        List<String> result = tracker.track(Unstructured.builder()
+        List<String> result = tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                        ImmutableMap.of("foo", "bar")
+                        Collections.singletonMap("foo", "bar")
                 ))
                 .build());
 
@@ -100,14 +102,16 @@ public class TrackerTest {
             public int getBatchSize() { return 0; }
             @Override
             public List<TrackerPayload> getBuffer() { return null; }
+            @Override
+            public void close() {}
         }
         FailingMockEmitter failingMockEmitter = new FailingMockEmitter();
-        tracker = new Tracker.TrackerBuilder(failingMockEmitter, "AF003", "cloudfront").build();
+        tracker = new Tracker(new TrackerConfiguration("AF003", "cloudfront"), failingMockEmitter);
 
-        List<String> result = tracker.track(Unstructured.builder()
+        List<String> result = tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                        ImmutableMap.of("foo", "bar")
+                        Collections.singletonMap("foo", "bar")
                 ))
                 .build());
 
@@ -154,46 +158,44 @@ public class TrackerTest {
         assertEquals(2, results.size());
 
         Map<String, String> result1 = results.get(0).getMap();
-        Map<String, String> expected1 = ImmutableMap.<String, String>builder()
-                .put("e", "tr")
-                .put("tr_cu", "currency")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("aid", "cloudfront")
-                .put("tr_sh", "3.0")
-                .put("ttm", "456789")
-                .put("tz", "Etc/UTC")
-                .put("tr_co", "country")
-                .put("tv", Version.TRACKER)
-                .put("p", "srv")
-                .put("tr_tx", "2.0")
-                .put("tr_af", "affiliation")
-                .put("tr_id", "order_id")
-                .put("tr_tt", "1.0")
-                .put("tr_ci", "city")
-                .put("tr_st", "state")
-                .build();
+        Map<String, String> expected1 = new HashMap<>();
+        expected1.put("e", "tr");
+        expected1.put("tr_cu", "currency");
+        expected1.put("co", EXPECTED_CONTEXTS);
+        expected1.put("tna", "AF003");
+        expected1.put("aid", "cloudfront");
+        expected1.put("tr_sh", "3.0");
+        expected1.put("ttm", "456789");
+        expected1.put("tz", "Etc/UTC");
+        expected1.put("tr_co", "country");
+        expected1.put("tv", Version.TRACKER);
+        expected1.put("p", "srv");
+        expected1.put("tr_tx", "2.0");
+        expected1.put("tr_af", "affiliation");
+        expected1.put("tr_id", "order_id");
+        expected1.put("tr_tt", "1.0");
+        expected1.put("tr_ci", "city");
+        expected1.put("tr_st", "state");
 
         assertTrue(result1.entrySet().containsAll(expected1.entrySet()));
 
         Map<String, String> result2 = results.get(1).getMap();
-        Map<String, String> expected2 = ImmutableMap.<String, String>builder()
-                .put("ti_nm", "name")
-                .put("ti_id", "order_id")
-                .put("e", "ti")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("aid", "cloudfront")
-                .put("ti_cu", "currency")
-                .put("ttm", "456789")
-                .put("tz", "Etc/UTC")
-                .put("ti_pr", "1.0")
-                .put("ti_qu", "2")
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("ti_ca", "category")
-                .put("ti_sk", "sku")
-                .build();
+        Map<String, String> expected2 = new HashMap<>();
+        expected2.put("ti_nm", "name");
+        expected2.put("ti_id", "order_id");
+        expected2.put("e", "ti");
+        expected2.put("co", EXPECTED_CONTEXTS);
+        expected2.put("tna", "AF003");
+        expected2.put("aid", "cloudfront");
+        expected2.put("ti_cu", "currency");
+        expected2.put("ttm", "456789");
+        expected2.put("tz", "Etc/UTC");
+        expected2.put("ti_pr", "1.0");
+        expected2.put("ti_qu", "2");
+        expected2.put("p", "srv");
+        expected2.put("tv", Version.TRACKER);
+        expected2.put("ti_ca", "category");
+        expected2.put("ti_sk", "sku");
 
         assertTrue(result2.entrySet().containsAll(expected2.entrySet()));
     }
@@ -219,34 +221,33 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("ti_nm", "name")
-                .put("ti_id", "order_id")
-                .put("e", "ti")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("aid", "cloudfront")
-                .put("ti_cu", "currency")
-                .put("ttm", "456789")
-                .put("tz", "Etc/UTC")
-                .put("ti_pr", "1.0")
-                .put("ti_qu", "2")
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("ti_ca", "category")
-                .put("ti_sk", "sku")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("ti_nm", "name");
+        expected.put("ti_id", "order_id");
+        expected.put("e", "ti");
+        expected.put("co", EXPECTED_CONTEXTS);
+        expected.put("tna", "AF003");
+        expected.put("aid", "cloudfront");
+        expected.put("ti_cu", "currency");
+        expected.put("ttm", "456789");
+        expected.put("tz", "Etc/UTC");
+        expected.put("ti_pr", "1.0");
+        expected.put("ti_qu", "2");
+        expected.put("p", "srv");
+        expected.put("tv", Version.TRACKER);
+        expected.put("ti_ca", "category");
+        expected.put("ti_sk", "sku");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
 
     @Test
-    public void testUnstructuredEventWithContext() throws InterruptedException {
+    public void testSelfDescribingEventWithContext() throws InterruptedException {
         // When
-        tracker.track(Unstructured.builder()
+        tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                        ImmutableMap.of("foo", "bar")
+                        Collections.singletonMap("foo", "bar")
                 ))
                 .customContext(contexts)
                 .trueTimestamp(456789L)
@@ -256,28 +257,27 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("e", "ue")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("tz", "Etc/UTC")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"bar\"}}}")
-                .put("ttm", "456789")
-                .put("aid", "cloudfront")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("p", "srv");
+        expected.put("tv", Version.TRACKER);
+        expected.put("e", "ue");
+        expected.put("co", EXPECTED_CONTEXTS);
+        expected.put("tna", "AF003");
+        expected.put("tz", "Etc/UTC");
+        expected.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"bar\"}}}");
+        expected.put("ttm", "456789");
+        expected.put("aid", "cloudfront");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
 
     @Test
-    public void testUnstructuredEventWithoutContext() throws InterruptedException {
+    public void testSelfDescribingEventWithoutContext() throws InterruptedException {
         // When
-        tracker.track(Unstructured.builder()
+        tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                        ImmutableMap.of("foo", "baær")
+                        Collections.singletonMap("foo", "baær")
                 ))
                 .trueTimestamp(456789L)
                 .build());
@@ -286,27 +286,26 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("e", "ue")
-                .put("tna", "AF003")
-                .put("tz", "Etc/UTC")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"baær\"}}}")
-                .put("ttm", "456789")
-                .put("aid", "cloudfront")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("p", "srv");
+        expected.put("tv", Version.TRACKER);
+        expected.put("e", "ue");
+        expected.put("tna", "AF003");
+        expected.put("tz", "Etc/UTC");
+        expected.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"baær\"}}}");
+        expected.put("ttm", "456789");
+        expected.put("aid", "cloudfront");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
 
     @Test
-    public void testUnstructuredEventWithoutTrueTimestamp() throws InterruptedException {
+    public void testSelfDescribingEventWithoutTrueTimestamp() throws InterruptedException {
         // When
-        tracker.track(Unstructured.builder()
+        tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                        ImmutableMap.of("foo", "bar")
+                        Collections.singletonMap("foo", "bar")
                 ))
                 .build());
 
@@ -314,27 +313,20 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("e", "ue")
-                .put("tna", "AF003")
-                .put("tz", "Etc/UTC")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"bar\"}}}")
-                .put("aid", "cloudfront")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("p", "srv");
+        expected.put("tv", Version.TRACKER);
+        expected.put("e", "ue");
+        expected.put("tna", "AF003");
+        expected.put("tz", "Etc/UTC");
+        expected.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"bar\"}}}");
+        expected.put("aid", "cloudfront");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
 
     @Test
     public void testTrackPageView() throws InterruptedException {
-        tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
-                .subject(new Subject.SubjectBuilder().build())
-                .base64(false)
-                .build();
-        tracker.getSubject().setTimezone("Etc/UTC");
-
         // When
         tracker.track(PageView.builder()
                 .pageUrl("url")
@@ -348,19 +340,18 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("ttm", "456789")
-                .put("tz", "Etc/UTC")
-                .put("e", "pv")
-                .put("page", "title")
-                .put("tv", Version.TRACKER)
-                .put("p", "srv")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("aid", "cloudfront")
-                .put("refr", "referer")
-                .put("url", "url")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("ttm", "456789");
+        expected.put("tz", "Etc/UTC");
+        expected.put("e", "pv");
+        expected.put("page", "title");
+        expected.put("tv", Version.TRACKER);
+        expected.put("p", "srv");
+        expected.put("co", EXPECTED_CONTEXTS);
+        expected.put("tna", "AF003");
+        expected.put("aid", "cloudfront");
+        expected.put("refr", "referer");
+        expected.put("url", "url");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
@@ -375,10 +366,10 @@ public class TrackerTest {
                 .trueTimestamp(123456L)
                 .build());
 
-        tracker.track(Unstructured.builder()
+        tracker.track(SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(
                         "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                        ImmutableMap.of("foo", "bar")
+                        Collections.singletonMap("foo", "bar")
                 ))
                 .trueTimestamp(456789L)
                 .build());
@@ -390,32 +381,30 @@ public class TrackerTest {
         assertEquals(2, results.size());
 
         Map<String, String> result1 = results.get(0).getMap();
-        Map<String, String> expected1 = ImmutableMap.<String, String>builder()
-                .put("ttm", "123456")
-                .put("tz", "Etc/UTC")
-                .put("e", "pv")
-                .put("page", "title")
-                .put("tv", Version.TRACKER)
-                .put("p", "srv")
-                .put("tna", "AF003")
-                .put("aid", "cloudfront")
-                .put("refr", "referer")
-                .put("url", "url")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("ttm", "123456");
+        expected.put("tz", "Etc/UTC");
+        expected.put("e", "pv");
+        expected.put("page", "title");
+        expected.put("tv", Version.TRACKER);
+        expected.put("p", "srv");
+        expected.put("tna", "AF003");
+        expected.put("aid", "cloudfront");
+        expected.put("refr", "referer");
+        expected.put("url", "url");
 
-        assertTrue(result1.entrySet().containsAll(expected1.entrySet()));
+        assertTrue(result1.entrySet().containsAll(expected.entrySet()));
 
         Map<String, String> result2 = results.get(1).getMap();
-        Map<String, String> expected2 = ImmutableMap.<String, String>builder()
-                .put("ttm", "456789")
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("e", "ue")
-                .put("tna", "AF003")
-                .put("tz", "Etc/UTC")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"bar\"}}}")
-                .put("aid", "cloudfront")
-                .build();
+        Map<String, String> expected2 = new HashMap<>();
+        expected2.put("ttm", "456789");
+        expected2.put("p", "srv");
+        expected2.put("tv", Version.TRACKER);
+        expected2.put("e", "ue");
+        expected2.put("tna", "AF003");
+        expected2.put("tz", "Etc/UTC");
+        expected2.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0\",\"data\":{\"foo\":\"bar\"}}}");
+        expected2.put("aid", "cloudfront");
 
         assertTrue(result2.entrySet().containsAll(expected2.entrySet()));
     }
@@ -434,17 +423,16 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("ttm", "456789")
-                .put("tz", "Etc/UTC")
-                .put("e", "ue")
-                .put("tv", Version.TRACKER)
-                .put("p", "srv")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("aid", "cloudfront")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("ttm", "456789");
+        expected.put("tz", "Etc/UTC");
+        expected.put("e", "ue");
+        expected.put("tv", Version.TRACKER);
+        expected.put("p", "srv");
+        expected.put("co", EXPECTED_CONTEXTS);
+        expected.put("tna", "AF003");
+        expected.put("aid", "cloudfront");
+        expected.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
@@ -462,16 +450,15 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("ttm", "456789")
-                .put("tz", "Etc/UTC")
-                .put("e", "ue")
-                .put("tv", Version.TRACKER)
-                .put("p", "srv")
-                .put("tna", "AF003")
-                .put("aid", "cloudfront")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("ttm", "456789");
+        expected.put("tz", "Etc/UTC");
+        expected.put("e", "ue");
+        expected.put("tv", Version.TRACKER);
+        expected.put("p", "srv");
+        expected.put("tna", "AF003");
+        expected.put("aid", "cloudfront");
+        expected.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
@@ -490,17 +477,16 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("e", "ue")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("tz", "Etc/UTC")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}")
-                .put("ttm", "456789")
-                .put("aid", "cloudfront")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("p", "srv");
+        expected.put("tv", Version.TRACKER);
+        expected.put("e", "ue");
+        expected.put("co", EXPECTED_CONTEXTS);
+        expected.put("tna", "AF003");
+        expected.put("tz", "Etc/UTC");
+        expected.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0\",\"data\":{\"id\":\"id\",\"name\":\"name\"}}}");
+        expected.put("ttm", "456789");
+        expected.put("aid", "cloudfront");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
@@ -521,17 +507,16 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("p", "srv")
-                .put("tv", Version.TRACKER)
-                .put("e", "ue")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("tz", "Etc/UTC")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}")
-                .put("ttm", "456789")
-                .put("aid", "cloudfront")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("p", "srv");
+        expected.put("tv", Version.TRACKER);
+        expected.put("e", "ue");
+        expected.put("co", EXPECTED_CONTEXTS);
+        expected.put("tna", "AF003");
+        expected.put("tz", "Etc/UTC");
+        expected.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}");
+        expected.put("ttm", "456789");
+        expected.put("aid", "cloudfront");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
     }
@@ -539,7 +524,7 @@ public class TrackerTest {
     @Test
     public void testTrackTimingWithSubject() throws InterruptedException {
         // Make Subject
-        Subject s1 = new Subject.SubjectBuilder().build();
+        Subject s1 = new Subject();
         s1.setIpAddress("127.0.0.1");
         s1.setTimezone("Etc/UTC");
 
@@ -558,18 +543,17 @@ public class TrackerTest {
         Thread.sleep(500);
 
         Map<String, String> result = mockEmitter.eventList.get(0).getMap();
-        Map<String, String> expected = ImmutableMap.<String, String>builder()
-                .put("p", "srv")
-                .put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}")
-                .put("tv", Version.TRACKER)
-                .put("e", "ue")
-                .put("ip", "127.0.0.1")
-                .put("co", EXPECTED_CONTEXTS)
-                .put("tna", "AF003")
-                .put("tz", "Etc/UTC")
-                .put("ttm", "456789")
-                .put("aid", "cloudfront")
-                .build();
+        Map<String, String> expected = new HashMap<>();
+        expected.put("p", "srv");
+        expected.put("ue_pr", "{\"schema\":\"iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0\",\"data\":{\"schema\":\"iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0\",\"data\":{\"category\":\"category\",\"label\":\"label\",\"timing\":10,\"variable\":\"variable\"}}}");
+        expected.put("tv", Version.TRACKER);
+        expected.put("e", "ue");
+        expected.put("ip", "127.0.0.1");
+        expected.put("co", EXPECTED_CONTEXTS);
+        expected.put("tna", "AF003");
+        expected.put("tz", "Etc/UTC");
+        expected.put("ttm", "456789");
+        expected.put("aid", "cloudfront");
 
         assertTrue(result.entrySet().containsAll(expected.entrySet()));
 
@@ -578,16 +562,30 @@ public class TrackerTest {
     // --- Tracker Setter & Getter Tests
 
     @Test
+    public void testCreateWithConfiguration() {
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
+        trackerConfig.base64Encoded(false);
+        trackerConfig.platform(DevicePlatform.General);
+
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("http://collector"));
+        Tracker tracker = new Tracker(trackerConfig, emitter);
+
+        assertEquals("namespace", tracker.getNamespace());
+        assertEquals(emitter, tracker.getEmitter());
+    }
+
+    @Test
     public void testGetTrackerVersion() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
-        assertEquals("java-0.12.2", tracker.getTrackerVersion());
+        Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "an-app-id"), mockEmitter);
+        assertEquals("java-1.0.0", tracker.getTrackerVersion());
     }
 
     @Test
     public void testSetDefaultPlatform() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
-                .platform(DevicePlatform.Desktop)
-                .build();
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("AF003", "cloudfront")
+                .platform(DevicePlatform.Desktop);
+
+        Tracker tracker = new Tracker(trackerConfig, mockEmitter);
         assertEquals(DevicePlatform.Desktop, tracker.getPlatform());
     }
 
@@ -596,13 +594,11 @@ public class TrackerTest {
         // Subject objects always have timezone set
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
 
-        Subject s1 = new Subject.SubjectBuilder().build();
+        Subject s1 = new Subject();
         s1.setLanguage("EN");
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
-                .subject(s1)
-                .build();
+        Tracker tracker = new Tracker(new TrackerConfiguration("AF003", "cloudfront"), mockEmitter, s1);
 
-        Subject s2 = new Subject.SubjectBuilder().build();
+        Subject s2 = new Subject();
         s2.setColorDepth(24);
         tracker.setSubject(s2);
 
@@ -615,21 +611,22 @@ public class TrackerTest {
 
     @Test
     public void testSetBase64Encoded() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "cloudfront")
-                .base64(false)
-                .build();
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("AF003", "cloudfront").base64Encoded(false);
+        tracker = new Tracker(trackerConfig, mockEmitter);
+
         assertFalse(tracker.getBase64Encoded());
     }
 
     @Test
     public void testSetAppId() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "AF003", "an-app-id").build();
+        Tracker tracker = new Tracker(new TrackerConfiguration("AF003", "an-app-id"), mockEmitter);
         assertEquals("an-app-id", tracker.getAppId());
     }
 
     @Test
     public void testSetNamespace() {
-        Tracker tracker = new Tracker.TrackerBuilder(mockEmitter, "namespace", "an-app-id").build();
+        Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "an-app-id"), mockEmitter);
+
         assertEquals("namespace", tracker.getNamespace());
     }
 }

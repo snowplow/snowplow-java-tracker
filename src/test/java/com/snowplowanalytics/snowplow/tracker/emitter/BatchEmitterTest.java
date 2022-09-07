@@ -12,14 +12,11 @@
  */
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.Lists;
-
+import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,22 +30,25 @@ import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 public class BatchEmitterTest {
 
     private MockHttpClientAdapter mockHttpClientAdapter;
-    private FlakyHttpClientAdapter flakyHttpClientAdapter;
     private BatchEmitter emitter;
 
-    // MockHttpClientAdapter always returns 200
     public static class MockHttpClientAdapter implements HttpClientAdapter {
+        private final int statusCode;
         public boolean isGetCalled = false;
         public boolean isPostCalled = false;
         public int postCounter = 0;
         public SelfDescribingJson capturedPayload;
+
+        public MockHttpClientAdapter(int statusCode) {
+            this.statusCode = statusCode;
+        }
 
         @Override
         public int post(SelfDescribingJson payload) {
             isPostCalled = true;
             postCounter++;
             capturedPayload = payload;
-            return 200;
+            return statusCode;
         }
 
         @Override
@@ -64,7 +64,7 @@ public class BatchEmitterTest {
         public Object getHttpClient() { return null; }
     }
 
-    // this class fails to "send" the first 4 requests
+    // this class fails to "send" the first 4 requests (status code 500)
     // but returns a successful result (200) subsequently
     static class FlakyHttpClientAdapter implements HttpClientAdapter {
         int failedPostCounter = 0;
@@ -90,33 +90,11 @@ public class BatchEmitterTest {
         public Object getHttpClient() { return null; }
     }
 
-    // This class always returns failure code 403
-    static class FailingHttpClientAdapter implements HttpClientAdapter {
-        int failedPostCounter = 0;
-        @Override
-        public int post(SelfDescribingJson payload) {
-            failedPostCounter++;
-            return 403;
-        }
-
-        @Override
-        public int get(TrackerPayload payload) { return 0; }
-
-        @Override
-        public String getUrl() { return null; }
-
-        @Override
-        public Object getHttpClient() { return null; }
-    }
-
     @Before
     public void setUp() {
-        mockHttpClientAdapter = new MockHttpClientAdapter();
-        flakyHttpClientAdapter = new FlakyHttpClientAdapter();
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(mockHttpClientAdapter)
-                .batchSize(10)
-                .build();
+        mockHttpClientAdapter = new MockHttpClientAdapter(200);
+        EmitterConfiguration emitterConfig = new EmitterConfiguration().batchSize(10);
+        emitter = new BatchEmitter(new NetworkConfiguration(mockHttpClientAdapter), emitterConfig);
     }
 
     @Test
@@ -149,11 +127,9 @@ public class BatchEmitterTest {
 
     @Test
     public void addToBuffer_doesNotAddEventIfBufferFull() {
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(mockHttpClientAdapter)
-                .bufferCapacity(1)
-                .build();
-
+        emitter = new BatchEmitter(
+                new NetworkConfiguration(mockHttpClientAdapter),
+                new EmitterConfiguration().bufferCapacity(1));
         emitter.add(createPayload());
 
         TrackerPayload differentPayload = createPayload();
@@ -233,7 +209,7 @@ public class BatchEmitterTest {
             threadNames.add(thread.getName());
         }
 
-        // Because the threadpools are named by a static ThreadFactory,
+        // Because the thread pools are named by a static ThreadFactory,
         // the pool number varies if this test is run in isolation or not
         boolean matchResult = false;
         for (String name : threadNames) {
@@ -270,11 +246,19 @@ public class BatchEmitterTest {
     }
 
     @Test
+    public void createEmitterWithConfiguration() {
+        NetworkConfiguration networkConfig = new NetworkConfiguration("http://endpoint");
+        EmitterConfiguration emitterConfig = new EmitterConfiguration().batchSize(5);
+        BatchEmitter emitter = new BatchEmitter(networkConfig, emitterConfig);
+
+        Assert.assertEquals(5, emitter.getBatchSize());
+    }
+
+    @Test
     public void eventsThatFailToSendAreReturnedToEventBuffer() throws InterruptedException {
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(new FlakyHttpClientAdapter())
-                .batchSize(10)
-                .build();
+        emitter = new BatchEmitter(
+                new NetworkConfiguration(new FlakyHttpClientAdapter()),
+                new EmitterConfiguration().batchSize(10));
 
         List<TrackerPayload> payloads = createPayloads(2);
         for (TrackerPayload payload : payloads) {
@@ -292,18 +276,21 @@ public class BatchEmitterTest {
 
     @Test
     public void eventSendingFailureIncreasesBackoffTime() throws InterruptedException {
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(flakyHttpClientAdapter)
-                .batchSize(1)
-                .build();
+        emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(500)),
+                new EmitterConfiguration().batchSize(1));
 
-        List<TrackerPayload> payloads = createPayloads(2);
-        for (TrackerPayload payload : payloads) {
-            emitter.add(payload);
-        }
+        emitter.add(createPayload());
         Thread.sleep(500);
 
-        Assert.assertEquals(100, emitter.getRetryDelay());
+        int firstDelay = emitter.getRetryDelay();
+        Assert.assertNotEquals(0, firstDelay);
+
+        emitter.add(createPayload());
+        Thread.sleep(500);
+
+        int secondDelay = emitter.getRetryDelay();
+        Assert.assertTrue(secondDelay > firstDelay);
     }
 
     @Test
@@ -311,11 +298,9 @@ public class BatchEmitterTest {
         // the FlakyHttpClientAdapter returns 500 for the first 4 requests
         // then subsequently returns 200
         FlakyHttpClientAdapter flakyHttpClientAdapter = new FlakyHttpClientAdapter();
-        emitter = BatchEmitter.builder()
-                .httpClientAdapter(flakyHttpClientAdapter)
-                .batchSize(1)
-                .threadCount(1)
-                .build();
+        emitter = new BatchEmitter(
+                new NetworkConfiguration(flakyHttpClientAdapter),
+                new EmitterConfiguration().batchSize(1).threadCount(1));
 
         List<TrackerPayload> payloads = createPayloads(6);
         for (TrackerPayload payload : payloads) {
@@ -329,17 +314,34 @@ public class BatchEmitterTest {
     }
 
     @Test
-    public void noRetryAfterDenylistResponseCode() throws InterruptedException {
-        List<Integer> noRetry = new ArrayList<>();
-        noRetry.add(403);
+    public void retryWithCustomRulesOverridingDefault() throws InterruptedException {
+        Map<Integer, Boolean> customRetry = new HashMap<>();
+        customRetry.put(403, true);
 
-        // the FailingHttpClientAdapter always returns 403
-        FailingHttpClientAdapter failingHttpClientAdapter = new FailingHttpClientAdapter();
-        BatchEmitter emitter = BatchEmitter.builder()
-                .httpClientAdapter(failingHttpClientAdapter)
-                .batchSize(2)
-                .fatalResponseCodes(noRetry)
-                .build();
+        // by default 403 isn't retried
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(403)),
+                new EmitterConfiguration().batchSize(2).customRetryForStatusCodes(customRetry));
+
+        List<TrackerPayload> payloads = createPayloads(4);
+        for (TrackerPayload payload : payloads) {
+            emitter.add(payload);
+        }
+
+        Thread.sleep(500);
+        Assert.assertNotEquals(0, emitter.getRetryDelay());
+        Assert.assertEquals(4, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void noRetryWithCustomRulesOverridingDefault() throws InterruptedException {
+        Map<Integer, Boolean> customRetry = new HashMap<>();
+        customRetry.put(500, false);
+
+        // by default, requests with code 500 are retried
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(500)),
+                new EmitterConfiguration().batchSize(2).customRetryForStatusCodes(customRetry));
 
         List<TrackerPayload> payloads = createPayloads(4);
         for (TrackerPayload payload : payloads) {
@@ -348,9 +350,218 @@ public class BatchEmitterTest {
 
         Thread.sleep(500);
 
-        Assert.assertEquals(2, failingHttpClientAdapter.failedPostCounter);
         Assert.assertEquals(0, emitter.getRetryDelay());
         Assert.assertEquals(0, emitter.getBuffer().size());
+    }
+
+    @Test
+    public void callsSuccessCallbackAfterSending() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            List<TrackerPayload> payloads;
+            final List<FailureType> failureTypes = new ArrayList<>();
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+                this.payloads = payloads;
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                failureTypes.add(failureType);
+            }
+        }
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(200)),
+                new EmitterConfiguration().batchSize(1).callback(callback));
+
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        Thread.sleep(500);
+
+        Assert.assertEquals(callback.payloads.get(0), payload);
+        Assert.assertTrue(callback.failureTypes.isEmpty());
+    }
+
+    @Test
+    public void callsFailureCallbackWhenRejectedNeedsRetry() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            final List<FailureType> failureTypes = new ArrayList<>();
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                failureTypes.add(failureType);
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        }
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(500)),
+                new EmitterConfiguration().batchSize(1).callback(callback));
+
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.REJECTED_BY_COLLECTOR, callback.failureTypes.get(0));
+        Assert.assertTrue(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload);
+    }
+
+    @Test
+    public void callsFailureCallbackWhenRejectedNoRetry() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            final List<FailureType> failureTypes = new ArrayList<>();
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                failureTypes.add(failureType);
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        }
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(403)),
+                new EmitterConfiguration().batchSize(1).callback(callback));
+
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.REJECTED_BY_COLLECTOR, callback.failureTypes.get(0));
+        Assert.assertEquals(1, callback.failureTypes.size());
+        Assert.assertFalse(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload);
+    }
+
+    @Test
+    public void callsFailureCallbackIfStorageIsFull() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            final List<FailureType> failureTypes = new ArrayList<>();
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                failureTypes.add(failureType);
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        }
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(200)),
+                new EmitterConfiguration().bufferCapacity(1).callback(callback));
+
+        emitter.add(createPayload());
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.TRACKER_STORAGE_FULL, callback.failureTypes.get(0));
+        Assert.assertEquals(1, callback.failureTypes.size());
+        Assert.assertFalse(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload);
+    }
+
+    @Test
+    public void callsFailureCallbackIfHttpClientAdapterFailsToSend() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            final List<FailureType> failureTypes = new ArrayList<>();
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                failureTypes.add(failureType);
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        }
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(-1)),
+                new EmitterConfiguration().bufferCapacity(1).callback(callback));
+
+        TrackerPayload payload = createPayload();
+        emitter.add(payload);
+        emitter.flushBuffer();
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.HTTP_CONNECTION_FAILURE, callback.failureTypes.get(0));
+        Assert.assertEquals(1, callback.failureTypes.size());
+        Assert.assertTrue(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload);
+    }
+
+    @Test
+    public void callsFailureCallbackIfStorageIsFullWhenReturningEventsForRetry() throws InterruptedException {
+        class TestCallback implements EmitterCallback {
+            boolean willRetry;
+            List<TrackerPayload> payloads;
+            final List<FailureType> failureTypes = new ArrayList<>();
+
+            @Override
+            public void onSuccess(List<TrackerPayload> payloads) {
+            }
+
+            @Override
+            public void onFailure(FailureType failureType, boolean willRetry, List<TrackerPayload> payloads) {
+                failureTypes.add(failureType);
+                this.willRetry = willRetry;
+                this.payloads = payloads;
+            }
+        }
+
+        TestCallback callback = new TestCallback();
+        BatchEmitter emitter = new BatchEmitter(
+                new NetworkConfiguration(new MockHttpClientAdapter(500)),
+                new EmitterConfiguration().bufferCapacity(2).callback(callback));
+
+        TrackerPayload payload1 = createPayload();
+        TrackerPayload payload2 = createPayload();
+        TrackerPayload payload3 = createPayload();
+
+        emitter.add(payload1);
+        emitter.flushBuffer();
+        Thread.sleep(10);
+
+        emitter.add(payload2);
+        emitter.add(payload3);
+        Thread.sleep(500);
+
+        Assert.assertEquals(FailureType.REJECTED_BY_COLLECTOR, callback.failureTypes.get(0));
+        Assert.assertEquals(FailureType.TRACKER_STORAGE_FULL, callback.failureTypes.get(1));
+        Assert.assertEquals(2, callback.failureTypes.size());
+        Assert.assertFalse(callback.willRetry);
+        Assert.assertEquals(callback.payloads.get(0), payload3);
     }
 
     private TrackerPayload createPayload() {
@@ -364,7 +575,7 @@ public class BatchEmitterTest {
     }
 
     private List<TrackerPayload> createPayloads(int numPayloads) {
-        final List<TrackerPayload> payloads = Lists.newArrayList();
+        final List<TrackerPayload> payloads = new ArrayList<>();
         for (int i = 0; i < numPayloads; i++) {
             payloads.add(createPayload());
         }

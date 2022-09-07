@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // This library
+import com.snowplowanalytics.snowplow.tracker.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 
 /**
@@ -29,22 +30,29 @@ public class Subject {
     private HashMap<String, String> standardPairs = new HashMap<>();
 
     /**
-     * Creates a Subject which will add extra data to each event.
+     * Creates a Subject instance from a SubjectConfiguration.
      *
-     * @param builder The builder that constructs a subject
+     * @param subjectConfig a SubjectConfiguration
      */
-    private Subject(SubjectBuilder builder) {
-        this.setUserId(builder.userId);
-        this.setScreenResolution(builder.screenResWidth, builder.screenResHeight);
-        this.setViewPort(builder.viewPortWidth, builder.viewPortHeight);
-        this.setColorDepth(builder.colorDepth);
-        this.setTimezone(builder.timezone);
-        this.setLanguage(builder.language);
-        this.setIpAddress(builder.ipAddress);
-        this.setUseragent(builder.useragent);
-        this.setNetworkUserId(builder.networkUserId);
-        this.setDomainUserId(builder.domainUserId);
-        this.setDomainSessionId(builder.domainSessionId);
+    public Subject(SubjectConfiguration subjectConfig) {
+        setUserId(subjectConfig.getUserId());
+        setScreenResolution(subjectConfig.getScreenResWidth(), subjectConfig.getScreenResHeight());
+        setViewPort(subjectConfig.getViewPortWidth(), subjectConfig.getViewPortHeight());
+        setColorDepth(subjectConfig.getColorDepth());
+        setTimezone(subjectConfig.getTimezone());
+        setLanguage(subjectConfig.getLanguage());
+        setIpAddress(subjectConfig.getIpAddress());
+        setUseragent(subjectConfig.getUseragent());
+        setNetworkUserId(subjectConfig.getNetworkUserId());
+        setDomainUserId(subjectConfig.getDomainUserId());
+        setDomainSessionId(subjectConfig.getDomainSessionId());
+    }
+
+    /**
+     * Creates a Subject instance with default configuration (only the timezone is set).
+     */
+    public Subject() {
+        this(new SubjectConfiguration());
     }
 
     /**
@@ -52,12 +60,23 @@ public class Subject {
      * @param subject The subject from which the map is copied.
      */
     public Subject(Subject subject){
-      this.standardPairs.putAll(subject.getSubject());
+        standardPairs.putAll(subject.getSubject());
+    }
+
+    /**
+     * @deprecated Use SubjectConfiguration class instead
+     * @return a SubjectBuilder object
+     */
+    @Deprecated
+    public static SubjectBuilder builder() {
+        return new SubjectBuilder();
     }
 
     /**
      * Builder for the Subject
+     * @deprecated Use SubjectConfiguration class instead
      */
+    @Deprecated
     public static class SubjectBuilder {
 
         private String userId; // Optional
@@ -185,7 +204,20 @@ public class Subject {
          * @return a new Subject object
          */
         public Subject build() {
-            return new Subject(this);
+            SubjectConfiguration subjectConfig = new SubjectConfiguration()
+                    .userId(userId)
+                    .screenResolution(screenResWidth, screenResHeight)
+                    .viewPort(viewPortWidth, viewPortHeight)
+                    .colorDepth(colorDepth)
+                    .timezone(timezone)
+                    .language(language)
+                    .ipAddress(ipAddress)
+                    .useragent(useragent)
+                    .networkUserId(networkUserId)
+                    .domainUserId(domainUserId)
+                    .domainSessionId(domainSessionId);
+
+            return new Subject(subjectConfig);
         }
     }
 
@@ -309,8 +341,8 @@ public class Subject {
     }
 
     /**
-     * User inputted Network User Id for the
-     * subject.
+     * User inputted Network User ID for the subject.
+     * This overrides the network user ID set by the Collector in response Cookies.
      *
      * @param networkUserId a network user id
      */

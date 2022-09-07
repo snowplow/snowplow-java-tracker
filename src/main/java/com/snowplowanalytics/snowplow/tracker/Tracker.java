@@ -12,8 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.google.common.base.Preconditions;
-
+import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Constants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
@@ -36,26 +35,46 @@ public class Tracker {
     /**
      * Creates a new Snowplow Tracker.
      *
-     * @param builder The builder that constructs a tracker
+     * @param trackerConfig a TrackerConfiguration object
+     * @param emitter an Emitter
+     * @param subject a Subject
+     *
      */
-    private Tracker(TrackerBuilder builder) {
+    public Tracker(TrackerConfiguration trackerConfig, Emitter emitter, Subject subject) {
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.emitter);
-        Preconditions.checkNotNull(builder.namespace);
-        Preconditions.checkNotNull(builder.appId);
-        Preconditions.checkArgument(!builder.namespace.isEmpty(), "namespace cannot be empty");
-        Preconditions.checkArgument(!builder.appId.isEmpty(), "appId cannot be empty");
+        Objects.requireNonNull(emitter);
+        Objects.requireNonNull(trackerConfig.getNamespace());
+        Objects.requireNonNull(trackerConfig.getAppId());
+        if (trackerConfig.getNamespace().isEmpty()) {
+            throw new IllegalArgumentException("namespace cannot be empty");
+        }
+        if (trackerConfig.getAppId().isEmpty()) {
+            throw new IllegalArgumentException("appId cannot be empty");
+        }
 
-        this.parameters = new TrackerParameters(builder.appId, builder.platform, builder.namespace, Version.TRACKER, builder.base64Encoded);
-        this.emitter = builder.emitter;
-        this.subject = builder.subject;
+        this.parameters = new TrackerParameters(trackerConfig.getAppId(), trackerConfig.getPlatform(), trackerConfig.getNamespace(), Version.TRACKER, trackerConfig.isBase64Encoded());
+        this.emitter = emitter;
+        this.subject = subject;
 
     }
 
     /**
-     * Builder for the Tracker
+     * Creates a new Snowplow Tracker.
+     *
+     * @param trackerConfig a TrackerConfiguration object
+     * @param emitter an Emitter
+     *
      */
+    public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
+        this(trackerConfig, emitter, null);
+    }
+
+    /**
+     * Builder for the Tracker
+     * @deprecated Use TrackerConfiguration class instead
+     */
+    @Deprecated
     public static class TrackerBuilder {
 
         private final Emitter emitter; // Required
@@ -113,8 +132,23 @@ public class Tracker {
          * @return a new Tracker object
          */
         public Tracker build() {
-            return new Tracker(this);
+            TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId)
+                    .platform(platform)
+                    .base64Encoded(base64Encoded);
+            return new Tracker(trackerConfig, emitter, subject);
         }
+    }
+
+    /**
+     * @deprecated Use TrackerConfiguration class instead
+     * @param emitter Emitter object
+     * @param namespace unique tracker namespace
+     * @param appId application ID
+     * @return TrackerBuilder object
+     */
+    @Deprecated
+    public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
+        return new TrackerBuilder(emitter, namespace, appId);
     }
 
     // --- Setters
@@ -248,11 +282,11 @@ public class Tracker {
         List<Event> eventList = new ArrayList<>();
         final Class<?> eventClass = event.getClass();
 
-        if (eventClass.equals(Unstructured.class)) {
-            // Need to set the Base64 rule for Unstructured events
-            final Unstructured unstructured = (Unstructured) event;
-            unstructured.setBase64Encode(parameters.getBase64Encoded());
-            eventList.add(unstructured);
+        if (eventClass.equals(SelfDescribing.class)) {
+            // Need to set the Base64 rule for SelfDescribing events
+            final SelfDescribing selfDescribing = (SelfDescribing) event;
+            selfDescribing.setBase64Encode(parameters.getBase64Encoded());
+            eventList.add(selfDescribing);
 
         } else if (eventClass.equals(EcommerceTransaction.class)) {
             final EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
@@ -262,17 +296,17 @@ public class Tracker {
             eventList.addAll(ecommerceTransaction.getItems());
 
         } else if (eventClass.equals(Timing.class) || eventClass.equals(ScreenView.class)) {
-            // Timing and ScreenView events are wrapper classes for Unstructured events
-            // Need to create Unstructured events from them to send.
-            final Unstructured unstructured = Unstructured.builder()
+            // Timing and ScreenView events are wrapper classes for SelfDescribing events
+            // Need to create SelfDescribing events from them to send.
+            final SelfDescribing selfDescribing = SelfDescribing.builder()
                     .eventData((SelfDescribingJson) event.getPayload())
                     .customContext(event.getContext())
                     .trueTimestamp(event.getTrueTimestamp())
                     .subject(event.getSubject())
                     .build();
 
-            unstructured.setBase64Encode(parameters.getBase64Encoded());
-            eventList.add(unstructured);
+            selfDescribing.setBase64Encode(parameters.getBase64Encoded());
+            eventList.add(selfDescribing);
 
         } else {
             eventList.add(event);
@@ -320,6 +354,16 @@ public class Tracker {
         } else if (subject != null) {
             payload.addMap(new HashMap<>(subject.getSubject()));
         }
+    }
+
+    /**
+     * Attempts to send all remaining events, then shuts down the Emitter so that no more events can be sent.
+     * This method calls the Emitter.close() method. For the default BatchEmitter,
+     * this stops the ScheduledExecutorService and the thread pool (non-daemon threads).
+     * There is no way to restart the Emitter after calling close().
+     */
+    public void close() {
+        emitter.close();
     }
 
 }
