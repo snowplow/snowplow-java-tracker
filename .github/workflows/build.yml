@@ -51,12 +51,12 @@ jobs:
 
     - name: Upload report if failed
       if: ${{ failure() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with: 
         name: Reports-JDK_${{ matrix.java }}
         path: build/reports
 
-    - uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v3
       with:
         name: Package-JDK_${{ matrix.java }}
         path: build/libs
