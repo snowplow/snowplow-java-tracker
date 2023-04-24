@@ -7,7 +7,7 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: gradle/wrapper-validation-action@v1
 
   build:
@@ -20,7 +20,7 @@ jobs:
         java: [ 8, 11, 17 ]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up JDK
       uses: actions/setup-java@v1
