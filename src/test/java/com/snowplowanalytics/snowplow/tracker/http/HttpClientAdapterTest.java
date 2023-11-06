@@ -103,9 +103,28 @@ public class HttpClientAdapterTest {
         mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
         // When
-        adapter.post(new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar")));
+        int responseCode = adapter.post(new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar")));
 
         // Then
+        assertEquals(200, responseCode);
+        assertEquals(1, mockWebServer.getRequestCount());
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals("/com.snowplowanalytics.snowplow/tp2", recordedRequest.getPath());
+        assertEquals("{\"schema\":\"schema\",\"data\":{\"foo\":\"bar\"}}", recordedRequest.getBody().readUtf8());
+        assertEquals("POST", recordedRequest.getMethod());
+        assertEquals("application/json; charset=utf-8", recordedRequest.getHeader("Content-Type"));
+    }
+
+    @Test
+    public void post_withUnsuccessfulStatusCode_isOk() throws InterruptedException {
+        // Given
+        mockWebServer.enqueue(new MockResponse().setResponseCode(404));
+
+        // When
+        int responseCode = adapter.post(new SelfDescribingJson("schema", Collections.singletonMap("foo", "bar")));
+
+        // Then
+        assertEquals(404, responseCode);
         assertEquals(1, mockWebServer.getRequestCount());
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals("/com.snowplowanalytics.snowplow/tp2", recordedRequest.getPath());

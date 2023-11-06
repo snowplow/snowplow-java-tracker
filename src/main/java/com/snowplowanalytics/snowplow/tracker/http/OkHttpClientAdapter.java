@@ -123,9 +123,8 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         try (Response response = httpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 LOGGER.error("OkHttpClient GET Request failed: {}", response);
-            } else {
-                returnValue = response.code();
             }
+            returnValue = response.code();
         } catch (IOException e) {
             LOGGER.error("OkHttpClient GET Request failed: {}", e.getMessage());
         }
@@ -154,9 +153,8 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         try (Response response = httpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 LOGGER.error("OkHttpClient POST Request failed: {}", response);
-            } else {
-                returnValue = response.code();
             }
+            returnValue = response.code();
         } catch (IOException e) {
             LOGGER.error("OkHttpClient POST Request failed: {}", e.getMessage());
         }

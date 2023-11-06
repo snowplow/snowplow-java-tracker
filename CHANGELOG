@@ -1,3 +1,7 @@
+Java 1.0.1 (2023-11-06)
+-----------------------
+Fix Issue with OkHttpClientAdapter (#366) (thanks to @eusorov for the contribution!)
+
 Java 1.0.0 (2022-09-06)
 -----------------------
 Add close() to Emitter interface and Tracker (#357)
