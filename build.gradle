@@ -58,7 +58,7 @@ test {
 
 dependencies {
     // Apache Commons
-    api 'commons-net:commons-net:3.6'
+    api 'commons-net:commons-net:3.10.0'
     api 'commons-codec:commons-codec:1.16.0'
 
     // Apache HTTP
