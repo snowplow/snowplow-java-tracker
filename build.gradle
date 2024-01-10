@@ -73,7 +73,7 @@ dependencies {
     testImplementation 'org.slf4j:slf4j-simple:1.7.36'
 
     // Jackson JSON processor
-    api 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
 
     // Testing libraries
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
