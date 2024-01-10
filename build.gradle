@@ -69,8 +69,8 @@ dependencies {
     okhttpSupportApi 'com.squareup.okhttp3:okhttp:4.9.3'
 
     // SLF4J logging API
-    api 'org.slf4j:slf4j-api:1.7.36'
-    testImplementation 'org.slf4j:slf4j-simple:1.7.36'
+    api 'org.slf4j:slf4j-api:2.0.11'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.11'
 
     // Jackson JSON processor
     api 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
