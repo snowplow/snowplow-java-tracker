@@ -76,7 +76,7 @@ dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
 
     // Testing libraries
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
     testCompileOnly 'junit:junit:4.13.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
 
