@@ -145,13 +145,7 @@ public class HttpClientAdapterTest {
 
     @Test
     public void testRequestWithCookies() throws IOException, InterruptedException {
-        OkHttpClient httpClient = new OkHttpClient.Builder()
-                .connectTimeout(1, TimeUnit.SECONDS)
-                .readTimeout(1, TimeUnit.SECONDS)
-                .writeTimeout(1, TimeUnit.SECONDS)
-                .cookieJar(new CollectorCookieJar())
-                .build();
-        adapter = new OkHttpClientAdapter(mockWebServer.url("/").toString(), httpClient);
+        adapter = new OkHttpClientWithCookieJarAdapter(mockWebServer.url("/").toString());
 
         mockWebServer.enqueue(new MockResponse().addHeader("Set-Cookie", "sp=test"));
 
