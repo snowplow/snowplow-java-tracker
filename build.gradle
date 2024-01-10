@@ -58,8 +58,8 @@ test {
 
 dependencies {
     // Apache Commons
-    api 'commons-codec:commons-codec:1.15'
     api 'commons-net:commons-net:3.6'
+    api 'commons-codec:commons-codec:1.16.0'
 
     // Apache HTTP
     apachehttpSupportApi 'org.apache.httpcomponents:httpclient:4.5.13'
