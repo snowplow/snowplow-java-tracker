@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,13 +23,14 @@ public class BatchEmitterBuilderTest {
 
     @Test
     public void setNeitherHttpClientAdapterOrCollectorUrl_shouldThrowException() {
-        Exception exception = Assert.assertThrows(Exception.class, () -> BatchEmitter.builder().build());
+        String collectorUrl = null;
+        Exception exception = Assert.assertThrows(Exception.class, () -> new BatchEmitter(new NetworkConfiguration(collectorUrl)));
         Assert.assertEquals("Collector url must be specified if not using a httpClientAdapter", exception.getMessage());
     }
 
     @Test
     public void setCollectorUrlAndNoHttpClientAdapter_shouldInitialiseCorrectly() {
-        BatchEmitter emitter = BatchEmitter.builder().url("https://mycollector.com").build();
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration("https://mycollector.com"));
         Assert.assertNotNull(emitter);
     }
 
@@ -56,7 +58,7 @@ public class BatchEmitterBuilderTest {
             }
         };
 
-        BatchEmitter emitter = BatchEmitter.builder().httpClientAdapter(mockHttpClientAdapter).build();
+        BatchEmitter emitter = new BatchEmitter(new NetworkConfiguration(mockHttpClientAdapter));
         Assert.assertNotNull(emitter);
     }
 }
