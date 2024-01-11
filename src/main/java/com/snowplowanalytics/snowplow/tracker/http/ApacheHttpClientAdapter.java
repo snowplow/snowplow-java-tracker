@@ -12,12 +12,11 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,9 +116,9 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
     public int doGet(String url) {
         try {
             HttpGet httpGet = new HttpGet(url);
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            httpGet.releaseConnection();
-            return httpResponse.getStatusLine().getStatusCode();
+            return httpClient.execute(httpGet, response -> {
+                return response.getCode();
+            });
         } catch (Exception e) {
             LOGGER.error("ApacheHttpClient GET Request failed: {}", e.getMessage());
             return -1;
@@ -140,9 +139,9 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
             httpPost.addHeader("Content-Type", Constants.POST_CONTENT_TYPE);
             StringEntity params = new StringEntity(payload, ContentType.APPLICATION_JSON);
             httpPost.setEntity(params);
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-            httpPost.releaseConnection();
-            return httpResponse.getStatusLine().getStatusCode();
+            return httpClient.execute(httpPost, response -> {
+                return response.getCode();
+            });
         } catch (Exception e) {
             LOGGER.error("ApacheHttpClient POST Request failed: {}", e.getMessage());
             return -1;
