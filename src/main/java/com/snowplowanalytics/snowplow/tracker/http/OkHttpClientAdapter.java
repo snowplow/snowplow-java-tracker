@@ -50,59 +50,6 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
     }
 
     /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param <T> Builder
-     */
-    @Deprecated
-    public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
-
-        private OkHttpClient httpClient; // Required
-
-        /**
-         * @param httpClient The OkHTTP Client to use
-         * @return itself
-         */
-        public T httpClient(OkHttpClient httpClient) {
-            this.httpClient = httpClient;
-            return self();
-        }
-
-        public OkHttpClientAdapter build() {
-            return new OkHttpClientAdapter(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @return Builder object
-     */
-    @Deprecated
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param builder Builder object
-     */
-    @Deprecated
-    protected OkHttpClientAdapter(Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Objects.requireNonNull(builder.httpClient);
-
-        httpClient = builder.httpClient;
-    }
-
-    /**
      * Returns the HttpClient in use; it is up to the developer
      * to cast it back to its original class.
      *

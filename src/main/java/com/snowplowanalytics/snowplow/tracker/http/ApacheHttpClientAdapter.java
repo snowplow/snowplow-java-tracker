@@ -44,59 +44,6 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
     }
 
     /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param <T> Builder
-     */
-    @Deprecated
-    public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
-
-        private CloseableHttpClient httpClient; // Required
-
-        /**
-         * @param httpClient The Apache HTTP Client to use
-         * @return itself
-         */
-        public T httpClient(CloseableHttpClient httpClient) {
-            this.httpClient = httpClient;
-            return self();
-        }
-
-        public ApacheHttpClientAdapter build() {
-            return new ApacheHttpClientAdapter(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @return Builder object
-     */
-    @Deprecated
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param builder Builder object
-     */
-    @Deprecated
-    protected ApacheHttpClientAdapter(Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Objects.requireNonNull(builder.httpClient);
-
-        this.httpClient = builder.httpClient;
-    }
-
-    /**
      * Returns the HttpClient in use; it is up to the developer
      * to cast it back to its original class.
      *

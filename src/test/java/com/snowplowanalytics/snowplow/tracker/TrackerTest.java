@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
-import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
