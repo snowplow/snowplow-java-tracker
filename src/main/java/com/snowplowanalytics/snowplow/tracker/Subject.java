@@ -233,6 +233,17 @@ public class Subject {
     }
 
     /**
+     * Sets the User ID and returns itself
+     *
+     * @param userId a user id string
+     * @return itself
+     */
+    public Subject userId(String userId) {
+        this.setUserId(userId);
+        return this;
+    }
+
+    /**
      * Sets the screen res parameter
      *
      * @param width a width integer
@@ -243,6 +254,18 @@ public class Subject {
             String res = Integer.toString(width) + "x" + Integer.toString(height);
             this.standardPairs.put(Parameter.RESOLUTION, res);
         }
+    }
+
+    /**
+     * Sets the screen res parameter and returns itself
+     *
+     * @param width a width integer
+     * @param height a height integer
+     * @return itself
+     */
+    public Subject screenResolution(int width, int height) {
+        this.setScreenResolution(width, height);
+        return this;
     }
 
     /**
@@ -259,6 +282,18 @@ public class Subject {
     }
 
     /**
+     * Sets the view port parameter and returns itself
+     *
+     * @param width a width integer
+     * @param height a height integer
+     * @return itself
+     */
+    public Subject viewPort(int width, int height) {
+        this.setViewPort(width, height);
+        return this;
+    }
+
+    /**
      * Sets the color depth parameter
      *
      * @param depth a color depth integer
@@ -267,6 +302,17 @@ public class Subject {
         if (depth > 0) {
             this.standardPairs.put(Parameter.COLOR_DEPTH, Integer.toString(depth));
         }
+    }
+
+    /**
+     * Sets the color depth parameter and returns itself
+     *
+     * @param depth a color depth integer
+     * @return itself
+     */
+    public Subject colorDepth(int depth) {
+        this.setColorDepth(depth);
+        return this;
     }
 
     /**
@@ -282,6 +328,19 @@ public class Subject {
     }
 
     /**
+     * Sets the timezone parameter and returns itself.
+     * Note that timezone is set by default to the server's timezone
+     * (`TimeZone tz = Calendar.getInstance().getTimeZone().getID()`)
+     * 
+     * @param timezone a timezone string
+     * @return itself
+     */
+    public Subject timezone(String timezone) {
+        this.setTimezone(timezone);
+        return this;
+    }
+
+    /**
      * Sets the language parameter
      *
      * @param language a language string
@@ -293,8 +352,18 @@ public class Subject {
     }
 
     /**
-     * User inputted ip address for the
-     * subject.
+     * Sets the language parameter and returns itself
+     *
+     * @param language a language string
+     * @return itself
+     */
+    public Subject language(String language) {
+        this.setLanguage(language);
+        return this;
+    }
+
+    /**
+     * User inputted ip address for the subject.
      *
      * @param ipAddress an ip address
      */
@@ -305,8 +374,18 @@ public class Subject {
     }
 
     /**
-     * User inputted useragent for the
-     * subject.
+     * Sets the user inputted ip address for the subject and returns itself
+     *
+     * @param ipAddress a ipAddress string
+     * @return itself
+     */
+    public Subject ipAddress(String ipAddress) {
+        this.setIpAddress(ipAddress);
+        return this;
+    }
+
+    /**
+     * User inputted useragent for the subject.
      *
      * @param useragent a useragent
      */
@@ -317,8 +396,18 @@ public class Subject {
     }
 
     /**
-     * User inputted Domain User Id for the
-     * subject.
+     * Sets the user inputted useragent for the subject and returns itself
+     *
+     * @param useragent a useragent string
+     * @return itself
+     */
+    public Subject useragent(String useragent) {
+        this.setUseragent(useragent);
+        return this;
+    }
+
+    /**
+     * User inputted Domain User Id for the subject.
      *
      * @param domainUserId a domain user id
      */
@@ -329,8 +418,18 @@ public class Subject {
     }
 
     /**
-     * User inputted Domain Session ID for the
-     * subject.
+     * Sets the user inputted Domain User Id for the subject and returns itself
+     *
+     * @param domainUserId a domainUserId string
+     * @return itself
+     */
+    public Subject domainUserId(String domainUserId) {
+        this.setDomainUserId(domainUserId);
+        return this;
+    }
+
+    /**
+     * User inputted Domain Session ID for the subject.
      *
      * @param domainSessionId a domain session id
      */
@@ -338,6 +437,17 @@ public class Subject {
         if (domainSessionId != null) {
             this.standardPairs.put(Parameter.SESSION_UID, domainSessionId);
         }
+    }
+
+    /**
+     * Sets the user inputted Domain Session ID for the subject and returns itself
+     *
+     * @param domainSessionId a domainSessionId string
+     * @return itself
+     */
+    public Subject domainSessionId(String domainSessionId) {
+        this.setDomainSessionId(domainSessionId);
+        return this;
     }
 
     /**
@@ -350,6 +460,18 @@ public class Subject {
         if (networkUserId != null) {
             this.standardPairs.put(Parameter.NETWORK_UID, networkUserId);
         }
+    }
+
+    /**
+     * Sets the user inputted Network User ID for the subject and returns itself.
+     * This overrides the network user ID set by the Collector in response Cookies.
+     *
+     * @param networkUserId a networkUserId string
+     * @return itself
+     */
+    public Subject networkUserId(String networkUserId) {
+        this.setNetworkUserId(networkUserId);
+        return this;
     }
 
     /**
