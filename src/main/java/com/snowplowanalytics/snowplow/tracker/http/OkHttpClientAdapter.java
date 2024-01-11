@@ -45,6 +45,10 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         this.httpClient = httpClient;
     }
 
+    public OkHttpClientAdapter(String url) {
+        this(url, new OkHttpClient.Builder().build());
+    }
+
     /**
      * @deprecated Create HttpClientAdapter directly instead
      * @param <T> Builder

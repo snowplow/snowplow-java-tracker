@@ -29,8 +29,6 @@ import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-import okhttp3.CookieJar;
-import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +75,6 @@ public class BatchEmitter implements Emitter, Closeable {
         private EventStore eventStore = null;  // Optional
         private Map<Integer, Boolean> customRetryForStatusCodes = null; // Optional
         private int threadCount = 50; // Optional
-        private CookieJar cookieJar = null; // Optional
         private ScheduledExecutorService requestExecutorService = null; // Optional
         private EmitterCallback callback = null; // Optional
 
@@ -177,18 +174,6 @@ public class BatchEmitter implements Emitter, Closeable {
         }
 
         /**
-         * Adds a custom CookieJar to be used with OkHttpClientAdapters.
-         * Will be ignored if a custom httpClientAdapter is provided.
-         *
-         * @param cookieJar the CookieJar to use
-         * @return itself
-         */
-        public T cookieJar(final CookieJar cookieJar) {
-            this.cookieJar = cookieJar;
-            return self();
-        }
-
-        /**
          * Provide a custom EmitterCallback to access successfully sent or failed event payloads.
          *
          * @param callback an EmitterCallback
@@ -201,8 +186,7 @@ public class BatchEmitter implements Emitter, Closeable {
 
         public BatchEmitter build() {
             NetworkConfiguration networkConfig = new NetworkConfiguration(collectorUrl)
-                    .httpClientAdapter(httpClientAdapter)
-                    .cookieJar(cookieJar);
+                    .httpClientAdapter(httpClientAdapter);
 
             EmitterConfiguration emitterConfig = new EmitterConfiguration()
                     .batchSize(batchSize)
@@ -240,8 +224,6 @@ public class BatchEmitter implements Emitter, Closeable {
      * @param emitterConfig an EmitterConfiguration object
      */
     public BatchEmitter(NetworkConfiguration networkConfig, EmitterConfiguration emitterConfig) {
-        OkHttpClient client;
-
         // Precondition checks
         if (emitterConfig.getThreadCount() <= 0) {
             throw new IllegalArgumentException("threadCount must be greater than 0");
@@ -258,18 +240,7 @@ public class BatchEmitter implements Emitter, Closeable {
         } else {
             Objects.requireNonNull(networkConfig.getCollectorUrl(), "Collector url must be specified if not using a httpClientAdapter");
 
-            if (networkConfig.getCookieJar() != null) {
-                client = new OkHttpClient.Builder()
-                        .cookieJar(networkConfig.getCookieJar())
-                        .build();
-            } else {
-                client = new OkHttpClient.Builder().build();
-            }
-
-            httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
-                    .url(networkConfig.getCollectorUrl())
-                    .httpClient(client)
-                    .build();
+            httpClientAdapter = new OkHttpClientAdapter(networkConfig.getCollectorUrl());
         }
 
         retryDelay = new AtomicInteger(0);

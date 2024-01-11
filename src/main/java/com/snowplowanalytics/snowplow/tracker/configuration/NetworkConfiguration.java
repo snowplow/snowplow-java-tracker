@@ -13,14 +13,12 @@
 package com.snowplowanalytics.snowplow.tracker.configuration;
 
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import okhttp3.CookieJar;
 
 
 public class NetworkConfiguration {
 
     private HttpClientAdapter httpClientAdapter = null; // Optional
     private String collectorUrl = null; // Required if not specifying a httpClientAdapter
-    private CookieJar cookieJar = null; // Optional
 
     // Getters and Setters
 
@@ -38,14 +36,6 @@ public class NetworkConfiguration {
      */
     public String getCollectorUrl() {
         return collectorUrl;
-    }
-
-    /**
-     * Returns the OkHttp CookieJar used for persisting cookies.
-     * @return CookieJar object
-     */
-    public CookieJar getCookieJar() {
-        return cookieJar;
     }
 
     // Constructors
@@ -92,18 +82,6 @@ public class NetworkConfiguration {
      */
     public NetworkConfiguration collectorUrl(String collectorUrl) {
         this.collectorUrl = collectorUrl;
-        return this;
-    }
-
-    /**
-     * Adds a custom CookieJar to be used with OkHttpClientAdapters.
-     * Will be ignored if a custom httpClientAdapter is provided.
-     *
-     * @param cookieJar the CookieJar to use
-     * @return itself
-     */
-    public NetworkConfiguration cookieJar(CookieJar cookieJar) {
-        this.cookieJar = cookieJar;
         return this;
     }
 }
