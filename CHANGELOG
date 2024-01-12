@@ -1,3 +1,17 @@
+Java 2.0.0 (2024-01-12)
+-----------------------
+Add builder methods Subject to allow method chaining (#303)
+Add okhttp adapter with cookie jar and remove cookie jar from network configuration (#361)
+Remove deprecated APIs (#373)
+Update to Apache Http Client to v5 (#364)
+Upgrade okhttp dependency to version 4.12 (#365)
+Bump slf4j-simple and slf4j-api to 2.0.11
+Bump junit-jupiter-api to 5.10.1
+Bump jackson-databind to 2.16.1
+Bump commons-net to 3.10
+Bump commons-codec to 1.16
+Update copyright headers in source files (#375)
+
 Java 1.0.1 (2023-11-06)
 -----------------------
 Fix Issue with OkHttpClientAdapter (#366) (thanks to @eusorov for the contribution!)

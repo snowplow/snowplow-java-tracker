@@ -86,7 +86,7 @@ public class Main {
             .quantity(2)
             .name("name")
             .category("category")
-            .currency("currency")
+            .currency("EUR")
             .customContext(context)
             .build();
 
@@ -100,7 +100,7 @@ public class Main {
             .city("city")
             .state("state")
             .country("country")
-            .currency("currency")
+            .currency("EUR")
             .items(item) // EcommerceTransactionItem events are added to a parent EcommerceTransaction here
             .customContext(context)
             .build();

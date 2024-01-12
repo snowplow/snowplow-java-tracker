@@ -16,9 +16,9 @@ test {
 }
 
 dependencies {
-    implementation 'com.snowplowanalytics:snowplow-java-tracker:1.+'
+    implementation 'com.snowplowanalytics:snowplow-java-tracker:2.+'
 
-    implementation ('com.snowplowanalytics:snowplow-java-tracker:1.+') {
+    implementation ('com.snowplowanalytics:snowplow-java-tracker:2.+') {
         capabilities {
             requireCapability 'com.snowplowanalytics:snowplow-java-tracker-okhttp-support'
         }
