@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -45,57 +45,8 @@ public class OkHttpClientAdapter extends AbstractHttpClientAdapter {
         this.httpClient = httpClient;
     }
 
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param <T> Builder
-     */
-    @Deprecated
-    public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
-
-        private OkHttpClient httpClient; // Required
-
-        /**
-         * @param httpClient The OkHTTP Client to use
-         * @return itself
-         */
-        public T httpClient(OkHttpClient httpClient) {
-            this.httpClient = httpClient;
-            return self();
-        }
-
-        public OkHttpClientAdapter build() {
-            return new OkHttpClientAdapter(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @return Builder object
-     */
-    @Deprecated
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param builder Builder object
-     */
-    @Deprecated
-    protected OkHttpClientAdapter(Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Objects.requireNonNull(builder.httpClient);
-
-        httpClient = builder.httpClient;
+    public OkHttpClientAdapter(String url) {
+        this(url, new OkHttpClient.Builder().build());
     }
 
     /**

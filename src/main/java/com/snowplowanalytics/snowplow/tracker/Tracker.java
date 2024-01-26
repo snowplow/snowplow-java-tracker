@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -68,87 +68,6 @@ public class Tracker {
      */
     public Tracker(TrackerConfiguration trackerConfig, Emitter emitter) {
         this(trackerConfig, emitter, null);
-    }
-
-    /**
-     * Builder for the Tracker
-     * @deprecated Use TrackerConfiguration class instead
-     */
-    @Deprecated
-    public static class TrackerBuilder {
-
-        private final Emitter emitter; // Required
-        private final String namespace; // Required
-        private final String appId; // Required
-        private Subject subject = null; // Optional
-        private DevicePlatform platform = DevicePlatform.ServerSideApp; // Optional
-        private boolean base64Encoded = true; // Optional
-
-        /**
-         * @param emitter Emitter to which events will be sent
-         * @param namespace Identifier for the Tracker instance
-         * @param appId Application ID
-         */
-        public TrackerBuilder(Emitter emitter, String namespace, String appId) {
-            this.emitter = emitter;
-            this.namespace = namespace;
-            this.appId = appId;
-        }
-
-        /**
-         * @param subject Subject to be tracked
-         * @return itself
-         */
-        public TrackerBuilder subject(Subject subject) {
-            this.subject = subject;
-            return this;
-        }
-
-        /**
-         * The {@link DevicePlatform} the tracker is running on (default is "srv", ServerSideApp).
-         *
-         * @param platform The device platform the tracker is running on
-         * @return itself
-         */
-        public TrackerBuilder platform(DevicePlatform platform) {
-            this.platform = platform;
-            return this;
-        }
-
-        /**
-         * Whether JSONs in the payload should be base-64 encoded (default is true)
-         *
-         * @param base64 JSONs should be encoded or not
-         * @return itself
-         */
-        public TrackerBuilder base64(Boolean base64) {
-            this.base64Encoded = base64;
-            return this;
-        }
-
-        /**
-         * Creates a new Tracker
-         *
-         * @return a new Tracker object
-         */
-        public Tracker build() {
-            TrackerConfiguration trackerConfig = new TrackerConfiguration(namespace, appId)
-                    .platform(platform)
-                    .base64Encoded(base64Encoded);
-            return new Tracker(trackerConfig, emitter, subject);
-        }
-    }
-
-    /**
-     * @deprecated Use TrackerConfiguration class instead
-     * @param emitter Emitter object
-     * @param namespace unique tracker namespace
-     * @param appId application ID
-     * @return TrackerBuilder object
-     */
-    @Deprecated
-    public static TrackerBuilder builder(Emitter emitter, String namespace, String appId) {
-        return new TrackerBuilder(emitter, namespace, appId);
     }
 
     // --- Setters

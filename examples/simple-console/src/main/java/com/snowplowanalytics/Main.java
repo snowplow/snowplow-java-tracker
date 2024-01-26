@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -86,7 +86,7 @@ public class Main {
             .quantity(2)
             .name("name")
             .category("category")
-            .currency("currency")
+            .currency("EUR")
             .customContext(context)
             .build();
 
@@ -100,7 +100,7 @@ public class Main {
             .city("city")
             .state("state")
             .country("country")
-            .currency("currency")
+            .currency("EUR")
             .items(item) // EcommerceTransactionItem events are added to a parent EcommerceTransaction here
             .customContext(context)
             .build();

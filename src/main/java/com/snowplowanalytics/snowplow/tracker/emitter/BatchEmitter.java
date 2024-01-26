@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -29,8 +29,6 @@ import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-import okhttp3.CookieJar;
-import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,185 +61,12 @@ public class BatchEmitter implements Emitter, Closeable {
     private final EmitterCallback callback;
 
     /**
-     * @deprecated Use NetworkConfiguration/EmitterConfiguration classes instead
-     * @param <T> Builder
-     */
-    @Deprecated
-    public static abstract class Builder<T extends Builder<T>> {
-        protected abstract T self();
-
-        private HttpClientAdapter httpClientAdapter; // Optional
-        private String collectorUrl = null; // Required if not specifying a httpClientAdapter
-        private int batchSize = 50; // Optional
-        private int bufferCapacity = 10000;
-        private EventStore eventStore = null;  // Optional
-        private Map<Integer, Boolean> customRetryForStatusCodes = null; // Optional
-        private int threadCount = 50; // Optional
-        private CookieJar cookieJar = null; // Optional
-        private ScheduledExecutorService requestExecutorService = null; // Optional
-        private EmitterCallback callback = null; // Optional
-
-        /**
-         * Adds a custom HttpClientAdapter to the Emitter (default is OkHttpClientAdapter).
-         *
-         * @param httpClientAdapter the adapter to use
-         * @return itself
-         */
-        public T httpClientAdapter(final HttpClientAdapter httpClientAdapter) {
-            this.httpClientAdapter = httpClientAdapter;
-            return self();
-        }
-
-
-        /**
-         * Sets the emitter url for when a httpClientAdapter is not specified.
-         * It will be used to create the default OkHttpClientAdapter.
-         *
-         * @param collectorUrl the url for the default httpClientAdapter
-         * @return itself
-         */
-        public T url(final String collectorUrl) {
-            this.collectorUrl = collectorUrl;
-            return self();
-        }
-
-        /**
-         * The default batch size is 50.
-         *
-         * @param batchSize The count of events to send in one HTTP request
-         * @return itself
-         */
-        public T batchSize(final int batchSize) {
-            this.batchSize = batchSize;
-            return self();
-        }
-
-        /**
-         * The default buffer capacity is 10 000 events.
-         * When the buffer is full (due to network outage), new events are lost.
-         *
-         * @param bufferCapacity The maximum capacity of the default InMemoryEventStore event buffer
-         * @return itself
-         */
-        public T bufferCapacity(final int bufferCapacity) {
-            this.bufferCapacity = bufferCapacity;
-            return self();
-        }
-
-        /**
-         * The default EventStore is InMemoryEventStore.
-         *
-         * @param eventStore The EventStore to use
-         * @return itself
-         */
-        public T eventStore(final EventStore eventStore) {
-            this.eventStore = eventStore;
-            return self();
-        }
-
-        /**
-         * Set custom retry rules for HTTP status codes received in emit responses from the Collector.
-         * By default, retry will not occur for status codes 400, 401, 403, 410 or 422. This can be overridden here.
-         * Note that 2xx codes will never retry as they are considered successful.
-         * @param customRetryForStatusCodes Mapping of integers (status codes) to booleans (true for retry and false for not retry)
-         * @return itself
-         */
-        public T customRetryForStatusCodes(Map<Integer, Boolean> customRetryForStatusCodes) {
-            this.customRetryForStatusCodes = customRetryForStatusCodes;
-            return self();
-        }
-
-        /**
-         * Sets the Thread Count for the ScheduledExecutorService (default is 50).
-         *
-         * @param threadCount the size of the thread pool
-         * @return itself
-         */
-        public T threadCount(final int threadCount) {
-            this.threadCount = threadCount;
-            return self();
-        }
-
-        /**
-         * Set a custom ScheduledExecutorService to send http requests (default is ScheduledThreadPoolExecutor).
-         * <p>
-         * <b>Implementation note: </b><em>Be aware that calling `close()` on a BatchEmitter instance
-         * has a side-effect and will shutdown that ExecutorService.</em>
-         *
-         * @param requestExecutorService the ScheduledExecutorService to use
-         * @return itself
-         */
-        public T requestExecutorService(final ScheduledExecutorService requestExecutorService) {
-            this.requestExecutorService = requestExecutorService;
-            return self();
-        }
-
-        /**
-         * Adds a custom CookieJar to be used with OkHttpClientAdapters.
-         * Will be ignored if a custom httpClientAdapter is provided.
-         *
-         * @param cookieJar the CookieJar to use
-         * @return itself
-         */
-        public T cookieJar(final CookieJar cookieJar) {
-            this.cookieJar = cookieJar;
-            return self();
-        }
-
-        /**
-         * Provide a custom EmitterCallback to access successfully sent or failed event payloads.
-         *
-         * @param callback an EmitterCallback
-         * @return itself
-         */
-        public T callback(final EmitterCallback callback) {
-            this.callback = callback;
-            return self();
-        }
-
-        public BatchEmitter build() {
-            NetworkConfiguration networkConfig = new NetworkConfiguration(collectorUrl)
-                    .httpClientAdapter(httpClientAdapter)
-                    .cookieJar(cookieJar);
-
-            EmitterConfiguration emitterConfig = new EmitterConfiguration()
-                    .batchSize(batchSize)
-                    .bufferCapacity(bufferCapacity)
-                    .eventStore(eventStore)
-                    .customRetryForStatusCodes(customRetryForStatusCodes)
-                    .threadCount(threadCount)
-                    .requestExecutorService(requestExecutorService)
-                    .callback(callback);
-
-            return new BatchEmitter(networkConfig, emitterConfig);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    /**
-     * @deprecated Use NetworkConfiguration/EmitterConfiguration classes instead
-     * @return Builder object
-     */
-    @Deprecated
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    /**
      * Creates a BatchEmitter object from configuration objects.
      *
      * @param networkConfig a NetworkConfiguration object
      * @param emitterConfig an EmitterConfiguration object
      */
     public BatchEmitter(NetworkConfiguration networkConfig, EmitterConfiguration emitterConfig) {
-        OkHttpClient client;
-
         // Precondition checks
         if (emitterConfig.getThreadCount() <= 0) {
             throw new IllegalArgumentException("threadCount must be greater than 0");
@@ -258,18 +83,7 @@ public class BatchEmitter implements Emitter, Closeable {
         } else {
             Objects.requireNonNull(networkConfig.getCollectorUrl(), "Collector url must be specified if not using a httpClientAdapter");
 
-            if (networkConfig.getCookieJar() != null) {
-                client = new OkHttpClient.Builder()
-                        .cookieJar(networkConfig.getCookieJar())
-                        .build();
-            } else {
-                client = new OkHttpClient.Builder().build();
-            }
-
-            httpClientAdapter = OkHttpClientAdapter.builder() // use okhttp as a default
-                    .url(networkConfig.getCollectorUrl())
-                    .httpClient(client)
-                    .build();
+            httpClientAdapter = new OkHttpClientAdapter(networkConfig.getCollectorUrl());
         }
 
         retryDelay = new AtomicInteger(0);

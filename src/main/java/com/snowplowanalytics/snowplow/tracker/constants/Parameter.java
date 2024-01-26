@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -29,9 +29,6 @@ public class Parameter {
     public static final String DEVICE_CREATED_TIMESTAMP = "dtm";
     public static final String DEVICE_SENT_TIMESTAMP = "stm";
 
-    /** deprecated Indicate the specific timestamp to use. This is kept for compatibility with older versions. */
-    @Deprecated
-    public static final String TIMESTAMP = DEVICE_CREATED_TIMESTAMP;
     public static final String TRACKER_VERSION = "tv";
     public static final String APP_ID = "aid";
     public static final String NAMESPACE = "tna";

@@ -52,7 +52,7 @@ $ java -jar ./build/libs/simple-console-all-0.0.1.jar "http://<your-collector-do
 
 ## Copyright and license
 
-The Snowplow Java Tracker is copyright 2014-2020 Snowplow Analytics Ltd.
+The Snowplow Java Tracker is copyright 2014-present Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0][license]** (the "License");
 you may not use this software except in compliance with the License.

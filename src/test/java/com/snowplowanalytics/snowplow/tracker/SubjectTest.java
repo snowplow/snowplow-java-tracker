@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -111,6 +111,34 @@ public class SubjectTest {
         expected.put("uid", "user1");
 
         assertEquals(expected, subject.getSubject());
+    }
+
+    @Test
+    public void testBuilderMethods() {
+        Subject subject = new Subject();
+        subject
+            .userId("user1")
+            .screenResolution(100, 150)
+            .viewPort(150, 100)
+            .colorDepth(10)
+            .timezone("America/Toronto")
+            .language("EN")
+            .ipAddress("127.0.0.1")
+            .useragent("useragent")
+            .domainUserId("duid")
+            .domainSessionId("sessionid")
+            .networkUserId("nuid");
+        assertEquals("user1", subject.getSubject().get("uid"));
+        assertEquals("100x150", subject.getSubject().get("res"));
+        assertEquals("150x100", subject.getSubject().get("vp"));
+        assertEquals("10", subject.getSubject().get("cd"));
+        assertEquals("America/Toronto", subject.getSubject().get("tz"));
+        assertEquals("EN", subject.getSubject().get("lang"));
+        assertEquals("127.0.0.1", subject.getSubject().get("ip"));
+        assertEquals("useragent", subject.getSubject().get("ua"));
+        assertEquals("duid", subject.getSubject().get("duid"));
+        assertEquals("sessionid", subject.getSubject().get("sid"));
+        assertEquals("nuid", subject.getSubject().get("tnuid"));
     }
 
     @Test

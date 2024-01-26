@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -23,7 +23,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -145,13 +145,7 @@ public class HttpClientAdapterTest {
 
     @Test
     public void testRequestWithCookies() throws IOException, InterruptedException {
-        OkHttpClient httpClient = new OkHttpClient.Builder()
-                .connectTimeout(1, TimeUnit.SECONDS)
-                .readTimeout(1, TimeUnit.SECONDS)
-                .writeTimeout(1, TimeUnit.SECONDS)
-                .cookieJar(new CollectorCookieJar())
-                .build();
-        adapter = new OkHttpClientAdapter(mockWebServer.url("/").toString(), httpClient);
+        adapter = new OkHttpClientWithCookieJarAdapter(mockWebServer.url("/").toString());
 
         mockWebServer.enqueue(new MockResponse().addHeader("Set-Cookie", "sp=test"));
 

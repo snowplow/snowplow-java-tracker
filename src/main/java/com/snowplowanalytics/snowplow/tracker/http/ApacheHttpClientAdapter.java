@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -12,12 +12,11 @@
  */
 package com.snowplowanalytics.snowplow.tracker.http;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,59 +44,6 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
     }
 
     /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param <T> Builder
-     */
-    @Deprecated
-    public static abstract class Builder<T extends Builder<T>> extends AbstractHttpClientAdapter.Builder<T> {
-
-        private CloseableHttpClient httpClient; // Required
-
-        /**
-         * @param httpClient The Apache HTTP Client to use
-         * @return itself
-         */
-        public T httpClient(CloseableHttpClient httpClient) {
-            this.httpClient = httpClient;
-            return self();
-        }
-
-        public ApacheHttpClientAdapter build() {
-            return new ApacheHttpClientAdapter(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @return Builder object
-     */
-    @Deprecated
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param builder Builder object
-     */
-    @Deprecated
-    protected ApacheHttpClientAdapter(Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Objects.requireNonNull(builder.httpClient);
-
-        this.httpClient = builder.httpClient;
-    }
-
-    /**
      * Returns the HttpClient in use; it is up to the developer
      * to cast it back to its original class.
      *
@@ -117,9 +63,9 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
     public int doGet(String url) {
         try {
             HttpGet httpGet = new HttpGet(url);
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            httpGet.releaseConnection();
-            return httpResponse.getStatusLine().getStatusCode();
+            return httpClient.execute(httpGet, response -> {
+                return response.getCode();
+            });
         } catch (Exception e) {
             LOGGER.error("ApacheHttpClient GET Request failed: {}", e.getMessage());
             return -1;
@@ -140,9 +86,9 @@ public class ApacheHttpClientAdapter extends AbstractHttpClientAdapter {
             httpPost.addHeader("Content-Type", Constants.POST_CONTENT_TYPE);
             StringEntity params = new StringEntity(payload, ContentType.APPLICATION_JSON);
             httpPost.setEntity(params);
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-            httpPost.releaseConnection();
-            return httpResponse.getStatusLine().getStatusCode();
+            return httpClient.execute(httpPost, response -> {
+                return response.getCode();
+            });
         } catch (Exception e) {
             LOGGER.error("ApacheHttpClient POST Request failed: {}", e.getMessage());
             return -1;

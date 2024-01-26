@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -26,58 +26,6 @@ public abstract class AbstractHttpClientAdapter implements HttpClientAdapter {
 
     public AbstractHttpClientAdapter(String url) {
         this.url = url.replaceFirst("/*$", "");
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param <T> Builder
-     */
-    @Deprecated
-    public static abstract class Builder<T extends Builder<T>> {
-
-        private String url; // Required
-        protected abstract T self();
-
-        /**
-         * Adds a URI to the Client Adapter
-         *
-         * @param url the emitter url
-         * @return itself
-         */
-        public T url(String url) {
-            this.url = url.replaceFirst("/*$", "");
-            return self();
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @return Builder object
-     */
-    @Deprecated
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    /**
-     * @deprecated Create HttpClientAdapter directly instead
-     * @param builder Builder object
-     */
-    @Deprecated
-    protected AbstractHttpClientAdapter(Builder<?> builder) {
-        // Precondition checks
-        if (!Utils.isValidUrl(builder.url)) {
-            throw new IllegalArgumentException();
-        }
-
-        this.url = builder.url;
     }
 
     /**

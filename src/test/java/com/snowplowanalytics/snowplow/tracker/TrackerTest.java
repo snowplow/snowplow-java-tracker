@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2014-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.*;
 import static java.util.Collections.singletonList;
 
-import com.snowplowanalytics.snowplow.tracker.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.tracker.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
@@ -577,7 +576,7 @@ public class TrackerTest {
     @Test
     public void testGetTrackerVersion() {
         Tracker tracker = new Tracker(new TrackerConfiguration("namespace", "an-app-id"), mockEmitter);
-        assertEquals("java-1.0.1", tracker.getTrackerVersion());
+        assertEquals("java-2.0.0", tracker.getTrackerVersion());
     }
 
     @Test
