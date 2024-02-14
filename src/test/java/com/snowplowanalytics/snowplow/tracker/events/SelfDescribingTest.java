@@ -1,7 +1,8 @@
 package com.snowplowanalytics.snowplow.tracker.events;
 
-// JUnit
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+
+// JUnit
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
