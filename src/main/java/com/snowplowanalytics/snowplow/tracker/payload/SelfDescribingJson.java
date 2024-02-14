@@ -198,4 +198,19 @@ public class SelfDescribingJson implements Payload {
     public String toString() {
         return Utils.mapToJSONString(payload);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SelfDescribingJson that = (SelfDescribingJson) o;
+
+        return payload.equals(that.payload);
+    }
+
+    @Override
+    public int hashCode() {
+        return payload.hashCode();
+    }
 }
