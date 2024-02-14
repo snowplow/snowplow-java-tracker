@@ -67,4 +67,30 @@ public class SelfDescribingJsonTest {
         assertNotNull(sdj);
         assertEquals(expected, sdjString);
     }
+
+    @Test
+    public void testEqualityOfTwoInstances_withSchemaNameOnly() {
+        SelfDescribingJson a = new SelfDescribingJson("schema");
+        SelfDescribingJson b = new SelfDescribingJson("schema");
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void testEqualityOfTwoInstances_withTrackerPayload() {
+        TrackerPayload nestedData = new TrackerPayload();
+        nestedData.add("key", "value");
+        SelfDescribingJson a = new SelfDescribingJson("schema", nestedData);
+        SelfDescribingJson b = new SelfDescribingJson("schema", nestedData);
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void testEqualityOfTwoInstances_withNestedEvent() {
+        TrackerPayload nestedData = new TrackerPayload();
+        nestedData.add("key", "value");
+        SelfDescribingJson nestedEvent = new SelfDescribingJson("nested_event", nestedData);
+        SelfDescribingJson a = new SelfDescribingJson("schema", nestedEvent);
+        SelfDescribingJson b = new SelfDescribingJson("schema", nestedEvent);
+        assertEquals(a, b);
+    }
 }

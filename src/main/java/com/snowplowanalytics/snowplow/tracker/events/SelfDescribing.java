@@ -95,4 +95,22 @@ public class SelfDescribing extends AbstractEvent {
                 Parameter.SELF_DESCRIBING_ENCODED, Parameter.SELF_DESCRIBING);
         return putTrueTimestamp(payload);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SelfDescribing that = (SelfDescribing) o;
+
+        if (base64Encode != that.base64Encode) return false;
+        return Objects.equals(eventData, that.eventData);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = eventData != null ? eventData.hashCode() : 0;
+        result = 31 * result + (base64Encode ? 1 : 0);
+        return result;
+    }
 }
