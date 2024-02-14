@@ -1,3 +1,8 @@
+Java 2.1.0 (2024-02-14)
+-----------------------
+Add support for serializing DateTime in self-describing data (#378) (thanks to @stephen-murby for the contribution!)
+Add equality functions for SelfDescribing and SelfDescribingJson so that they can be compared in unit tests (#380) (thanks to @stephen-murby for the contribution!)
+
 Java 2.0.0 (2024-01-12)
 -----------------------
 Add builder methods Subject to allow method chaining (#303)
