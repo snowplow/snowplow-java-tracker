@@ -18,8 +18,8 @@ import java.util.Map;
 
 // JUnit
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import static org.junit.Assert.*;
 
 public class SelfDescribingJsonTest {
 
@@ -92,5 +92,39 @@ public class SelfDescribingJsonTest {
         SelfDescribingJson a = new SelfDescribingJson("schema", nestedEvent);
         SelfDescribingJson b = new SelfDescribingJson("schema", nestedEvent);
         assertEquals(a, b);
+    }
+
+    @Test
+    public void testNegativeEqualityOfTwoInstances_withSchemaNameOnly() {
+        SelfDescribingJson a = new SelfDescribingJson("schema-one");
+        SelfDescribingJson b = new SelfDescribingJson("schema-two");
+        assertNotEquals(a, b);
+    }
+
+    @Test
+    public void testNegativeEqualityOfTwoInstances_withTrackerPayload() {
+        TrackerPayload nestedDataOne = new TrackerPayload();
+        nestedDataOne.add("key", "value-one");
+        TrackerPayload nestedDataTwo = new TrackerPayload();
+        nestedDataTwo.add("key", "value-two");
+        SelfDescribingJson a = new SelfDescribingJson("schema", nestedDataOne);
+        SelfDescribingJson b = new SelfDescribingJson("schema", nestedDataTwo);
+        assertNotEquals(a, b);
+    }
+
+    @Test
+    public void testNegativeEqualityOfTwoInstances_withNestedEvent() {
+        TrackerPayload nestedDataOne = new TrackerPayload();
+        nestedDataOne.add("key", "value-one");
+        SelfDescribingJson nestedEventOne = new SelfDescribingJson("nested_event", nestedDataOne);
+
+        TrackerPayload nestedDataTwo = new TrackerPayload();
+        nestedDataTwo.add("key", "value-two");
+        SelfDescribingJson nestedEventTwo = new SelfDescribingJson("nested_event", nestedDataTwo);
+
+
+        SelfDescribingJson a = new SelfDescribingJson("schema", nestedEventOne);
+        SelfDescribingJson b = new SelfDescribingJson("schema", nestedEventTwo);
+        assertNotEquals(a, b);
     }
 }
