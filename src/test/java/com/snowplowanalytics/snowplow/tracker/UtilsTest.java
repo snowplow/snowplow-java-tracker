@@ -17,6 +17,8 @@ import org.junit.Test;
 
 // Java
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -68,6 +70,14 @@ public class UtilsTest {
         Map<String, Object> payload2 = new LinkedHashMap<>();
         payload2.put("k1", new Object());
         assertEquals("", Utils.mapToJSONString(payload2));
+
+        Map<String, Object> payload3 = new LinkedHashMap<>();
+        payload3.put("k1", LocalDateTime.of(2020, 1, 1, 0, 0));
+        assertEquals("{\"k1\":\"2020-01-01T00:00:00\"}", Utils.mapToJSONString(payload3));
+
+        Map<String, Object> payload4 = new LinkedHashMap<>();
+        payload4.put("k1", LocalDate.of(2020, 1, 1));
+        assertEquals("{\"k1\":\"2020-01-01\"}", Utils.mapToJSONString(payload4));
     }
 
     @Test
